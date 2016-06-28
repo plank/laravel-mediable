@@ -29,16 +29,16 @@ class SourceAdapterFactory{
      */
     public function create($source)
     {
-        $adapter = null;
-        if(is_object($source)){
-            $adapter = $this->adaptClass($source);
+        if($source instanceof SourceAdapterInterface){
+            return $source;
+        }
+        else if(is_object($source)){
+            $class = $this->adaptClass($source);
+            return new $class($source);
         }
         else if(is_string($source)){
-            $adapter = $this->adaptString($source);
-        }
-
-        if($adapter){
-            return new $adapter($source);
+            $class = $this->adaptString($source);
+            return new $class($source);
         }
 
         throw MediaUploadException::unrecognizedSource($source);

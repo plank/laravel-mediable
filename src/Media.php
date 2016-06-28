@@ -22,7 +22,7 @@ class Media extends Model
     const TYPE_OTHER = 'other';
     const TYPE_ALL = 'all';
 
-    protected $guarded = ['id', 'disk', 'directory', 'basename', 'size', 'mime', 'type'];
+    protected $guarded = ['id', 'disk', 'directory', 'filename', 'extension' 'size', 'mime', 'type'];
 
     /**
      * {@inheritDoc}
@@ -60,18 +60,9 @@ class Media extends Model
      * Retrieve the file extension
      * @return string
      */
-    public function getExtensionAttribute()
+    public function getBasenameAttribute()
     {
-        return pathinfo($this->basename, PATHINFO_EXTENSION);
-    }
-
-    /**
-     * Retrieve the file name
-     * @return string
-     */
-    public function getFilenameAttribute()
-    {
-        return pathinfo($this->basename, PATHINFO_FILENAME);
+        return $this->filename . '.' $this->extension;
     }
 
     /**
@@ -101,6 +92,20 @@ class Media extends Model
     public function scopeInOrUnderDirectory(Builder $q, $disk, $directory)
     {
         $q->inDirectory($disk, $directory, true);
+    }
+
+    public function scopeWhereBasename($basename)
+    {
+        $q->where('filename', pathinfo($basename, PATHINFO_FILENAME))
+            ->where('extension', pathinfo($basename), PATHINFO_EXTENSION);
+    }
+
+    public function scopeForPathOnDisk($disk, $path)
+    {
+        $q->where('disk', $disk)
+            ->where('directory', pathinfo($path, PATHINFO_DIRNAME))
+            ->where('filename', pathinfo($path, PATHINFO_FILENAME))
+            ->where('extension', pathinfo($path), PATHINFO_EXTENSION);
     }
 
     /**
@@ -235,7 +240,7 @@ class Media extends Model
      */
     public function fileExists()
     {
-        return $this->filesystem()->has($this->diskPath());
+        return $this->storage()->has($this->diskPath());
     }
 
     /**
@@ -243,31 +248,29 @@ class Media extends Model
      *
      * Will invoke the `save()` method on the model after the associated file has been moved to prevent synchronization errors
      * @param  string $destination directory relative to disk root
-     * @param  string $name        filename. Extension may be ommitted
+     * @param  string $name        filename. Do not include extension
      * @throws  MediaMoveException If attempting to change the file extension or a file with the same name already exists at the destination
      */
-    public function move($destination, $name = null)
+    public function move($destination, $filename = null)
     {
-        if (!$name) {
-            $name = $this->basename;
+        if (!$filename) {
+            $filename = $this->filename;
         }
 
-        $extension = pathinfo($name, PATHINFO_EXTENSION);
-        if (!$extension) {
-            $name .= '.'.$this->extension;
-        } elseif ($extension != $this->extension) {
-            throw MediaMoveException::cannotChangeExtension($this->extension, $extension);
+        //remove extension from filename
+        if(mb_strrpos($filename, '.' . $this->extension) === mb_strlen($filename) - mb_strlen($this->extension) -1){
+            $filename = mb_substr(0, mb_strlen($filename) - mb_strlen($this->extension) -1);
         }
 
         $destination = trim($destination, '/');
-        $target_path = $destination . '/' . $name;
+        $target_path = $destination . '/' . $filename . '.' . $this->extension;
 
-        if ($this->filesystem()->has($target_path)) {
+        if ($this->storage()->has($target_path)) {
             throw MediaMoveException::destinationExists($target_path);
         }
 
-        $this->filesystem()->move($this->diskPath(), $target_path);
-        $this->basename = $name;
+        $this->storage()->move($this->diskPath(), $target_path);
+        $this->filename = $filename;
         $this->directory = $destination;
         $this->save();
     }
@@ -277,9 +280,9 @@ class Media extends Model
      * @param  string $name
      * @see Media::move()
      */
-    public function rename($name)
+    public function rename($filename)
     {
-        $this->move($this->directory, $name);
+        $this->move($this->directory, $filename);
     }
 
     /**
@@ -288,14 +291,14 @@ class Media extends Model
      */
     public function contents()
     {
-        return $this->filesystem()->get($this->diskPath());
+        return $this->storage()->get($this->diskPath());
     }
 
     /**
      * Get the filesystem object for this media
      * @return \Illuminate\Contracts\Filesystem\Filesystem
      */
-    protected function filesystem()
+    protected function storage()
     {
         return app('filesystem')->disk($this->disk);
     }

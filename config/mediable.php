@@ -24,6 +24,16 @@ return [
     'max_size' => 1024 * 1024 * 10,
 
     /*
+     * What to do if a duplicate file is uploaded. Options include:
+     *
+     * * 'increment': the new file's name is given an incrementing suffix
+     * * 'replace' : the old file and media model is deleted
+     * * 'error': an Exception is thrown
+     *
+     */
+    'on_duplicate' => 'increment',
+
+    /*
      * Reject files unless both their mime and extension are recognized and match
      */
     'strict_type_checking' => false,
@@ -35,7 +45,7 @@ return [
     'allow_unrecognized_types' => false,
 
     /**
-     * List of recognized mime types and extensions
+     * Global list of recognized mime types and extensions
      */
     'type_map' => [
         'mimes' => [

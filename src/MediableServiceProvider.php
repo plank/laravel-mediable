@@ -64,12 +64,12 @@ class MediableServiceProvider extends ServiceProvider
     }
 
     /**
-     * Bind and instance of the Uploader to the container
+     * Bind the Media Uploader to the container
      * @return void
      */
     public function registerUploader(){
-        $this->app->singleton('mediable.uploader', function(Container $app){
-            return new MediaUploader($this->app['filesystem'], $this->app['mediable.factory']);
+        $this->app->bind('mediable.uploader', function(Container $app){
+            return new MediaUploader($this->app['filesystem'], $this->app['mediable.factory'], $this->app['config']['mediable']);
         });
         $this->app->alias('mediable.uploader', MediaUploader::class);
     }

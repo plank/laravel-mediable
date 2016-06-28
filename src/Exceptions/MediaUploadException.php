@@ -9,7 +9,16 @@ class MediaUploadException extends Exception
     public static function unrecognizedSource($source)
     {
         $source = is_object($source) ? get_class($source) : (string)$source;
-        return new static("Could not recognize source, `{$source}` provided");
+        return new static("Could not recognize source, `{$source}` provided.");
+    }
+
+    public static function noSourceProvided(){
+        return new static("No source provided for upload.");
+    }
+
+    public static function diskNotAllowed($disk)
+    {
+        return new static("The disk `{$disk}` is not in the allowed disks for media.")
     }
 
     public static function CannotSetAdapter($class)
@@ -22,6 +31,11 @@ class MediaUploadException extends Exception
         return new static("File `{$path}` does not exist.");
     }
 
+    public static function fileExists($path)
+    {
+        return new static("A file already exists at `{$path}`.");
+    }
+
     public static function strictTypeMismatch($mime, $ext)
     {
         return new static("File with mime of `{$mime}` not recognized for extension `{$ext}`.");
@@ -32,20 +46,32 @@ class MediaUploadException extends Exception
         return new static("File with mime of `{$mime}` and extension `{$ext}` is not permitted.");
     }
 
+    public static function mimeRestricted($mime, $allowed_mimes)
+    {
+        $allowed = implode("`, `", $allowed_mimes);
+        return new static("Cannot upload file with MIME type `{$mime}`. Only the `{$allowed}` MIME type(s) are permitted.");
+    }
+
+    public static function extensionRestricter($extension, $allowed_extensions)
+    {
+        $allowed = implode("`, `", $allowed_extensions);
+        return new static("Cannot upload file with extension `{$extension}`. Only the `{$allowed}` extension(s) are permitted.");
+    }
+
     public static function typeRestricted($type, $allowed_types)
     {
         $allowed = implode("`, `", $allowed_types);
-        return new static("Cannot upload file of type `{$type}`. Only files of type(s) `{$allowed}` are permitted.");
+        return new static("Cannot upload file of media type `{$type}`. Only files of type(s) `{$allowed}` are permitted.");
     }
 
-    public static function fileIsTooBig($size)
+    public static function fileIsTooBig($size, $max)
     {
         $size = bytestring($size);
-        $max = bytestring(config('admin.media.max_size'));
+        $max = bytestring($max);
         return new static("File is too big ({$size}). Maximum upload size is {$max}.");
     }
 
-    public static function missingWritePermissions($disk, $path)
+    public static function directoryNotWritable($disk, $path)
     {
         return new static("Unable to write to `{$path}` on filesystem `{$disk}`.");
     }
