@@ -13,6 +13,7 @@ class TestCase extends BaseTestCase
     public function setUp()
     {
         parent::setUp();
+        $this->withFactories(__DIR__.'/factories');
         $this->resetDatabase();
     }
 
