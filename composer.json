@@ -16,6 +16,7 @@
         "illuminate/database": "~5.0"
     },
     "require-dev": {
+        "orchestra/testbench": "~3.0",
         "phpunit/phpunit": "~4.0"
     },
     "suggest": {
@@ -26,5 +27,6 @@
             "Frasmage\\Mediable\\": "src/"
         }
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
