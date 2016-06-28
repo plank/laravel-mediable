@@ -7,9 +7,8 @@ use Illuminate\Database\Eloquent\Builder;
 /**
  * HasMedia Trait
  *
- * Provides implementation of the HasMedia Interface
  */
-trait MediableTrait
+trait Mediable
 {
 
     /**
