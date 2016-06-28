@@ -278,8 +278,8 @@ class MediaUploader
      */
     public function inferMediaTypeFromMime($mime)
     {
-        foreach($this->config['type_map']['mimes'] as $type => $mimes){
-            if(in_array($mime, $mimes)){
+        foreach($this->config['types'] as $type => $attributes){
+            if(in_array($mime, $attributes['mime_types'])){
                 return $type;
             }
         }
@@ -293,8 +293,8 @@ class MediaUploader
      */
     public function inferMediaTypeFromExtension($extension)
     {
-        foreach($this->config['type_map']['extensions'] as $type => $extensions){
-            if(in_array($extension, $extensions)){
+        foreach($this->config['types'] as $type => $attributes){
+            if(in_array($extension, $attributes['extensions'])){
                 return $type;
             }
         }

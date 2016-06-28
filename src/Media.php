@@ -19,6 +19,7 @@ class Media extends Model
     const TYPE_AUDIO = 'audio';
     const TYPE_ARCHIVE = 'archive';
     const TYPE_DOCUMENT = 'document';
+    const TYPE_SPREADSHEET = 'spreadsheer';
     const TYPE_OTHER = 'other';
     const TYPE_ALL = 'all';
 

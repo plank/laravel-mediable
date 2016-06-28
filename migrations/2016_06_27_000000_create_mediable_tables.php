@@ -14,11 +14,11 @@ class CreateMediableTables extends Migration
     {
         Schema::create('media', function(Blueprint $table){
             $table->increments('id')->primary();
-            $table->string('disk');
+            $table->string('disk', 32);
             $table->string('directory');
             $table->string('filename');
             $table->string('extension', 32);
-            $table->string('mime', 64);
+            $table->string('mime', 128);
             $table->string('type', 32);
             $table->integer('size')->unsigned();
             $table->timestamps();
