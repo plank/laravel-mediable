@@ -23,7 +23,7 @@ class Media extends Model
     const TYPE_OTHER = 'other';
     const TYPE_ALL = 'all';
 
-    protected $guarded = ['id', 'disk', 'directory', 'filename', 'extension' 'size', 'mime', 'type'];
+    protected $guarded = ['id', 'disk', 'directory', 'filename', 'extension', 'size', 'mime', 'type'];
 
     /**
      * {@inheritDoc}
@@ -63,7 +63,7 @@ class Media extends Model
      */
     public function getBasenameAttribute()
     {
-        return $this->filename . '.' $this->extension;
+        return $this->filename . '.' . $this->extension;
     }
 
     /**
@@ -259,7 +259,7 @@ class Media extends Model
         }
 
         //remove extension from filename
-        if(mb_strrpos($filename, '.' . $this->extension) === mb_strlen($filename) - mb_strlen($this->extension) -1){
+        if (mb_strrpos($filename, '.' . $this->extension) === mb_strlen($filename) - mb_strlen($this->extension) -1) {
             $filename = mb_substr(0, mb_strlen($filename) - mb_strlen($this->extension) -1);
         }
 

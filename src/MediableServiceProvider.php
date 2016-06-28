@@ -51,8 +51,9 @@ class MediableServiceProvider extends ServiceProvider
      * Attaches the default adapter types
      * @return void
      */
-    public function registerSourceAdapterFactory(){
-        $this->app->singleton('mediable.factory', function(Container $app){
+    public function registerSourceAdapterFactory()
+    {
+        $this->app->singleton('mediable.factory', function (Container $app) {
            $factory = new SourceAdapterFactory;
            $factory->setAdapterForClass(FoundationUploadedFile::class, UploadedFile::class);
            $factory->setAdapterForClass(FoundationFile::class, File::class);
@@ -67,8 +68,9 @@ class MediableServiceProvider extends ServiceProvider
      * Bind the Media Uploader to the container
      * @return void
      */
-    public function registerUploader(){
-        $this->app->bind('mediable.uploader', function(Container $app){
+    public function registerUploader()
+    {
+        $this->app->bind('mediable.uploader', function (Container $app) {
             return new MediaUploader($this->app['filesystem'], $this->app['mediable.factory'], $this->app['config']['mediable']);
         });
         $this->app->alias('mediable.uploader', MediaUploader::class);
@@ -78,11 +80,11 @@ class MediableServiceProvider extends ServiceProvider
      * List the container bindings provided by the service provider.
      * @return array
      */
-    public function provides(){
+    public function provides()
+    {
         return [
             'mediable.uploader',
             'mediable.factory'
         ];
     }
-
 }

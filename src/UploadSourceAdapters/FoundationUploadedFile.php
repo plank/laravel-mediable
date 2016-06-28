@@ -4,7 +4,8 @@ namespace Frasmage\Mediable\UploadSourceAdapters;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class FoundationUploadedFile implements SourceAdapterInterface{
+class FoundationUploadedFile implements SourceAdapterInterface
+{
 
     /**
      * The source object
@@ -16,56 +17,64 @@ class FoundationUploadedFile implements SourceAdapterInterface{
      * Constructor
      * @param UploadedFile $source
      */
-	public function __construct(UploadedFile $source){
-		$this->source = $source;
-	}
+    public function __construct(UploadedFile $source)
+    {
+        $this->source = $source;
+    }
 
     /**
      * {@inheritDoc}
      */
-	public function path(){
-		return $this->source->getPath().'/'.$this->source->getFilename();
-	}
+    public function path()
+    {
+        return $this->source->getPath().'/'.$this->source->getFilename();
+    }
 
     /**
      * {@inheritDoc}
      */
-	public function filename(){
-		return pathinfo($this->source->getClientOriginalName(), PATHINFO_FILENAME);
-	}
+    public function filename()
+    {
+        return pathinfo($this->source->getClientOriginalName(), PATHINFO_FILENAME);
+    }
 
     /**
      * {@inheritDoc}
      */
-	public function extension(){
-		return $this->source->getClientOriginalExtension();
-	}
+    public function extension()
+    {
+        return $this->source->getClientOriginalExtension();
+    }
 
     /**
      * {@inheritDoc}
      */
-	public function mimeType(){
-		return $this->source->getClientMimeType();
-	}
+    public function mimeType()
+    {
+        return $this->source->getClientMimeType();
+    }
 
     /**
      * {@inheritDoc}
      */
-	public function contents(){
-		return fopen($this->path(), 'r');
-	}
+    public function contents()
+    {
+        return fopen($this->path(), 'r');
+    }
 
     /**
      * {@inheritDoc}
      */
-	public function valid(){
-		return $this->source->isValid();
-	}
+    public function valid()
+    {
+        return $this->source->isValid();
+    }
 
     /**
      * {@inheritDoc}
      */
-	public function size(){
-		return $this->source->getClientSize();
-	}
+    public function size()
+    {
+        return $this->source->getClientSize();
+    }
 }
