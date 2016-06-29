@@ -63,14 +63,12 @@ class TestCase extends BaseTestCase
 
     private function resetDatabase()
     {
-        // Relative to the testbench app folder: vendors/orchestra/testbench/src/fixture
-        $migrationsPath = 'migrations';
         $artisan = $this->app->make('Illuminate\Contracts\Console\Kernel');
 
         // Makes sure the migrations table is created
         $artisan->call('migrate', [
             '--database' => 'testing',
-            '--path'     => $migrationsPath,
+            '--realpath' => realpath(__DIR__.'/../migrations'),
         ]);
 
         // We empty all tables
@@ -81,7 +79,7 @@ class TestCase extends BaseTestCase
         // Migrate
         $artisan->call('migrate', [
             '--database' => 'testing',
-            '--path'     => $migrationsPath,
+            '--realpath'     => realpath(__DIR__.'/../migrations'),
         ]);
     }
 

@@ -9,7 +9,7 @@ $factory->define(Frasmage\Mediable\Media::class, function (Faker\Generator $fake
         'directory' => implode('/', $faker->words($faker->randomDigit)),
         'filename' => $faker->word,
         'extension' => $faker->randomElement($types[$type]['extensions']),
-        'mime_type' => $faker->randomElement($types[$type]['mime_type']),
+        'mime_type' => $faker->randomElement($types[$type]['mime_types']),
         'type' => $type,
         'size' => $faker->randomNumber(),
     ];
