@@ -95,18 +95,18 @@ class Media extends Model
         $q->inDirectory($disk, $directory, true);
     }
 
-    public function scopeWhereBasename($basename)
+    public function scopeWhereBasename(Builder $q, $basename)
     {
         $q->where('filename', pathinfo($basename, PATHINFO_FILENAME))
-            ->where('extension', pathinfo($basename), PATHINFO_EXTENSION);
+            ->where('extension', pathinfo($basename, PATHINFO_EXTENSION));
     }
 
-    public function scopeForPathOnDisk($disk, $path)
+    public function scopeForPathOnDisk(Builder $q, $disk, $path)
     {
         $q->where('disk', $disk)
             ->where('directory', pathinfo($path, PATHINFO_DIRNAME))
             ->where('filename', pathinfo($path, PATHINFO_FILENAME))
-            ->where('extension', pathinfo($path), PATHINFO_EXTENSION);
+            ->where('extension', pathinfo($path, PATHINFO_EXTENSION));
     }
 
     /**
@@ -149,7 +149,7 @@ class Media extends Model
      */
     public function isPubliclyAccessible()
     {
-        return strpos($this->absolutePath(), public_path()) == 0;
+        return strpos($this->absolutePath(), public_path()) === 0;
     }
 
     /**
@@ -186,7 +186,7 @@ class Media extends Model
      */
     public function isGlideAccesible()
     {
-        return strpos($this->absolutePath(), $this->glideRoot()) == 0;
+        return strpos($this->absolutePath(), $this->glideRoot()) === 0;
     }
 
     /**

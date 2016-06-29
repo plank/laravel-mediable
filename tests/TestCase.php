@@ -39,7 +39,12 @@ class TestCase extends BaseTestCase
         ]);
         $app['config']->set('filesystems.disks.tmp', [
             'driver' => 'local',
-            'root' => sys_get_temp_dir(),
+            'root' => storage_path('tmp'),
+        ]);
+        $app['config']->set('filesystems.disks.uploads', [
+            'driver' => 'local',
+            'root' => public_path('uploads'),
+            'visibility' => 'uploads'
         ]);
     }
 
@@ -55,10 +60,6 @@ class TestCase extends BaseTestCase
         $method = $reflector->getMethod($method_name);
         $method->setAccessible(true);
         return $method;
-    }
-
-    protected function tmpPath($path){
-        return rtrim(sys_get_temp_dir(),'/').'/'. ltrim($path, '/');
     }
 
     private function resetDatabase()
