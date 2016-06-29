@@ -25,18 +25,16 @@ class CreateMediableTables extends Migration
 
             $table->index(['disk','directory']);
             $table->unique(['disk', 'directory', 'filename', 'extension']);
-            $table->index('extension');
-            $table->index('mime_type');
             $table->index('type');
         });
 
         Schema::create('mediables', function(Blueprint $table){
-            $table->increments('media_id');
-            $table->integer('mediable_id')->unsigned();
+            $table->integer('media_id');
             $table->string('mediable_type');
+            $table->integer('mediable_id')->unsigned();
             $table->string('association');
 
-            $table->unique(['media_id', 'mediable_id', 'association']);
+            $table->primary(['media_id', 'mediable_type', 'mediable_id', 'association']);
             $table->index(['mediable_id', 'mediable_type']);
             $table->foreign('media_id')->references('id')->on('media')
                 ->onDelete('cascade');

@@ -15,8 +15,9 @@ class CreateSampleMediablesTable extends Migration
      */
     public function up()
     {
-        Schema::create('posts', function(Blueprint $table){
+        Schema::create('sample_mediables', function(Blueprint $table){
             $table->increments('id');
+            $table->timestamps();
         });
     }
 
@@ -27,6 +28,6 @@ class CreateSampleMediablesTable extends Migration
      */
     public function down()
     {
-        Schema::drop('posts');
+        Schema::drop('sample_mediables');
     }
 }

@@ -24,7 +24,7 @@ trait Mediable
      * @param  Builder $q
      * @param  string  $association
      */
-    public function scopeHasMedia(Builder $q, $association)
+    public function scopeWhereHasMedia(Builder $q, $association)
     {
         $q->whereHas('media', function ($q) use ($association) {
             $q->where('association', '=', $association);
@@ -36,23 +36,17 @@ trait Mediable
      */
     public function addMedia($media_id, $association)
     {
-        if ($media_id instanceof Media) {
-            $media_id = $media_id->id;
-        }
         $this->media()->attach($media_id, ['association' => $association]);
     }
 
     /**
      * @see HasMediaInterface::replaceMedia()
      */
-    public function replaceMedia($media_array, $association)
+    public function syncMedia($media_array, $association)
     {
         $model = $this;
         $this->removeMediaForAssociation($association);
-        collect($media_array)->each(function ($media) use ($model, $association) {
-            $id = $media instanceof Media ? $media->id : $media;
-            $model->addMedia($id, $association);
-        });
+        $model->addMedia(collect($media_array), $association);
     }
 
     /**
