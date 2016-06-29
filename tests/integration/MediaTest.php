@@ -2,6 +2,7 @@
 
 use Frasmage\Mediable\Media;
 use Frasmage\Mediable\Exceptions\MediaUrlException;
+use Frasmage\Mediable\Exceptions\MediaMoveException;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
@@ -102,7 +103,69 @@ class MediaTest extends TestCase{
         $this->assertEquals('http://localhost/uploads/foo/bar/baz.jpg', $media->url(true));
     }
 
-    protected function seedFileForMedia($media){
-        app('filesystem')->disk($media->disk)->put($media->diskPath(), '');
+    public function test_it_can_be_checked_for_glide_visibility(){
+        $media = factory(Media::class)->make(['disk' => 'tmp']);
+        $this->assertFalse($media->isGlideAccessible());
+
+        $media = factory(Media::class)->make(['disk' => 'uploads']);
+        $this->assertTrue($media->isGlideAccessible());
+    }
+
+    public function test_it_can_generate_its_path_from_the_glide_root(){
+        $media = factory(Media::class)->make(['disk' => 'uploads', 'directory' => 'foo/bar', 'filename' => 'baz', 'extension' => 'jpg']);
+        $this->assertEquals('/uploads/foo/bar/baz.jpg', $media->glidePath());
+    }
+
+    public function test_glide_path_throws_exception_if_not_accessible(){
+        $media = factory(Media::class)->make(['disk' => 'tmp']);
+        $this->expectException(MediaUrlException::class);
+        $media->glidePath();
+    }
+
+    public function test_it_can_generate_a_glide_url(){
+        $media = factory(Media::class)->make(['disk' => 'uploads', 'directory' => 'foo/bar', 'filename' => 'baz', 'extension' => 'jpg']);
+        $this->assertEquals('/glide/uploads/foo/bar/baz.jpg?w=400', $media->glideUrl(['w' => 400], false));
+        $this->assertEquals('http://localhost/glide/uploads/foo/bar/baz.jpg?w=400', $media->glideUrl(['w' => 400], true));
+    }
+
+    public function test_it_can_check_if_its_file_exists(){
+        $media = factory(Media::class)->make();
+        $this->assertFalse($media->fileExists());
+        $this->seedFileForMedia($media);
+        $this->assertTrue($media->fileExists());
+    }
+
+    public function test_it_can_be_moved_on_disk(){
+        $media = factory(Media::class)->make(['directory' => 'foo', 'filename' => 'bar', 'extension' => 'baz']);
+        $this->seedFileForMedia($media);
+
+        $media->move('alpha/beta');
+        $this->assertEquals('alpha/beta/bar.baz', $media->diskPath());
+        $this->assertTrue($media->exists());
+        $media->move('', 'gamma.baz');
+        $this->assertEquals('gamma.baz', $media->diskPath());
+        $media->rename('foo.bar');
+        $this->assertEquals('foo.bar.baz', $media->diskPath());
+        $this->assertTrue($media->exists());
+    }
+
+    public function test_it_throws_an_exception_if_moving_to_existing_file(){
+        $media1 = factory(Media::class)->make(['directory'=>'', 'filename' => 'foo', 'extension' => 'baz']);
+        $media2 = factory(Media::class)->make(['directory'=>'', 'filename' => 'bar', 'extension' => 'baz']);
+        $this->seedFileForMedia($media1);
+        $this->seedFileForMedia($media2);
+
+        $this->expectException(MediaMoveException::class);
+        $media1->move('','bar.baz');
+    }
+
+    public function test_it_can_access_file_contents(){
+        $media = factory(Media::class)->make(['extension' => 'html']);
+        $this->seedFileForMedia($media,'<h1>Hello World</h1>');
+        $this->assertEquals('<h1>Hello World</h1>', $media->contents());
+    }
+
+    protected function seedFileForMedia($media, $contents = ''){
+        app('filesystem')->disk($media->disk)->put($media->diskPath(), $contents);
     }
 }

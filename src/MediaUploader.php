@@ -133,7 +133,7 @@ class MediaUploader
      */
     public function setDirectory($directory)
     {
-        $this->directory = trim($this->sanitizePath($directory), '/');
+        $this->directory = trim($this->sanitizePath($directory), DIRECTORY_SEPARATOR);
         return $this;
     }
 

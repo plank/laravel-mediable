@@ -131,7 +131,7 @@ class Media extends Model
      */
     public function absolutePath()
     {
-        return $this->diskRoot() . '/' . $this->diskPath();
+        return $this->diskRoot() . DIRECTORY_SEPARATOR . $this->diskPath();
     }
 
     /**
@@ -140,7 +140,7 @@ class Media extends Model
      */
     public function diskPath()
     {
-        return trim(trim($this->directory, '/') .'/' . $this->basename, '/');
+        return trim(trim($this->directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $this->basename, DIRECTORY_SEPARATOR);
     }
 
     /**
@@ -162,7 +162,7 @@ class Media extends Model
         if (!$this->isPubliclyAccessible()) {
             throw MediaUrlException::mediaNotPubliclyAccessible($this->diskRoot(), public_path());
         }
-        $path = str_replace(public_path(), '', $this->diskRoot()) . '/' . $this->diskPath();
+        $path = str_replace(public_path(), '', $this->diskRoot()) . DIRECTORY_SEPARATOR . $this->diskPath();
 
         if (DIRECTORY_SEPARATOR != '/') {
             $path = str_replace(DIRECTORY_SEPARATOR, '/', $path);
@@ -184,7 +184,7 @@ class Media extends Model
      * Check if the file is located below the glide root
      * @return boolean
      */
-    public function isGlideAccesible()
+    public function isGlideAccessible()
     {
         return strpos($this->absolutePath(), $this->glideRoot()) === 0;
     }
@@ -197,10 +197,10 @@ class Media extends Model
     public function glidePath()
     {
         $glide_path = $this->glideRoot();
-        if (! $this->isGlideAccesible()) {
+        if (! $this->isGlideAccessible()) {
             throw MediaUrlException::mediaNotGlideAccessible($this->absolutePath(), $glide_path);
         }
-        $path = str_replace($glide_path, '', $this->diskRoot()) . '/' . $this->diskPath();
+        $path = str_replace($glide_path, '', $this->diskRoot()) . DIRECTORY_SEPARATOR . $this->diskPath();
 
         if (DIRECTORY_SEPARATOR != '/') {
             $path = str_replace(DIRECTORY_SEPARATOR, '/', $path);
@@ -213,26 +213,15 @@ class Media extends Model
      * @throws MediaUrlException If media's disk is not accessible to glide
      * @return string
      */
-    public function glideUrl($params = [])
+    public function glideUrl($params = [], $apsolute = true)
     {
         $glide = app('laravel-glide-image')->load($this->glidePath(), $params);
         $glide->useAbsoluteSourceFilePath();
-        return asset($glide->getUrl());
-    }
-
-    /**
-     * Generate a URL to access the media file by id
-     *
-     * This allows access to the file regardless of its location on disk.
-     * @throws MediaUrlException If media's disk is not publicly accessible
-     * @return string
-     */
-    public function accessUrl()
-    {
-        if (!$this->isPubliclyAccessible()) {
-            throw MediaUrlException::mediaNotPubliclyAccessible($this->diskRoot(), public_path());
+        $url = $glide->getUrl();
+        if($apsolute){
+            return asset($url);
         }
-        return route('media.show', ['id' => $this->id, 'ext' => $this->extension]);
+        return $url;
     }
 
     /**
@@ -254,17 +243,14 @@ class Media extends Model
      */
     public function move($destination, $filename = null)
     {
-        if (!$filename) {
+        if ($filename) {
+            $filename = $this->removeExtensionFromFilename($filename);
+        }else{
             $filename = $this->filename;
         }
 
-        //remove extension from filename
-        if (mb_strrpos($filename, '.' . $this->extension) === mb_strlen($filename) - mb_strlen($this->extension) -1) {
-            $filename = mb_substr(0, mb_strlen($filename) - mb_strlen($this->extension) -1);
-        }
-
-        $destination = trim($destination, '/');
-        $target_path = $destination . '/' . $filename . '.' . $this->extension;
+        $destination = trim($destination, DIRECTORY_SEPARATOR);
+        $target_path = $destination . DIRECTORY_SEPARATOR . $filename . '.' . $this->extension;
 
         if ($this->storage()->has($target_path)) {
             throw MediaMoveException::destinationExists($target_path);
@@ -320,5 +306,14 @@ class Media extends Model
     private function glideRoot()
     {
         return config('laravel-glide.source.path');
+    }
+
+    private function removeExtensionFromFilename($filename){
+        $extension = '.' . $this->extension;
+        $extension_length = mb_strlen($filename) - mb_strlen($extension);
+        if (mb_strrpos($filename, $extension) === $extension_length) {
+            $filename = mb_substr($filename, 0, $extension_length);
+        }
+        return $filename;
     }
 }

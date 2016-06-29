@@ -15,28 +15,36 @@ class TestCase extends BaseTestCase
         parent::setUp();
         $this->withFactories(__DIR__.'/factories');
         $this->resetDatabase();
+        $this->emptyFilesystem('tmp');
+        $this->emptyFilesystem('uploads');
     }
 
     protected function getPackageProviders($app)
     {
-        return [Frasmage\Mediable\MediableServiceProvider::class];
+        return [
+            Frasmage\Mediable\MediableServiceProvider::class,
+            Spatie\Glide\GlideServiceProvider::class
+        ];
     }
 
     protected function getPackageAliases($app)
     {
         return [
-            'MediaUploader' => 'Frasmage\Mediable\MediaUploaderFacade'
+            'MediaUploader' => 'Frasmage\Mediable\MediaUploaderFacade',
         ];
     }
 
     protected function getEnvironmentSetUp($app)
     {
+        //use in-memory database
         $app['config']->set('database.default', 'testing');
         $app['config']->set('database.connections.testing', [
             'driver' => 'sqlite',
             'database' => ':memory:',
             'prefix' => ''
         ]);
+
+        //set up private and public testing disks
         $app['config']->set('filesystems.disks.tmp', [
             'driver' => 'local',
             'root' => storage_path('tmp'),
@@ -45,6 +53,15 @@ class TestCase extends BaseTestCase
             'driver' => 'local',
             'root' => public_path('uploads'),
             'visibility' => 'uploads'
+        ]);
+
+        //set up glide configs
+        $app['config']->set('laravel-glide', [
+            'source' => ['path' => public_path()],
+            'cache' => ['path' => storage_path('glide/cache')],
+            'baseURL' => 'glide',
+            'maxSize' => 2000 * 2000,
+            'useSecureURLs' => false //can't anticipate the hash
         ]);
     }
 
@@ -82,6 +99,15 @@ class TestCase extends BaseTestCase
             '--database' => 'testing',
             '--realpath'     => realpath(__DIR__.'/../migrations'),
         ]);
+    }
+
+    private function emptyFilesystem($disk){
+        if(!$this->app['config']->has('filesystems.disks.' . $disk)){
+            return;
+        }
+        $root = $this->app['config']['filesystems.disks.' . $disk . '.root'];
+        $filesystem =  $this->app->make(Illuminate\Filesystem\Filesystem::class);
+        $filesystem->cleanDirectory($root);
     }
 
     public function testSetup(){
