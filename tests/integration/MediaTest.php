@@ -6,10 +6,12 @@ use Frasmage\Mediable\Exceptions\MediaMoveException;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class MediaTest extends TestCase{
+class MediaTest extends TestCase
+{
     use DatabaseMigrations;
 
-    public function test_it_has_path_accessors(){
+    public function test_it_has_path_accessors()
+    {
         $media = factory(Media::class)->make([
             'disk' => 'tmp',
             'directory' => 'a/b/c',
@@ -26,7 +28,8 @@ class MediaTest extends TestCase{
         $this->assertEquals('jpg', $media->extension);
     }
 
-    public function test_it_can_be_queried_by_directory(){
+    public function test_it_can_be_queried_by_directory()
+    {
         factory(Media::class)->create(['directory' => 'foo']);
         factory(Media::class)->create(['directory' => 'foo']);
         factory(Media::class)->create(['directory' => 'bar']);
@@ -36,7 +39,8 @@ class MediaTest extends TestCase{
         $this->assertEquals(1, Media::inDirectory('tmp', 'foo/baz')->count());
     }
 
-    public function test_it_can_be_queried_by_directory_recursively(){
+    public function test_it_can_be_queried_by_directory_recursively()
+    {
         factory(Media::class)->create(['directory' => 'foo']);
         factory(Media::class)->create(['directory' => 'foo/bar']);
         factory(Media::class)->create(['directory' => 'foo/bar']);
@@ -47,7 +51,8 @@ class MediaTest extends TestCase{
         $this->assertEquals(1, Media::inDirectory('tmp', 'foo/bar/baz', true)->count());
     }
 
-    public function test_it_can_be_queried_by_basename(){
+    public function test_it_can_be_queried_by_basename()
+    {
         factory(Media::class)->create(['filename' => 'foo', 'extension' => 'bar']);
         factory(Media::class)->create(['id' => 99, 'filename' => 'baz', 'extension' => 'bat']);
         factory(Media::class)->create(['filename' => 'bar', 'extension' => 'foo']);
@@ -55,7 +60,8 @@ class MediaTest extends TestCase{
         $this->assertEquals(99, Media::whereBasename('baz.bat')->first()->id);
     }
 
-    public function test_it_can_be_queried_by_path_on_disk(){
+    public function test_it_can_be_queried_by_path_on_disk()
+    {
         factory(Media::class)->create([
             'id' => 4,
             'disk' => 'tmp',
@@ -66,7 +72,8 @@ class MediaTest extends TestCase{
         $this->assertEquals(4, Media::forPathOnDisk('tmp', 'foo/bar/baz/bat.jpg')->first()->id);
     }
 
-    public function test_it_can_view_human_readable_file_size(){
+    public function test_it_can_view_human_readable_file_size()
+    {
         $media = factory(Media::class)->make(['size' => 0]);
 
         $this->assertEquals('0 bytes', $media->readableSize());
@@ -78,7 +85,8 @@ class MediaTest extends TestCase{
         $this->assertEquals('1.1 MB', $media->readableSize(2));
     }
 
-    public function test_it_can_be_checked_for_public_visibility(){
+    public function test_it_can_be_checked_for_public_visibility()
+    {
         $media = factory(Media::class)->make(['disk' => 'tmp']);
         $this->assertFalse($media->isPubliclyAccessible());
 
@@ -86,24 +94,28 @@ class MediaTest extends TestCase{
         $this->assertTrue($media->isPubliclyAccessible());
     }
 
-    public function test_it_can_generate_its_path_from_the_webroot(){
+    public function test_it_can_generate_its_path_from_the_webroot()
+    {
         $media = factory(Media::class)->make(['disk' => 'uploads', 'directory' => 'foo/bar', 'filename' => 'baz', 'extension' => 'jpg']);
         $this->assertEquals('/uploads/foo/bar/baz.jpg', $media->publicPath());
     }
 
-    public function test_non_public_access_to_public_path_throws_exception(){
+    public function test_non_public_access_to_public_path_throws_exception()
+    {
         $media = factory(Media::class)->make(['disk' => 'tmp']);
         $this->expectException(MediaUrlException::class);
         $media->publicPath();
     }
 
-    public function test_it_can_generate_a_url_to_the_file(){
+    public function test_it_can_generate_a_url_to_the_file()
+    {
         $media = factory(Media::class)->make(['disk' => 'uploads', 'directory' => 'foo/bar', 'filename' => 'baz', 'extension' => 'jpg']);
         $this->assertEquals('/uploads/foo/bar/baz.jpg', $media->url(false));
         $this->assertEquals('http://localhost/uploads/foo/bar/baz.jpg', $media->url(true));
     }
 
-    public function test_it_can_be_checked_for_glide_visibility(){
+    public function test_it_can_be_checked_for_glide_visibility()
+    {
         $media = factory(Media::class)->make(['disk' => 'tmp']);
         $this->assertFalse($media->isGlideAccessible());
 
@@ -111,31 +123,36 @@ class MediaTest extends TestCase{
         $this->assertTrue($media->isGlideAccessible());
     }
 
-    public function test_it_can_generate_its_path_from_the_glide_root(){
+    public function test_it_can_generate_its_path_from_the_glide_root()
+    {
         $media = factory(Media::class)->make(['disk' => 'uploads', 'directory' => 'foo/bar', 'filename' => 'baz', 'extension' => 'jpg']);
         $this->assertEquals('/uploads/foo/bar/baz.jpg', $media->glidePath());
     }
 
-    public function test_glide_path_throws_exception_if_not_accessible(){
+    public function test_glide_path_throws_exception_if_not_accessible()
+    {
         $media = factory(Media::class)->make(['disk' => 'tmp']);
         $this->expectException(MediaUrlException::class);
         $media->glidePath();
     }
 
-    public function test_it_can_generate_a_glide_url(){
+    public function test_it_can_generate_a_glide_url()
+    {
         $media = factory(Media::class)->make(['disk' => 'uploads', 'directory' => 'foo/bar', 'filename' => 'baz', 'extension' => 'jpg']);
         $this->assertEquals('/glide/uploads/foo/bar/baz.jpg?w=400', $media->glideUrl(['w' => 400], false));
         $this->assertEquals('http://localhost/glide/uploads/foo/bar/baz.jpg?w=400', $media->glideUrl(['w' => 400], true));
     }
 
-    public function test_it_can_check_if_its_file_exists(){
+    public function test_it_can_check_if_its_file_exists()
+    {
         $media = factory(Media::class)->make();
         $this->assertFalse($media->fileExists());
         $this->seedFileForMedia($media);
         $this->assertTrue($media->fileExists());
     }
 
-    public function test_it_can_be_moved_on_disk(){
+    public function test_it_can_be_moved_on_disk()
+    {
         $media = factory(Media::class)->make(['directory' => 'foo', 'filename' => 'bar', 'extension' => 'baz']);
         $this->seedFileForMedia($media);
 
@@ -149,23 +166,26 @@ class MediaTest extends TestCase{
         $this->assertTrue($media->exists());
     }
 
-    public function test_it_throws_an_exception_if_moving_to_existing_file(){
+    public function test_it_throws_an_exception_if_moving_to_existing_file()
+    {
         $media1 = factory(Media::class)->make(['directory'=>'', 'filename' => 'foo', 'extension' => 'baz']);
         $media2 = factory(Media::class)->make(['directory'=>'', 'filename' => 'bar', 'extension' => 'baz']);
         $this->seedFileForMedia($media1);
         $this->seedFileForMedia($media2);
 
         $this->expectException(MediaMoveException::class);
-        $media1->move('','bar.baz');
+        $media1->move('', 'bar.baz');
     }
 
-    public function test_it_can_access_file_contents(){
+    public function test_it_can_access_file_contents()
+    {
         $media = factory(Media::class)->make(['extension' => 'html']);
-        $this->seedFileForMedia($media,'<h1>Hello World</h1>');
+        $this->seedFileForMedia($media, '<h1>Hello World</h1>');
         $this->assertEquals('<h1>Hello World</h1>', $media->contents());
     }
 
-    protected function seedFileForMedia($media, $contents = ''){
+    protected function seedFileForMedia($media, $contents = '')
+    {
         app('filesystem')->disk($media->disk)->put($media->diskPath(), $contents);
     }
 }

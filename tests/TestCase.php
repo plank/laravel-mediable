@@ -65,14 +65,16 @@ class TestCase extends BaseTestCase
         ]);
     }
 
-    protected function getPrivateProperty($class, $property_name) {
+    protected function getPrivateProperty($class, $property_name)
+    {
         $reflector = new ReflectionClass($class);
         $property = $reflector->getProperty($property_name);
         $property->setAccessible(true);
         return $property;
     }
 
-    protected function getPrivateMethod($class, $method_name){
+    protected function getPrivateMethod($class, $method_name)
+    {
         $reflector = new ReflectionClass($class);
         $method = $reflector->getMethod($method_name);
         $method->setAccessible(true);
@@ -101,16 +103,13 @@ class TestCase extends BaseTestCase
         ]);
     }
 
-    private function emptyFilesystem($disk){
-        if(!$this->app['config']->has('filesystems.disks.' . $disk)){
+    private function emptyFilesystem($disk)
+    {
+        if (!$this->app['config']->has('filesystems.disks.' . $disk)) {
             return;
         }
         $root = $this->app['config']['filesystems.disks.' . $disk . '.root'];
         $filesystem =  $this->app->make(Illuminate\Filesystem\Filesystem::class);
         $filesystem->cleanDirectory($root);
-    }
-
-    public function testSetup(){
-        $this->assertTrue(true);
     }
 }

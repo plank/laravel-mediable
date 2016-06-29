@@ -218,7 +218,7 @@ class Media extends Model
         $glide = app('laravel-glide-image')->load($this->glidePath(), $params);
         $glide->useAbsoluteSourceFilePath();
         $url = $glide->getUrl();
-        if($apsolute){
+        if ($apsolute) {
             return asset($url);
         }
         return $url;
@@ -245,7 +245,7 @@ class Media extends Model
     {
         if ($filename) {
             $filename = $this->removeExtensionFromFilename($filename);
-        }else{
+        } else {
             $filename = $this->filename;
         }
 
@@ -308,7 +308,8 @@ class Media extends Model
         return config('laravel-glide.source.path');
     }
 
-    private function removeExtensionFromFilename($filename){
+    private function removeExtensionFromFilename($filename)
+    {
         $extension = '.' . $this->extension;
         $extension_length = mb_strlen($filename) - mb_strlen($extension);
         if (mb_strrpos($filename, $extension) === $extension_length) {

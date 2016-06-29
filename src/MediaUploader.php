@@ -376,7 +376,7 @@ class MediaUploader
     private function generateUniqueFilename(Media $model)
     {
         $counter = 0;
-        do(){
+        do{
             ++$counter;
             $filename = "{$model->filename} ({$counter})"
             $path = "{$model->directory}/{$filename}.{$model->extension}";
