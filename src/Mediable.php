@@ -1,6 +1,6 @@
 <?php
 
-namespace Frasmage\Mediable\Traits;
+namespace Frasmage\Mediable;
 
 use Illuminate\Database\Eloquent\Builder;
 

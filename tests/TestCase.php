@@ -1,5 +1,6 @@
 <?php
 
+use Frasmage\Mediable\Media;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
 class TestCase extends BaseTestCase
@@ -79,6 +80,11 @@ class TestCase extends BaseTestCase
         $method = $reflector->getMethod($method_name);
         $method->setAccessible(true);
         return $method;
+    }
+
+    protected function seedFileForMedia(Media $media, $contents = '')
+    {
+        app('filesystem')->disk($media->disk)->put($media->diskPath(), $contents);
     }
 
     private function resetDatabase()

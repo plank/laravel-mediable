@@ -34,7 +34,7 @@ class Media extends Model
 
         //remove file on deletion
         static::deleted(function ($media) {
-            $media->filesystem()->delete($media->diskPath());
+            $media->storage()->delete($media->diskPath());
         });
     }
 
@@ -45,7 +45,7 @@ class Media extends Model
      */
     public function models($class)
     {
-        $this->morphedByMany($class, 'mediable')->withPivot('association');
+        return $this->morphedByMany($class, 'mediable')->withPivot('association');
     }
 
     /**

@@ -26,7 +26,7 @@ class MediableServiceProvider extends ServiceProvider
         ], 'config');
 
         $this->publishes([
-            __DIR__.'/../migrations/' => database_path('migrations')
+            __DIR__.'/../migrations/2016_06_27_000000_create_mediable_tables.php' => database_path('migrations/2016_06_27_000000_create_mediable_tables.php')
         ], 'migrations');
     }
 

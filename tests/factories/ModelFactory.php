@@ -14,3 +14,7 @@ $factory->define(Frasmage\Mediable\Media::class, function (Faker\Generator $fake
         'size' => $faker->randomNumber(),
     ];
 });
+
+$factory->define(SampleMediable::class, function(Faker\Generator $faker) {
+    return [];
+});

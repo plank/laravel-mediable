@@ -3,12 +3,22 @@
 use Frasmage\Mediable\Media;
 use Frasmage\Mediable\Exceptions\MediaUrlException;
 use Frasmage\Mediable\Exceptions\MediaMoveException;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+
 
 class MediaTest extends TestCase
 {
-    use DatabaseMigrations;
+    public function test_it_can_be_related_to_other_models(){
+        $media = factory(Media::class)->make();
+        $other = $this->getMockForAbstractClass(Model::class);
+        $relationship = $media->models(get_class($other));
+
+        $this->assertInstanceOf(MorphToMany::class, $relationship);
+        $this->assertEquals('mediable_type', $relationship->getMorphType());
+        $this->assertEquals('mediables.media_id', $relationship->getForeignKey());
+        $this->assertEquals('media.id', $relationship->getQualifiedParentKeyName());
+    }
 
     public function test_it_has_path_accessors()
     {
@@ -184,8 +194,19 @@ class MediaTest extends TestCase
         $this->assertEquals('<h1>Hello World</h1>', $media->contents());
     }
 
-    protected function seedFileForMedia($media, $contents = '')
-    {
-        app('filesystem')->disk($media->disk)->put($media->diskPath(), $contents);
+    public function test_it_deletes_its_file_on_deletion(){
+        $media = factory(Media::class)->create([
+            'disk' => 'tmp',
+            'directory' => '',
+            'filename' => 'file',
+            'extension' => 'txt'
+        ]);
+        $this->seedFileForMedia($media);
+        $path = $media->absolutePath();
+
+        $this->assertFileExists($path);
+        $media->delete();
+        $this->assertFalse(file_exists($path));
+
     }
 }
