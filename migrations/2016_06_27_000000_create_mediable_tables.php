@@ -36,6 +36,7 @@ class CreateMediableTables extends Migration
 
             $table->primary(['media_id', 'mediable_type', 'mediable_id', 'association']);
             $table->index(['mediable_id', 'mediable_type']);
+            $table->index('association');
             $table->foreign('media_id')->references('id')->on('media')
                 ->onDelete('cascade');
         });

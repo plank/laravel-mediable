@@ -16,6 +16,7 @@ class MediaTest extends TestCase
 
         $this->assertInstanceOf(MorphToMany::class, $relationship);
         $this->assertEquals('mediable_type', $relationship->getMorphType());
+        $this->assertEquals('mediables', $relationship->getTable());
         $this->assertEquals('mediables.media_id', $relationship->getForeignKey());
         $this->assertEquals('media.id', $relationship->getQualifiedParentKeyName());
     }

@@ -34,7 +34,7 @@ trait Mediable
     /**
      * @see HasMediaInterface::addMedia()
      */
-    public function addMedia($media_id, $association)
+    public function attachMedia($media_id, $association)
     {
         $this->media()->attach($media_id, ['association' => $association]);
     }
@@ -44,15 +44,14 @@ trait Mediable
      */
     public function syncMedia($media_array, $association)
     {
-        $model = $this;
-        $this->removeMediaForAssociation($association);
-        $model->addMedia(collect($media_array), $association);
+        $this->detachMediaForAssociation($association);
+        $this->attachMedia($media_array, $association);
     }
 
     /**
      * @see HasMediaInterface::removeMedia()
      */
-    public function removeMedia($media_id, $association = null)
+    public function detachMedia($media_id, $association = null)
     {
         if ($media_id instanceof Media) {
             $media_id = $media_id->id;
@@ -67,7 +66,7 @@ trait Mediable
     /**
      * @see HasMediaInterface::removeMediaForAssociation()
      */
-    public function removeMediaForAssociation($association)
+    public function detachMediaForAssociation($association)
     {
         $model = $this;
         $this->getMedia($association)->each(function ($media) use ($model, $association) {
@@ -107,6 +106,8 @@ trait Mediable
      */
     public function getAllMedia()
     {
-        return $this->media->groupBy('association');
+        return $this->media->groupBy(function($media){
+            return $media->pivot->association;
+        });
     }
 }
