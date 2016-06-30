@@ -29,7 +29,7 @@ class MediableTest extends TestCase
     public function test_it_can_attach_one_media_to_multiple_associations(){
         $mediable = factory(SampleMediable::class)->create();
         $media1 = factory(Media::class)->create(['id' => 9]);
-        
+
         $mediable->attachMedia($media1, 'bar');
         $mediable->attachMedia($media1, 'foo');
         $this->assertEquals(9, $mediable->getMedia('foo')->first()->id);
@@ -56,7 +56,6 @@ class MediableTest extends TestCase
         $mediable->attachMedia($media, 'foo');
         $mediable->detachMedia($media, 'foo');
         $this->assertEquals(0, $mediable->getMedia('foo')->count());
-
     }
 
     public function test_it_can_be_queried_media_association_type(){

@@ -10,104 +10,163 @@ use Illuminate\Database\Eloquent\Builder;
  */
 trait Mediable
 {
+    private $media_dirty_tags = [];
 
     /**
      * @see HasMediaInterface::media()
      */
     public function media()
     {
-        return $this->morphToMany(Media::class, 'mediable')->withPivot('association');
+        return $this->morphToMany(Media::class, 'mediable')->withPivot('tag');
     }
 
     /**
-     * Query scope to detect the presence of one or more attached media for a particular association
+     * Query scope to detect the presence of one or more attached media for a given tag
      * @param  Builder $q
-     * @param  string  $association
+     * @param  string  $tag
      */
-    public function scopeWhereHasMedia(Builder $q, $association)
+    public function scopeWhereHasMedia(Builder $q, $tags)
     {
-        $q->whereHas('media', function ($q) use ($association) {
-            $q->where('association', '=', $association);
+        $q->whereHas('media', function ($q) use ($tags) {
+            $q->whereIn('tag', (array) $tags);
         });
     }
 
     /**
      * @see HasMediaInterface::addMedia()
      */
-    public function attachMedia($media_id, $association)
+    public function attachMedia($media, $tags)
     {
-        $this->media()->attach($media_id, ['association' => $association]);
+        if(is_array($tags)){
+            foreach($tags as $tag){
+                $this->attachMedia($media, $tag);
+            }
+            return;
+        }
+
+        $this->media()->attach($media, ['tag' => $tags]);
+        $this->markMediaDirty($tags);
     }
 
     /**
      * @see HasMediaInterface::replaceMedia()
      */
-    public function syncMedia($media_array, $association)
+    public function syncMedia($media, $tags)
     {
-        $this->detachMediaForAssociation($association);
-        $this->attachMedia($media_array, $association);
+        $this->detachMediaTags($tags);
+        $this->attachMedia($media, $tags);
     }
 
     /**
      * @see HasMediaInterface::removeMedia()
      */
-    public function detachMedia($media_id, $association = null)
+    public function detachMedia($media, $tags = null)
     {
-        if ($media_id instanceof Media) {
-            $media_id = $media_id->id;
-        }
         $query = $this->media();
-        if ($association) {
-            $query->where('association', $association);
+        if ($tags) {
+            $query->wherePivotIn('tag', (array) $tags);
         }
-        $query->detach($media_id);
+        $query->detach($media);
+        $this->markMediaDirty($tags);
     }
 
     /**
      * @see HasMediaInterface::removeMediaForAssociation()
      */
-    public function detachMediaForAssociation($association)
+    public function detachMediaTags($tags)
     {
-        $model = $this;
-        $this->getMedia($association)->each(function ($media) use ($model, $association) {
-            $model->removeMedia($media->id, $association);
-        });
+        $this->media()->wherePivotIn('tag', (array) $tags)->detach();
+        $this->markMediaDirty($tags);
     }
 
     /**
      * @see HasMediaInterface::hasMedia()
      */
-    public function hasMedia($association)
+    public function hasMedia($tags, $match_all = false)
     {
-        return count($this->getMedia($association)) > 0;
+        return count($this->getMedia($tags, $match_all)) > 0;
     }
 
     /**
      * @see HasMediaInterface::getMedia()
      */
-    public function getMedia($association)
+    public function getMedia($tags, $match_all = false)
     {
-        $model = $this;
-        return $this->media->filter(function ($media) use ($model, $association) {
-            return $media->pivot->association == $association;
+        if($match_all){
+            return $this->getMediaMatchAll($tags);
+        }
+
+        $this->rehydrateMediaIfNecessary($tags);
+        return $this->media->filter(function ($media) use ($tags) {
+                return in_array($media->pivot->tag, (array) $tags);
         });
     }
 
-    /**
-     * @see HasMediaInterface::firstMedia()
-     */
-    public function firstMedia($association)
-    {
-        return $this->getMedia($association)->first();
+    public function getMediaMatchAll($tags){
+        $tags = (array) $tags;
+        $this->rehydrateMediaIfNecessary($tags);
+        return $this->media->groupBy('pivot.tag')
+        ->filter(function($_, $key) use($tags){
+            return in_array($key, $tags);
+        })->reduce(function($media, $tagged){
+            return $media->intersect($tagged);
+        }, $this->media);
     }
 
     /**
      * @see HasMediaInterface::getAllMedia()
      */
-    public function getAllMedia()
+    public function getAllMediaByTag()
     {
-        return $this->media->groupBy(function($media){
-            return $media->pivot->association;
-        });
+        $this->rehydrateMediaIfNecessary();
+        return $this->media->groupBy('pivot.tag');
     }
+
+    /**
+     * @see HasMediaInterface::firstMedia()
+     */
+    public function firstMedia($tags, $match_all = false)
+    {
+        return $this->getMedia($tags, $match_all)->first();
+    }
+
+    protected function markMediaDirty($tags)
+    {
+        foreach((array) $tags as $tag){
+            $this->media_dirty_tags[$tag] = $tag;
+        }
+    }
+
+    protected function mediaIsDirty($tags = null){
+        if(is_null($tags)){
+            return count($this->media_dirty_tags);
+        }else{
+            return count(array_intersect((array) $tags, $this->media_dirty_tags));
+        }
+    }
+
+    protected function rehydrateMediaIfNecessary($tags = null)
+    {
+        if($this->rehydratesMedia() && $this->mediaIsDirty($tags)){
+            $this->load('media');
+        }
+    }
+
+    protected function rehydratesMedia(){
+        if(property_exists($this, 'rehydrates_media')){
+            return $this->rehydrates_media;
+        }
+        return true;
+    }
+
+    public function load($relations){
+        if (is_string($relations)) {
+            $relations = func_get_args();
+        }
+        if(in_array('media', $relations)){
+            $this->media_dirty_tags = [];
+        }
+        return parent::load($relations);
+    }
+
 }

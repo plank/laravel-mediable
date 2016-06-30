@@ -32,11 +32,11 @@ class CreateMediableTables extends Migration
             $table->integer('media_id');
             $table->string('mediable_type');
             $table->integer('mediable_id')->unsigned();
-            $table->string('association');
+            $table->string('tag');
 
-            $table->primary(['media_id', 'mediable_type', 'mediable_id', 'association']);
+            $table->primary(['media_id', 'mediable_type', 'mediable_id', 'tag']);
             $table->index(['mediable_id', 'mediable_type']);
-            $table->index('association');
+            $table->index('tag');
             $table->foreign('media_id')->references('id')->on('media')
                 ->onDelete('cascade');
         });

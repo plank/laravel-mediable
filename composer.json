@@ -26,9 +26,11 @@
     "autoload": {
         "psr-4": {
             "Frasmage\\Mediable\\": "src/"
-        },
+        }
+    },
+    "autoload-dev":{
         "classmap": ["tests/"]
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true
 }
