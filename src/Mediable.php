@@ -75,7 +75,10 @@ trait Mediable
      */
     public function detachMediaTags($tags)
     {
-        $this->media()->wherePivotIn('tag', (array) $tags)->detach();
+        $this->media()->newPivotStatement()
+            ->where($this->media()->getMorphType(), $this->media()->getMorphClass())
+            ->where($this->media()->getForeignKey(), $this->getKey())
+            ->whereIn('tag', (array) $tags)->delete();
         $this->markMediaDirty($tags);
     }
 
@@ -97,20 +100,35 @@ trait Mediable
         }
 
         $this->rehydrateMediaIfNecessary($tags);
-        return $this->media->filter(function ($media) use ($tags) {
+        return $this->media
+        // 
+        ->filter(function ($media) use ($tags) {
                 return in_array($media->pivot->tag, (array) $tags);
-        });
+        })
+        //remove duplicate media
+        ->keyBy(function($media){
+            return $media->getKey();
+        })->values();
     }
 
     public function getMediaMatchAll($tags){
         $tags = (array) $tags;
         $this->rehydrateMediaIfNecessary($tags);
-        return $this->media->groupBy('pivot.tag')
+        return $this->media
+        //froup media by tag name
+        ->groupBy('pivot.tag')
+        //discard unused tags
         ->filter(function($_, $key) use($tags){
             return in_array($key, $tags);
-        })->reduce(function($media, $tagged){
+        })
+        //remove media not matching each tag
+        ->reduce(function($media, $tagged){
             return $media->intersect($tagged);
-        }, $this->media);
+        }, $this->media)
+        //remove duplicate media
+        ->keyBy(function($media){
+            return $media->getKey();
+        })->values();
     }
 
     /**
@@ -120,6 +138,14 @@ trait Mediable
     {
         $this->rehydrateMediaIfNecessary();
         return $this->media->groupBy('pivot.tag');
+    }
+
+    public function getTagsForMedia(Media $media){
+        return $this->media->filter(function($item) use ($media){
+            return $item->getKey() === $media->getKey();
+        })->map(function($item){
+            return $item->pivot->tag;
+        });
     }
 
     /**
