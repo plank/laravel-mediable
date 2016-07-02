@@ -111,6 +111,14 @@ trait Mediable
         })->values();
     }
 
+    /**
+     * @see HasMediaInterface::firstMedia()
+     */
+    public function firstMedia($tags, $match_all = false)
+    {
+        return $this->getMedia($tags, $match_all)->first();
+    }
+
     public function getMediaMatchAll($tags){
         $tags = (array) $tags;
         $this->rehydrateMediaIfNecessary($tags);
@@ -145,15 +153,8 @@ trait Mediable
             if($item->getKey() === $media->getKey()){
                 $carry[] = $item->pivot->tag;
             }
+            return $carry;
         }, []);
-    }
-
-    /**
-     * @see HasMediaInterface::firstMedia()
-     */
-    public function firstMedia($tags, $match_all = false)
-    {
-        return $this->getMedia($tags, $match_all)->first();
     }
 
     protected function markMediaDirty($tags)
