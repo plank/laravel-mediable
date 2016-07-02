@@ -33,7 +33,7 @@ return [
      * * 'error': an Exception is thrown
      *
      */
-    'on_duplicate' => 'increment',
+    'on_duplicate' => \Frasmage\Mediable\MediaUploader::ON_DUPLICATE_INCREMENT,
 
     /*
      * Reject files unless both their mime and extension are recognized and match
@@ -45,6 +45,10 @@ return [
      * if true, files will be given a type of `'other'`
      */
     'allow_unrecognized_types' => false,
+
+    'allowed_mime_types' => [],
+    'allowed_extensions' => [],
+    'allowed_types' => [],
 
     /**
      * Global list of recognized mime types and extensions
@@ -153,14 +157,14 @@ return [
     ],
 
     'source_adapters' => [
+        'class' => [
+            Symfony\Component\HttpFoundation\File\UploadedFile::class => Frasmage\Mediable\SourceAdapters\UploadedFileAdapter::class,
+            Symfony\Component\HttpFoundation\File\File::class => Frasmage\Mediable\SourceAdapters\FileAdapter::class,
+        ],
         'pattern' => [
             '^https?://' => Frasmage\Mediable\SourceAdapters\RemoteUrlAdapter::class,
             '^/' => Frasmage\Mediable\SourceAdapters\LocalPathAdapter::class
         ],
-        'class' => [
-            Symfony\Component\HttpFoundation\File\UploadedFile::class => Frasmage\Mediable\SourceAdapters\UploadedFileAdapter::class,
-            Symfony\Component\HttpFoundation\File\File::class => Frasmage\Mediable\SourceAdapters\FileAdapter::class,
-        ]
     ],
 
     'rehydrate_media' => true,

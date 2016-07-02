@@ -69,7 +69,7 @@ class LocalPathAdapter implements SourceAdapterInterface
      */
     public function valid()
     {
-        return file_exists($this->source);
+        return is_readable($this->source);
     }
 
     /**

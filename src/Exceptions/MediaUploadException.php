@@ -10,6 +10,10 @@ class MediaUploadException extends Exception
         return new static("Could not set adapter of class `{$class}`. Must implement `\Frasmage\Mediable\SourceAdapters\SourceAdapterInterface`.");
     }
 
+    public static function cannotSetModel($class){
+        return new static("Could not set `{$class}` as Media model class. Must extend `\Frasmage\Mediable\Media`.");
+    }
+
     public static function unrecognizedSource($source)
     {
         $source = is_object($source) ? get_class($source) : (string)$source;
