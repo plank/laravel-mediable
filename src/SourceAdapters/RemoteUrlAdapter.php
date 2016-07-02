@@ -26,6 +26,10 @@ class RemoteUrlAdapter implements SourceAdapterInterface
         $this->source = $source;
     }
 
+    public function getSource(){
+        return $this->source;
+    }
+
     /**
      * {@inheritDoc}
      */

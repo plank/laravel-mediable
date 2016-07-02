@@ -5,6 +5,12 @@ namespace Frasmage\Mediable\SourceAdapters;
 Interface SourceAdapterInterface{
 
     /**
+     * Get the underlying source
+     * @return mixed
+     */
+    public function getSource();
+
+    /**
      * Get the absolute path to the file
      * @return string
      */

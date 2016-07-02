@@ -6,6 +6,10 @@ use Exception;
 
 class MediaUploadException extends Exception
 {
+    public static function cannotSetAdapter($class){
+        return new static("Could not set adapter of class `{$class}`. Must implement `\Frasmage\Mediable\SourceAdapters\SourceAdapterInterface`.");
+    }
+
     public static function unrecognizedSource($source)
     {
         $source = is_object($source) ? get_class($source) : (string)$source;
@@ -18,12 +22,7 @@ class MediaUploadException extends Exception
 
     public static function diskNotAllowed($disk)
     {
-        return new static("The disk `{$disk}` is not in the allowed disks for media.")
-    }
-
-    public static function CannotSetAdapter($class)
-    {
-        return new static("Cannot set adapter of class `{$class}`. Adapter must implement `\Frasmage\Mediable\SourceAdapter\SourceAdapterInterface`.");
+        return new static("The disk `{$disk}` is not in the allowed disks for media.");
     }
 
     public static function fileNotFound($path)

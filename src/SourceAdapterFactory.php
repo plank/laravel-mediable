@@ -33,12 +33,14 @@ class SourceAdapterFactory{
             return $source;
         }
         else if(is_object($source)){
-            $class = $this->adaptClass($source);
-            return new $class($source);
+            $adapter = $this->adaptClass($source);
         }
         else if(is_string($source)){
-            $class = $this->adaptString($source);
-            return new $class($source);
+            $adapter = $this->adaptString($source);
+        }
+
+        if($adapter){
+            return new $adapter($source);
         }
 
         throw MediaUploadException::unrecognizedSource($source);
@@ -78,12 +80,13 @@ class SourceAdapterFactory{
     private function adaptClass($source)
     {
         $tree = class_parents($source);
-        array_unshift($tree, get_class($source))
+        array_unshift($tree, get_class($source));
         foreach ($this->class_adapters as $class => $adapter) {
             if(in_array($class, $tree)){
                 return $adapter;
             }
         }
+        return null;
     }
 
     /**
@@ -99,6 +102,7 @@ class SourceAdapterFactory{
                 return $adapter;
             }
         }
+        return null;
     }
 
     /**
@@ -108,8 +112,8 @@ class SourceAdapterFactory{
      * @return void
      */
     private function validateAdapterClass($class){
-        if(!is_subclass_of($class, SourceAdapterInterface::class)){
-            throw MediaUploadException::cannotSetAdaptor($class);
+        if(!class_implements($class, SourceAdapterInterface::class)){
+            throw MediaUploadException::cannotSetAdapter($class);
         }
     }
 

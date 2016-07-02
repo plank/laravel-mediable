@@ -154,12 +154,12 @@ return [
 
     'source_adapters' => [
         'pattern' => [
-            '^https?://' => Frasmage\Mediable\RemoteUrl::class,
-            '^/' => Frasmage\Mediable\LocalPath::class
+            '^https?://' => Frasmage\Mediable\SourceAdapters\RemoteUrlAdapter::class,
+            '^/' => Frasmage\Mediable\SourceAdapters\LocalPathAdapter::class
         ],
         'class' => [
-            Symfony\Component\HttpFoundation\File\UploadedFile::class => Frasmage\Mediable\UploadedFile::class,
-            Symfony\Component\HttpFoundation\File\File::class => Frasmage\Mediable\FoundationFile::class,
+            Symfony\Component\HttpFoundation\File\UploadedFile::class => Frasmage\Mediable\SourceAdapters\UploadedFileAdapter::class,
+            Symfony\Component\HttpFoundation\File\File::class => Frasmage\Mediable\SourceAdapters\FileAdapter::class,
         ]
     ],
 
