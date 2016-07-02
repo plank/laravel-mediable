@@ -1,6 +1,6 @@
 <?php
 
-namespace Frasmage\Mediable\UploadSourceAdapters;
+namespace Frasmage\Mediable\SourceAdapters;
 
 Interface SourceAdapterInterface{
 
@@ -8,41 +8,41 @@ Interface SourceAdapterInterface{
      * Get the absolute path to the file
      * @return string
      */
-	abstract public function path();
+	public function path();
 
     /**
      * Get the name of the file
      * @return string
      */
-	abstract public function filename();
+	public function filename();
 
     /**
      * Get the extension of the file
      * @return string
      */
-	abstract public function extension();
+	public function extension();
 
     /**
      * Get the MIME type of the file
      * @return string
      */
-	abstract public function mimeType();
+	public function mimeType();
 
     /**
      * Get the body of the file
      * @return string
      */
-	abstract public function contents();
+	public function contents();
 
     /**
      * Check if the file can be transfered
      * @return Boolean
      */
-	abstract public function valid();
+	public function valid();
 
     /**
      * Determine the size of the file
      * @return integer
      */
-	abstract public function size();
+	public function size();
 }

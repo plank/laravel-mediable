@@ -151,4 +151,17 @@ return [
             ]
         ],
     ],
+
+    'source_adapters' => [
+        'pattern' => [
+            '^https?://' => Frasmage\Mediable\RemoteUrl::class,
+            '^/' => Frasmage\Mediable\LocalPath::class
+        ],
+        'class' => [
+            Symfony\Component\HttpFoundation\File\UploadedFile::class => Frasmage\Mediable\UploadedFile::class,
+            Symfony\Component\HttpFoundation\File\File::class => Frasmage\Mediable\FoundationFile::class,
+        ]
+    ],
+
+    'rehydrate_media' => true,
 ];

@@ -183,7 +183,7 @@ trait Mediable
         if(property_exists($this, 'rehydrates_media')){
             return $this->rehydrates_media;
         }
-        return true;
+        return config('mediable.rehydrate_media', true);
     }
 
     public function load($relations){

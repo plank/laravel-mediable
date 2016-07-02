@@ -14,7 +14,7 @@ class TestCase extends BaseTestCase
     public function setUp()
     {
         parent::setUp();
-        $this->withFactories(__DIR__.'/factories');
+        $this->withFactories(__DIR__.'/_factories');
         $this->resetDatabase();
         $this->emptyFilesystem('tmp');
         $this->emptyFilesystem('uploads');
@@ -53,7 +53,7 @@ class TestCase extends BaseTestCase
         $app['config']->set('filesystems.disks.uploads', [
             'driver' => 'local',
             'root' => public_path('uploads'),
-            'visibility' => 'uploads'
+            'visibility' => 'public'
         ]);
 
         //set up glide configs

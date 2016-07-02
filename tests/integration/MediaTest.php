@@ -9,7 +9,8 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class MediaTest extends TestCase
 {
-    public function test_it_can_be_related_to_other_models(){
+    public function test_it_can_be_related_to_other_models()
+    {
         $media = factory(Media::class)->make();
         $other = $this->getMockForAbstractClass(Model::class);
         $relationship = $media->models(get_class($other));
@@ -195,7 +196,8 @@ class MediaTest extends TestCase
         $this->assertEquals('<h1>Hello World</h1>', $media->contents());
     }
 
-    public function test_it_deletes_its_file_on_deletion(){
+    public function test_it_deletes_its_file_on_deletion()
+    {
         $media = factory(Media::class)->create([
             'disk' => 'tmp',
             'directory' => '',

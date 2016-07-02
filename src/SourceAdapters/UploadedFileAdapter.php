@@ -1,10 +1,10 @@
 <?php
 
-namespace Frasmage\Mediable\UploadSourceAdapters;
+namespace Frasmage\Mediable\SourceAdapters;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class FoundationUploadedFile implements SourceAdapterInterface
+class UploadedFileAdapter implements SourceAdapterInterface
 {
 
     /**

@@ -5,7 +5,7 @@ namespace Frasmage\Mediable;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Frasmage\Mediable\Exceptions\MediaUploadException;
-use Frasmage\Mediable\UploadSourceAdapters\SourceAdapterInterface;
+use Frasmage\Mediable\SourceAdapters\SourceAdapterInterface;
 
 class SourceAdapterFactory{
 

@@ -1,21 +1,23 @@
 <?php
 
-namespace Frasmage\Mediable\UploadSourceAdapters;
+namespace Frasmage\Mediable\SourceAdapters;
 
-class LocalPath implements SourceAdapterInterface
+use Symfony\Component\HttpFoundation\File\File;
+
+class FileAdapter implements SourceAdapterInterface
 {
 
     /**
-     * The source string
-     * @var string
+     * The source object
+     * @var File
      */
     protected $source;
 
     /**
      * Constructor
-     * @param string $source
+     * @param File $source
      */
-    public function __construct($source)
+    public function __construct(File $source)
     {
         $this->source = $source;
     }
@@ -25,7 +27,7 @@ class LocalPath implements SourceAdapterInterface
      */
     public function path()
     {
-        return $this->source;
+        return $this->source->getPath().'/'.$this->source->getFilename();
     }
 
     /**
@@ -33,7 +35,7 @@ class LocalPath implements SourceAdapterInterface
      */
     public function filename()
     {
-        return pathinfo($this->source, PATHINFO_FILENAME);
+        return pathinfo($this->source->getFilename(), PATHINFO_FILENAME);
     }
 
     /**
@@ -41,7 +43,7 @@ class LocalPath implements SourceAdapterInterface
      */
     public function extension()
     {
-        return pathinfo($this->source, PATHINFO_EXTENSION);
+        return pathinfo($this->source->getFilename(), PATHINFO_EXTENSION);
     }
 
     /**
@@ -49,7 +51,7 @@ class LocalPath implements SourceAdapterInterface
      */
     public function mimeType()
     {
-        return mime_content_type($this->source);
+        return $this->source->getMimeType();
     }
 
     /**
@@ -57,7 +59,7 @@ class LocalPath implements SourceAdapterInterface
      */
     public function contents()
     {
-        return fopen($this->source, 'r');
+        return fopen($this->path(), 'r');
     }
 
     /**
@@ -65,7 +67,7 @@ class LocalPath implements SourceAdapterInterface
      */
     public function valid()
     {
-        return file_exists($this->source);
+        return file_exists($this->path());
     }
 
     /**
@@ -73,6 +75,6 @@ class LocalPath implements SourceAdapterInterface
      */
     public function size()
     {
-        return filesize($this->source);
+        return filesize($this->path());
     }
 }

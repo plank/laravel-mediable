@@ -1,15 +1,9 @@
 <?php
 
-namespace Frasmage\Mediable\UploadSourceAdapters;
+namespace Frasmage\Mediable\SourceAdapters;
 
-class RemoteUrl implements SourceAdapterInterface
+class LocalPathAdapter implements SourceAdapterInterface
 {
-
-    /**
-     * Cache of headers loaded from the remote server
-     * @var array
-     */
-    private $headers;
 
     /**
      * The source string
@@ -55,7 +49,7 @@ class RemoteUrl implements SourceAdapterInterface
      */
     public function mimeType()
     {
-        return $this->getHeader('Content-Type');
+        return mime_content_type($this->source);
     }
 
     /**
@@ -71,7 +65,7 @@ class RemoteUrl implements SourceAdapterInterface
      */
     public function valid()
     {
-        return strpos($this->getHeader(0), '200');
+        return file_exists($this->source);
     }
 
     /**
@@ -79,22 +73,6 @@ class RemoteUrl implements SourceAdapterInterface
      */
     public function size()
     {
-        return $this->getHeader('Content-Length');
-    }
-
-    /**
-     * [getHeader description]
-     * @param  [type] $key [description]
-     * @return [type]      [description]
-     */
-    private function getHeader($key)
-    {
-        if (!$this->headers) {
-            $this->headers = get_headers($this->source, 1);
-        }
-        if (array_key_exists($key, $this->headers)) {
-            return $this->headers[$key];
-        }
-        return null;
+        return filesize($this->source);
     }
 }
