@@ -36,7 +36,7 @@ return [
     'on_duplicate' => \Frasmage\Mediable\MediaUploader::ON_DUPLICATE_INCREMENT,
 
     /*
-     * Reject files unless both their mime and extension are recognized and match
+     * Reject files unless both their mime and extension are recognized and both match a single type
      */
     'strict_type_checking' => false,
 
@@ -46,12 +46,13 @@ return [
      */
     'allow_unrecognized_types' => false,
 
+
     'allowed_mime_types' => [],
     'allowed_extensions' => [],
     'allowed_types' => [],
 
     /**
-     * Global list of recognized mime types and extensions
+     * Global list of types by recognized mime types and extensions
      */
     'types' => [
         Frasmage\Mediable\Media::TYPE_IMAGE => [

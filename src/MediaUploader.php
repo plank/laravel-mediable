@@ -130,6 +130,7 @@ class MediaUploader
     /**
      * Change the class to use for generated Media
      * @param string $class 
+     * @return static
      * @throws MediaUploaderException if $class does not extend Frasmage\Mediable\Media
      */
     public function setModelClass($class)
@@ -144,6 +145,7 @@ class MediaUploader
     /**
      * Change the maximum allowed filesize
      * @param integer $size
+     * @return static
      */
     public function setMaximumSize($size)
     {
@@ -154,6 +156,7 @@ class MediaUploader
     /**
      * Change the behaviour for when the destination already exists
      * @param string $behavior
+     * @return static
      */
     public function setOnDuplicateBehavior($behavior)
     {
@@ -164,6 +167,7 @@ class MediaUploader
     /**
      * Change whether mime and extensions must agree
      * @param boolean $strict
+     * @return static
      */
     public function setStrictTypeChecking($strict)
     {
@@ -174,6 +178,7 @@ class MediaUploader
     /**
      * Change whether unknown media types are allowed
      * @param boolean $allow
+     * @return static
      */
     public function setAllowUnrecognizedTypes($allow)
     {
@@ -186,12 +191,13 @@ class MediaUploader
      * @param string $type       the name of the type
      * @param array  $mime_types list of MIME types recognized
      * @param array  $extensions list of file extensions recognized
+     * @return static
      */
-    public function setTypeDefinition($type, array $mime_types, array $extensions)
+    public function setTypeDefinition($type, $mime_types, $extensions)
     {
         $this->config['types'][$type] = [
-            'mime_types' => $mime_types,
-            'extensions' => $extensions,
+            'mime_types' => (array) $mime_types,
+            'extensions' => (array) $extensions,
         ];
         return $this;
     }
@@ -227,6 +233,70 @@ class MediaUploader
     {
         $this->config['allowed_types'] = $allowed_types;
         return $this;
+    }
+
+    /**
+     * Determine the media type of the file based on the MIME type and the extension
+     * @param  string $mime_type
+     * @param  string $extension
+     * @param  boolean|null $strict Defaults to mediable.strict_type_checking value
+     * @return string
+     * @throws  MediaUploadException If strict mode is enabled and mime and extension disagree
+     */
+    public function inferMediaType($mime_type, $extension, $strict = null)
+    {
+        $strict = is_null($strict) ? $this->config['strict_type_checking'] : $strict;
+        $types_for_mime = $this->possibleMediaTypesForMimeType($mime_type);
+        $types_for_extension = $this->possibleMediaTypesForExtension($extension);
+
+        $intersection = array_intersect($types_for_mime, $types_for_extension);
+
+        if(count($intersection)){
+            return $intersection[0];
+        }
+
+        if(empty($types_for_mime) && empty($types_for_extension)){
+            return Media::TYPE_OTHER;
+        }
+
+        if($strict){
+            throw MediaUploadException::strictTypeMismatch($mime_type, $extension);
+        }
+        
+        $merged = array_merge($types_for_mime, $types_for_extension);
+        return reset($merged);
+    }
+
+    /**
+     * Determine the media type of the file based on the MIME type
+     * @param  string $mime
+     * @return string
+     */
+    public function possibleMediaTypesForMimeType($mime)
+    {
+        $types = [];
+        foreach($this->config['types'] as $type => $attributes){
+            if(in_array($mime, $attributes['mime_types'])){
+                $types[] = $type;
+            }
+        }
+        return $types;
+    }
+
+    /**
+     * Determine the media type of the file based on the extension
+     * @param  string $extension
+     * @return string|null
+     */
+    public function possibleMediaTypesForExtension($extension)
+    {
+        $types = [];
+        foreach($this->config['types'] as $type => $attributes){
+            if(in_array($extension, $attributes['extensions'])){
+                $types[] = $type;
+            }
+        }
+        return $types;
     }
 
     /**
@@ -276,8 +346,11 @@ class MediaUploader
         }
     }
 
-
-
+    /**
+     * Ensure that the file's mime type is allowed
+     * @param  string $mime_type
+     * @return string
+     */
     private function verifyMimeType($mime_type)
     {
         $allowed = $this->config['allowed_mime_types'];
@@ -287,6 +360,11 @@ class MediaUploader
         return $mime_type;
     }
 
+    /**
+     * Ensure that the file's extension is allowed
+     * @param  string $extension
+     * @return string
+     */
     private function verifyExtension($extension)
     {
         $allowed = $this->config['allowed_extensions'];
@@ -296,6 +374,13 @@ class MediaUploader
         return $extension;
     }
 
+    /**
+     * [verifyMediaType description]
+     * @param  [type] $type      [description]
+     * @param  [type] $mime_type [description]
+     * @param  [type] $extension [description]
+     * @return [type]            [description]
+     */
     private function verifyMediaType($type, $mime_type, $extension)
     {
         if(!$this->config && $type == Media::TYPE_OTHER){
@@ -307,61 +392,6 @@ class MediaUploader
             throw MediaUploadException::typeRestricted($type, $allowed);
         }
         return $type;
-    }
-
-    /**
-     * Determine the media type of the file based on the MIME type and the extension
-     * @param  string $mime
-     * @param  string $extension
-     * @param  boolean|null $strict Defaults to mediable.strict_type_checking value
-     * @return string
-     * @throws  MediaUploadException If strict mode is enabled and mime and extension disagree
-     */
-    public function inferMediaType($mime, $extension, $strict = null)
-    {
-        $strict = is_null($strict) ? $this->config['strict_type_checking'] : $strict;
-        $type_from_mime = $this->inferMediaTypeFromMime($mime);
-        $type_from_ext = $this->inferMediaTypeFromExtension($extension);
-
-        if($strict && $type_from_mime != $type_from_ext){
-            throw MediaUploadException::strictTypeMismatch($mime, $extension);
-        }
-
-        if($type_from_mime != Media::TYPE_OTHER){
-            return $type_from_mime;
-        }
-
-        return $type_from_ext;
-    }
-
-    /**
-     * Determine the media type of the file based on the MIME type
-     * @param  string $mime
-     * @return string
-     */
-    public function inferMediaTypeFromMime($mime)
-    {
-        foreach($this->config['types'] as $type => $attributes){
-            if(in_array($mime, $attributes['mime_types'])){
-                return $type;
-            }
-        }
-        return Media::TYPE_OTHER;
-    }
-
-    /**
-     * Determine the media type of the file based on the extension
-     * @param  string $extension
-     * @return string|null
-     */
-    public function inferMediaTypeFromExtension($extension)
-    {
-        foreach($this->config['types'] as $type => $attributes){
-            if(in_array($extension, $attributes['extensions'])){
-                return $type;
-            }
-        }
-        return Media::TYPE_OTHER;
     }
 
     /**
@@ -431,14 +461,15 @@ class MediaUploader
      * @param  Media $model
      * @return void
      */
-    private function generateUniqueFilename($storage, Media $model)
+    private function generateUniqueFilename(Media $model)
     {
+        $storage = $this->filesystem->disk($model->disk);
         $counter = 0;
         do{
             ++$counter;
             $filename = "{$model->filename} ({$counter})";
             $path = "{$model->directory}/{$filename}.{$model->extension}";
-        }while($this->storage->has($path));
+        }while($storage->has($path));
 
        return $filename;
     }
