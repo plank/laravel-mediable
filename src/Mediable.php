@@ -101,7 +101,7 @@ trait Mediable
 
         $this->rehydrateMediaIfNecessary($tags);
         return $this->media
-        // 
+        //exclude media not matching at least one tag
         ->filter(function ($media) use ($tags) {
                 return in_array($media->pivot->tag, (array) $tags);
         })
@@ -114,21 +114,21 @@ trait Mediable
     public function getMediaMatchAll($tags){
         $tags = (array) $tags;
         $this->rehydrateMediaIfNecessary($tags);
-        return $this->media
-        //froup media by tag name
-        ->groupBy('pivot.tag')
-        //discard unused tags
-        ->filter(function($_, $key) use($tags){
-            return in_array($key, $tags);
+
+        //group all tags for each media
+        $model_tags = $this->media->reduce(function($carry, $media){
+            $carry[$media->getKey()][] = $media->pivot->tag;
+            return $carry;
+        }, []);
+
+        //exclude media not matching all tags
+        return $this->media->filter(function($media) use($tags, $model_tags){
+           return count(array_intersect($tags, $model_tags[$media->getKey()])) === count($tags);
         })
-        //remove media not matching each tag
-        ->reduce(function($media, $tagged){
-            return $media->intersect($tagged);
-        }, $this->media)
         //remove duplicate media
         ->keyBy(function($media){
             return $media->getKey();
-        })->values();
+        })->values();;
     }
 
     /**
@@ -141,11 +141,11 @@ trait Mediable
     }
 
     public function getTagsForMedia(Media $media){
-        return $this->media->filter(function($item) use ($media){
-            return $item->getKey() === $media->getKey();
-        })->map(function($item){
-            return $item->pivot->tag;
-        });
+        return $this->media->reduce(function($carry, $item) use ($media){
+            if($item->getKey() === $media->getKey()){
+                $carry[] = $item->pivot->tag;
+            }
+        }, []);
     }
 
     /**

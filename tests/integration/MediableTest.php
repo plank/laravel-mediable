@@ -16,7 +16,7 @@ class MediableTest extends TestCase
         $this->assertEquals('sample_mediables.id', $relationship->getQualifiedParentKeyName());
     }
 
-    public function test_it_can_attach_and_retrieve_media_by_tag(){
+    public function test_it_can_attach_and_retrieve_media_by_a_tag(){
         $mediable = factory(SampleMediable::class)->create();
         $media1 = factory(Media::class)->create(['id' => 2]);
 
@@ -77,6 +77,24 @@ class MediableTest extends TestCase
         $mediable->attachMedia($media3, 'baz');
 
         $this->assertEquals([1], $mediable->getMedia(['foo', 'bar'], true)->pluck('id')->toArray());
+        $this->assertEquals(0, $mediable->getMedia(['foo', 'bat'], true)->count());
+    }
+
+    public function test_it_can_check_presence_of_attached_media(){
+        $mediable = factory(SampleMediable::class)->create();
+        $media1 = factory(Media::class)->create(['id' => 1]);
+        $media2 = factory(Media::class)->create(['id' => 2]);
+
+        $mediable->attachMedia($media1, 'foo');
+        $mediable->attachMedia($media2, 'foo');
+        $mediable->attachMedia($media2, 'bar');
+
+        $this->assertTrue($mediable->hasMedia('foo'));
+        $this->assertTrue($mediable->hasMedia('bar'));
+        $this->assertFalse($mediable->hasMedia('baz'));
+        $this->assertTrue($mediable->hasMedia(['bar', 'baz'], false), 'Failed to find model matching one of many tag');
+        // dd($mediable->getMedia(['bar', 'baz'], true));
+        $this->assertFalse($mediable->hasMedia(['bar', 'baz'], true), 'Failed to match all tags');
     }
 
     public function test_it_can_detach_media_by_tag(){
