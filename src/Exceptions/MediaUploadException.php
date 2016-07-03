@@ -24,6 +24,11 @@ class MediaUploadException extends Exception
         return new static("No source provided for upload.");
     }
 
+    public static function diskNotFound($disk)
+    {
+        return new static("Cannot find disk named `{$disk}`.");
+    }
+
     public static function diskNotAllowed($disk)
     {
         return new static("The disk `{$disk}` is not in the allowed disks for media.");
@@ -55,7 +60,7 @@ class MediaUploadException extends Exception
         return new static("Cannot upload file with MIME type `{$mime}`. Only the `{$allowed}` MIME type(s) are permitted.");
     }
 
-    public static function extensionRestricter($extension, $allowed_extensions)
+    public static function extensionRestricted($extension, $allowed_extensions)
     {
         $allowed = implode("`, `", $allowed_extensions);
         return new static("Cannot upload file with extension `{$extension}`. Only the `{$allowed}` extension(s) are permitted.");
@@ -69,13 +74,6 @@ class MediaUploadException extends Exception
 
     public static function fileIsTooBig($size, $max)
     {
-        $size = bytestring($size);
-        $max = bytestring($max);
-        return new static("File is too big ({$size}). Maximum upload size is {$max}.");
-    }
-
-    public static function directoryNotWritable($disk, $path)
-    {
-        return new static("Unable to write to `{$path}` on filesystem `{$disk}`.");
+        return new static("File is too big ({$size} bytes). Maximum upload size is {$max} bytes.");
     }
 }

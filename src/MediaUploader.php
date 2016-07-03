@@ -98,7 +98,11 @@ class MediaUploader
      */
     public function setDisk($disk)
     {
-        if(!in_array($disk, $this->config['allowed_disks']) || !in_array($disk, config('filesystems.disks'))){
+        if(!array_key_exists($disk, config('filesystems.disks'))){
+            throw MediaUploadException::diskNotFound($disk);
+        }
+
+        if(!in_array($disk, $this->config['allowed_disks'])){
             throw MediaUploadException::diskNotAllowed($disk);
         }
         $this->disk = $disk;
@@ -209,7 +213,7 @@ class MediaUploader
      */
     public function setAllowedMimeTypes($allowed_mimes)
     {
-        $this->config['allowed_mimes'] = $allowed_mimes;
+        $this->config['allowed_mime_types'] = $allowed_mimes;
         return $this;
     }
 
@@ -310,8 +314,7 @@ class MediaUploader
     {
         $this->verifySource();
         
-        $class = $this->config['model'];
-        $model = new $class;
+        $model = $this->makeModel();
 
         $model->size = $this->verifyFileSize($this->source->size());
         $model->mime_type = $this->verifyMimeType($this->source->mimeType());
@@ -327,9 +330,14 @@ class MediaUploader
 
         $this->verifyDestination($model);
 
-        $this->storage->put($model->diskPath(), $this->source->contents());
+        $this->filesystem->disk($model->disk)->put($model->diskPath(), $this->source->contents());
         $model->save();
         return $model;
+    }
+
+    private function makeModel(){
+        $class = $this->config['model'];
+        return new $class;
     }
 
     /**
@@ -383,7 +391,7 @@ class MediaUploader
      */
     private function verifyMediaType($type, $mime_type, $extension)
     {
-        if(!$this->config && $type == Media::TYPE_OTHER){
+        if(!$this->config['allow_unrecognized_types'] && $type == Media::TYPE_OTHER){
             throw MediaUploadException::unrecognizedFileType($mime_type, $extension);
         }
 
@@ -404,7 +412,7 @@ class MediaUploader
     {
         $max = $this->config['max_size'];
         if($max > 0 && $size > $max){
-            throw MediaUploadException::fileIsTooBig($size);
+            throw MediaUploadException::fileIsTooBig($size, $max);
         }
         return $size;
     }
@@ -418,10 +426,6 @@ class MediaUploader
     private function verifyDestination(Media $model)
     {
         $storage = $this->filesystem->disk($model->disk);
-
-        if(!$storage->isWritable($model->directory)){
-            throw MediaUploadException::directoryNotWritable($model->disk, $model->directory);
-        }
 
         if($storage->has($model->diskPath())){
             $this->handleDuplicate($model);
@@ -451,8 +455,8 @@ class MediaUploader
     {
         Media::where('disk', $model->disk)
             ->where('directory', $model->directory)
-            ->where('filename', $model->filename())
-            ->where('extension', $model->extension())
+            ->where('filename', $model->filename)
+            ->where('extension', $model->extension)
             ->first()->delete();
     }
 

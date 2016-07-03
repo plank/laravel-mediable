@@ -46,13 +46,18 @@ return [
      */
     'allow_unrecognized_types' => false,
 
-
+    /**
+     * Only allow files with specific MIME type to be upload
+     */
     'allowed_mime_types' => [],
     'allowed_extensions' => [],
     'allowed_types' => [],
 
     /**
-     * Global list of types by recognized mime types and extensions
+     * List of types recognized by the application
+     * 
+     * Each type should list the MIME types and extensions
+     * that should be recognized for the type
      */
     'types' => [
         Frasmage\Mediable\Media::TYPE_IMAGE => [

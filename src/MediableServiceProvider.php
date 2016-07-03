@@ -77,7 +77,7 @@ class MediableServiceProvider extends ServiceProvider
     public function registerUploader()
     {
         $this->app->bind('mediable.uploader', function (Container $app) {
-            return new MediaUploader($this->app['filesystem'], $this->app['mediable.factory'], $this->app['config']['mediable']);
+            return new MediaUploader($this->app['filesystem'], $this->app['mediable.factory'], $this->app['config']->get('mediable'));
         });
         $this->app->alias('mediable.uploader', MediaUploader::class);
     }

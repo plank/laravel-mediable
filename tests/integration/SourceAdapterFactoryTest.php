@@ -9,7 +9,7 @@ class SourceAdapterFactoryTest extends TestCase
 	public function test_it_allows_setting_adapter_for_class()
 	{
 		$factory = new SourceAdapterFactory;
-		$source = $this->getMockBuilder(stdClass::class)->getMock();
+		$source = $this->createMock(stdClass::class);
 		$source_class = get_class($source);
 		$adapter_class = $this->getMockClass(SourceAdapterInterface::class);
 
@@ -54,7 +54,7 @@ class SourceAdapterFactoryTest extends TestCase
 
 	public function test_it_returns_adapters_unmodified(){
 		$factory = new SourceAdapterFactory;
-		$adapter = $this->getMockBuilder(SourceAdapterInterface::class)->getMock();
+		$adapter = $this->createMock(SourceAdapterInterface::class);
 		
 		$this->assertEquals($adapter, $factory->create($adapter));
 	}

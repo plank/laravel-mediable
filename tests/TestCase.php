@@ -55,6 +55,11 @@ class TestCase extends BaseTestCase
             'root' => public_path('uploads'),
             'visibility' => 'public'
         ]);
+        
+        $app['config']->set('mediable.allowed_disks', [
+            'tmp', 
+            'uploads'
+        ]);
 
         //set up glide configs
         $app['config']->set('laravel-glide', [

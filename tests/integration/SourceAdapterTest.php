@@ -47,6 +47,15 @@ class SourceAdapterTest extends TestCase
 	/**
 	 * @dataProvider adapterProvider
 	 */
+	public function test_it_can_return_source($adapter, $source)
+	{
+		$adapter = new $adapter($source);
+		$this->assertEquals($source, $adapter->getSource());
+	}
+
+	/**
+	 * @dataProvider adapterProvider
+	 */
 	public function test_it_adapts_absolute_path($adapter, $source, $path)
 	{
 		$adapter = new $adapter($source);
