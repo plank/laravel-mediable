@@ -15,6 +15,6 @@ $factory->define(Frasmage\Mediable\Media::class, function (Faker\Generator $fake
     ];
 });
 
-$factory->define(SampleMediable::class, function(Faker\Generator $faker) {
+$factory->define(SampleMediable::class, function (Faker\Generator $faker) {
     return [];
 });

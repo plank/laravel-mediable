@@ -6,11 +6,13 @@ use Exception;
 
 class MediaUploadException extends Exception
 {
-    public static function cannotSetAdapter($class){
+    public static function cannotSetAdapter($class)
+    {
         return new static("Could not set adapter of class `{$class}`. Must implement `\Frasmage\Mediable\SourceAdapters\SourceAdapterInterface`.");
     }
 
-    public static function cannotSetModel($class){
+    public static function cannotSetModel($class)
+    {
         return new static("Could not set `{$class}` as Media model class. Must extend `\Frasmage\Mediable\Media`.");
     }
 
@@ -20,7 +22,8 @@ class MediaUploadException extends Exception
         return new static("Could not recognize source, `{$source}` provided.");
     }
 
-    public static function noSourceProvided(){
+    public static function noSourceProvided()
+    {
         return new static("No source provided for upload.");
     }
 

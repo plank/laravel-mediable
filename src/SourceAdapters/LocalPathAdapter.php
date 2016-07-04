@@ -20,7 +20,8 @@ class LocalPathAdapter implements SourceAdapterInterface
         $this->source = $source;
     }
 
-    public function getSource(){
+    public function getSource()
+    {
         return $this->source;
     }
 

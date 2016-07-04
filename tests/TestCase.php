@@ -57,7 +57,7 @@ class TestCase extends BaseTestCase
         ]);
         
         $app['config']->set('mediable.allowed_disks', [
-            'tmp', 
+            'tmp',
             'uploads'
         ]);
 

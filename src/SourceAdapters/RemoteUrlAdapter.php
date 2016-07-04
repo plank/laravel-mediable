@@ -26,7 +26,8 @@ class RemoteUrlAdapter implements SourceAdapterInterface
         $this->source = $source;
     }
 
-    public function getSource(){
+    public function getSource()
+    {
         return $this->source;
     }
 
@@ -97,11 +98,11 @@ class RemoteUrlAdapter implements SourceAdapterInterface
             $this->headers = get_headers($this->source, 1);
         }
         if (array_key_exists($key, $this->headers)) {
-        	//if redirects encountered, return the final values
-            if(is_array($this->headers[$key])){
-            	return end($this->headers[$key]);
-            }else{
-            	return $this->headers[$key];
+            //if redirects encountered, return the final values
+            if (is_array($this->headers[$key])) {
+                return end($this->headers[$key]);
+            } else {
+                return $this->headers[$key];
             }
         }
         return null;

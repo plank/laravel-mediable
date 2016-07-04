@@ -57,11 +57,11 @@ class MediableServiceProvider extends ServiceProvider
             $factory = new SourceAdapterFactory;
             $adapters = $app['config']->get('mediable.source_adapters');
             
-            foreach($adapters['class'] as $source => $adapter){
+            foreach ($adapters['class'] as $source => $adapter) {
                 $factory->setAdapterForClass($adapter, $source);
             }
 
-            foreach($adapters['pattern'] as $source => $adapter){
+            foreach ($adapters['pattern'] as $source => $adapter) {
                 $factory->setAdapterForPattern($adapter, $source);
             }
 

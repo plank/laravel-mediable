@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
  */
 class MediableTest extends TestCase
 {
-    public function test_it_can_be_related_to_media(){
+    public function test_it_can_be_related_to_media()
+    {
         $mediable = factory(SampleMediable::class)->make();
         $relationship = $mediable->media();
 
@@ -19,7 +20,8 @@ class MediableTest extends TestCase
         $this->assertEquals('sample_mediables.id', $relationship->getQualifiedParentKeyName());
     }
 
-    public function test_it_can_attach_and_retrieve_media_by_a_tag(){
+    public function test_it_can_attach_and_retrieve_media_by_a_tag()
+    {
         $mediable = factory(SampleMediable::class)->create();
         $media1 = factory(Media::class)->create(['id' => 2]);
 
@@ -31,7 +33,8 @@ class MediableTest extends TestCase
     }
 
 
-    public function test_it_can_attach_one_media_to_multiple_tags(){
+    public function test_it_can_attach_one_media_to_multiple_tags()
+    {
         $mediable = factory(SampleMediable::class)->create();
         $media1 = factory(Media::class)->create(['id' => 2]);
 
@@ -43,7 +46,8 @@ class MediableTest extends TestCase
         $this->assertEquals(0, $mediable->getMedia('baz')->count(), 'Found media for non-existent tag');
     }
 
-    public function test_it_can_attach_multiple_media_to_multiple_tags_simultaneously(){
+    public function test_it_can_attach_multiple_media_to_multiple_tags_simultaneously()
+    {
         $mediable = factory(SampleMediable::class)->create();
         $media1 = factory(Media::class)->create();
         $media2 = factory(Media::class)->create();
@@ -54,7 +58,8 @@ class MediableTest extends TestCase
         $this->assertCount(2, $mediable->getMedia('bar'));
     }
 
-    public function test_it_can_find_the_first_media(){
+    public function test_it_can_find_the_first_media()
+    {
         $mediable = factory(SampleMediable::class)->create();
         $media1 = factory(Media::class)->create(['id' => 1]);
         $media2 = factory(Media::class)->create(['id' => 2]);
@@ -65,7 +70,8 @@ class MediableTest extends TestCase
         $this->assertEquals(1, $mediable->firstMedia('foo')->id);
     }
 
-    public function test_it_can_find_media_matching_any_tags(){
+    public function test_it_can_find_media_matching_any_tags()
+    {
         $mediable = factory(SampleMediable::class)->create();
         $media1 = factory(Media::class)->create(['id' => 1]);
         $media2 = factory(Media::class)->create(['id' => 2]);
@@ -79,7 +85,8 @@ class MediableTest extends TestCase
         $this->assertEquals([1, 2], $mediable->getMedia(['foo', 'bar'], false)->pluck('id')->toArray());
     }
 
-    public function test_it_can_find_media_matching_multiple_tags(){
+    public function test_it_can_find_media_matching_multiple_tags()
+    {
         $mediable = factory(SampleMediable::class)->create();
         $media1 = factory(Media::class)->create(['id' => 1]);
         $media2 = factory(Media::class)->create(['id' => 2]);
@@ -94,7 +101,8 @@ class MediableTest extends TestCase
         $this->assertEquals(0, $mediable->getMedia(['foo', 'bat'], true)->count());
     }
 
-    public function test_it_can_check_presence_of_attached_media(){
+    public function test_it_can_check_presence_of_attached_media()
+    {
         $mediable = factory(SampleMediable::class)->create();
         $media1 = factory(Media::class)->create(['id' => 1]);
         $media2 = factory(Media::class)->create(['id' => 2]);
@@ -111,7 +119,8 @@ class MediableTest extends TestCase
         $this->assertFalse($mediable->hasMedia(['bar', 'baz'], true), 'Failed to match all tags');
     }
 
-    public function test_it_can_list_media_by_tag(){
+    public function test_it_can_list_media_by_tag()
+    {
         $mediable = factory(SampleMediable::class)->create();
         $media1 = factory(Media::class)->create(['id' => 1]);
         $media2 = factory(Media::class)->create(['id' => 2]);
@@ -123,10 +132,10 @@ class MediableTest extends TestCase
         $this->assertEquals(['foo', 'bar'], $result->keys()->toArray());
         $this->assertEquals([1], $result['foo']->pluck('id')->toArray());
         $this->assertEquals([2], $result['bar']->pluck('id')->toArray());
-
     }
 
-    public function test_it_can_detach_media_by_tag(){
+    public function test_it_can_detach_media_by_tag()
+    {
         $mediable = factory(SampleMediable::class)->create();
         $media = factory(Media::class)->create();
         $mediable->attachMedia($media, 'foo');
@@ -135,13 +144,15 @@ class MediableTest extends TestCase
         $this->assertEquals(0, $mediable->getMedia('foo')->count());
     }
 
-    public function test_it_can_detach_media_of_multiple_tags(){
+    public function test_it_can_detach_media_of_multiple_tags()
+    {
         $mediable = factory(SampleMediable::class)->create();
         $media1 = factory(Media::class)->create(['id'=>1]);
         $media2 = factory(Media::class)->create(['id'=>2]);
     }
 
-    public function test_it_can_sync_media_by_tag(){
+    public function test_it_can_sync_media_by_tag()
+    {
         $mediable = factory(SampleMediable::class)->create();
         $media1 = factory(Media::class)->create(['id' => 2]);
         $media2 = factory(Media::class)->create(['id' => 3]);
@@ -154,7 +165,8 @@ class MediableTest extends TestCase
         $this->assertEquals([3], $mediable->getMedia('bar')->pluck('id')->toArray(), 'Modified other tags');
     }
 
-    public function test_it_can_sync_media_to_multiple_tags(){
+    public function test_it_can_sync_media_to_multiple_tags()
+    {
         $mediable = factory(SampleMediable::class)->create();
         $media1 = factory(Media::class)->create(['id' => 2]);
         $media2 = factory(Media::class)->create(['id' => 3]);
@@ -170,7 +182,8 @@ class MediableTest extends TestCase
         $this->assertEquals([3, 4], $mediable->getMedia('baz')->pluck('id')->toArray());
     }
 
-    public function test_it_can_be_queried_by_tag(){
+    public function test_it_can_be_queried_by_tag()
+    {
         $mediable = factory(SampleMediable::class)->create();
         $media = factory(Media::class)->create();
         $mediable->attachMedia($media, 'foo');
@@ -179,7 +192,8 @@ class MediableTest extends TestCase
         $this->assertEquals(0, SampleMediable::whereHasMedia('bar')->count(), 'Queriable by non-existent group');
     }
 
-    public function test_it_can_list_the_tags_a_media_is_attached_to(){
+    public function test_it_can_list_the_tags_a_media_is_attached_to()
+    {
         $mediable = factory(SampleMediable::class)->create();
         $media = factory(Media::class)->create();
 
@@ -189,7 +203,8 @@ class MediableTest extends TestCase
         $this->assertEquals(['foo', 'bar'], $mediable->getTagsForMedia($media));
     }
 
-    public function test_it_can_disable_automatic_rehydration(){
+    public function test_it_can_disable_automatic_rehydration()
+    {
         $mediable = factory(SampleMediable::class)->create();
         $mediable->rehydrates_media = false;
         $media = factory(Media::class)->create();
@@ -198,5 +213,4 @@ class MediableTest extends TestCase
         $mediable->attachMedia($media, 'foo');
         $this->assertEquals(0, $mediable->getMedia('foo')->count());
     }
-
 }

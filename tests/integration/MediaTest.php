@@ -6,7 +6,6 @@ use Frasmage\Mediable\Exceptions\MediaMoveException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
-
 class MediaTest extends TestCase
 {
     public function test_it_can_be_related_to_other_models()
@@ -210,6 +209,5 @@ class MediaTest extends TestCase
         $this->assertFileExists($path);
         $media->delete();
         $this->assertFalse(file_exists($path));
-
     }
 }

@@ -98,11 +98,11 @@ class MediaUploader
      */
     public function setDisk($disk)
     {
-        if(!array_key_exists($disk, config('filesystems.disks'))){
+        if (!array_key_exists($disk, config('filesystems.disks'))) {
             throw MediaUploadException::diskNotFound($disk);
         }
 
-        if(!in_array($disk, $this->config['allowed_disks'])){
+        if (!in_array($disk, $this->config['allowed_disks'])) {
             throw MediaUploadException::diskNotAllowed($disk);
         }
         $this->disk = $disk;
@@ -139,7 +139,7 @@ class MediaUploader
      */
     public function setModelClass($class)
     {
-        if(!is_subclass_of($class, Media::class)){
+        if (!is_subclass_of($class, Media::class)) {
             throw MediaUploadException::cannotSetModel($class);
         }
         $this->config['model'] = $class;
@@ -255,15 +255,15 @@ class MediaUploader
 
         $intersection = array_intersect($types_for_mime, $types_for_extension);
 
-        if(count($intersection)){
+        if (count($intersection)) {
             return $intersection[0];
         }
 
-        if(empty($types_for_mime) && empty($types_for_extension)){
+        if (empty($types_for_mime) && empty($types_for_extension)) {
             return Media::TYPE_OTHER;
         }
 
-        if($strict){
+        if ($strict) {
             throw MediaUploadException::strictTypeMismatch($mime_type, $extension);
         }
         
@@ -279,8 +279,8 @@ class MediaUploader
     public function possibleMediaTypesForMimeType($mime)
     {
         $types = [];
-        foreach($this->config['types'] as $type => $attributes){
-            if(in_array($mime, $attributes['mime_types'])){
+        foreach ($this->config['types'] as $type => $attributes) {
+            if (in_array($mime, $attributes['mime_types'])) {
                 $types[] = $type;
             }
         }
@@ -295,8 +295,8 @@ class MediaUploader
     public function possibleMediaTypesForExtension($extension)
     {
         $types = [];
-        foreach($this->config['types'] as $type => $attributes){
-            if(in_array($extension, $attributes['extensions'])){
+        foreach ($this->config['types'] as $type => $attributes) {
+            if (in_array($extension, $attributes['extensions'])) {
                 $types[] = $type;
             }
         }
@@ -335,7 +335,8 @@ class MediaUploader
         return $model;
     }
 
-    private function makeModel(){
+    private function makeModel()
+    {
         $class = $this->config['model'];
         return new $class;
     }
@@ -345,11 +346,12 @@ class MediaUploader
      * @return void
      * @throws MediaUploadException If no source is provided or is invalid
      */
-    private function verifySource(){
-        if(empty($this->source)){
+    private function verifySource()
+    {
+        if (empty($this->source)) {
             throw MediaUploadException::noSourceProvided();
         }
-        if(!$this->source->valid()){
+        if (!$this->source->valid()) {
             throw MediaUploadException::fileNotFound($this->source->path());
         }
     }
@@ -362,7 +364,7 @@ class MediaUploader
     private function verifyMimeType($mime_type)
     {
         $allowed = $this->config['allowed_mime_types'];
-        if(!empty($allowed) && !in_array($mime_type, $allowed)){
+        if (!empty($allowed) && !in_array($mime_type, $allowed)) {
             throw MediaUploadException::mimeRestricted($mime_type, $allowed);
         }
         return $mime_type;
@@ -376,7 +378,7 @@ class MediaUploader
     private function verifyExtension($extension)
     {
         $allowed = $this->config['allowed_extensions'];
-        if(!empty($allowed) && !in_array($extension, $allowed)){
+        if (!empty($allowed) && !in_array($extension, $allowed)) {
             throw MediaUploadException::extensionRestricted($extension, $allowed);
         }
         return $extension;
@@ -391,12 +393,12 @@ class MediaUploader
      */
     private function verifyMediaType($type, $mime_type, $extension)
     {
-        if(!$this->config['allow_unrecognized_types'] && $type == Media::TYPE_OTHER){
+        if (!$this->config['allow_unrecognized_types'] && $type == Media::TYPE_OTHER) {
             throw MediaUploadException::unrecognizedFileType($mime_type, $extension);
         }
 
         $allowed = $this->config['allowed_types'];
-        if(!empty($allowed) && !in_array($type, $allowed)){
+        if (!empty($allowed) && !in_array($type, $allowed)) {
             throw MediaUploadException::typeRestricted($type, $allowed);
         }
         return $type;
@@ -411,7 +413,7 @@ class MediaUploader
     private function verifyFileSize($size)
     {
         $max = $this->config['max_size'];
-        if($max > 0 && $size > $max){
+        if ($max > 0 && $size > $max) {
             throw MediaUploadException::fileIsTooBig($size, $max);
         }
         return $size;
@@ -427,13 +429,14 @@ class MediaUploader
     {
         $storage = $this->filesystem->disk($model->disk);
 
-        if($storage->has($model->diskPath())){
+        if ($storage->has($model->diskPath())) {
             $this->handleDuplicate($model);
         }
     }
 
-    private function handleDuplicate(Media $model){
-        switch($this->config['on_duplicate']){
+    private function handleDuplicate(Media $model)
+    {
+        switch ($this->config['on_duplicate']) {
             case static::ON_DUPLICATE_ERROR:
                 throw MediaUploadException::fileExists($model->diskpath);
                 break;
@@ -469,13 +472,13 @@ class MediaUploader
     {
         $storage = $this->filesystem->disk($model->disk);
         $counter = 0;
-        do{
+        do {
             ++$counter;
             $filename = "{$model->filename} ({$counter})";
             $path = "{$model->directory}/{$filename}.{$model->extension}";
-        }while($storage->has($path));
+        } while ($storage->has($path));
 
-       return $filename;
+        return $filename;
     }
 
     /**
@@ -483,7 +486,8 @@ class MediaUploader
      * @param  string $path
      * @return string
      */
-    private function sanitizePath($path){
+    private function sanitizePath($path)
+    {
         return str_replace(['#', '?', '\\'], '-', $path);
     }
 
@@ -492,8 +496,8 @@ class MediaUploader
      * @param  string $file
      * @return string
      */
-    private function sanitizeFileName($file){
+    private function sanitizeFileName($file)
+    {
         return str_replace(['#', '?', '\\', '/'], '-', $file);
     }
-
 }

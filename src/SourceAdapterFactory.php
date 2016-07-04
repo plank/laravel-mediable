@@ -7,7 +7,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Frasmage\Mediable\Exceptions\MediaUploadException;
 use Frasmage\Mediable\SourceAdapters\SourceAdapterInterface;
 
-class SourceAdapterFactory{
+class SourceAdapterFactory
+{
 
     /**
      * Map of which adapters to use for a given source class
@@ -29,17 +30,15 @@ class SourceAdapterFactory{
      */
     public function create($source)
     {
-        if($source instanceof SourceAdapterInterface){
+        if ($source instanceof SourceAdapterInterface) {
             return $source;
-        }
-        else if(is_object($source)){
+        } elseif (is_object($source)) {
             $adapter = $this->adaptClass($source);
-        }
-        else if(is_string($source)){
+        } elseif (is_string($source)) {
             $adapter = $this->adaptString($source);
         }
 
-        if($adapter){
+        if ($adapter) {
             return new $adapter($source);
         }
 
@@ -82,7 +81,7 @@ class SourceAdapterFactory{
         $tree = class_parents($source);
         array_unshift($tree, get_class($source));
         foreach ($this->class_adapters as $class => $adapter) {
-            if(in_array($class, $tree)){
+            if (in_array($class, $tree)) {
                 return $adapter;
             }
         }
@@ -96,9 +95,9 @@ class SourceAdapterFactory{
      */
     private function adaptString($source)
     {
-        foreach($this->pattern_adapters as $pattern => $adapter){
+        foreach ($this->pattern_adapters as $pattern => $adapter) {
             $pattern = '/'.str_replace('/', '\\/', $pattern).'/i';
-            if(preg_match($pattern, $source)){
+            if (preg_match($pattern, $source)) {
                 return $adapter;
             }
         }
@@ -111,10 +110,10 @@ class SourceAdapterFactory{
      * @throws MediaUploadException If class is not valid
      * @return void
      */
-    private function validateAdapterClass($class){
-        if(!class_implements($class, SourceAdapterInterface::class)){
+    private function validateAdapterClass($class)
+    {
+        if (!class_implements($class, SourceAdapterInterface::class)) {
             throw MediaUploadException::cannotSetAdapter($class);
         }
     }
-
 }
