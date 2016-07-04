@@ -18,18 +18,18 @@ class SourceAdapterTest extends TestCase
 	{
 		parent::getEnvironmentSetUp($app);
 		$app['filesystem']->disk('uploads')->put('plank.png', fopen(__DIR__.'/../_data/plank.png','r'));
-		
+
 	}
 
 	public function adapterProvider()
 	{
 		$file = realpath(__DIR__.'/../_data/plank.png');
-		$url = 'http://localhost/uploads/plank.png';
+		$url = 'https://www.plankdesign.com/externaluse/plank.png';
 		$data = [
 			[FileAdapter::class, new File($file), $file],
 			[UploadedFileAdapter::class, new UploadedFile($file, 'plank.png', 'image/png', 8444, UPLOAD_ERR_OK, true), $file],
 			[LocalPathAdapter::class, $file, $file],
-			// [RemoteUrlAdapter::class, $url, $url]
+			[RemoteUrlAdapter::class, $url, $url]
 		];
 		return $data;
 	}

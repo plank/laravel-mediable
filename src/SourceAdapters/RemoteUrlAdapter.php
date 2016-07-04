@@ -75,7 +75,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
      */
     public function valid()
     {
-        return strpos($this->getHeader(0), '200');
+        return strpos($this->getHeader(0), '200') !== false;
     }
 
     /**
@@ -87,9 +87,9 @@ class RemoteUrlAdapter implements SourceAdapterInterface
     }
 
     /**
-     * [getHeader description]
-     * @param  [type] $key [description]
-     * @return [type]      [description]
+     * Read the headers of the remote content
+     * @param  string $key Header name
+     * @return mixed
      */
     private function getHeader($key)
     {
@@ -97,7 +97,12 @@ class RemoteUrlAdapter implements SourceAdapterInterface
             $this->headers = get_headers($this->source, 1);
         }
         if (array_key_exists($key, $this->headers)) {
-            return $this->headers[$key];
+        	//if redirects encountered, return the final values
+            if(is_array($this->headers[$key])){
+            	return end($this->headers[$key]);
+            }else{
+            	return $this->headers[$key];
+            }
         }
         return null;
     }
