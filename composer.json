@@ -1,6 +1,6 @@
 {
     "name": "frasmage/laravel-mediable",
-    "description": "A package for easily managing and assigning media files to models with Laravel",
+    "description": "A package for easily uploading and attaching media files to models with Laravel",
     "keywords": ["media", "image", "uploader", "eloquent"],
     "license": "MIT",
     "authors": [
