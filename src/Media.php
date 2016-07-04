@@ -9,6 +9,14 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Storage;
 
+/**
+ * Media Model
+ *
+ * @var string $basename
+ * @var string $dirname
+ *
+ * @author Sean Fraser <sean@plankdesign.com>
+ */
 class Media extends Model
 {
 

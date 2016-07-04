@@ -10,6 +10,13 @@ use Frasmage\Mediable\SourceAdapters\SourceAdapterInterface;
 use Illuminate\Filesystem\FileSystemManager;
 use Storage;
 
+/**
+ * Media Uploader
+ *
+ * Validates files, uploads them to disk and generates Media
+ *
+ * @author Sean Fraser <sean@plankdesign.com>
+ */
 class MediaUploader
 {
     const ON_DUPLICATE_REPLACE = 'replace';
@@ -133,7 +140,7 @@ class MediaUploader
 
     /**
      * Change the class to use for generated Media
-     * @param string $class 
+     * @param string $class
      * @return static
      * @throws MediaUploaderException if $class does not extend Frasmage\Mediable\Media
      */
@@ -266,7 +273,7 @@ class MediaUploader
         if ($strict) {
             throw MediaUploadException::strictTypeMismatch($mime_type, $extension);
         }
-        
+
         $merged = array_merge($types_for_mime, $types_for_extension);
         return reset($merged);
     }
@@ -313,7 +320,7 @@ class MediaUploader
     public function upload()
     {
         $this->verifySource();
-        
+
         $model = $this->makeModel();
 
         $model->size = $this->verifyFileSize($this->source->size());
@@ -322,8 +329,8 @@ class MediaUploader
 
         $type = $this->inferMediaType($model->mime_type, $model->extension);
         $model->type = $this->verifyMediaType($type, $model->mime_type, $model->extension);
-        
-        
+
+
         $model->disk = $this->disk ?: $this->config['default_disk'];
         $model->directory = $this->directory;
         $model->filename = $this->filename ?: $this->sanitizeFilename($source->filename());

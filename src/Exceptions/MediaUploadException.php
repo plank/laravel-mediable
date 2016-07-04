@@ -4,6 +4,9 @@ namespace Frasmage\Mediable\Exceptions;
 
 use Exception;
 
+/**
+ * @author Sean Fraser <sean@plankdesign.com>
+ */
 class MediaUploadException extends Exception
 {
     public static function cannotSetAdapter($class)

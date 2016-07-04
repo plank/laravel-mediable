@@ -4,6 +4,13 @@ namespace Frasmage\Mediable\SourceAdapters;
 
 use Symfony\Component\HttpFoundation\File\File;
 
+/**
+ * File Adapter
+ *
+ * Adapts the File class from Symfony Components
+ *
+ * @author Sean Fraser <sean@plankdesign.com>
+ */
 class FileAdapter implements SourceAdapterInterface
 {
 

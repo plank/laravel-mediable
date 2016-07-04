@@ -2,6 +2,13 @@
 
 namespace Frasmage\Mediable\SourceAdapters;
 
+/**
+ * URL Adapter
+ *
+ * Adapts a string representing a URL
+ *
+ * @author Sean Fraser <sean@plankdesign.com>
+ */
 class RemoteUrlAdapter implements SourceAdapterInterface
 {
 

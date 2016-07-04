@@ -7,6 +7,13 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Frasmage\Mediable\Exceptions\MediaUploadException;
 use Frasmage\Mediable\SourceAdapters\SourceAdapterInterface;
 
+/**
+ * Source Adapter Factory
+ *
+ * Generates SourceAdapter instances for different sources
+ *
+ * @author Sean Fraser <sean@plankdesign.com>
+ */
 class SourceAdapterFactory
 {
 

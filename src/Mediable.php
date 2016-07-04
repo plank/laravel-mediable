@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Builder;
 /**
  * Mediable Trait
  *
+ * Provides functionality for attaching media to an eloquent model.
+ *
+ * @author Sean Fraser <sean@plankdesign.com>
  * @var boolean $rehydrates_media
  * Whether the model should automatically reload its media relationship after modification.
  */

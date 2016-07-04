@@ -4,6 +4,9 @@ namespace Frasmage\Mediable\Exceptions;
 
 use \Exception;
 
+/**
+ * @author Sean Fraser <sean@plankdesign.com>
+ */
 class MediaMoveException extends Exception
 {
     public static function destinationExists($path)

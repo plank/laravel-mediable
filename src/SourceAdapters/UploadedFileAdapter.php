@@ -4,6 +4,13 @@ namespace Frasmage\Mediable\SourceAdapters;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+/**
+ * Uploaded File Adapter
+ *
+ * Adapts the UploadedFile class from Symfony Components.
+ *
+ * @author Sean Fraser <sean@plankdesign.com>
+ */
 class UploadedFileAdapter implements SourceAdapterInterface
 {
 

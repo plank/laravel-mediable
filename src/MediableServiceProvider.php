@@ -12,6 +12,13 @@ use Illuminate\Contracts\Container\Container;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+/**
+ * Mediable Service Provider
+ *
+ * Registers Laravel-Mediable package functionality
+ *
+ * @author Sean Fraser <sean@plankdesign.com>
+ */
 class MediableServiceProvider extends ServiceProvider
 {
     /**
@@ -56,7 +63,7 @@ class MediableServiceProvider extends ServiceProvider
         $this->app->singleton('mediable.factory', function (Container $app) {
             $factory = new SourceAdapterFactory;
             $adapters = $app['config']->get('mediable.source_adapters');
-            
+
             foreach ($adapters['class'] as $source => $adapter) {
                 $factory->setAdapterForClass($adapter, $source);
             }

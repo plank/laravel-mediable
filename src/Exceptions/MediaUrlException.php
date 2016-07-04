@@ -4,6 +4,9 @@ namespace Frasmage\Mediable\Exceptions;
 
 use Exception;
 
+/**
+ * @author Sean Fraser <sean@plankdesign.com>
+ */
 class MediaUrlException extends Exception
 {
     public static function mediaNotPubliclyAccessible($path, $public_path)
