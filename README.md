@@ -51,8 +51,215 @@ php artisan migrate
 
 ## Uploading Files
 
-## Attaching Media
+The easiest way to upload media to your server is with the `MediaUploader` class, which handles validating the file, moving it to its destination and creating a `Media` instance to reference it. You can get an instance of the MediaUploader using the Facade and configure it with a fluent interface.
 
+```php
+$media = MediaUploader::fromSource($request->file('thumbnail'))
+	->toDestination('uploads', '/') // root of the uploads disk
+	->withFilename('thumbnail') // override the source's filename
+	->upload();
+```
+
+The `fromSource()` method will accept either
+
+- an instance of `Symfony\Component\HttpFoundation\File`
+- an instance of `Symfony\Component\HttpFoundation\UploadedFile`
+- a URL as a string.
+- an absolute path as a string.
+
+You can override the most configuration values that apply to the uploader on a case-by-case basis using the same fluent interface.
+
+```php
+$media = MediaUploader::fromSource($request->file('image'))
+	->toDestination('uploads', '/')
+	->setModelClass(MediSubclass::class)
+	->setMaximumSize(99999)
+	->setOnDuplicateBehavior(Media::ON_DUPLICATE_REPLACE)
+	->setStrictTypeChecking(true)
+	->setAllowUnrecognizedTypes(true)
+	->setAllowedMimeTypes(['image/jpeg'])
+	->setAllowedExtensions(['jpg', 'jpeg'])
+	->setAllowedMediaTypes(['image'])
+	->upload();
+```
+
+
+## Using Media
+
+Add the `Mediable` trait to any Eloquent models that you would like to attach media to.
+
+```php
+<?php
+
+namespace App;
+
+use Illuminate\Database\Eloquent\Model;
+use Frasmage\Mediable\Mediable;
+
+class Post extends Model
+{
+	use Mediable;
+	
+	// ...
+}
+```
+
+### Attaching Media
+
+You can attach media to your model using the `attachMedia()` method. This method takes a second argument, specifying one or more tags which define the relationship between the model and the media.
+
+```php
+$post = Post::first();
+$post->attachMedia($media, 'thumbnail');
+```
+
+You can attach multiple media to the same tag with a single call. The `attachMedia()` method accept any of the following for its first parameter:
+
+- a numeric or string id
+- an instance of `Media`
+- an array of ids
+- an instance of `\Illuminate\Database\Eloquent\Collection`
+
+```php
+$post->attachMedia([$media1->id, $media2->id], 'gallery');
+```
+
+You can also assign a media to multiple tags with a single call.
+
+```php
+$post->attachMedia($media, ['gallery', 'featured']);
+```
+
+The `attachMedia()` method will add a new association, but will not remove any existing associations to other media. If you want to replace the media previously attached to the specified tag(s) you can use the `syncMedia()` method. This method accepts the same inputs as `attachMedia()`.
+
+```php
+$post->syncMedia($media, 'thumbnail');
+```
+
+### Checking for the Presence of Media
+
+You can verify if a model has one or more media assigned to a given tag with the `hasMedia()` method.
+
+```php
+if($post->hasMedia('thumbnail')){
+	// ...
+}
+```
+
+If you specify multiple tags, the method will return `true` if media is attached for any media. Set the `$match_all` parameter to `true` to tell the method to only return `true` if a single media is assigned to all of the specified tags.
+
+```php
+$post->hasMedia(['header', 'footer']); // either
+$post->hasMedia(['header', 'footer'], true) //both
+```
+
+You also can perform this check using the query builder.
+
+```php
+$posts = Post::whereHasMedia('thumbnail')->get();
+```
+
+### Retrieving Media
+
+You can retrieve media attached to a file by refering to the tag to which it was previously assigned.
+
+```php 
+$media = $post->getMedia('thumbnail');
+```
+
+This returns a collection of all media assigned to that tag. In cases where you only need one `Media` entity, you can instead use `firstMedia()`.
+
+```php 
+$media = $post->firstMedia('thumbnail');
+```
+
+You can specify multiple tags when calling either method, which functions similarly to `hasMedia()`.
+
+### Detaching Media
+
+ 
+
+## Media Paths
+
+`Media` instances keep track of the location of their file and are able to generate a number of paths and URLs relative to the file. Consider the following example:
+
+*config/filesystems.php*
+
+```php
+'disks' => [
+	'uploads' => [
+		'driver' => 'local',
+		'root' => public_path('uploads')
+	]
+],
+```
+
+*given a `Media` instance with the following attributes* 
+
+```
+
+[
+	'disk' => 'uploads',
+	'directory' => 'foo/bar',
+	'filename' => 'picture',
+	'extension' => 'jpg'
+	// ...
+];
+```
+
+The following path attributes and methods would be exposed
+
+```php
+$media->absolutePath() 
+# /var/www/site/public/uploads/foo/bar/picture.jpg
+
+$media->dirname;
+# /var/www/site/public/uploads/foo/bar
+
+$media->diskPath() 
+# foo/bar/picture.jpg
+
+$media->directory;
+# foo/bar
+
+$media->basename;
+# picture.jpg
+
+$media->filename;
+# picture
+
+$media->extension;
+# jpg
+```
+
+### Public Paths
+
+If the file is located below the webroot, the following methods are also available:
+
+```php
+$media->publicPath();
+# /uploads/foo/bar/picture.jpg
+
+$media->url();
+# http://localhost/uploads/foo/bar/picture.jpg
+```
+
+You can check if a file is loated below the webroot with
+
+```php
+$media->isPubliclyAccessible();
+```
+
+### Glide Integration
+
+If the [spatie/laravel-glide](https://github.com/spatie/laravel-glide) package is installed and a file is below Glide's source directory, the following helper methods are also available.
+
+```php
+$media->glidePath() //path relative to the glide root
+# /foo/bar/picture.jpg
+
+$media->glideUrl(['w' => 400]); //generate glide image
+# http://localhost/glide/foo/bar/picture.jpg?w=400&s=...
+```
 ## Querying Media
-
 
