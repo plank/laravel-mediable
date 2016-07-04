@@ -87,7 +87,7 @@ class MediaTest extends TestCase
     {
         $media = factory(Media::class)->make(['size' => 0]);
 
-        $this->assertEquals('0 bytes', $media->readableSize());
+        $this->assertEquals('0 B', $media->readableSize());
 
         $media->size = 1024 * 1024;
         $this->assertEquals('1 MB', $media->readableSize(0));

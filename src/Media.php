@@ -117,9 +117,9 @@ class Media extends Model
     public function readableSize($precision = 1)
     {
         if ($this->size === 0) {
-            return '0 bytes';
+            return '0 B';
         }
-        $units = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
+        static $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
         $exponent = floor(log($this->size, 1024));
         $value = $this->size / pow(1024, $exponent);
         return round($value, $precision) . ' ' . $units[$exponent];
