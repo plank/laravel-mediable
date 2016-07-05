@@ -115,7 +115,6 @@ class MediableTest extends TestCase
         $this->assertTrue($mediable->hasMedia('bar'));
         $this->assertFalse($mediable->hasMedia('baz'));
         $this->assertTrue($mediable->hasMedia(['bar', 'baz'], false), 'Failed to find model matching one of many tag');
-        // dd($mediable->getMedia(['bar', 'baz'], true));
         $this->assertFalse($mediable->hasMedia(['bar', 'baz'], true), 'Failed to match all tags');
     }
 
@@ -201,8 +200,8 @@ class MediableTest extends TestCase
         $mediable->attachMedia($media1, ['foo', 'bar']);
         $mediable->attachMedia($media2, ['foo']);
 
-        $query = SampleMediable::whereHasMedia(['foo', 'bar'], true)->get();
-        $this->assertEquals([1], SampleMediable::whereHasMedia(['foo', 'bar'], true)->get()->pluck('id')->all());
+        $query = SampleMediable::whereHasMediaMatchAll(['foo', 'bar'], true);
+        $this->assertEquals([1], $query->get()->pluck('id')->toArray());
     }
 
     public function test_it_can_list_the_tags_a_media_is_attached_to()

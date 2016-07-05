@@ -52,16 +52,16 @@ trait Mediable
      */
     public function scopeWhereHasMediaMatchAll(Builder $q, array $tags)
     {
+        $grammar = $q->getConnection()->getQueryGrammar();
         $subquery = $this->media()->newPivotStatement()
             ->selectRaw('count(*)')
             ->where($this->media()->getMorphType(), $this->media()->getMorphClass())
-            ->whereRaw($this->media()->getForeignKey() . ' = ' . $this->getQualifiedKeyName())
+            ->whereRaw($grammar->wrap($this->media()->getForeignKey()) . ' = ' . $grammar->wrap($this->getQualifiedKeyName()))
             ->whereIn('tag', $tags)
-            ->groupBy('media_id')
-            ->havingRaw('count(media_id) = ?', [count($tags)]);
+            ->groupBy($this->media()->getOtherKey())
+            ->havingRaw('count('.$grammar->wrap($this->media()->getOtherKey()).') = ' . count($tags));
 
-        $q->addBinding($subquery->getBindings(), 'where')
-            ->where(new Expression('(' . $subquery->toSql() . ')'), '>=', 1);
+	    $q->whereRaw('(' . $subquery->toSql() . ') >= 1', $subquery->getBindings());
     }
 
      /**

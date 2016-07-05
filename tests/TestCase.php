@@ -38,12 +38,12 @@ class TestCase extends BaseTestCase
     protected function getEnvironmentSetUp($app)
     {
         //use in-memory database
-        $app['config']->set('database.default', 'testing');
         $app['config']->set('database.connections.testing', [
             'driver' => 'sqlite',
             'database' => ':memory:',
             'prefix' => ''
         ]);
+        $app['config']->set('database.default', 'testing');
 
         //set up private and public testing disks
         $app['config']->set('filesystems.disks.tmp', [
@@ -55,7 +55,7 @@ class TestCase extends BaseTestCase
             'root' => public_path('uploads'),
             'visibility' => 'public'
         ]);
-        
+
         $app['config']->set('mediable.allowed_disks', [
             'tmp',
             'uploads'
@@ -95,22 +95,12 @@ class TestCase extends BaseTestCase
     private function resetDatabase()
     {
         $artisan = $this->app->make('Illuminate\Contracts\Console\Kernel');
+        $database = $this->app['config']->get('database.default');
 
-        // Makes sure the migrations table is created
-        $artisan->call('migrate', [
-            '--database' => 'testing',
+        //Remigrate all database tables
+        $artisan->call('migrate:refresh', [
+            '--database' => $database,
             '--realpath' => realpath(__DIR__.'/../migrations'),
-        ]);
-
-        // We empty all tables
-        $artisan->call('migrate:reset', [
-            '--database' => 'testing',
-        ]);
-
-        // Migrate
-        $artisan->call('migrate', [
-            '--database' => 'testing',
-            '--realpath'     => realpath(__DIR__.'/../migrations'),
         ]);
     }
 
@@ -119,7 +109,7 @@ class TestCase extends BaseTestCase
         if (!$this->app['config']->has('filesystems.disks.' . $disk)) {
             return;
         }
-        $root = $this->app['config']['filesystems.disks.' . $disk . '.root'];
+        $root = $this->app['config']->get('filesystems.disks.' . $disk . '.root');
         $filesystem =  $this->app->make(Illuminate\Filesystem\Filesystem::class);
         $filesystem->cleanDirectory($root);
     }

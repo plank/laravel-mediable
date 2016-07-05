@@ -29,7 +29,7 @@
         }
     },
     "autoload-dev":{
-        "classmap": ["tests/"]
+        "classmap": ["tests/", "migrations/"]
     },
     "minimum-stability": "stable",
     "prefer-stable": true
