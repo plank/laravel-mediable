@@ -3,6 +3,7 @@
 namespace Frasmage\Mediable;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Expression;
 
 /**
  * Mediable Trait
@@ -29,14 +30,38 @@ trait Mediable
     /**
      * Query scope to detect the presence of one or more attached media for a given tag
      * @param  Builder $q
-     * @param  string|array  $tags
+     * @param  string|array $tags
+     * @param  boolean $match_all
      * @return void
      */
-    public function scopeWhereHasMedia(Builder $q, $tags)
+    public function scopeWhereHasMedia(Builder $q, $tags, $match_all = false)
     {
+        if($match_all && is_array($tags) && count($tags) > 1){
+            return $this->scopeWhereHasMediaMatchAll($q, $tags);
+        }
         $q->whereHas('media', function ($q) use ($tags) {
             $q->whereIn('tag', (array) $tags);
         });
+    }
+
+    /**
+     * Query scope to detect the presence of one or more attached media that is bound to all of the specified tags simultaneously
+     * @param  Builder $q
+     * @param  array $tags
+     * @return void
+     */
+    public function scopeWhereHasMediaMatchAll(Builder $q, array $tags)
+    {
+        $subquery = $this->media()->newPivotStatement()
+            ->selectRaw('count(*)')
+            ->where($this->media()->getMorphType(), $this->media()->getMorphClass())
+            ->whereRaw($this->media()->getForeignKey() . ' = ' . $this->getQualifiedKeyName())
+            ->whereIn('tag', $tags)
+            ->groupBy('media_id')
+            ->havingRaw('count(media_id) = ?', [count($tags)]);
+
+        $q->addBinding($subquery->getBindings(), 'where')
+            ->where(new Expression('(' . $subquery->toSql() . ')'), '>=', 1);
     }
 
      /**
@@ -145,12 +170,11 @@ trait Mediable
 
     /**
      * Retrieve media attached to multiple tags simultaneously
-     * @param  string|array  $tags
+     * @param array  $tags
      * @return boolean
      */
-    public function getMediaMatchAll($tags)
+    public function getMediaMatchAll(array $tags)
     {
-        $tags = (array) $tags;
         $this->rehydrateMediaIfNecessary($tags);
 
         //group all tags for each media

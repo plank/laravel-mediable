@@ -188,8 +188,21 @@ class MediableTest extends TestCase
         $media = factory(Media::class)->create();
         $mediable->attachMedia($media, 'foo');
 
-        $this->assertEquals(1, SampleMediable::whereHasMedia('foo')->count());
-        $this->assertEquals(0, SampleMediable::whereHasMedia('bar')->count(), 'Queriable by non-existent group');
+        $this->assertEquals(1, SampleMediable::whereHasMedia('foo', false)->count());
+        $this->assertEquals(0, SampleMediable::whereHasMedia('bar', false)->count(), 'Queriable by non-existent group');
+    }
+
+    public function test_it_can_be_queried_by_tag_matching_all()
+    {
+        $mediable = factory(SampleMediable::class)->create();
+        $media1 = factory(Media::class)->create(['id' => 1]);
+        $media2 = factory(Media::class)->create(['id' => 2]);
+
+        $mediable->attachMedia($media1, ['foo', 'bar']);
+        $mediable->attachMedia($media2, ['foo']);
+
+        $query = SampleMediable::whereHasMedia(['foo', 'bar'], true)->get();
+        $this->assertEquals([1], SampleMediable::whereHasMedia(['foo', 'bar'], true)->get()->pluck('id')->all());
     }
 
     public function test_it_can_list_the_tags_a_media_is_attached_to()
