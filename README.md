@@ -1,10 +1,10 @@
 # Laravel-Mediable
 
-Laravel-Mediable is a package for easily uploading and attaching media files to models with Laravel 5. 
+Laravel-Mediable is a package for easily uploading and attaching media files to models with Laravel 5.
 
 ## Features
 
-- Filesystem-driven approach is easily configurable to allow any number of upload directories with different accessibility.  
+- Filesystem-driven approach is easily configurable to allow any number of upload directories with different accessibility.
 - Many-to-many polymorphic relationships allow any number of media to be assigned to any number of other models without any need to modify the schema.
 - Attach media to models with tags, to set and retrieve media for specific purposes, such as `'thumbnail'`, `'featured image'`, `'gallery'` or `'download'`.
 - Easily query media and restrict uploads by MIME type, extension and/or aggregate type (e.g. `image` for jpeg, png or gif).
@@ -99,7 +99,7 @@ use Frasmage\Mediable\Mediable;
 class Post extends Model
 {
 	use Mediable;
-	
+
 	// ...
 }
 ```
@@ -142,13 +142,13 @@ $post->syncMedia($media, 'thumbnail');
 
 You can retrieve media attached to a file by refering to the tag to which it was previously assigned.
 
-```php 
+```php
 $media = $post->getMedia('thumbnail');
 ```
 
 This returns a collection of all media assigned to that tag. In cases where you only need one `Media` entity, you can instead use `firstMedia()`.
 
-```php 
+```php
 $media = $post->firstMedia('thumbnail');
 // shorthand for
 $media = $post->getMedia('thumbnail')->first();
@@ -189,20 +189,20 @@ $posts = Post::whereHasMedia('thumbnail')->get();
 ### Detaching Media
 
  You can remove a media instance from a model with the `detachMedia()` method.
- 
- ```php
- $post->detachMedia($media); // remove media from all tags
- $post->detachMedia($media, 'feature'); //remove media from specific tag
- $post->detachMedia($media, ['feature', 'thumbnail]); //remove media from specific tags
- ```
- 
+
+```php
+$post->detachMedia($media); // remove media from all tags
+$post->detachMedia($media, 'feature'); //remove media from specific tag
+$post->detachMedia($media, ['feature', 'thumbnail]); //remove media from specific tags
+```
+
  You can also remove all media assigned to one or more tags
- 
- ```php
- $post->detachMediaTags('feature');
-  $post->detachMediaTags(['feature', 'thumbnail']);
- ```
- 
+
+```php
+$post->detachMediaTags('feature');
+$post->detachMediaTags(['feature', 'thumbnail']);
+```
+
 
 ## Using Media
 
@@ -221,7 +221,7 @@ $posts = Post::whereHasMedia('thumbnail')->get();
 ],
 ```
 
-*given a `Media` instance with the following attributes* 
+*given a `Media` instance with the following attributes*
 
 ```
 
@@ -237,7 +237,7 @@ $posts = Post::whereHasMedia('thumbnail')->get();
 The following attributes and methods would be exposed
 
 ```php
-$media->absolutePath(); 
+$media->absolutePath();
 # /var/www/site/public/uploads/foo/bar/picture.jpg
 
 $media->dirname;
