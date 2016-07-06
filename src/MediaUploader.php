@@ -5,7 +5,7 @@ namespace Frasmage\Mediable;
 use Frasmage\Mediable\Exceptions\MediaUploadException;
 use Frasmage\Mediable\Exceptions\MediaManagerException;
 use Frasmage\Mediable\Media;
-use Frasmage\Mediable\SourceAdapterFactory;
+use Frasmage\Mediable\SourceAdapters\SourceAdapterFactory;
 use Frasmage\Mediable\SourceAdapters\SourceAdapterInterface;
 use Illuminate\Filesystem\FileSystemManager;
 use Storage;

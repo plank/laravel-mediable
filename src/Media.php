@@ -32,8 +32,6 @@ class Media extends Model
 
     protected $guarded = ['id', 'disk', 'directory', 'filename', 'extension', 'size', 'mime', 'type'];
 
-    private $url_generator;
-
     /**
      * {@inheritDoc}
      */
@@ -186,6 +184,15 @@ class Media extends Model
     }
 
     /**
+     * Retrieve the contents of the file
+     * @return string
+     */
+    public function contents()
+    {
+        return $this->storage()->get($this->getDiskPath());
+    }
+
+    /**
      * Move the file to a new location on disk
      *
      * Will invoke the `save()` method on the model after the associated file has been moved to prevent synchronization errors
@@ -196,23 +203,7 @@ class Media extends Model
      */
     public function move($destination, $filename = null)
     {
-        if ($filename) {
-            $filename = $this->removeExtensionFromFilename($filename);
-        } else {
-            $filename = $this->filename;
-        }
-
-        $destination = trim($destination, DIRECTORY_SEPARATOR);
-        $target_path = $destination . DIRECTORY_SEPARATOR . $filename . '.' . $this->extension;
-
-        if ($this->storage()->has($target_path)) {
-            throw MediaMoveException::destinationExists($target_path);
-        }
-
-        $this->storage()->move($this->getDiskPath(), $target_path);
-        $this->filename = $filename;
-        $this->directory = $destination;
-        $this->save();
+        app('mediable.mover')->move($this, $destination, $filename);
     }
 
     /**
@@ -224,15 +215,6 @@ class Media extends Model
     public function rename($filename)
     {
         $this->move($this->directory, $filename);
-    }
-
-    /**
-     * Retrieve the contents of the file
-     * @return string
-     */
-    public function contents()
-    {
-        return $this->storage()->get($this->getDiskPath());
     }
 
     /**
@@ -252,18 +234,4 @@ class Media extends Model
         return app('mediable.url.factory')->create($this);
     }
 
-    /**
-     * Remove the media's extension from a filename
-     * @param  string $filename
-     * @return string
-     */
-    private function removeExtensionFromFilename($filename)
-    {
-        $extension = '.' . $this->extension;
-        $extension_length = mb_strlen($filename) - mb_strlen($extension);
-        if (mb_strrpos($filename, $extension) === $extension_length) {
-            $filename = mb_substr($filename, 0, $extension_length);
-        }
-        return $filename;
-    }
 }

@@ -10,6 +10,4 @@ interface UrlGenerator{
     public function isPubliclyAccessible();
 
     public function getUrl();
-
-    public function getDriver();
 }

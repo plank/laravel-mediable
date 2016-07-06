@@ -2,7 +2,7 @@
 
 use Frasmage\Mediable\Media;
 use Frasmage\Mediable\MediaUploader;
-use Frasmage\Mediable\SourceAdapterFactory;
+use Frasmage\Mediable\SourceAdapters\SourceAdapterFactory;
 use Frasmage\Mediable\SourceAdapters\SourceAdapter;
 use Frasmage\Mediable\Exceptions\MediaUploadException;
 use MediaUploader as Facade;

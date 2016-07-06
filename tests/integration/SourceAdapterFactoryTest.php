@@ -1,6 +1,6 @@
 <?php
 
-use Frasmage\Mediable\SourceAdapterFactory;
+use Frasmage\Mediable\SourceAdapters\SourceAdapterFactory;
 use Frasmage\Mediable\SourceAdapters\SourceAdapter;
 use Frasmage\Mediable\Exceptions\MediaUploadException;
 

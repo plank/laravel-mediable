@@ -2,11 +2,7 @@
 
 namespace Frasmage\Mediable;
 
-use Frasmage\Mediable\SourceAdapterFactory;
-use Frasmage\Mediable\UploadSourceAdapters\RemoteUrl;
-use Frasmage\Mediable\UploadSourceAdapters\LocalPath;
-use Frasmage\Mediable\UploadSourceAdapters\FoundationFile;
-use Frasmage\Mediable\UploadSourceAdapters\FoundationUploadedFile;
+use Frasmage\Mediable\SourceAdapters\SourceAdapterFactory;
 use Frasmage\Mediable\UrlGenerators\UrlGeneratorFactory;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Container\Container;
@@ -51,6 +47,7 @@ class MediableServiceProvider extends ServiceProvider
 
         $this->registerSourceAdapterFactory();
         $this->registerUploader();
+        $this->registerMover();
         $this->registerUrlGeneratorFactory();
     }
 
@@ -89,6 +86,18 @@ class MediableServiceProvider extends ServiceProvider
             return new MediaUploader($this->app['filesystem'], $this->app['mediable.source.factory'], $this->app['config']->get('mediable'));
         });
         $this->app->alias('mediable.uploader', MediaUploader::class);
+    }
+
+    /**
+     * Bind the Media Uploader to the container
+     * @return void
+     */
+    public function registerMover()
+    {
+        $this->app->bind('mediable.mover', function (Container $app) {
+            return new MediaMover($this->app['filesystem']);
+        });
+        $this->app->alias('mediable.mover', MediaMover::class);
     }
 
     /**
