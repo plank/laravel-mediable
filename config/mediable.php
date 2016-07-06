@@ -55,7 +55,7 @@ return [
 
     /**
      * List of types recognized by the application
-     * 
+     *
      * Each type should list the MIME types and extensions
      * that should be recognized for the type
      */
@@ -171,6 +171,11 @@ return [
             '^https?://' => Frasmage\Mediable\SourceAdapters\RemoteUrlAdapter::class,
             '^/' => Frasmage\Mediable\SourceAdapters\LocalPathAdapter::class
         ],
+    ],
+
+    'url_generators' => [
+        'local' => Frasmage\Mediable\UrlGenerators\LocalUrlGenerator::class,
+        's3' => Frasmage\Mediable\UrlGenerators\S3UrlGenerator::class,
     ],
 
     'rehydrate_media' => true,

@@ -9,7 +9,7 @@ namespace Frasmage\Mediable\SourceAdapters;
  *
  * @author Sean Fraser <sean@plankdesign.com>
  */
-class RemoteUrlAdapter implements SourceAdapterInterface
+class RemoteUrlAdapter implements SourceAdapter
 {
 
     /**

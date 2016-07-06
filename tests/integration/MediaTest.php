@@ -30,9 +30,8 @@ class MediaTest extends TestCase
             'extension' => 'jpg',
         ]);
 
-        $this->assertEquals(storage_path('tmp/a/b/c/foo.bar.jpg'), $media->absolutePath());
-        $this->assertEquals(storage_path('tmp/a/b/c'), $media->dirname);
-        $this->assertEquals('a/b/c/foo.bar.jpg', $media->diskPath());
+        $this->assertEquals(storage_path('tmp/a/b/c/foo.bar.jpg'), $media->getAbsolutePath());
+        $this->assertEquals('a/b/c/foo.bar.jpg', $media->getDiskPath());
         $this->assertEquals('a/b/c', $media->directory);
         $this->assertEquals('foo.bar.jpg', $media->basename);
         $this->assertEquals('foo.bar', $media->filename);
@@ -105,53 +104,10 @@ class MediaTest extends TestCase
         $this->assertTrue($media->isPubliclyAccessible());
     }
 
-    public function test_it_can_generate_its_path_from_the_webroot()
-    {
-        $media = factory(Media::class)->make(['disk' => 'uploads', 'directory' => 'foo/bar', 'filename' => 'baz', 'extension' => 'jpg']);
-        $this->assertEquals('/uploads/foo/bar/baz.jpg', $media->publicPath());
-    }
-
-    public function test_non_public_access_to_public_path_throws_exception()
-    {
-        $media = factory(Media::class)->make(['disk' => 'tmp']);
-        $this->expectException(MediaUrlException::class);
-        $media->publicPath();
-    }
-
     public function test_it_can_generate_a_url_to_the_file()
     {
         $media = factory(Media::class)->make(['disk' => 'uploads', 'directory' => 'foo/bar', 'filename' => 'baz', 'extension' => 'jpg']);
-        $this->assertEquals('/uploads/foo/bar/baz.jpg', $media->url(false));
-        $this->assertEquals('http://localhost/uploads/foo/bar/baz.jpg', $media->url(true));
-    }
-
-    public function test_it_can_be_checked_for_glide_visibility()
-    {
-        $media = factory(Media::class)->make(['disk' => 'tmp']);
-        $this->assertFalse($media->isGlideAccessible());
-
-        $media = factory(Media::class)->make(['disk' => 'uploads']);
-        $this->assertTrue($media->isGlideAccessible());
-    }
-
-    public function test_it_can_generate_its_path_from_the_glide_root()
-    {
-        $media = factory(Media::class)->make(['disk' => 'uploads', 'directory' => 'foo/bar', 'filename' => 'baz', 'extension' => 'jpg']);
-        $this->assertEquals('/uploads/foo/bar/baz.jpg', $media->glidePath());
-    }
-
-    public function test_glide_path_throws_exception_if_not_accessible()
-    {
-        $media = factory(Media::class)->make(['disk' => 'tmp']);
-        $this->expectException(MediaUrlException::class);
-        $media->glidePath();
-    }
-
-    public function test_it_can_generate_a_glide_url()
-    {
-        $media = factory(Media::class)->make(['disk' => 'uploads', 'directory' => 'foo/bar', 'filename' => 'baz', 'extension' => 'jpg']);
-        $this->assertEquals('/glide/uploads/foo/bar/baz.jpg?w=400', $media->glideUrl(['w' => 400], false));
-        $this->assertEquals('http://localhost/glide/uploads/foo/bar/baz.jpg?w=400', $media->glideUrl(['w' => 400], true));
+        $this->assertEquals('http://localhost/uploads/foo/bar/baz.jpg', $media->getUrl());
     }
 
     public function test_it_can_check_if_its_file_exists()
@@ -168,12 +124,12 @@ class MediaTest extends TestCase
         $this->seedFileForMedia($media);
 
         $media->move('alpha/beta');
-        $this->assertEquals('alpha/beta/bar.baz', $media->diskPath());
+        $this->assertEquals('alpha/beta/bar.baz', $media->getDiskPath());
         $this->assertTrue($media->exists());
         $media->move('', 'gamma.baz');
-        $this->assertEquals('gamma.baz', $media->diskPath());
+        $this->assertEquals('gamma.baz', $media->getDiskPath());
         $media->rename('foo.bar');
-        $this->assertEquals('foo.bar.baz', $media->diskPath());
+        $this->assertEquals('foo.bar.baz', $media->getDiskPath());
         $this->assertTrue($media->exists());
     }
 
@@ -204,7 +160,7 @@ class MediaTest extends TestCase
             'extension' => 'txt'
         ]);
         $this->seedFileForMedia($media);
-        $path = $media->absolutePath();
+        $path = $media->getAbsolutePath();
 
         $this->assertFileExists($path);
         $media->delete();

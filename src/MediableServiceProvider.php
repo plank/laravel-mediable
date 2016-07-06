@@ -7,6 +7,7 @@ use Frasmage\Mediable\UploadSourceAdapters\RemoteUrl;
 use Frasmage\Mediable\UploadSourceAdapters\LocalPath;
 use Frasmage\Mediable\UploadSourceAdapters\FoundationFile;
 use Frasmage\Mediable\UploadSourceAdapters\FoundationUploadedFile;
+use Frasmage\Mediable\UrlGenerators\UrlGeneratorFactory;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Container\Container;
 use Symfony\Component\HttpFoundation\File\File;
@@ -50,6 +51,7 @@ class MediableServiceProvider extends ServiceProvider
 
         $this->registerSourceAdapterFactory();
         $this->registerUploader();
+        $this->registerUrlGeneratorFactory();
     }
 
     /**
@@ -60,7 +62,7 @@ class MediableServiceProvider extends ServiceProvider
      */
     public function registerSourceAdapterFactory()
     {
-        $this->app->singleton('mediable.factory', function (Container $app) {
+        $this->app->singleton('mediable.source.factory', function (Container $app) {
             $factory = new SourceAdapterFactory;
             $adapters = $app['config']->get('mediable.source_adapters');
 
@@ -74,7 +76,7 @@ class MediableServiceProvider extends ServiceProvider
 
             return $factory;
         });
-        $this->app->alias('mediable.factory', SourceAdapterFactory::class);
+        $this->app->alias('mediable.source.factory', SourceAdapterFactory::class);
     }
 
     /**
@@ -84,8 +86,26 @@ class MediableServiceProvider extends ServiceProvider
     public function registerUploader()
     {
         $this->app->bind('mediable.uploader', function (Container $app) {
-            return new MediaUploader($this->app['filesystem'], $this->app['mediable.factory'], $this->app['config']->get('mediable'));
+            return new MediaUploader($this->app['filesystem'], $this->app['mediable.source.factory'], $this->app['config']->get('mediable'));
         });
         $this->app->alias('mediable.uploader', MediaUploader::class);
+    }
+
+    /**
+     * Bind the Media Uploader to the container
+     * @return void
+     */
+    public function registerUrlGeneratorFactory()
+    {
+        $this->app->singleton('mediable.url.factory', function (Container $app) {
+            $factory = new UrlGeneratorFactory;
+
+            $config = $app['config']->get('mediable.url_generators');
+            foreach ($config as $driver => $generator) {
+                $factory->setGeneratorForFilesystemDriver($generator, $driver);
+            }
+            return $factory;
+        });
+        $this->app->alias('mediable.url.factory', UrlGeneratorFactory::class);
     }
 }

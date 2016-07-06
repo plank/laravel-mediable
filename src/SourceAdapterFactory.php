@@ -5,7 +5,7 @@ namespace Frasmage\Mediable;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Frasmage\Mediable\Exceptions\MediaUploadException;
-use Frasmage\Mediable\SourceAdapters\SourceAdapterInterface;
+use Frasmage\Mediable\SourceAdapters\SourceAdapter;
 
 /**
  * Source Adapter Factory
@@ -32,12 +32,12 @@ class SourceAdapterFactory
     /**
      * Create a Source Adapter for the provided source
      * @param  Object|string $source
-     * @return SourceAdapterInterface
+     * @return SourceAdapter
      * @throws MediaUploadException If the provided source does not match any of the mapped classes or patterns
      */
     public function create($source)
     {
-        if ($source instanceof SourceAdapterInterface) {
+        if ($source instanceof SourceAdapter) {
             return $source;
         } elseif (is_object($source)) {
             $adapter = $this->adaptClass($source);
@@ -81,7 +81,7 @@ class SourceAdapterFactory
     /**
      * Choose an adapter class for the class of the provided object
      * @param  object $source
-     * @return SourceAdapterInterface|null
+     * @return SourceAdapter|null
      */
     private function adaptClass($source)
     {
@@ -98,7 +98,7 @@ class SourceAdapterFactory
     /**
      * Choose an adapter class for the provided string
      * @param  string $source
-     * @return SourceAdapterInterface|null
+     * @return SourceAdapter|null
      */
     private function adaptString($source)
     {
@@ -112,14 +112,14 @@ class SourceAdapterFactory
     }
 
     /**
-     * Verify that the provided class implements the SourceAdapterInterface
+     * Verify that the provided class implements the SourceAdapter interface
      * @param  string $class
      * @throws MediaUploadException If class is not valid
      * @return void
      */
     private function validateAdapterClass($class)
     {
-        if (!class_implements($class, SourceAdapterInterface::class)) {
+        if (!class_implements($class, SourceAdapter::class)) {
             throw MediaUploadException::cannotSetAdapter($class);
         }
     }

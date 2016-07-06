@@ -14,8 +14,8 @@ class MediaUrlException extends Exception
         return new static("Media file `{$path}` is not part of the public path `{$public_path}`");
     }
 
-    public static function mediaNotGlideAccessible($path, $glide_path)
+    public static function cannotGetAbsolutePath($disk)
     {
-        return new static("Media file `{$path}` is not part of Glide's source path `{$glide_path}`");
+        return new static("Cannot get absolute path. Disk `{$disk}` is not on the local filesystem");
     }
 }

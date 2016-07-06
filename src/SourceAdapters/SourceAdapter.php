@@ -9,7 +9,7 @@ namespace Frasmage\Mediable\SourceAdapters;
  *
  * @author Sean Fraser <sean@plankdesign.com>
  */
-interface SourceAdapterInterface
+interface SourceAdapter
 {
     /**
      * Get the underlying source

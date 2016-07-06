@@ -337,7 +337,7 @@ class MediaUploader
 
         $this->verifyDestination($model);
 
-        $this->filesystem->disk($model->disk)->put($model->diskPath(), $this->source->contents());
+        $this->filesystem->disk($model->disk)->put($model->getDiskPath(), $this->source->contents());
         $model->save();
         return $model;
     }
@@ -436,7 +436,7 @@ class MediaUploader
     {
         $storage = $this->filesystem->disk($model->disk);
 
-        if ($storage->has($model->diskPath())) {
+        if ($storage->has($model->getDiskPath())) {
             $this->handleDuplicate($model);
         }
     }
@@ -445,7 +445,7 @@ class MediaUploader
     {
         switch ($this->config['on_duplicate']) {
             case static::ON_DUPLICATE_ERROR:
-                throw MediaUploadException::fileExists($model->diskpath);
+                throw MediaUploadException::fileExists($model->getDiskpath);
                 break;
             case static::ON_DUPLICATE_REPLACE:
                 $this->deleteExistingMedia($model);

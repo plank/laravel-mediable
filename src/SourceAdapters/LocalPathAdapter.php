@@ -9,7 +9,7 @@ namespace Frasmage\Mediable\SourceAdapters;
  *
  * @author Sean Fraser <sean@plankdesign.com>
  */
-class LocalPathAdapter implements SourceAdapterInterface
+class LocalPathAdapter implements SourceAdapter
 {
 
     /**

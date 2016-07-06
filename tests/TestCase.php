@@ -23,8 +23,7 @@ class TestCase extends BaseTestCase
     protected function getPackageProviders($app)
     {
         return [
-            Frasmage\Mediable\MediableServiceProvider::class,
-            Spatie\Glide\GlideServiceProvider::class
+            Frasmage\Mediable\MediableServiceProvider::class
         ];
     }
 
@@ -45,15 +44,18 @@ class TestCase extends BaseTestCase
         ]);
         $app['config']->set('database.default', 'testing');
 
-        //set up private and public testing disks
-        $app['config']->set('filesystems.disks.tmp', [
-            'driver' => 'local',
-            'root' => storage_path('tmp'),
-        ]);
-        $app['config']->set('filesystems.disks.uploads', [
-            'driver' => 'local',
-            'root' => public_path('uploads'),
-            'visibility' => 'public'
+        $app['config']->set('filesystems.disks', [
+	        //private local storage
+        	'tmp' => [
+	            'driver' => 'local',
+	            'root' => storage_path('tmp'),
+        	],
+	        //public local storage
+        	'uploads' => [
+	            'driver' => 'local',
+	            'root' => public_path('uploads'),
+	            'visibility' => 'public'
+        	],
         ]);
 
         $app['config']->set('mediable.allowed_disks', [
@@ -89,7 +91,7 @@ class TestCase extends BaseTestCase
 
     protected function seedFileForMedia(Media $media, $contents = '')
     {
-        app('filesystem')->disk($media->disk)->put($media->diskPath(), $contents);
+        app('filesystem')->disk($media->disk)->put($media->getDiskPath(), $contents);
     }
 
     private function resetDatabase()

@@ -12,10 +12,9 @@ use Storage;
 /**
  * Media Model
  *
- * @var string $basename
- * @var string $dirname
- *
  * @author Sean Fraser <sean@plankdesign.com>
+ *
+ * @var string $basename
  */
 class Media extends Model
 {
@@ -33,6 +32,8 @@ class Media extends Model
 
     protected $guarded = ['id', 'disk', 'directory', 'filename', 'extension', 'size', 'mime', 'type'];
 
+    private $url_generator;
+
     /**
      * {@inheritDoc}
      */
@@ -42,7 +43,7 @@ class Media extends Model
 
         //remove file on deletion
         static::deleted(function ($media) {
-            $media->storage()->delete($media->diskPath());
+            $media->storage()->delete($media->getDiskPath());
         });
     }
 
@@ -54,15 +55,6 @@ class Media extends Model
     public function models($class)
     {
         return $this->morphedByMany($class, 'mediable')->withPivot('tag');
-    }
-
-    /**
-     * Get the absolute path to the parent directory of the file
-     * @return string
-     */
-    public function getDirnameAttribute()
-    {
-        return pathinfo($this->absolutePath(), PATHINFO_DIRNAME);
     }
 
     /**
@@ -80,6 +72,7 @@ class Media extends Model
      * @param  string  $disk      Filesystem disk to search in
      * @param  string  $directory Path relative to disk
      * @param  boolean $recursive (_optional_) If true, will find media in or under the specified directory
+     * @return void
      */
     public function scopeInDirectory(Builder $q, $disk, $directory, $recursive = false)
     {
@@ -93,22 +86,36 @@ class Media extends Model
     }
 
     /**
-     * Query scope for to find media in a particular directory or one of its subdirectories
+     * Query scope for finding media in a particular directory or one of its subdirectories
      * @param  Builder  $q
      * @param  string  $disk      Filesystem disk to search in
      * @param  string  $directory Path relative to disk
+     * @return void
      */
     public function scopeInOrUnderDirectory(Builder $q, $disk, $directory)
     {
         $q->inDirectory($disk, $directory, true);
     }
 
+    /**
+     * Query scope for finding media by basename
+     * @param  Builder $q
+     * @param  string  $basename filename and extension
+     * @return void
+     */
     public function scopeWhereBasename(Builder $q, $basename)
     {
         $q->where('filename', pathinfo($basename, PATHINFO_FILENAME))
             ->where('extension', pathinfo($basename, PATHINFO_EXTENSION));
     }
 
+    /**
+     * Query scope finding media at a path relative to a disk
+     * @param  Builder $q
+     * @param  string  $disk
+     * @param  string  $path directory, filename and extension
+     * @return void
+     */
     public function scopeForPathOnDisk(Builder $q, $disk, $path)
     {
         $q->where('disk', $disk)
@@ -134,21 +141,20 @@ class Media extends Model
     }
 
     /**
-     * Get the absolute filesystem path to the file
-     * @return string
-     */
-    public function absolutePath()
-    {
-        return $this->diskRoot() . DIRECTORY_SEPARATOR . $this->diskPath();
-    }
-
-    /**
      * Get the path to the file relative to the root of the disk
      * @return string
      */
-    public function diskPath()
+    public function getDiskPath(){
+        return ltrim(rtrim($this->directory, '/') . '/' . ltrim($this->basename, '/'), '/');
+    }
+
+    /**
+     * Get the absolute filesystem path to the file
+     * @return string
+     */
+    public function getAbsolutePath()
     {
-        return trim(trim($this->directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $this->basename, DIRECTORY_SEPARATOR);
+        return $this->getUrlGenerator()->getAbsolutePath();
     }
 
     /**
@@ -157,25 +163,7 @@ class Media extends Model
      */
     public function isPubliclyAccessible()
     {
-        return strpos($this->absolutePath(), public_path()) === 0;
-    }
-
-    /**
-     * Get the path to relative to the webroot
-     * @throws MediaUrlException If media's disk is not publicly accessible
-     * @return string
-     */
-    public function publicPath()
-    {
-        if (!$this->isPubliclyAccessible()) {
-            throw MediaUrlException::mediaNotPubliclyAccessible($this->diskRoot(), public_path());
-        }
-        $path = str_replace(public_path(), '', $this->diskRoot()) . DIRECTORY_SEPARATOR . $this->diskPath();
-
-        if (DIRECTORY_SEPARATOR != '/') {
-            $path = str_replace(DIRECTORY_SEPARATOR, '/', $path);
-        }
-        return $path;
+        return $this->getUrlGenerator()->isPubliclyAccessible();
     }
 
     /**
@@ -183,53 +171,9 @@ class Media extends Model
      * @throws MediaUrlException If media's disk is not publicly accessible
      * @return string
      */
-    public function url($absolute = true)
+    public function getUrl()
     {
-        return $absolute ? asset($this->publicPath()) : $this->publicPath();
-    }
-
-    /**
-     * Check if the file is located below the glide root
-     * @return boolean
-     */
-    public function isGlideAccessible()
-    {
-        return strpos($this->absolutePath(), $this->glideRoot()) === 0;
-    }
-
-    /**
-     * Get the path relative to the glide root
-     * @throws MediaUrlException If media's disk is not visible to glide
-     * @return string
-     */
-    public function glidePath()
-    {
-        $glide_path = $this->glideRoot();
-        if (! $this->isGlideAccessible()) {
-            throw MediaUrlException::mediaNotGlideAccessible($this->absolutePath(), $glide_path);
-        }
-        $path = str_replace($glide_path, '', $this->diskRoot()) . DIRECTORY_SEPARATOR . $this->diskPath();
-
-        if (DIRECTORY_SEPARATOR != '/') {
-            $path = str_replace(DIRECTORY_SEPARATOR, '/', $path);
-        }
-        return $path;
-    }
-
-    /**
-     * Generate a Url for applying glide modifications
-     * @throws MediaUrlException If media's disk is not accessible to glide
-     * @return string
-     */
-    public function glideUrl($params = [], $apsolute = true)
-    {
-        $glide = app('laravel-glide-image')->load($this->glidePath(), $params);
-        $glide->useAbsoluteSourceFilePath();
-        $url = $glide->getUrl();
-        if ($apsolute) {
-            return asset($url);
-        }
-        return $url;
+        return $this->getUrlGenerator()->getUrl();
     }
 
     /**
@@ -238,7 +182,7 @@ class Media extends Model
      */
     public function fileExists()
     {
-        return $this->storage()->has($this->diskPath());
+        return $this->storage()->has($this->getDiskPath());
     }
 
     /**
@@ -247,6 +191,7 @@ class Media extends Model
      * Will invoke the `save()` method on the model after the associated file has been moved to prevent synchronization errors
      * @param  string $destination directory relative to disk root
      * @param  string $name        filename. Do not include extension
+     * @return void
      * @throws  MediaMoveException If attempting to change the file extension or a file with the same name already exists at the destination
      */
     public function move($destination, $filename = null)
@@ -264,7 +209,7 @@ class Media extends Model
             throw MediaMoveException::destinationExists($target_path);
         }
 
-        $this->storage()->move($this->diskPath(), $target_path);
+        $this->storage()->move($this->getDiskPath(), $target_path);
         $this->filename = $filename;
         $this->directory = $destination;
         $this->save();
@@ -273,6 +218,7 @@ class Media extends Model
     /**
      * Rename the file in place
      * @param  string $name
+     * @return void
      * @see Media::move()
      */
     public function rename($filename)
@@ -286,7 +232,7 @@ class Media extends Model
      */
     public function contents()
     {
-        return $this->storage()->get($this->diskPath());
+        return $this->storage()->get($this->getDiskPath());
     }
 
     /**
@@ -299,23 +245,18 @@ class Media extends Model
     }
 
     /**
-     * Get the absolute path to the root of the storage disk
-     * @return string
+     * Get a UrlGenerator instance for the media.
+     * @return \Frasmage\Mediable\UrlGenerators\UrlGenerator
      */
-    private function diskRoot()
-    {
-        return config("filesystems.disks.{$this->disk}.root");
+    protected function getUrlGenerator(){
+        return app('mediable.url.factory')->create($this);
     }
 
     /**
-     * Get the absolute path to the root of the storage disk
+     * Remove the media's extension from a filename
+     * @param  string $filename
      * @return string
      */
-    private function glideRoot()
-    {
-        return config('laravel-glide.source.path');
-    }
-
     private function removeExtensionFromFilename($filename)
     {
         $extension = '.' . $this->extension;

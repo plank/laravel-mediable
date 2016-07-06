@@ -18,10 +18,8 @@
     "require-dev": {
         "orchestra/testbench": "~3.0",
         "phpunit/phpunit": "~4.0",
-        "spatie/laravel-glide": "^2.3"
-    },
-    "suggest": {
-        "spatie/laravel-glide": "Assist with modifying images on the fly"
+        "vlucas/phpdotenv": "~2.2",
+        "league/flysystem-aws-s3-v3" : "~1.0"
     },
     "autoload": {
         "psr-4": {

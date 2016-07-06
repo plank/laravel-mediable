@@ -3,7 +3,7 @@
 use Frasmage\Mediable\Media;
 use Frasmage\Mediable\MediaUploader;
 use Frasmage\Mediable\SourceAdapterFactory;
-use Frasmage\Mediable\SourceAdapters\SourceAdapterInterface;
+use Frasmage\Mediable\SourceAdapters\SourceAdapter;
 use Frasmage\Mediable\Exceptions\MediaUploadException;
 use MediaUploader as Facade;
 use Illuminate\Filesystem\FilesystemManager;
@@ -90,7 +90,7 @@ class MediaUploaderTest extends TestCase
         $uploader = $this->mockUploader();
         $method = $this->getPrivateMethod($uploader, 'verifySource');
 
-        $source = $this->createMock(SourceAdapterInterface::class);
+        $source = $this->createMock(SourceAdapter::class);
         $source->method('valid')->willReturn(true);
         $uploader->fromSource($source);
         $method->invoke($uploader);
@@ -103,7 +103,7 @@ class MediaUploaderTest extends TestCase
         $uploader = $this->mockUploader();
         $method = $this->getPrivateMethod($uploader, 'verifySource');
 
-        $source = $this->createMock(SourceAdapterInterface::class);
+        $source = $this->createMock(SourceAdapter::class);
         $source->method('valid')->willReturn(false);
         $uploader->fromSource($source);
 
@@ -240,7 +240,7 @@ class MediaUploaderTest extends TestCase
         $this->assertInstanceOf(Media::class, $media);
         $this->assertTrue($media->fileExists());
         $this->assertEquals('tmp', $media->disk);
-        $this->assertEquals('foo/bar.png', $media->diskPath());
+        $this->assertEquals('foo/bar.png', $media->getDiskPath());
         $this->assertEquals('image/png', $media->mime_type);
         $this->assertEquals(8444, $media->size);
         $this->assertEquals('image', $media->type);
