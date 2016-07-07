@@ -7,7 +7,7 @@ use Frasmage\Mediable\Exceptions\MediaManagerException;
 use Frasmage\Mediable\Media;
 use Frasmage\Mediable\SourceAdapters\SourceAdapterFactory;
 use Frasmage\Mediable\SourceAdapters\SourceAdapterInterface;
-use Illuminate\Filesystem\FileSystemManager;
+use Illuminate\Filesystem\FilesystemManager;
 use Storage;
 
 /**

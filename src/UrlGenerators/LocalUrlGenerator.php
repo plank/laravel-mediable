@@ -8,15 +8,31 @@ use Frasmage\Mediable\Media;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Routing\UrlGenerator as Url;
 
+/**
+ * Local Url Generator
+ *
+ * @author Sean Fraser <sean@plankdesign.com>
+ */
 class LocalUrlGenerator extends BaseUrlGenerator{
 
+    /**
+     * @var Url
+     */
     protected $url;
 
+    /**
+     * Constructor
+     * @param Config $config
+     * @param Url    $url
+     */
     public function __construct(Config $config, Url $url){
         parent::__construct($config);
         $this->url = $url;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function isPubliclyAccessible(){
         return strpos($this->getAbsolutePath(), public_path()) === 0;
     }
@@ -37,16 +53,14 @@ class LocalUrlGenerator extends BaseUrlGenerator{
     }
 
     /**
-     * Get the url to a file
-     * @return
+     * {@inheritDoc}
      */
     public function getUrl(){
         return $this->url->asset($this->getPublicPath());
     }
 
     /**
-     * Get the absolute path to the file on the filesystem
-     * @return string
+     * {@inheritDoc}
      */
     public function getAbsolutePath(){
         return $this->diskRoot() . DIRECTORY_SEPARATOR . $this->media->getDiskPath();

@@ -56,8 +56,9 @@ class MediaUploaderTest extends TestCase
     public function test_it_throws_exception_for_disallowed_disk()
     {
         $uploader = $this->mockUploader();
+        config()->set('filesystems.disks.foo', []);
         $this->expectException(MediaUploadException::class);
-        $uploader->setDisk('public');
+        $uploader->setDisk('foo');
     }
 
     public function test_it_can_change_model_class()

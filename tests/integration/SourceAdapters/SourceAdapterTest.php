@@ -17,12 +17,12 @@ class SourceAdapterTest extends TestCase
     protected function getEnvironmentSetUp($app)
     {
         parent::getEnvironmentSetUp($app);
-        $app['filesystem']->disk('uploads')->put('plank.png', fopen(__DIR__.'/../_data/plank.png', 'r'));
+        $app['filesystem']->disk('uploads')->put('plank.png', fopen(__DIR__.'/../../_data/plank.png', 'r'));
     }
 
     public function adapterProvider()
     {
-        $file = realpath(__DIR__.'/../_data/plank.png');
+        $file = realpath(__DIR__.'/../../_data/plank.png');
         $url = 'https://www.plankdesign.com/externaluse/plank.png';
         $data = [
             [FileAdapter::class, new File($file), $file],
@@ -35,7 +35,7 @@ class SourceAdapterTest extends TestCase
 
     public function invalidAdapterProvider()
     {
-        $file = __DIR__ . '/../_data/invalid.png';
+        $file = __DIR__ . '/../../_data/invalid.png';
         return [
             [new FileAdapter(new File($file, false))],
             [new LocalPathAdapter($file)],

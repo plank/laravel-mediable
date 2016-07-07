@@ -36,6 +36,8 @@ class TestCase extends BaseTestCase
 
     protected function getEnvironmentSetUp($app)
     {
+        $dotenv = new Dotenv\Dotenv(dirname(__DIR__));
+        $dotenv->load();
         //use in-memory database
         $app['config']->set('database.connections.testing', [
             'driver' => 'sqlite',
@@ -56,6 +58,14 @@ class TestCase extends BaseTestCase
 	            'root' => public_path('uploads'),
 	            'visibility' => 'public'
         	],
+            's3' => [
+                'driver' => 's3',
+                'key'    => env('S3_KEY'),
+                'secret' => env('S3_SECRET'),
+                'region' => env('S3_REGION'),
+                'bucket' => env('S3_BUCKET'),
+                'version' => 'latest'
+            ]
         ]);
 
         $app['config']->set('mediable.allowed_disks', [

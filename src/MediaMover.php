@@ -5,13 +5,35 @@ namespace Frasmage\Mediable;
 use Frasmage\Mediable\Exceptions\MediaMoveException;
 use Illuminate\Filesystem\FilesystemManager;
 
+/**
+ * Media Mover Class
+ *
+ * @author Sean Fraser <sean@plankdesign.com>
+ */
 class MediaMover{
+    /**
+     * @var FilesystemManager
+     */
     protected $filesystem;
 
+    /**
+     * Constructor
+     * @param FilesystemManager $filesystem
+     */
     public function __construct(FilesystemManager $filesystem){
         $this->filesystem = $filesystem;
     }
 
+    /**
+     * Move the file to a new location on disk
+     *
+     * Will invoke the `save()` method on the model after the associated file has been moved to prevent synchronization errors
+     * @param  Media $media
+     * @param  string $directory directory relative to disk root
+     * @param  string $name        filename. Do not include extension
+     * @return void
+     * @throws  MediaMoveException If attempting to change the file extension or a file with the same name already exists at the destination
+     */
     public function move(Media $media, $directory, $filename = null){
         $storage = $this->filesystem->disk($media->disk);
 

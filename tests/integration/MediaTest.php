@@ -102,12 +102,24 @@ class MediaTest extends TestCase
 
         $media = factory(Media::class)->make(['disk' => 'uploads']);
         $this->assertTrue($media->isPubliclyAccessible());
+
+        $media = factory(Media::class)->make(['disk' => 's3']);
+        $this->assertTrue($media->isPubliclyAccessible());
+
+        config()->set('filesystems.disks.s3.visibility', 'hidden');
+        $this->assertFalse($media->isPubliclyAccessible());
     }
 
-    public function test_it_can_generate_a_url_to_the_file()
+    public function test_it_can_generate_a_url_to_the_local_file()
     {
         $media = factory(Media::class)->make(['disk' => 'uploads', 'directory' => 'foo/bar', 'filename' => 'baz', 'extension' => 'jpg']);
         $this->assertEquals('http://localhost/uploads/foo/bar/baz.jpg', $media->getUrl());
+    }
+
+    public function test_it_can_generate_a_url_to_the_file_on_s3()
+    {
+        $media = factory(Media::class)->make(['disk' => 's3', 'directory' => 'foo/bar', 'filename' => 'baz', 'extension' => 'jpg']);
+        $this->assertEquals('https://s3.amazonaws.com/' . env('S3_BUCKET') . '/foo/bar/baz.jpg', $media->getUrl());
     }
 
     public function test_it_can_check_if_its_file_exists()
