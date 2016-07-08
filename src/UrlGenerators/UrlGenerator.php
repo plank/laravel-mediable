@@ -19,6 +19,9 @@ interface UrlGenerator
 
     /**
      * Retrieve the absolute path to the file
+     *
+     * For local files this should return a path
+     * For remote files this should return a url
      * @return string
      */
     public function getAbsolutePath();

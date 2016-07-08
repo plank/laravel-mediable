@@ -5,7 +5,7 @@ use Frasmage\Mediable\UrlGenerators\UrlGeneratorFactory;
 use Frasmage\Mediable\UrlGenerators\UrlGenerator;
 use Frasmage\Mediable\Media;
 
-class UrlGeneratorTest extends TestCase
+class UrlGeneratorFactoryTest extends TestCase
 {
 
     public function test_it_sets_generator_for_driver()

@@ -32,7 +32,6 @@ class MediableTest extends TestCase
         $this->assertEquals([2], $result->pluck('id')->toArray());
     }
 
-
     public function test_it_can_attach_one_media_to_multiple_tags()
     {
         $mediable = factory(SampleMediable::class)->create();

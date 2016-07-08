@@ -56,6 +56,7 @@ class LocalUrlGenerator extends BaseUrlGenerator
 
     /**
      * {@inheritDoc}
+     * @throws MediaUrlException If media's disk is not publicly accessible
      */
     public function getUrl()
     {
@@ -67,7 +68,7 @@ class LocalUrlGenerator extends BaseUrlGenerator
      */
     public function getAbsolutePath()
     {
-        return $this->diskRoot() . DIRECTORY_SEPARATOR . $this->media->getDiskPath();
+        return $this->getDiskConfig('root') . DIRECTORY_SEPARATOR . $this->media->getDiskPath();
     }
 
 
@@ -82,14 +83,5 @@ class LocalUrlGenerator extends BaseUrlGenerator
             $path = str_replace(DIRECTORY_SEPARATOR, '/', $path);
         }
         return $path;
-    }
-
-    /**
-     * Get the absolute path to the root of the storage disk
-     * @return string
-     */
-    private function diskRoot()
-    {
-        return $this->getDiskConfig('root');
     }
 }

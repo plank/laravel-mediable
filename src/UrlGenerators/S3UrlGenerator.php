@@ -30,7 +30,7 @@ class S3UrlGenerator extends BaseUrlGenerator
      */
     public function getAbsolutePath()
     {
-        throw MediaUrlException::cannotGetAbsolutePath($this->media->disk);
+        return $this->getUrl();
     }
 
     /**
