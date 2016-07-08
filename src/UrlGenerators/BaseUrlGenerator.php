@@ -14,11 +14,13 @@ abstract class BaseUrlGenerator implements UrlGenerator
 {
 
     /**
+     * Configuration Repository
      * @var Config
      */
     protected $config;
 
     /**
+     * Media instance being linked
      * @var Media
      */
     protected $media;

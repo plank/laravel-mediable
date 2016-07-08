@@ -29,6 +29,9 @@ class FileAdapter implements SourceAdapter
         $this->source = $source;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getSource()
     {
         return $this->source;

@@ -441,6 +441,11 @@ class MediaUploader
         }
     }
 
+    /**
+     * Decide what to do about duplicated files
+     * @param  Media  $model
+     * @return void
+     */
     private function handleDuplicate(Media $model)
     {
         switch ($this->config['on_duplicate']) {

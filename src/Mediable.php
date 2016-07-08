@@ -16,6 +16,10 @@ use Illuminate\Database\Query\Expression;
  */
 trait Mediable
 {
+    /**
+     * List of media tags that have been modified since last load
+     * @var array
+     */
     private $media_dirty_tags = [];
 
     /**

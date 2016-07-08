@@ -194,5 +194,10 @@ return [
         's3' => Plank\Mediable\UrlGenerators\S3UrlGenerator::class,
     ],
 
+    /**
+     * Should mediable instances automatically reload their media relationships after modification are made to the association.
+     *
+     * If true, will automatically reload media the next time `getMedia()`, `getMediaMatchAll()` or `getAllMediaByTag()` are called.
+     */
     'rehydrate_media' => true,
 ];

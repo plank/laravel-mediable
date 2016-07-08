@@ -15,10 +15,16 @@ class S3UrlGenerator extends BaseUrlGenerator
 {
 
     /**
+     * Filesystem Manager
      * @var FilesystemManager
      */
     protected $filesystem;
 
+    /**
+     * Constructor
+     * @param Config            $config
+     * @param FilesystemManager $filesystem
+     */
     public function __construct(Config $config, FilesystemManager $filesystem)
     {
         parent::__construct($config);
