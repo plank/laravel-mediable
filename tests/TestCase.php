@@ -47,17 +47,17 @@ class TestCase extends BaseTestCase
         $app['config']->set('database.default', 'testing');
 
         $app['config']->set('filesystems.disks', [
-	        //private local storage
-        	'tmp' => [
-	            'driver' => 'local',
-	            'root' => storage_path('tmp'),
-        	],
-	        //public local storage
-        	'uploads' => [
-	            'driver' => 'local',
-	            'root' => public_path('uploads'),
-	            'visibility' => 'public'
-        	],
+            //private local storage
+            'tmp' => [
+                'driver' => 'local',
+                'root' => storage_path('tmp'),
+            ],
+            //public local storage
+            'uploads' => [
+                'driver' => 'local',
+                'root' => public_path('uploads'),
+                'visibility' => 'public'
+            ],
             's3' => [
                 'driver' => 's3',
                 'key'    => env('S3_KEY'),

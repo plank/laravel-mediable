@@ -11,14 +11,16 @@ use Illuminate\Filesystem\FilesystemManager;
  *
  * @author Sean Fraser <sean@plankdesign.com>
  */
-class S3UrlGenerator extends BaseUrlGenerator{
+class S3UrlGenerator extends BaseUrlGenerator
+{
 
     /**
      * @var FilesystemManager
      */
     protected $filesystem;
 
-    public function __construct(Config $config, FilesystemManager $filesystem){
+    public function __construct(Config $config, FilesystemManager $filesystem)
+    {
         parent::__construct($config);
         $this->filesystem = $filesystem;
     }

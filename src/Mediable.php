@@ -36,7 +36,7 @@ trait Mediable
      */
     public function scopeWhereHasMedia(Builder $q, $tags, $match_all = false)
     {
-        if($match_all && is_array($tags) && count($tags) > 1){
+        if ($match_all && is_array($tags) && count($tags) > 1) {
             return $this->scopeWhereHasMediaMatchAll($q, $tags);
         }
         $q->whereHas('media', function ($q) use ($tags) {
@@ -61,7 +61,7 @@ trait Mediable
             ->groupBy($this->media()->getOtherKey())
             ->havingRaw('count('.$grammar->wrap($this->media()->getOtherKey()).') = ' . count($tags));
 
-	    $q->whereRaw('(' . $subquery->toSql() . ') >= 1', $subquery->getBindings());
+        $q->whereRaw('(' . $subquery->toSql() . ') >= 1', $subquery->getBindings());
     }
 
      /**

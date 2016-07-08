@@ -10,7 +10,8 @@ use Illuminate\Filesystem\FilesystemManager;
  *
  * @author Sean Fraser <sean@plankdesign.com>
  */
-class MediaMover{
+class MediaMover
+{
     /**
      * @var FilesystemManager
      */
@@ -20,7 +21,8 @@ class MediaMover{
      * Constructor
      * @param FilesystemManager $filesystem
      */
-    public function __construct(FilesystemManager $filesystem){
+    public function __construct(FilesystemManager $filesystem)
+    {
         $this->filesystem = $filesystem;
     }
 
@@ -34,7 +36,8 @@ class MediaMover{
      * @return void
      * @throws  MediaMoveException If attempting to change the file extension or a file with the same name already exists at the destination
      */
-    public function move(Media $media, $directory, $filename = null){
+    public function move(Media $media, $directory, $filename = null)
+    {
         $storage = $this->filesystem->disk($media->disk);
 
         if ($filename) {

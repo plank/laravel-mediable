@@ -4,7 +4,6 @@ namespace Frasmage\Mediable\UrlGenerators;
 
 use Frasmage\Mediable\Exceptions\MediaUrlException;
 use Frasmage\Mediable\Media;
-
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Routing\UrlGenerator as Url;
 
@@ -13,7 +12,8 @@ use Illuminate\Routing\UrlGenerator as Url;
  *
  * @author Sean Fraser <sean@plankdesign.com>
  */
-class LocalUrlGenerator extends BaseUrlGenerator{
+class LocalUrlGenerator extends BaseUrlGenerator
+{
 
     /**
      * @var Url
@@ -25,7 +25,8 @@ class LocalUrlGenerator extends BaseUrlGenerator{
      * @param Config $config
      * @param Url    $url
      */
-    public function __construct(Config $config, Url $url){
+    public function __construct(Config $config, Url $url)
+    {
         parent::__construct($config);
         $this->url = $url;
     }
@@ -33,7 +34,8 @@ class LocalUrlGenerator extends BaseUrlGenerator{
     /**
      * {@inheritDoc}
      */
-    public function isPubliclyAccessible(){
+    public function isPubliclyAccessible()
+    {
         return strpos($this->getAbsolutePath(), public_path()) === 0;
     }
 
@@ -55,14 +57,16 @@ class LocalUrlGenerator extends BaseUrlGenerator{
     /**
      * {@inheritDoc}
      */
-    public function getUrl(){
+    public function getUrl()
+    {
         return $this->url->asset($this->getPublicPath());
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getAbsolutePath(){
+    public function getAbsolutePath()
+    {
         return $this->diskRoot() . DIRECTORY_SEPARATOR . $this->media->getDiskPath();
     }
 
@@ -72,7 +76,8 @@ class LocalUrlGenerator extends BaseUrlGenerator{
      * @param  string $path
      * @return string
      */
-    protected function cleanDirectorySeparators($path){
+    protected function cleanDirectorySeparators($path)
+    {
         if (DIRECTORY_SEPARATOR != '/') {
             $path = str_replace(DIRECTORY_SEPARATOR, '/', $path);
         }
@@ -87,5 +92,4 @@ class LocalUrlGenerator extends BaseUrlGenerator{
     {
         return $this->getDiskConfig('root');
     }
-
 }

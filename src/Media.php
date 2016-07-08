@@ -142,7 +142,8 @@ class Media extends Model
      * Get the path to the file relative to the root of the disk
      * @return string
      */
-    public function getDiskPath(){
+    public function getDiskPath()
+    {
         return ltrim(rtrim($this->directory, '/') . '/' . ltrim($this->basename, '/'), '/');
     }
 
@@ -230,8 +231,8 @@ class Media extends Model
      * Get a UrlGenerator instance for the media.
      * @return \Frasmage\Mediable\UrlGenerators\UrlGenerator
      */
-    protected function getUrlGenerator(){
+    protected function getUrlGenerator()
+    {
         return app('mediable.url.factory')->create($this);
     }
-
 }

@@ -237,13 +237,10 @@ $post->detachMediaTags(['feature', 'thumbnail']);
 The following attributes and methods would be exposed
 
 ```php
-$media->absolutePath();
+$media->getAbsolutePath();
 # /var/www/site/public/uploads/foo/bar/picture.jpg
 
-$media->dirname;
-# /var/www/site/public/uploads/foo/bar
-
-$media->diskPath();
+$media->getDiskPath();
 # foo/bar/picture.jpg
 
 $media->directory;
@@ -267,7 +264,7 @@ If the file is located below the webroot, the following methods are also availab
 $media->publicPath();
 # /uploads/foo/bar/picture.jpg
 
-$media->url();
+$media->getUrl();
 # http://localhost/uploads/foo/bar/picture.jpg
 ```
 
@@ -275,27 +272,6 @@ You can check if a media instance's file is located below the webroot with
 
 ```php
 $media->isPubliclyAccessible();
-```
-
-#### Glide Integration
-
-If the [spatie/laravel-glide](https://github.com/spatie/laravel-glide) package is installed and a file is below Glide's source directory, the following helper methods are also available.
-
-*example assumes Glide source is set to `public_path('uploads')`*
-
-```php
-
-$media->glidePath() //path relative to the glide source root
-# /foo/bar/picture.jpg
-
-$media->glideUrl(['w' => 400]); //generate glide image
-# http://localhost/glide/foo/bar/picture.jpg?w=400&s=...
-```
-
-You can check if a media instance's file is located below Glide's source directory with
-
-```php
-$media->isGlideAccessible();
 ```
 
 ### Querying Media
