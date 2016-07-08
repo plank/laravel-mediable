@@ -206,7 +206,7 @@ class MediaUploader
      */
     public function setTypeDefinition($type, $mime_types, $extensions)
     {
-        $this->config['types'][$type] = [
+        $this->config['aggregate_types'][$type] = [
             'mime_types' => (array) $mime_types,
             'extensions' => (array) $extensions,
         ];
@@ -242,7 +242,7 @@ class MediaUploader
      */
     public function setAllowedAggregateTypes($allowed_types)
     {
-        $this->config['allowed_types'] = $allowed_types;
+        $this->config['allowed_aggregate_types'] = $allowed_types;
         return $this;
     }
 
@@ -286,7 +286,7 @@ class MediaUploader
     public function possibleAggregateTypesForMimeType($mime)
     {
         $types = [];
-        foreach ($this->config['types'] as $type => $attributes) {
+        foreach ($this->config['aggregate_types'] as $type => $attributes) {
             if (in_array($mime, $attributes['mime_types'])) {
                 $types[] = $type;
             }
@@ -302,7 +302,7 @@ class MediaUploader
     public function possibleAggregateTypesForExtension($extension)
     {
         $types = [];
-        foreach ($this->config['types'] as $type => $attributes) {
+        foreach ($this->config['aggregate_types'] as $type => $attributes) {
             if (in_array($extension, $attributes['extensions'])) {
                 $types[] = $type;
             }
@@ -404,7 +404,7 @@ class MediaUploader
             throw MediaUploadException::unrecognizedFileType($mime_type, $extension);
         }
 
-        $allowed = $this->config['allowed_types'];
+        $allowed = $this->config['allowed_aggregate_types'];
         if (!empty($allowed) && !in_array($type, $allowed)) {
             throw MediaUploadException::typeRestricted($type, $allowed);
         }

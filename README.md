@@ -312,11 +312,56 @@ $media->delete();
 Media::where(...)->delete(); //will not delete files
 ```
 
-## About Aggregate Types
+## Aggregate Types
 
-Laravel-Mediable
+Laravel-Mediable provides functionality for handling multiple kinds of files under a shared aggregate type. This is intended to make it easy to find similar media without needing to constantly juggle multiple MIME types or file extensions. For example, you might want to query for an image, but not care if it is in JPEG, PNG or GIF format.
 
-## Lincense
+```php
+Media::where('type', Media::TYPE_IMAGE)->get();
+```
+
+You can use this functionality to restrict the uploader to only accept certain types of files
+
+```php
+MediaUploader::fromSource($request->file('thumbnail'))
+	->toDestination('uploads', '')
+	->setAllowedAggregateTypes([Media::TYPE_IMAGE, Media::TYPE_IMAGE_VECTOR])
+	->upload()
+```
+
+### Defining Aggregate Types
+
+The package defines a number of common file types in the config file (config/mediable.php). Feel free to modify the default types provided by the package or add your own. Each aggregate type requires a key used to identify the type and a list of MIME types and file extensions that should be recognized as belonging to that aggregate type.
+
+```php
+//...
+	'aggregate_types' => [
+		//...
+		'markup' => [
+			'mime_types' => [
+				'text/markdown',
+				'text/html',
+				'text/xml',
+				'application/xml',
+				'application/xhtml+xml',
+			],
+			'extensions' => [
+				'md',
+				'html',
+				'htm',
+				'xhtml',
+				'xml'
+			]
+		],
+		//...
+	]
+//...
+```
+
+Note: a MIME type or extension could be present in more than one aggregate type's definitions (the system will try to find the best match), but each Media instance can only have one aggregate type.
+
+
+## License
 
 This package is released under the MIT license (MIT).
 

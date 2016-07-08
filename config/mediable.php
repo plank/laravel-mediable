@@ -46,20 +46,28 @@ return [
      */
     'allow_unrecognized_types' => false,
 
-    /**
-     * Only allow files with specific MIME type to be upload
+    /*
+     * Only allow files with specific MIME type(s) to be uploaded
      */
     'allowed_mime_types' => [],
-    'allowed_extensions' => [],
-    'allowed_types' => [],
 
-    /**
-     * List of types recognized by the application
+    /*
+     * Only allow files with specific file extension(s) to be uploaded
+     */
+    'allowed_extensions' => [],
+
+    /*
+     * Only allow files matching specific aggregate type(s) to be uploaded
+     */
+    'allowed_aggregate_types' => [],
+
+    /*
+     * List of aggregate types recognized by the application
      *
      * Each type should list the MIME types and extensions
      * that should be recognized for the type
      */
-    'types' => [
+    'aggregate_types' => [
         Plank\Mediable\Media::TYPE_IMAGE => [
             'mime_types' => [
                 'image/jpeg',
@@ -162,6 +170,11 @@ return [
         ],
     ],
 
+    /*
+     * List of adapters to use for various source inputs
+     *
+     * Adapters can map either to a class or a pattern (regex)
+     */
     'source_adapters' => [
         'class' => [
             Symfony\Component\HttpFoundation\File\UploadedFile::class => Plank\Mediable\SourceAdapters\UploadedFileAdapter::class,
@@ -173,6 +186,9 @@ return [
         ],
     ],
 
+    /*
+     * List of URL Generators to use for handling various filesystem disks
+     */
     'url_generators' => [
         'local' => Plank\Mediable\UrlGenerators\LocalUrlGenerator::class,
         's3' => Plank\Mediable\UrlGenerators\S3UrlGenerator::class,
