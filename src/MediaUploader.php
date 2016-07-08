@@ -165,7 +165,7 @@ class MediaUploader
     }
 
     /**
-     * Change the behaviour for when the destination already exists
+     * Change the behaviour for when a file already exists at the destination
      * @param string $behavior
      * @return static
      */
@@ -176,7 +176,7 @@ class MediaUploader
     }
 
     /**
-     * Change whether mime and extensions must agree
+     * Change whether both the MIME type and extensions must match the same aggregate type
      * @param boolean $strict
      * @return static
      */
@@ -187,7 +187,7 @@ class MediaUploader
     }
 
     /**
-     * Change whether unknown media types are allowed
+     * Change whether files not matching any aggregate types are allowed
      * @param boolean $allow
      * @return static
      */
@@ -198,7 +198,7 @@ class MediaUploader
     }
 
     /**
-     * Add or update the definition of a media type
+     * Add or update the definition of a aggregate type
      * @param string $type       the name of the type
      * @param array  $mime_types list of MIME types recognized
      * @param array  $extensions list of file extensions recognized
