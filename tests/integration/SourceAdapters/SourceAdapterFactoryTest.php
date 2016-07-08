@@ -1,8 +1,8 @@
 <?php
 
-use Frasmage\Mediable\SourceAdapters\SourceAdapterFactory;
-use Frasmage\Mediable\SourceAdapters\SourceAdapter;
-use Frasmage\Mediable\Exceptions\MediaUploadException;
+use Plank\Mediable\SourceAdapters\SourceAdapterFactory;
+use Plank\Mediable\SourceAdapters\SourceAdapter;
+use Plank\Mediable\Exceptions\MediaUploadException;
 
 class SourceAdapterFactoryTest extends TestCase
 {

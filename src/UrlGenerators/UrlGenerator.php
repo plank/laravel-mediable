@@ -1,8 +1,8 @@
 <?php
 
-namespace Frasmage\Mediable\UrlGenerators;
+namespace Plank\Mediable\UrlGenerators;
 
-use Frasmage\Mediable\Media;
+use Plank\Mediable\Media;
 
 /**
  * Url Generator Interface

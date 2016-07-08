@@ -1,6 +1,6 @@
 <?php
 
-namespace Frasmage\Mediable\Exceptions;
+namespace Plank\Mediable\Exceptions;
 
 use Exception;
 
@@ -11,12 +11,12 @@ class MediaUploadException extends Exception
 {
     public static function cannotSetAdapter($class)
     {
-        return new static("Could not set adapter of class `{$class}`. Must implement `\Frasmage\Mediable\SourceAdapters\SourceAdapterInterface`.");
+        return new static("Could not set adapter of class `{$class}`. Must implement `\Plank\Mediable\SourceAdapters\SourceAdapterInterface`.");
     }
 
     public static function cannotSetModel($class)
     {
-        return new static("Could not set `{$class}` as Media model class. Must extend `\Frasmage\Mediable\Media`.");
+        return new static("Could not set `{$class}` as Media model class. Must extend `\Plank\Mediable\Media`.");
     }
 
     public static function unrecognizedSource($source)

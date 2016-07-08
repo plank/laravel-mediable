@@ -1,12 +1,12 @@
 {
-    "name": "frasmage/laravel-mediable",
+    "name": "plank/laravel-mediable",
     "description": "A package for easily uploading and attaching media files to models with Laravel",
     "keywords": ["media", "image", "uploader", "eloquent"],
     "license": "MIT",
     "authors": [
         {
             "name": "Sean Fraser",
-            "email": "frasmage@gmail.com"
+            "email": "sean@plankdesign.com"
         }
     ],
     "require": {
@@ -23,7 +23,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Frasmage\\Mediable\\": "src/"
+            "Plank\\Mediable\\": "src/"
         }
     },
     "autoload-dev":{

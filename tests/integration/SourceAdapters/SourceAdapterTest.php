@@ -1,9 +1,9 @@
 <?php
 
-use Frasmage\Mediable\SourceAdapters\FileAdapter;
-use Frasmage\Mediable\SourceAdapters\UploadedFileAdapter;
-use Frasmage\Mediable\SourceAdapters\LocalPathAdapter;
-use Frasmage\Mediable\SourceAdapters\RemoteUrlAdapter;
+use Plank\Mediable\SourceAdapters\FileAdapter;
+use Plank\Mediable\SourceAdapters\UploadedFileAdapter;
+use Plank\Mediable\SourceAdapters\LocalPathAdapter;
+use Plank\Mediable\SourceAdapters\RemoteUrlAdapter;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 

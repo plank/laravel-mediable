@@ -1,10 +1,10 @@
 <?php
 
-use Frasmage\Mediable\Media;
+use Plank\Mediable\Media;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 /**
- * @covers Frasmage\Mediable\Mediable
+ * @covers Plank\Mediable\Mediable
  */
 class MediableTest extends TestCase
 {

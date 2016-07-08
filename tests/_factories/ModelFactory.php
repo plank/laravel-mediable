@@ -1,6 +1,6 @@
 <?php
 
-$factory->define(Frasmage\Mediable\Media::class, function (Faker\Generator $faker) {
+$factory->define(Plank\Mediable\Media::class, function (Faker\Generator $faker) {
     $types = config('mediable.types');
     $type = $faker->randomElement(array_keys($types));
 

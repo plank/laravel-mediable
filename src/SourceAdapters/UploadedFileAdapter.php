@@ -1,6 +1,6 @@
 <?php
 
-namespace Frasmage\Mediable\SourceAdapters;
+namespace Plank\Mediable\SourceAdapters;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 

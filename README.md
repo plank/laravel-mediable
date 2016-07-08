@@ -79,7 +79,7 @@ $media = MediaUploader::fromSource($request->file('image'))
 	->setAllowUnrecognizedTypes(true)
 	->setAllowedMimeTypes(['image/jpeg'])
 	->setAllowedExtensions(['jpg', 'jpeg'])
-	->setAllowedMediaTypes(['image'])
+	->setAllowedAggregateTypes(['image'])
 	->upload();
 ```
 
@@ -311,3 +311,16 @@ $media->delete();
 ```php
 Media::where(...)->delete(); //will not delete files
 ```
+
+## About Aggregate Types
+
+Laravel-Mediable
+
+## Lincense
+
+This package is released under the MIT license (MIT).
+
+## About Plank
+
+[Plank](http://plankdesign.com) is a web development agency based in Montreal, Canada.
+

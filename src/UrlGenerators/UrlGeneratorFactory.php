@@ -1,9 +1,9 @@
 <?php
 
-namespace Frasmage\Mediable\UrlGenerators;
+namespace Plank\Mediable\UrlGenerators;
 
-use Frasmage\Mediable\Exceptions\MediaUrlException;
-use Frasmage\Mediable\Media;
+use Plank\Mediable\Exceptions\MediaUrlException;
+use Plank\Mediable\Media;
 
 /**
  * Url Generator Factory

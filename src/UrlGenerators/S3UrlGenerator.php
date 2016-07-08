@@ -1,8 +1,8 @@
 <?php
 
-namespace Frasmage\Mediable\UrlGenerators;
+namespace Plank\Mediable\UrlGenerators;
 
-use Frasmage\Mediable\Exceptions\MediaUrlException;
+use Plank\Mediable\Exceptions\MediaUrlException;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Filesystem\FilesystemManager;
 

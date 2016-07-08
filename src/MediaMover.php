@@ -1,8 +1,8 @@
 <?php
 
-namespace Frasmage\Mediable;
+namespace Plank\Mediable;
 
-use Frasmage\Mediable\Exceptions\MediaMoveException;
+use Plank\Mediable\Exceptions\MediaMoveException;
 use Illuminate\Filesystem\FilesystemManager;
 
 /**

@@ -1,9 +1,9 @@
 <?php
 
-namespace Frasmage\Mediable;
+namespace Plank\Mediable;
 
-use Frasmage\Mediable\Exceptions\MediaUrlException;
-use Frasmage\Mediable\Exceptions\MediaMoveException;
+use Plank\Mediable\Exceptions\MediaUrlException;
+use Plank\Mediable\Exceptions\MediaMoveException;
 use Glide;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -229,7 +229,7 @@ class Media extends Model
 
     /**
      * Get a UrlGenerator instance for the media.
-     * @return \Frasmage\Mediable\UrlGenerators\UrlGenerator
+     * @return \Plank\Mediable\UrlGenerators\UrlGenerator
      */
     protected function getUrlGenerator()
     {

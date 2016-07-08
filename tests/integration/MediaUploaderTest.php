@@ -1,10 +1,10 @@
 <?php
 
-use Frasmage\Mediable\Media;
-use Frasmage\Mediable\MediaUploader;
-use Frasmage\Mediable\SourceAdapters\SourceAdapterFactory;
-use Frasmage\Mediable\SourceAdapters\SourceAdapter;
-use Frasmage\Mediable\Exceptions\MediaUploadException;
+use Plank\Mediable\Media;
+use Plank\Mediable\MediaUploader;
+use Plank\Mediable\SourceAdapters\SourceAdapterFactory;
+use Plank\Mediable\SourceAdapters\SourceAdapter;
+use Plank\Mediable\Exceptions\MediaUploadException;
 use MediaUploader as Facade;
 use Illuminate\Filesystem\FilesystemManager;
 use League\Flysystem\Filesystem;
@@ -29,11 +29,11 @@ class MediaUploaderTest extends TestCase
         $uploader->setTypeDefinition('baz', ['text/foo', 'text/baz'], ['baz']);
         $uploader->setTypeDefinition('bat', ['text/bat'], ['bat']);
 
-        $this->assertEquals('foo', $uploader->inferMediaType('text/foo', 'foo', false), 'Double match, loose');
-        $this->assertEquals('foo', $uploader->inferMediaType('text/foo', 'foo', true), 'Double match, strict');
-        $this->assertEquals('bat', $uploader->inferMediaType('text/bat', 'foo', false), 'Loose should match MIME type first');
-        $this->assertEquals(Media::TYPE_OTHER, $uploader->inferMediaType('text/abc', 'abc', false), 'Loose match none');
-        $this->assertEquals(Media::TYPE_OTHER, $uploader->inferMediaType('text/abc', 'abc', true), 'Strict match none');
+        $this->assertEquals('foo', $uploader->inferAggregateType('text/foo', 'foo', false), 'Double match, loose');
+        $this->assertEquals('foo', $uploader->inferAggregateType('text/foo', 'foo', true), 'Double match, strict');
+        $this->assertEquals('bat', $uploader->inferAggregateType('text/bat', 'foo', false), 'Loose should match MIME type first');
+        $this->assertEquals(Media::TYPE_OTHER, $uploader->inferAggregateType('text/abc', 'abc', false), 'Loose match none');
+        $this->assertEquals(Media::TYPE_OTHER, $uploader->inferAggregateType('text/abc', 'abc', true), 'Strict match none');
     }
 
     public function test_it_throws_exception_for_type_mismatch()
@@ -43,7 +43,7 @@ class MediaUploaderTest extends TestCase
         $uploader->setTypeDefinition('bar', ['text/bar'], ['bar']);
         $uploader->setStrictTypeChecking(true);
         $this->expectException(MediaUploadException::class);
-        $uploader->inferMediaType('text/foo', 'bar');
+        $uploader->inferAggregateType('text/foo', 'bar');
     }
 
     public function test_it_throws_exception_for_non_existent_disk()
@@ -143,11 +143,11 @@ class MediaUploaderTest extends TestCase
     public function test_it_validates_allowed_types()
     {
         $uploader = $this->mockUploader();
-        $method = $this->getPrivateMethod($uploader, 'verifyMediaType');
+        $method = $this->getPrivateMethod($uploader, 'verifyAggregateType');
 
         $this->assertEquals('foo', $method->invoke($uploader, 'foo', 'text/foo', 'foo'), 'No restrictions');
 
-        $uploader->setAllowedMediaTypes(['bar']);
+        $uploader->setAllowedAggregateTypes(['bar']);
         $this->assertEquals('bar', $method->invoke($uploader, 'bar', 'text/bar', 'bar'), 'With Restriction');
 
         $this->expectException(MediaUploadException::class);
@@ -157,7 +157,7 @@ class MediaUploaderTest extends TestCase
     public function test_it_can_restrict_to_known_types()
     {
         $uploader = $this->mockUploader();
-        $method = $this->getPrivateMethod($uploader, 'verifyMediaType');
+        $method = $this->getPrivateMethod($uploader, 'verifyAggregateType');
 
         $uploader->setAllowUnrecognizedTypes(true);
         $this->assertEquals(Media::TYPE_OTHER, $method->invoke($uploader, Media::TYPE_OTHER, 'text/foo', 'bar'));

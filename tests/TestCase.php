@@ -1,6 +1,6 @@
 <?php
 
-use Frasmage\Mediable\Media;
+use Plank\Mediable\Media;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
 class TestCase extends BaseTestCase
@@ -23,14 +23,14 @@ class TestCase extends BaseTestCase
     protected function getPackageProviders($app)
     {
         return [
-            Frasmage\Mediable\MediableServiceProvider::class
+            Plank\Mediable\MediableServiceProvider::class
         ];
     }
 
     protected function getPackageAliases($app)
     {
         return [
-            'MediaUploader' => 'Frasmage\Mediable\MediaUploaderFacade',
+            'MediaUploader' => 'Plank\Mediable\MediaUploaderFacade',
         ];
     }
 

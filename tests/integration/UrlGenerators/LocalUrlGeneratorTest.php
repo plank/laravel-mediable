@@ -1,8 +1,8 @@
 <?php
 
-use Frasmage\Mediable\Exceptions\MediaUrlException;
-use Frasmage\Mediable\UrlGenerators\LocalUrlGenerator;
-use Frasmage\Mediable\Media;
+use Plank\Mediable\Exceptions\MediaUrlException;
+use Plank\Mediable\UrlGenerators\LocalUrlGenerator;
+use Plank\Mediable\Media;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Routing\UrlGenerator as Url;
 

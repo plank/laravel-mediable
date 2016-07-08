@@ -1,6 +1,6 @@
 <?php
 
-namespace Frasmage\Mediable\Exceptions;
+namespace Plank\Mediable\Exceptions;
 
 use Exception;
 
@@ -16,7 +16,7 @@ class MediaUrlException extends Exception
 
     public static function invalidGenerator($class)
     {
-        return new static("Could not set UrlGenerator, class `{$class}` does not extend `Frasmage\Mediable\UrlGenerators\UrlGenerator`");
+        return new static("Could not set UrlGenerator, class `{$class}` does not extend `Plank\Mediable\UrlGenerators\UrlGenerator`");
     }
 
     public static function mediaNotPubliclyAccessible($path, $public_path)

@@ -1,9 +1,9 @@
 <?php
 
-namespace Frasmage\Mediable;
+namespace Plank\Mediable;
 
-use Frasmage\Mediable\SourceAdapters\SourceAdapterFactory;
-use Frasmage\Mediable\UrlGenerators\UrlGeneratorFactory;
+use Plank\Mediable\SourceAdapters\SourceAdapterFactory;
+use Plank\Mediable\UrlGenerators\UrlGeneratorFactory;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Container\Container;
 use Symfony\Component\HttpFoundation\File\File;

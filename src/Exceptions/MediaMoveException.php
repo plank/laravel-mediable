@@ -1,6 +1,6 @@
 <?php
 
-namespace Frasmage\Mediable\Exceptions;
+namespace Plank\Mediable\Exceptions;
 
 use \Exception;
 

@@ -4,9 +4,9 @@ return [
     /*
      * FQCN of the model to use for media
      *
-     * Should extend Frasmage\Mediable\Media::class
+     * Should extend Plank\Mediable\Media::class
      */
-    'model' => Frasmage\Mediable\Media::class,
+    'model' => Plank\Mediable\Media::class,
 
     /*
      * Filesystem disk to use if none is specified
@@ -33,7 +33,7 @@ return [
      * * 'error': an Exception is thrown
      *
      */
-    'on_duplicate' => \Frasmage\Mediable\MediaUploader::ON_DUPLICATE_INCREMENT,
+    'on_duplicate' => Plank\Mediable\MediaUploader::ON_DUPLICATE_INCREMENT,
 
     /*
      * Reject files unless both their mime and extension are recognized and both match a single type
@@ -60,7 +60,7 @@ return [
      * that should be recognized for the type
      */
     'types' => [
-        Frasmage\Mediable\Media::TYPE_IMAGE => [
+        Plank\Mediable\Media::TYPE_IMAGE => [
             'mime_types' => [
                 'image/jpeg',
                 'image/png',
@@ -73,7 +73,7 @@ return [
                 'gif',
             ]
         ],
-        Frasmage\Mediable\Media::TYPE_IMAGE_VECTOR => [
+        Plank\Mediable\Media::TYPE_IMAGE_VECTOR => [
             'mime_types' => [
                 'image/svg+xml',
             ],
@@ -81,7 +81,7 @@ return [
                 'svg',
             ]
         ],
-        Frasmage\Mediable\Media::TYPE_PDF => [
+        Plank\Mediable\Media::TYPE_PDF => [
             'mime_types' => [
                 'application/pdf',
             ],
@@ -89,7 +89,7 @@ return [
                 'pdf',
             ]
         ],
-        Frasmage\Mediable\Media::TYPE_AUDIO => [
+        Plank\Mediable\Media::TYPE_AUDIO => [
             'mime_types' => [
                 'audio/aac',
                 'audio/ogg',
@@ -106,7 +106,7 @@ return [
                 'wav',
             ]
         ],
-        Frasmage\Mediable\Media::TYPE_VIDEO => [
+        Plank\Mediable\Media::TYPE_VIDEO => [
             'mime_types' => [
                 'video/mp4',
                 'video/mpeg',
@@ -121,7 +121,7 @@ return [
                 'webm'
             ]
         ],
-        Frasmage\Mediable\Media::TYPE_ARCHIVE => [
+        Plank\Mediable\Media::TYPE_ARCHIVE => [
             'mime_types' => [
                 'application/zip',
                 'application/x-compressed-zip',
@@ -131,7 +131,7 @@ return [
                 'zip',
             ]
         ],
-        Frasmage\Mediable\Media::TYPE_DOCUMENT => [
+        Plank\Mediable\Media::TYPE_DOCUMENT => [
             'mime_types' => [
                 'text/plain',
                 'application/plain',
@@ -150,7 +150,7 @@ return [
                 'json',
             ]
         ],
-        Frasmage\Mediable\Media::TYPE_SPREADSHEET => [
+        Plank\Mediable\Media::TYPE_SPREADSHEET => [
             'mime_types' => [
                 'application/vnd.ms-excel',
                 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -164,18 +164,18 @@ return [
 
     'source_adapters' => [
         'class' => [
-            Symfony\Component\HttpFoundation\File\UploadedFile::class => Frasmage\Mediable\SourceAdapters\UploadedFileAdapter::class,
-            Symfony\Component\HttpFoundation\File\File::class => Frasmage\Mediable\SourceAdapters\FileAdapter::class,
+            Symfony\Component\HttpFoundation\File\UploadedFile::class => Plank\Mediable\SourceAdapters\UploadedFileAdapter::class,
+            Symfony\Component\HttpFoundation\File\File::class => Plank\Mediable\SourceAdapters\FileAdapter::class,
         ],
         'pattern' => [
-            '^https?://' => Frasmage\Mediable\SourceAdapters\RemoteUrlAdapter::class,
-            '^/' => Frasmage\Mediable\SourceAdapters\LocalPathAdapter::class
+            '^https?://' => Plank\Mediable\SourceAdapters\RemoteUrlAdapter::class,
+            '^/' => Plank\Mediable\SourceAdapters\LocalPathAdapter::class
         ],
     ],
 
     'url_generators' => [
-        'local' => Frasmage\Mediable\UrlGenerators\LocalUrlGenerator::class,
-        's3' => Frasmage\Mediable\UrlGenerators\S3UrlGenerator::class,
+        'local' => Plank\Mediable\UrlGenerators\LocalUrlGenerator::class,
+        's3' => Plank\Mediable\UrlGenerators\S3UrlGenerator::class,
     ],
 
     'rehydrate_media' => true,

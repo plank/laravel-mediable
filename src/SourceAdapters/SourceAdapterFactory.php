@@ -1,11 +1,11 @@
 <?php
 
-namespace Frasmage\Mediable\SourceAdapters;
+namespace Plank\Mediable\SourceAdapters;
 
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Frasmage\Mediable\Exceptions\MediaUploadException;
-use Frasmage\Mediable\SourceAdapters\SourceAdapter;
+use Plank\Mediable\Exceptions\MediaUploadException;
+use Plank\Mediable\SourceAdapters\SourceAdapter;
 
 /**
  * Source Adapter Factory

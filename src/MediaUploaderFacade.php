@@ -1,6 +1,6 @@
 <?php
 
-namespace Frasmage\Mediable;
+namespace Plank\Mediable;
 
 use Illuminate\Support\Facades\Facade;
 
