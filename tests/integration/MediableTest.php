@@ -200,8 +200,8 @@ class MediableTest extends TestCase
         $mediable->attachMedia($media1, ['foo', 'bar']);
         $mediable->attachMedia($media2, ['foo']);
 
-        $query = SampleMediable::whereHasMediaMatchAll(['foo', 'bar'], true);
-        $this->assertEquals([1], $query->get()->pluck('id')->toArray());
+        $this->assertEquals([1], SampleMediable::whereHasMediaMatchAll(['foo', 'bar'])->get()->pluck('id')->toArray());
+        $this->assertEquals([1], SampleMediable::whereHasMedia(['foo', 'bar'], true)->get()->pluck('id')->toArray());
     }
 
     public function test_it_can_list_the_tags_a_media_is_attached_to()
