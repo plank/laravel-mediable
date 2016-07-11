@@ -142,7 +142,7 @@ class MediaUploader
      * Change the class to use for generated Media
      * @param string $class
      * @return static
-     * @throws MediaUploaderException if $class does not extend Plank\Mediable\Media
+     * @throws MediaUploadException if $class does not extend Plank\Mediable\Media
      */
     public function setModelClass($class)
     {
@@ -250,32 +250,43 @@ class MediaUploader
      * Determine the aggregate type of the file based on the MIME type and the extension
      * @param  string $mime_type
      * @param  string $extension
-     * @param  boolean|null $strict Defaults to mediable.strict_type_checking value
      * @return string
-     * @throws  MediaUploadException If strict mode is enabled and mime and extension disagree
+     * @throws  MediaUploadException If a legal aggregate type cannot be determined
      */
-    public function inferAggregateType($mime_type, $extension, $strict = null)
+    public function inferAggregateType($mime_type, $extension)
     {
-        $strict = is_null($strict) ? $this->config['strict_type_checking'] : $strict;
+        $allowed_types = $this->config['allowed_aggregate_types'];
         $types_for_mime = $this->possibleAggregateTypesForMimeType($mime_type);
         $types_for_extension = $this->possibleAggregateTypesForExtension($extension);
 
-        $intersection = array_intersect($types_for_mime, $types_for_extension);
+        if(count($allowed_types)){ 
+            $intersection = array_intersect($types_for_mime, $types_for_extension, $allowed_types);
+        }else{
+            $intersection = array_intersect($types_for_mime, $types_for_extension);
+        }
 
         if (count($intersection)) {
-            return $intersection[0];
+            $type = $intersection[0];
+
+        }else if (empty($types_for_mime) && empty($types_for_extension)) {
+            if (!$this->config['allow_unrecognized_types']) {
+                throw MediaUploadException::unrecognizedFileType($mime_type, $extension);
+            }
+            $type = Media::TYPE_OTHER;
+
+        }else{
+            if($this->config['strict_type_checking']) {
+                throw MediaUploadException::strictTypeMismatch($mime_type, $extension);
+            }
+            $merged = array_merge($types_for_mime, $types_for_extension);
+            $type = reset($merged);
         }
 
-        if (empty($types_for_mime) && empty($types_for_extension)) {
-            return Media::TYPE_OTHER;
+        if (count($allowed_types) && !in_array($type, $allowed_types)) {
+            throw MediaUploadException::aggregateTypeRestricted($type, $allowed_types);
         }
 
-        if ($strict) {
-            throw MediaUploadException::strictTypeMismatch($mime_type, $extension);
-        }
-
-        $merged = array_merge($types_for_mime, $types_for_extension);
-        return reset($merged);
+        return $type;
     }
 
     /**
@@ -326,10 +337,7 @@ class MediaUploader
         $model->size = $this->verifyFileSize($this->source->size());
         $model->mime_type = $this->verifyMimeType($this->source->mimeType());
         $model->extension = $this->verifyExtension($this->source->extension());
-
-        $type = $this->inferAggregateType($model->mime_type, $model->extension);
-        $model->type = $this->verifyAggregateType($type, $model->mime_type, $model->extension);
-
+        $model->type = $this->inferAggregateType($model->mime_type, $model->extension);
 
         $model->disk = $this->disk ?: $this->config['default_disk'];
         $model->directory = $this->directory;
@@ -389,26 +397,6 @@ class MediaUploader
             throw MediaUploadException::extensionRestricted($extension, $allowed);
         }
         return $extension;
-    }
-
-    /**
-     * Ensure that the file's aggregate type is allowed
-     * @param  string $type
-     * @param  string $mime_type
-     * @param  string $extension
-     * @return string
-     */
-    private function verifyAggregateType($type, $mime_type, $extension)
-    {
-        if (!$this->config['allow_unrecognized_types'] && $type == Media::TYPE_OTHER) {
-            throw MediaUploadException::unrecognizedFileType($mime_type, $extension);
-        }
-
-        $allowed = $this->config['allowed_aggregate_types'];
-        if (!empty($allowed) && !in_array($type, $allowed)) {
-            throw MediaUploadException::typeRestricted($type, $allowed);
-        }
-        return $type;
     }
 
     /**

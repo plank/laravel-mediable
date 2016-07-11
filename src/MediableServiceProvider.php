@@ -49,6 +49,7 @@ class MediableServiceProvider extends ServiceProvider
         $this->registerUploader();
         $this->registerMover();
         $this->registerUrlGeneratorFactory();
+        $this->registerConsoleCommands();
     }
 
     /**
@@ -116,5 +117,18 @@ class MediableServiceProvider extends ServiceProvider
             return $factory;
         });
         $this->app->alias('mediable.url.factory', UrlGeneratorFactory::class);
+    }
+
+    /**
+     * Add package commands to artisan console
+     * @return void
+     */
+    public function registerConsoleCommands()
+    {
+        $this->commands([
+            Plank\Mediable\Commands\ImportMediaCommand::class,
+            Plank\Mediable\Commands\PruneMediaCommand::class,
+            Plank\Mediable\Commands\SyncMediaCommand::class,
+        ]);
     }
 }
