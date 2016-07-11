@@ -240,6 +240,9 @@ The following attributes and methods would be exposed
 $media->getAbsolutePath();
 # /var/www/site/public/uploads/foo/bar/picture.jpg
 
+$media->getUrl();
+# http://localhost/uploads/foo/bar/picture.jpg
+
 $media->getDiskPath();
 # foo/bar/picture.jpg
 
@@ -256,35 +259,16 @@ $media->extension;
 # jpg
 ```
 
-#### Public Paths
-
-If the file is located below the webroot, the following methods are also available:
-
-```php
-$media->publicPath();
-# /uploads/foo/bar/picture.jpg
-
-$media->getUrl();
-# http://localhost/uploads/foo/bar/picture.jpg
-```
-
-You can check if a media instance's file is located below the webroot with
-
-```php
-$media->isPubliclyAccessible();
-```
-
 ### Querying Media
 
 If you need to query the media table directly, rather than through associated models, the Media class exposes a few helpful methods for the query builder.
 
 ```php
-Media::inDirectory($disk, $directory, $recursive = false);
-Media::inOrUnderDirectory($disk, $directory);
-Media::whereBasename($basename);
-Media::forPathOnDisk($disk, $path);
+Media::inDirectory('uploads', 'foo/bar');
+Media::inOrUnderDirectory('uploads, 'foo');
+Media::forPathOnDisk('uploads, 'foo/bar/picture.jpg');
+Media::whereBasename('picture.jpg');
 ```
-
 
 ### Moving Media
 
