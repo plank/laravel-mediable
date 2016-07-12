@@ -6,6 +6,11 @@ use Illuminate\Console\Command;
 use Illuminate\Filesystem\FilesystemManager;
 use Plank\Mediable\Media;
 
+/**
+ * Prune Media Artisan Command
+ *
+ * @author Sean Fraser <sean@plankdesign.com>
+ */
 class PruneMediaCommand extends Command
 {
     /**
@@ -38,6 +43,11 @@ class PruneMediaCommand extends Command
         $this->filesystem = $filesystem;
     }
 
+    /**
+     * Execute the console command.
+     *
+     * @return void
+     */
     public function handle()
     {
         $disk = $this->argument('disk');

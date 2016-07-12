@@ -8,6 +8,11 @@ use Plank\Mediable\Media;
 use Plank\Mediable\MediaUploader;
 use Plank\Mediable\Exceptions\MediaUploadException;
 
+/**
+ * Import Media Artisan Command
+ *
+ * @author Sean Fraser <sean@plankdesign.com>
+ */
 class ImportMediaCommand extends Command
 {
     /**
@@ -63,7 +68,7 @@ class ImportMediaCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return mixed
+     * @return void
      */
     public function handle()
     {
@@ -83,7 +88,7 @@ class ImportMediaCommand extends Command
                     $this->updateRecordForFile($path);
                 }
             }else{
-                $this->createRecordForFile($disk, $path)
+                $this->createRecordForFile($disk, $path);
             }
         }
 
@@ -117,7 +122,7 @@ class ImportMediaCommand extends Command
         $dirname = File::cleanDirname($path);
         return $existing_media->filter(function($media) use($path, $dirname){
 
-            return $media->directory == $dirname;
+            return $media->directory == $dirname
                 && $media->filename == pathinfo($path, PATHINFO_FILENAME)
                 && $media->extension == pathinfo($path, PATHINFO_EXTENSION);
         })->first();

@@ -126,9 +126,9 @@ class MediableServiceProvider extends ServiceProvider
     public function registerConsoleCommands()
     {
         $this->commands([
-            Plank\Mediable\Commands\ImportMediaCommand::class,
-            Plank\Mediable\Commands\PruneMediaCommand::class,
-            Plank\Mediable\Commands\SyncMediaCommand::class,
+            \Plank\Mediable\Commands\ImportMediaCommand::class,
+            \Plank\Mediable\Commands\PruneMediaCommand::class,
+            \Plank\Mediable\Commands\SyncMediaCommand::class,
         ]);
     }
 }

@@ -72,7 +72,7 @@ class MediaUploadException extends Exception
         return new static("Cannot upload file with extension `{$extension}`. Only the `{$allowed}` extension(s) are permitted.");
     }
 
-    public static function typeRestricted($type, $allowed_types)
+    public static function aggregateTypeRestricted($type, $allowed_types)
     {
         $allowed = implode("`, `", $allowed_types);
         return new static("Cannot upload file of media type `{$type}`. Only files of type(s) `{$allowed}` are permitted.");

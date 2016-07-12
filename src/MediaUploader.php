@@ -259,7 +259,7 @@ class MediaUploader
         $types_for_mime = $this->possibleAggregateTypesForMimeType($mime_type);
         $types_for_extension = $this->possibleAggregateTypesForExtension($extension);
 
-        if(count($allowed_types)){ 
+        if(count($allowed_types)){
             $intersection = array_intersect($types_for_mime, $types_for_extension, $allowed_types);
         }else{
             $intersection = array_intersect($types_for_mime, $types_for_extension);

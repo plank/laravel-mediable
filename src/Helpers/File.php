@@ -13,7 +13,7 @@ class File
         return trim($dirname, '/');
     }
 
-    public static function readableSize($bytes, $precision)
+    public static function readableSize($bytes, $precision = 1)
     {
         static $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
         if ($bytes === 0) {

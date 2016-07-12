@@ -28,6 +28,7 @@ class MediaUploaderTest extends TestCase
         $uploader->setTypeDefinition('bar', ['text/foo', 'text/bar'], ['foo', 'bar']);
         $uploader->setTypeDefinition('baz', ['text/foo', 'text/baz'], ['baz']);
         $uploader->setTypeDefinition('bat', ['text/bat'], ['bat']);
+        $uploader->setAllowUnrecognizedTypes(true);
 
         $this->assertEquals('foo', $uploader->inferAggregateType('text/foo', 'foo', false), 'Double match, loose');
         $this->assertEquals('foo', $uploader->inferAggregateType('text/foo', 'foo', true), 'Double match, strict');
@@ -42,6 +43,32 @@ class MediaUploaderTest extends TestCase
         $uploader->setTypeDefinition('foo', ['text/foo'], ['foo']);
         $uploader->setTypeDefinition('bar', ['text/bar'], ['bar']);
         $uploader->setStrictTypeChecking(true);
+        $this->expectException(MediaUploadException::class);
+        $uploader->inferAggregateType('text/foo', 'bar');
+    }
+
+    public function test_it_validates_allowed_types()
+    {
+        $uploader = $this->mockUploader();
+        $uploader->setTypeDefinition('foo', ['text/foo'], ['foo']);
+        $uploader->setTypeDefinition('bar', ['text/bar'], ['bar']);
+
+        $this->assertEquals('foo', $uploader->inferAggregateType('text/foo', 'foo'), 'No restrictions');
+
+        $uploader->setAllowedAggregateTypes(['bar']);
+        $this->assertEquals('bar', $uploader->inferAggregateType('text/bar', 'bar'), 'With Restriction');
+
+        $this->expectException(MediaUploadException::class);
+        $uploader->inferAggregateType('text/foo', 'bar');
+    }
+
+    public function test_it_can_restrict_to_known_types()
+    {
+        $uploader = $this->mockUploader();
+
+        $uploader->setAllowUnrecognizedTypes(true);
+        $this->assertEquals(Media::TYPE_OTHER, $uploader->inferAggregateType('text/foo', 'bar'));
+        $uploader->setAllowUnrecognizedTypes(false);
         $this->expectException(MediaUploadException::class);
         $uploader->inferAggregateType('text/foo', 'bar');
     }
@@ -138,32 +165,6 @@ class MediaUploaderTest extends TestCase
 
         $this->expectException(MediaUploadException::class);
         $method->invoke($uploader, 'foo');
-    }
-
-    public function test_it_validates_allowed_types()
-    {
-        $uploader = $this->mockUploader();
-        $method = $this->getPrivateMethod($uploader, 'verifyAggregateType');
-
-        $this->assertEquals('foo', $method->invoke($uploader, 'foo', 'text/foo', 'foo'), 'No restrictions');
-
-        $uploader->setAllowedAggregateTypes(['bar']);
-        $this->assertEquals('bar', $method->invoke($uploader, 'bar', 'text/bar', 'bar'), 'With Restriction');
-
-        $this->expectException(MediaUploadException::class);
-        $method->invoke($uploader, 'foo', 'text/foo', 'bar');
-    }
-
-    public function test_it_can_restrict_to_known_types()
-    {
-        $uploader = $this->mockUploader();
-        $method = $this->getPrivateMethod($uploader, 'verifyAggregateType');
-
-        $uploader->setAllowUnrecognizedTypes(true);
-        $this->assertEquals(Media::TYPE_OTHER, $method->invoke($uploader, Media::TYPE_OTHER, 'text/foo', 'bar'));
-        $uploader->setAllowUnrecognizedTypes(false);
-        $this->expectException(MediaUploadException::class);
-        $method->invoke($uploader, Media::TYPE_OTHER, 'text/foo', 'bar');
     }
 
     public function test_it_validates_file_size()

@@ -6,6 +6,11 @@ use Illuminate\Console\Command;
 use Illuminate\Filesystem\FilesystemManager;
 use Plank\Mediable\Media;
 
+/**
+ * Synchronize Media Artisan Command
+ *
+ * @author Sean Fraser <sean@plankdesign.com>
+ */
 class SyncMediaCommand extends Command
 {
     /**
@@ -14,7 +19,8 @@ class SyncMediaCommand extends Command
      */
     protected $signature = 'media:sync {disk : the name of the filesystem disk.}
         {--d|directory= : prune records for files in or below a given directory.}
-        {--n|non-recursive : only prune record for files in the specified directory.}';
+        {--n|non-recursive : only prune record for files in the specified directory.}
+        {--f|force : re-process existing media.}';
 
     /**
      * {@inheritDoc}
@@ -22,6 +28,11 @@ class SyncMediaCommand extends Command
      */
     protected $description = 'Synchronize media records with the filesystem.';
 
+    /**
+     * Execute the console command.
+     *
+     * @return void
+     */
     public function handle()
     {
         $disk = $this->argument('disk');

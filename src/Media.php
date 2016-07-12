@@ -4,10 +4,9 @@ namespace Plank\Mediable;
 
 use Plank\Mediable\Exceptions\MediaUrlException;
 use Plank\Mediable\Exceptions\MediaMoveException;
-use Glide;
+use Plank\Mediable\Helpers\File;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Storage;
 
 /**
  * Media Model
@@ -129,7 +128,7 @@ class Media extends Model
      */
     public function readableSize($precision = 1)
     {
-        File::readableSize($this->size, $precision);
+        return File::readableSize($this->size, $precision);
     }
 
     /**
