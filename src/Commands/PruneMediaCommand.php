@@ -19,7 +19,7 @@ class PruneMediaCommand extends Command
      */
     protected $signature = 'media:prune {disk : the name of the filesystem disk.}
         {--d|directory= : prune records for files in or below a given directory.}
-        {--n|non-recursive : only prune record for files in the specified directory.}';
+        {--non-recursive : only prune record for files in the specified directory.}';
 
     /**
      * {@inheritDoc}
@@ -51,11 +51,11 @@ class PruneMediaCommand extends Command
     public function handle()
     {
         $disk = $this->argument('disk');
-        $directory = $this->option('directory');
+        $directory = $this->option('directory') ?: '';
         $recursive = !$this->option('non-recursive');
         $counter = 0;
 
-        $records = Media::inDirectory($disk, $directory, $recursive);
+        $records = Media::inDirectory($disk, $directory, $recursive)->get();
 
         foreach($records as $media){
             if(!$media->fileExists()){
@@ -65,6 +65,6 @@ class PruneMediaCommand extends Command
             }
         }
 
-        $this->info("Pruned {$counter} records.");
+        $this->info("Pruned {$counter} record(s).");
     }
 }

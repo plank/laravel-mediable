@@ -19,7 +19,7 @@ class SyncMediaCommand extends Command
      */
     protected $signature = 'media:sync {disk : the name of the filesystem disk.}
         {--d|directory= : prune records for files in or below a given directory.}
-        {--n|non-recursive : only prune record for files in the specified directory.}
+        {--non-recursive : only prune record for files in the specified directory.}
         {--f|force : re-process existing media.}';
 
     /**
@@ -36,9 +36,9 @@ class SyncMediaCommand extends Command
     public function handle()
     {
         $disk = $this->argument('disk');
-        $directory = $this->argument('directory') ?: '';
-        $non_recursive = !!$this->argument('non-recursive');
-        $force = !!$this->argument('force');
+        $directory = $this->option('directory') ?: '';
+        $non_recursive = !!$this->option('non-recursive');
+        $force = !!$this->option('force');
 
         $this->call('media:prune', [
             'disk' => $disk,
@@ -46,7 +46,7 @@ class SyncMediaCommand extends Command
             '--non-recursive' => $non_recursive
         ]);
 
-        $this->call('media:sync', [
+        $this->call('media:import', [
             'disk' => $disk,
             '--directory' => $directory,
             '--non-recursive' => $non_recursive,

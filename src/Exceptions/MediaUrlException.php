@@ -23,4 +23,9 @@ class MediaUrlException extends Exception
     {
         return new static("Media file `{$path}` is not part of the public path `{$public_path}`");
     }
+
+    public static function cloudMediaNotPubliclyAccessible($disk)
+    {
+        return new static("Media files on cloud disk `{$disk}` are not publicly accessible");
+    }
 }
