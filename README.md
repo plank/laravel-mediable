@@ -344,6 +344,24 @@ The package defines a number of common file types in the config file (config/med
 
 Note: a MIME type or extension could be present in more than one aggregate type's definitions (the system will try to find the best match), but each Media instance can only have one aggregate type.
 
+## Artisan Commands
+
+This package provides a handful of artisan commands to help keep you filesystem and database in sync.
+
+Create a media record in the database for any files on the disk that do not already have a record. This will apply any type restrictions in the mediable configuration file.
+```bash
+$ php artisan media:import {disk}
+```
+
+Delete any media records representing a file that no longer exists on the disk.
+```bash
+$ php artisan media:purge {disk}
+```
+
+To perform both commands together, you can use
+```bash
+$ php artisan media:sync {disk}
+```
 
 ## License
 
