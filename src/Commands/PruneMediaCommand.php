@@ -57,8 +57,8 @@ class PruneMediaCommand extends Command
 
         $records = Media::inDirectory($disk, $directory, $recursive)->get();
 
-        foreach($records as $media){
-            if(!$media->fileExists()){
+        foreach ($records as $media) {
+            if (!$media->fileExists()) {
                 $media->delete();
                 ++$counter;
                 $this->info("Pruned record for file {$media->getDiskPath()}", 'v');

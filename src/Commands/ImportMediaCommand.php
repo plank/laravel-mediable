@@ -83,12 +83,12 @@ class ImportMediaCommand extends Command
         $files = $this->listFiles($disk, $directory, $recursive);
         $existing_media = Media::inDirectory($disk, $directory, $recursive)->get();
 
-        foreach($files as $path){
-            if($record = $this->getRecordForFile($path, $existing_media)){
-                if($force){
+        foreach ($files as $path) {
+            if ($record = $this->getRecordForFile($path, $existing_media)) {
+                if ($force) {
                     $this->updateRecordForFile($record, $path);
                 }
-            }else{
+            } else {
                 $this->createRecordForFile($disk, $path);
             }
         }
@@ -105,9 +105,9 @@ class ImportMediaCommand extends Command
      */
     protected function listFiles($disk, $directory = '', $recursive = true)
     {
-        if($recursive){
+        if ($recursive) {
             return $this->filesystem->disk($disk)->allFiles($directory);
-        }else{
+        } else {
             return $this->filesystem->disk($disk)->files($directory);
         }
     }
@@ -123,7 +123,7 @@ class ImportMediaCommand extends Command
         $directory = File::cleanDirname($path);
         $filename = pathinfo($path, PATHINFO_FILENAME);
         $extension = pathinfo($path, PATHINFO_EXTENSION);
-        return $existing_media->filter(function($media) use($directory, $filename, $extension){
+        return $existing_media->filter(function ($media) use ($directory, $filename, $extension) {
             return $media->directory == $directory && $media->filename == $filename && $media->extension == $extension;
         })->first();
     }
@@ -144,7 +144,7 @@ class ImportMediaCommand extends Command
         $media->size = $this->filesystem->disk($disk)->size($path);
         $media->mime_type = $this->filesystem->disk($disk)->mimeType($path);
 
-        if($media->aggregate_type = $this->determineAggregateType($media, $path)){
+        if ($media->aggregate_type = $this->determineAggregateType($media, $path)) {
             $media->save();
             ++$this->counters['created'];
             $this->info("Created record for {$path}", 'v');
@@ -162,12 +162,12 @@ class ImportMediaCommand extends Command
         $media->size = $this->filesystem->disk($media->disk)->size($path);
         $media->mime_type = $this->filesystem->disk($media->disk)->mimeType($path);
 
-        if($media->aggregate_type = $this->determineAggregateType($media, $path)){
-            if($media->isDirty()){
+        if ($media->aggregate_type = $this->determineAggregateType($media, $path)) {
+            if ($media->isDirty()) {
                 $media->save();
                 ++$this->counters['updated'];
                 $this->info("Updated record for {$path}", 'v');
-            }else{
+            } else {
                 ++$this->counters['unmodified'];
             }
         }
@@ -181,10 +181,10 @@ class ImportMediaCommand extends Command
      */
     protected function determineAggregateType(Media $media, $path)
     {
-        try{
+        try {
             return $this->uploader->inferAggregateType($media->mime_type, $media->extensions);
-        }catch(MediaUploadException $e){
-             ++$this->counters['skipped'];
+        } catch (MediaUploadException $e) {
+            ++$this->counters['skipped'];
             $this->warn($e->getMessage(), 'vvv');
             $this->info("Skipped unrecognized file at {$path}", 'v');
         }
@@ -199,13 +199,13 @@ class ImportMediaCommand extends Command
     protected function outputCounters($force)
     {
         $this->info(sprintf("Imported %d file(s).", $this->counters['created']));
-        if($this->counters['skipped'] > 0){
+        if ($this->counters['skipped'] > 0) {
             $this->info(sprintf("Skipped %d unrecognized file(s).", $this->counters['skipped']));
         }
-        if($this->counters['updated'] > 0){
+        if ($this->counters['updated'] > 0) {
             $this->info(sprintf("Updated %d existing record(s).", $this->counters['updated']));
         }
-        if($this->counters['unmodified'] > 0){
+        if ($this->counters['unmodified'] > 0) {
             $this->info(sprintf("Skipped %d unmodified record(s).", $this->counters['unmodified']));
         }
     }
@@ -223,6 +223,4 @@ class ImportMediaCommand extends Command
             'unmodified' => 0
         ];
     }
-
-
 }

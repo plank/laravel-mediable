@@ -7,7 +7,7 @@ class File
     public static function cleanDirname($path)
     {
         $dirname = pathinfo($path, PATHINFO_DIRNAME);
-        if($dirname == '.'){
+        if ($dirname == '.') {
             return '';
         }
         return trim($dirname, '/');

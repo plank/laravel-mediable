@@ -259,23 +259,21 @@ class MediaUploader
         $types_for_mime = $this->possibleAggregateTypesForMimeType($mime_type);
         $types_for_extension = $this->possibleAggregateTypesForExtension($extension);
 
-        if(count($allowed_types)){
+        if (count($allowed_types)) {
             $intersection = array_intersect($types_for_mime, $types_for_extension, $allowed_types);
-        }else{
+        } else {
             $intersection = array_intersect($types_for_mime, $types_for_extension);
         }
 
         if (count($intersection)) {
             $type = $intersection[0];
-
-        }else if (empty($types_for_mime) && empty($types_for_extension)) {
+        } elseif (empty($types_for_mime) && empty($types_for_extension)) {
             if (!$this->config['allow_unrecognized_types']) {
                 throw MediaUploadException::unrecognizedFileType($mime_type, $extension);
             }
             $type = Media::TYPE_OTHER;
-
-        }else{
-            if($this->config['strict_type_checking']) {
+        } else {
+            if ($this->config['strict_type_checking']) {
                 throw MediaUploadException::strictTypeMismatch($mime_type, $extension);
             }
             $merged = array_merge($types_for_mime, $types_for_extension);

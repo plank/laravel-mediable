@@ -6,7 +6,8 @@ use Illuminate\Contracts\Console\Kernel as Artisan;
 
 class ImportMediaCommandTest extends TestCase
 {
-    public function getEnvironmentSetUp($app){
+    public function getEnvironmentSetUp($app)
+    {
         parent::getEnvironmentSetUp($app);
         $app['config']->set('mediable.allow_unrecognized_types', true);
         $app['config']->set('mediable.strict_type_checking', false);
@@ -67,9 +68,8 @@ class ImportMediaCommandTest extends TestCase
 
         $artisan->registerCommand($command);
 
-        $artisan->call('media:import',['disk' => 'tmp']);
+        $artisan->call('media:import', ['disk' => 'tmp']);
         $this->assertEquals("Imported 0 file(s).\nSkipped 1 unrecognized file(s).\n", $artisan->output());
-
     }
 
     public function test_it_updates_existing_media()
@@ -87,13 +87,12 @@ class ImportMediaCommandTest extends TestCase
             'size' => 8444,
             'mime_type' => 'image/png',
             'aggregate_type' => 'image']);
-        $this->seedFileForMedia($media1, fopen(__DIR__.'/../../_data/plank.png' ,'r'));
-        $this->seedFileForMedia($media2, fopen(__DIR__.'/../../_data/plank.png' ,'r'));
+        $this->seedFileForMedia($media1, fopen(__DIR__.'/../../_data/plank.png', 'r'));
+        $this->seedFileForMedia($media2, fopen(__DIR__.'/../../_data/plank.png', 'r'));
 
         $artisan->call('media:import', ['disk' => 'tmp', '--force' => true]);
         $this->assertEquals(['image', 'image'], Media::pluck('aggregate_type')->toArray());
         $this->assertEquals("Imported 0 file(s).\nUpdated 1 existing record(s).\nSkipped 1 unmodified record(s).\n", $artisan->output());
-
     }
 
     protected function getArtisan()
