@@ -337,7 +337,7 @@ class MediaUploader
         $model->size = $this->verifyFileSize($this->source->size());
         $model->mime_type = $this->verifyMimeType($this->source->mimeType());
         $model->extension = $this->verifyExtension($this->source->extension());
-        $model->type = $this->inferAggregateType($model->mime_type, $model->extension);
+        $model->aggregate_type = $this->inferAggregateType($model->mime_type, $model->extension);
 
         $model->disk = $this->disk ?: $this->config['default_disk'];
         $model->directory = $this->directory;

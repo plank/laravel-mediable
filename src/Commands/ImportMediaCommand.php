@@ -144,7 +144,7 @@ class ImportMediaCommand extends Command
         $media->size = $this->filesystem->disk($disk)->size($path);
         $media->mime_type = $this->filesystem->disk($disk)->mimeType($path);
 
-        if($media->type = $this->determineAggregateType($media, $path)){
+        if($media->aggregate_type = $this->determineAggregateType($media, $path)){
             $media->save();
             ++$this->counters['created'];
             $this->info("Created record for {$path}", 'v');
@@ -162,7 +162,7 @@ class ImportMediaCommand extends Command
         $media->size = $this->filesystem->disk($media->disk)->size($path);
         $media->mime_type = $this->filesystem->disk($media->disk)->mimeType($path);
 
-        if($media->type = $this->determineAggregateType($media, $path)){
+        if($media->aggregate_type = $this->determineAggregateType($media, $path)){
             if($media->isDirty()){
                 $media->save();
                 ++$this->counters['updated'];

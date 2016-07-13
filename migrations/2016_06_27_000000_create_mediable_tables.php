@@ -19,13 +19,13 @@ class CreateMediableTables extends Migration
             $table->string('filename');
             $table->string('extension', 32);
             $table->string('mime_type', 128);
-            $table->string('type', 32);
+            $table->string('aggregate_type', 32);
             $table->integer('size')->unsigned();
             $table->timestamps();
 
             $table->index(['disk','directory']);
             $table->unique(['disk', 'directory', 'filename', 'extension']);
-            $table->index('type');
+            $table->index('aggregate_type');
         });
 
         Schema::create('mediables', function(Blueprint $table){

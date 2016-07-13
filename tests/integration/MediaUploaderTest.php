@@ -245,7 +245,7 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('foo/bar.png', $media->getDiskPath());
         $this->assertEquals('image/png', $media->mime_type);
         $this->assertEquals(8444, $media->size);
-        $this->assertEquals('image', $media->type);
+        $this->assertEquals('image', $media->aggregate_type);
     }
 
     protected function mockUploader($filesystem = null, $factory = null)

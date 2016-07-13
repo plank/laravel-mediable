@@ -57,7 +57,7 @@ class MediaUploadException extends Exception
 
     public static function unrecognizedFileType($mime, $ext)
     {
-        return new static("File with mime of `{$mime}` and extension `{$ext}` is not permitted.");
+        return new static("File with mime of `{$mime}` and extension `{$ext}` is not recognized.");
     }
 
     public static function mimeRestricted($mime, $allowed_mimes)
@@ -75,7 +75,7 @@ class MediaUploadException extends Exception
     public static function aggregateTypeRestricted($type, $allowed_types)
     {
         $allowed = implode("`, `", $allowed_types);
-        return new static("Cannot upload file of media type `{$type}`. Only files of type(s) `{$allowed}` are permitted.");
+        return new static("Cannot upload file of aggregate type `{$type}`. Only files of type(s) `{$allowed}` are permitted.");
     }
 
     public static function fileIsTooBig($size, $max)

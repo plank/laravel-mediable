@@ -10,7 +10,7 @@ $factory->define(Plank\Mediable\Media::class, function (Faker\Generator $faker) 
         'filename' => $faker->word,
         'extension' => $faker->randomElement($types[$type]['extensions']),
         'mime_type' => $faker->randomElement($types[$type]['mime_types']),
-        'type' => $type,
+        'aggregate_type' => $type,
         'size' => $faker->randomNumber(),
     ];
 });

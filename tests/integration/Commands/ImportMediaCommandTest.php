@@ -54,7 +54,7 @@ class ImportMediaCommandTest extends TestCase
         $this->assertEquals(['foo'], Media::pluck('filename')->toArray());
     }
 
-    public function test_it_skips_files_of_unmatched_type()
+    public function test_it_skips_files_of_unmatched_aggregate_type()
     {
         $artisan = $this->getArtisan();
         $filesystem = app(\Illuminate\Filesystem\FilesystemManager::class);
@@ -79,19 +79,19 @@ class ImportMediaCommandTest extends TestCase
             'disk' => 'tmp',
             'filename' => 'bar',
             'extension' => 'png',
-            'type' => 'foo']);
+            'aggregate_type' => 'foo']);
         $media2 = factory(Media::class)->create([
             'disk' => 'tmp',
             'filename' => 'bar',
             'extension' => 'png',
             'size' => 8444,
             'mime_type' => 'image/png',
-            'type' => 'image']);
+            'aggregate_type' => 'image']);
         $this->seedFileForMedia($media1, fopen(__DIR__.'/../../_data/plank.png' ,'r'));
         $this->seedFileForMedia($media2, fopen(__DIR__.'/../../_data/plank.png' ,'r'));
 
         $artisan->call('media:import', ['disk' => 'tmp', '--force' => true]);
-        $this->assertEquals(['image', 'image'], Media::pluck('type')->toArray());
+        $this->assertEquals(['image', 'image'], Media::pluck('aggregate_type')->toArray());
         $this->assertEquals("Imported 0 file(s).\nUpdated 1 existing record(s).\nSkipped 1 unmodified record(s).\n", $artisan->output());
 
     }
