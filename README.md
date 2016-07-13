@@ -51,7 +51,7 @@ php artisan migrate
 
 ## Uploading Files
 
-The easiest way to upload media to your server is with the `MediaUploader` class, which handles validating the file, moving it to its destination and creating a `Media` instance to reference it. You can get an instance of the MediaUploader using the Facade and configure it with a fluent interface.
+The easiest way to upload media to your server is with the `MediaUploader` class, which handles validating the file, moving it to its destination and creating a `Media` record to reference it. You can get an instance of the MediaUploader using the Facade and configure it with a fluent interface.
 
 ```php
 $media = MediaUploader::fromSource($request->file('thumbnail'))
@@ -116,7 +116,7 @@ $post->attachMedia($media, 'thumbnail');
 You can attach multiple media to the same tag with a single call. The `attachMedia()` method accept any of the following for its first parameter:
 
 - a numeric or string id
-- an instance of `Media`
+- an instance `Media`
 - an array of ids
 - an instance of `\Illuminate\Database\Eloquent\Collection`
 
@@ -188,7 +188,7 @@ $posts = Post::whereHasMedia('thumbnail')->get();
 
 ### Detaching Media
 
- You can remove a media instance from a model with the `detachMedia()` method.
+ You can remove a media record from a model with the `detachMedia()` method.
 
 ```php
 $post->detachMedia($media); // remove media from all tags
@@ -208,7 +208,7 @@ $post->detachMediaTags(['feature', 'thumbnail']);
 
 ### Media Paths & URLs
 
-`Media` instances keep track of the location of their file and are able to generate a number of paths and URLs relative to the file. Consider the following example:
+`Media` records keep track of the location of their file and are able to generate a number of paths and URLs relative to the file. Consider the following example:
 
 *config/filesystems.php*
 
@@ -272,7 +272,7 @@ Media::whereBasename('picture.jpg');
 
 ### Moving Media
 
-You should taking caution if manually changing a media instance's attributes, as you record and file could go out of sync.
+You should taking caution if manually changing a media record's attributes, as you record and file could go out of sync.
 
 You can change the location of a media file on disk. You cannot move a media to a different disk this way.
 
@@ -284,7 +284,7 @@ $media->rename('new-filename');
 
 ### Deleting Media
 
-You can delete media with standard Eloquent model `delete()` method. This will also delete the file associated with the instance.
+You can delete media with standard Eloquent model `delete()` method. This will also delete the file associated with the record.
 
 ```php
 $media->delete();
@@ -301,7 +301,7 @@ Media::where(...)->delete(); //will not delete files
 Laravel-Mediable provides functionality for handling multiple kinds of files under a shared aggregate type. This is intended to make it easy to find similar media without needing to constantly juggle multiple MIME types or file extensions. For example, you might want to query for an image, but not care if it is in JPEG, PNG or GIF format.
 
 ```php
-Media::where('type', Media::TYPE_IMAGE)->get();
+Media::where('aggregate_type', Media::TYPE_IMAGE)->get();
 ```
 
 You can use this functionality to restrict the uploader to only accept certain types of files
@@ -342,7 +342,7 @@ The package defines a number of common file types in the config file (config/med
 //...
 ```
 
-Note: a MIME type or extension could be present in more than one aggregate type's definitions (the system will try to find the best match), but each Media instance can only have one aggregate type.
+Note: a MIME type or extension could be present in more than one aggregate type's definitions (the system will try to find the best match), but each Media record can only have one aggregate type.
 
 ## Artisan Commands
 
