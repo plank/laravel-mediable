@@ -339,7 +339,7 @@ class MediaUploader
 
         $model->disk = $this->disk ?: $this->config['default_disk'];
         $model->directory = $this->directory;
-        $model->filename = $this->filename ?: $this->sanitizeFilename($source->filename());
+        $model->filename = $this->filename ?: $this->sanitizeFilename($this->source->filename());
 
         $this->verifyDestination($model);
 
