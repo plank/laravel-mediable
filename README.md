@@ -14,7 +14,7 @@ Laravel-Mediable is a package for easily uploading and attaching media files to 
 Add the package to your Laravel app using composer
 
 ```bash
-composer require frasmage/laravel-mediable
+composer require plank/laravel-mediable
 ```
 
 Register the package's servive provider in `config/app.php`
@@ -22,7 +22,7 @@ Register the package's servive provider in `config/app.php`
 ```php
 'providers' => [
     ...
-    'Frasmage\Mediable\MediableServiceProvider',
+    'Plank\Mediable\MediableServiceProvider',
     ...
 ];
 ```
@@ -32,7 +32,7 @@ The package comes with a Facade for the image uploader, which you can optionally
 ```php
 'aliases' => [
 	...
-    'MediaUploader' => 'Frasmage\Mediable\MediaUploaderFacade',
+    'MediaUploader' => 'Plank\Mediable\MediaUploaderFacade',
     ...
 ]
 ```
@@ -40,7 +40,7 @@ The package comes with a Facade for the image uploader, which you can optionally
 Publish the config file (`config/mediable.php`) and migration file (`database/migrations/####_##_##_######_create_mediable_tables.php`) of the package using artisan.
 
 ```bash
-php artisan vendor:publish --provider="Frasmage\Mediable\MediableServiceProvider"
+php artisan vendor:publish --provider="Plank\Mediable\MediableServiceProvider"
 ```
 
 Run the migrations to add the required tables to your database.
@@ -94,7 +94,7 @@ Add the `Mediable` trait to any Eloquent models that you would like to be able t
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use Frasmage\Mediable\Mediable;
+use Plank\Mediable\Mediable;
 
 class Post extends Model
 {
