@@ -8,7 +8,7 @@ Configuration
 
 Disks
 ------------------------
-Laravel-Mediable is built on top of Laravel's Filesystem component. Before you use the package, you will need to configure the filesystem disks where you would like files to be stored in ``config/filesystems.php``. [Learn more about filesystem disk](https://laravel.com/docs/5.2/filesystem).
+Laravel-Mediable is built on top of Laravel's Filesystem component. Before you use the package, you will need to configure the filesystem disks where you would like files to be stored in ``config/filesystems.php``. `Learn more about filesystem disk <https://laravel.com/docs/5.2/filesystem>`_.
 
 An example setup with one private disk (``local``) and one publicly accessible disk (``uploads``):
 
