@@ -29,7 +29,6 @@ $post->attachMedia($media, ['thumbnail']);
 Retrieve the media from the model by its tag(s).
 
 ```php
-//retrieve the Media assigned to the tag
 $post->getMedia('thumbnail')->first()->getUrl();
 ```
 
