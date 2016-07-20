@@ -36,7 +36,7 @@ return [
     'on_duplicate' => Plank\Mediable\MediaUploader::ON_DUPLICATE_INCREMENT,
 
     /*
-     * Reject files unless both their mime and extension are recognized and both match a single type
+     * Reject files unless both their mime and extension are recognized and both match a single aggregate type
      */
     'strict_type_checking' => false,
 
