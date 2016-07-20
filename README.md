@@ -24,7 +24,7 @@ Attach the Media to another eloquent model with one or more tags defining their 
 ```php
 $post = Post::create($this->request->input());
 $post->attachMedia($media, ['thumbnail']);
-
+```
 
 Retrieve the media from the model by its tag(s).
 
