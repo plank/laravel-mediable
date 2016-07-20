@@ -136,7 +136,8 @@ class ImportMediaCommand extends Command
      */
     protected function createRecordForFile($disk, $path)
     {
-        $media = new Media;
+        $class = config('mediable.model');
+        $media = new $class;
         $media->disk = $disk;
         $media->directory = File::cleanDirname($path);
         $media->filename = pathinfo($path, PATHINFO_FILENAME);
