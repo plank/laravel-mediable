@@ -1,7 +1,7 @@
 {
     "name": "plank/laravel-mediable",
     "description": "A package for easily uploading and attaching media files to models with Laravel",
-    "keywords": ["media", "image", "uploader", "eloquent"],
+    "keywords": ["media", "image", "uploader", "eloquent", "laravel"],
     "license": "MIT",
     "authors": [
         {

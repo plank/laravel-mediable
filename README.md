@@ -9,6 +9,30 @@ Laravel-Mediable is a package for easily uploading and attaching media files to 
 - Attach media to models with tags, to set and retrieve media for specific purposes, such as `'thumbnail'`, `'featured image'`, `'gallery'` or `'download'`.
 - Easily query media and restrict uploads by MIME type, extension and/or aggregate type (e.g. `image` for jpeg, png or gif).
 
+## Example Usage
+
+Upload a file to the server, and place it on the filesystem disk named "uploads". This will create a Media record that can be used to refer to the file
+
+```php
+$media = MediaUploader::fromSource($request->file('thumb'))
+	->toDestination('uploads', 'blog/thumbnails')
+	->upload();
+```
+
+Attach the Media to another eloquent model with one or more tags defining their relationship.
+
+```php
+$post = Post::create($this->request->input());
+$post->attachMedia($media, ['thumbnail']);
+
+
+Retrieve the media from the model by its tag(s).
+
+```php
+//retrieve the Media assigned to the tag
+$post->getMedia('thumbnail')->first()->getUrl();
+```
+
 ## Installation
 
 Add the package to your Laravel app using composer
