@@ -51,7 +51,7 @@ php artisan migrate
 
 ## Documentation
 
-Read the documentation [here]().
+Read the documentation [here](http://laravel-mediable.readthedocs.io/en/latest/).
 
 ## License
 
