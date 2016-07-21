@@ -5,7 +5,7 @@ php:
 before_script:
   - phpenv config-rm xdebug.ini
   - travis_retry composer self-update
-  - travis_retry composer update --prefer-source --prefer-stable --prefer-lowest
+  - travis_retry composer update --prefer-source --prefer-stable
 script: phpunit
 branches:
   only:
