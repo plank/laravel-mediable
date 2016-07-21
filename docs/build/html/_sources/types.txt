@@ -1,6 +1,8 @@
 Aggregate Types
 ===============
 
+.. highlight:: php
+
 Laravel-Mediable provides functionality for handling multiple kinds of files under a shared aggregate type. This is intended to make it easy to find similar media without needing to constantly juggle multiple MIME types or file extensions. For example, you might want to query for an image, but not care if it is in JPEG, PNG or GIF format.
 
 ::
