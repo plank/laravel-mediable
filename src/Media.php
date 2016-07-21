@@ -39,7 +39,7 @@ class Media extends Model
         parent::boot();
 
         //remove file on deletion
-        static::deleted(function ($media) {
+        static::deleted(function (Media $media) {
             $media->storage()->delete($media->getDiskPath());
         });
     }

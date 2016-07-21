@@ -3,7 +3,6 @@
 namespace Plank\Mediable\UrlGenerators;
 
 use Plank\Mediable\Exceptions\MediaUrlException;
-use Plank\Mediable\Media;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Routing\UrlGenerator as Url;
 

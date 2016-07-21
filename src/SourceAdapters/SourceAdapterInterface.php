@@ -9,7 +9,7 @@ namespace Plank\Mediable\SourceAdapters;
  *
  * @author Sean Fraser <sean@plankdesign.com>
  */
-interface SourceAdapter
+interface SourceAdapterInterface
 {
     /**
      * Get the underlying source

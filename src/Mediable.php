@@ -3,7 +3,6 @@
 namespace Plank\Mediable;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Query\Expression;
 
 /**
  * Mediable Trait
@@ -43,7 +42,7 @@ trait Mediable
         if ($match_all && is_array($tags) && count($tags) > 1) {
             return $this->scopeWhereHasMediaMatchAll($q, $tags);
         }
-        $q->whereHas('media', function ($q) use ($tags) {
+        $q->whereHas('media', function (Builder $q) use ($tags) {
             $q->whereIn('tag', (array) $tags);
         });
     }
@@ -163,11 +162,11 @@ trait Mediable
         $this->rehydrateMediaIfNecessary($tags);
         return $this->media
         //exclude media not matching at least one tag
-        ->filter(function ($media) use ($tags) {
+        ->filter(function (Media $media) use ($tags) {
                 return in_array($media->pivot->tag, (array) $tags);
         })
         //remove duplicate media
-        ->keyBy(function ($media) {
+        ->keyBy(function (Media $media) {
             return $media->getKey();
         })->values();
     }
@@ -182,17 +181,17 @@ trait Mediable
         $this->rehydrateMediaIfNecessary($tags);
 
         //group all tags for each media
-        $model_tags = $this->media->reduce(function ($carry, $media) {
+        $model_tags = $this->media->reduce(function ($carry, Media $media) {
             $carry[$media->getKey()][] = $media->pivot->tag;
             return $carry;
         }, []);
 
         //exclude media not matching all tags
-        return $this->media->filter(function ($media) use ($tags, $model_tags) {
+        return $this->media->filter(function (Media $media) use ($tags, $model_tags) {
            return count(array_intersect($tags, $model_tags[$media->getKey()])) === count($tags);
         })
         //remove duplicate media
-        ->keyBy(function ($media) {
+        ->keyBy(function (Media $media) {
             return $media->getKey();
         })->values();
         ;
@@ -227,7 +226,7 @@ trait Mediable
      */
     public function getTagsForMedia(Media $media)
     {
-        return $this->media->reduce(function ($carry, $item) use ($media) {
+        return $this->media->reduce(function ($carry, Media $item) use ($media) {
             if ($item->getKey() === $media->getKey()) {
                 $carry[] = $item->pivot->tag;
             }

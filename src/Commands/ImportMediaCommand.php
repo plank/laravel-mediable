@@ -123,7 +123,7 @@ class ImportMediaCommand extends Command
         $directory = File::cleanDirname($path);
         $filename = pathinfo($path, PATHINFO_FILENAME);
         $extension = pathinfo($path, PATHINFO_EXTENSION);
-        return $existing_media->filter(function ($media) use ($directory, $filename, $extension) {
+        return $existing_media->filter(function (Media $media) use ($directory, $filename, $extension) {
             return $media->directory == $directory && $media->filename == $filename && $media->extension == $extension;
         })->first();
     }

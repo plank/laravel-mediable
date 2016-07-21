@@ -3,12 +3,9 @@
 namespace Plank\Mediable;
 
 use Plank\Mediable\Exceptions\MediaUploadException;
-use Plank\Mediable\Exceptions\MediaManagerException;
 use Plank\Mediable\Media;
 use Plank\Mediable\SourceAdapters\SourceAdapterFactory;
-use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
 use Illuminate\Filesystem\FilesystemManager;
-use Storage;
 
 /**
  * Media Uploader

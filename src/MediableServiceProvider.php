@@ -6,8 +6,6 @@ use Plank\Mediable\SourceAdapters\SourceAdapterFactory;
 use Plank\Mediable\UrlGenerators\UrlGeneratorFactory;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Container\Container;
-use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * Mediable Service Provider

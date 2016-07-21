@@ -9,7 +9,7 @@ namespace Plank\Mediable\SourceAdapters;
  *
  * @author Sean Fraser <sean@plankdesign.com>
  */
-class LocalPathAdapter implements SourceAdapter
+class LocalPathAdapter implements SourceAdapterInterface
 {
 
     /**

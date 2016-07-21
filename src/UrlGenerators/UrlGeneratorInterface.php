@@ -9,7 +9,7 @@ use Plank\Mediable\Media;
  *
  * @author Sean Fraser <sean@plankdesign.com>
  */
-interface UrlGenerator
+interface UrlGeneratorInterface
 {
     /**
      * Set the media instance for which urls are being generated

@@ -9,7 +9,7 @@ namespace Plank\Mediable\SourceAdapters;
  *
  * @author Sean Fraser <sean@plankdesign.com>
  */
-class RemoteUrlAdapter implements SourceAdapter
+class RemoteUrlAdapter implements SourceAdapterInterface
 {
 
     /**

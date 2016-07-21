@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  *
  * @author Sean Fraser <sean@plankdesign.com>
  */
-class UploadedFileAdapter implements SourceAdapter
+class UploadedFileAdapter implements SourceAdapterInterface
 {
 
     /**

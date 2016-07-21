@@ -2,10 +2,8 @@
 
 namespace Plank\Mediable\SourceAdapters;
 
-use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Plank\Mediable\Exceptions\MediaUploadException;
-use Plank\Mediable\SourceAdapters\SourceAdapter;
+use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
 
 /**
  * Source Adapter Factory
@@ -32,12 +30,12 @@ class SourceAdapterFactory
     /**
      * Create a Source Adapter for the provided source
      * @param  Object|string $source
-     * @return SourceAdapter
+     * @return SourceAdapterInterface
      * @throws MediaUploadException If the provided source does not match any of the mapped classes or patterns
      */
     public function create($source)
     {
-        if ($source instanceof SourceAdapter) {
+        if ($source instanceof SourceAdapterInterface) {
             return $source;
         } elseif (is_object($source)) {
             $adapter = $this->adaptClass($source);
@@ -81,7 +79,7 @@ class SourceAdapterFactory
     /**
      * Choose an adapter class for the class of the provided object
      * @param  object $source
-     * @return SourceAdapter|null
+     * @return SourceAdapterInterface|null
      */
     private function adaptClass($source)
     {
@@ -98,7 +96,7 @@ class SourceAdapterFactory
     /**
      * Choose an adapter class for the provided string
      * @param  string $source
-     * @return SourceAdapter|null
+     * @return SourceAdapterInterface|null
      */
     private function adaptString($source)
     {
@@ -119,7 +117,7 @@ class SourceAdapterFactory
      */
     private function validateAdapterClass($class)
     {
-        if (!class_implements($class, SourceAdapter::class)) {
+        if (!class_implements($class, SourceAdapterInterface::class)) {
             throw MediaUploadException::cannotSetAdapter($class);
         }
     }

@@ -3,8 +3,6 @@
 namespace Plank\Mediable\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Filesystem\FilesystemManager;
-use Plank\Mediable\Media;
 
 /**
  * Synchronize Media Artisan Command

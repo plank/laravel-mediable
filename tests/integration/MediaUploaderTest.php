@@ -3,7 +3,7 @@
 use Plank\Mediable\Media;
 use Plank\Mediable\MediaUploader;
 use Plank\Mediable\SourceAdapters\SourceAdapterFactory;
-use Plank\Mediable\SourceAdapters\SourceAdapter;
+use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
 use Plank\Mediable\Exceptions\MediaUploadException;
 use MediaUploader as Facade;
 use Illuminate\Filesystem\FilesystemManager;
@@ -118,7 +118,7 @@ class MediaUploaderTest extends TestCase
         $uploader = $this->mockUploader();
         $method = $this->getPrivateMethod($uploader, 'verifySource');
 
-        $source = $this->createMock(SourceAdapter::class);
+        $source = $this->createMock(SourceAdapterInterface::class);
         $source->method('valid')->willReturn(true);
         $uploader->fromSource($source);
         $method->invoke($uploader);
@@ -131,7 +131,7 @@ class MediaUploaderTest extends TestCase
         $uploader = $this->mockUploader();
         $method = $this->getPrivateMethod($uploader, 'verifySource');
 
-        $source = $this->createMock(SourceAdapter::class);
+        $source = $this->createMock(SourceAdapterInterface::class);
         $source->method('valid')->willReturn(false);
         $uploader->fromSource($source);
 

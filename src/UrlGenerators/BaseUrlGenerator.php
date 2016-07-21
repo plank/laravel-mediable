@@ -10,7 +10,7 @@ use Illuminate\Contracts\Config\Repository as Config;
  *
  * @author Sean Fraser <sean@plankdesign.com>
  */
-abstract class BaseUrlGenerator implements UrlGenerator
+abstract class BaseUrlGenerator implements UrlGeneratorInterface
 {
 
     /**

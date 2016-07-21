@@ -58,7 +58,7 @@ class UrlGeneratorFactory
      */
     protected function validateGeneratorClass($class)
     {
-        if (!class_exists($class) || !is_subclass_of($class, UrlGenerator::class)) {
+        if (!class_exists($class) || !is_subclass_of($class, UrlGeneratorInterface::class)) {
             throw MediaUrlException::invalidGenerator($class);
         }
     }

@@ -2,7 +2,7 @@
 
 use Plank\Mediable\Exceptions\MediaUrlException;
 use Plank\Mediable\UrlGenerators\UrlGeneratorFactory;
-use Plank\Mediable\UrlGenerators\UrlGenerator;
+use Plank\Mediable\UrlGenerators\UrlGeneratorInterface;
 use Plank\Mediable\Media;
 
 class UrlGeneratorFactoryTest extends TestCase
@@ -11,7 +11,7 @@ class UrlGeneratorFactoryTest extends TestCase
     public function test_it_sets_generator_for_driver()
     {
         $factory = new UrlGeneratorFactory;
-        $generator = $this->getMockClass(UrlGenerator::class);
+        $generator = $this->getMockClass(UrlGeneratorInterface::class);
 
         $media = factory(Media::class)->make(['disk' => 'uploads']);
 

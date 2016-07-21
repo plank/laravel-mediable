@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\File\File;
  *
  * @author Sean Fraser <sean@plankdesign.com>
  */
-class FileAdapter implements SourceAdapter
+class FileAdapter implements SourceAdapterInterface
 {
 
     /**
