@@ -9,5 +9,5 @@ before_script:
 script: phpunit
 branches:
   only:
-    - master
-    - stable
+  - master
+  - stable
