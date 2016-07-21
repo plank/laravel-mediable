@@ -17,7 +17,7 @@
     },
     "require-dev": {
         "orchestra/testbench": "~3.0",
-        "phpunit/phpunit": "~4.0",
+        "phpunit/phpunit": "~5.0",
         "vlucas/phpdotenv": "~2.2",
         "league/flysystem-aws-s3-v3" : "~1.0"
     },

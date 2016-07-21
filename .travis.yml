@@ -3,8 +3,9 @@ php:
   - '5.6'
   - '7.0'
 before_script:
+  - phpenv config-rm xdebug.ini
   - travis_retry composer self-update
-  - travis_retry composer update --prefer-source $PREFER_LOWEST
+  - travis_retry composer update --prefer-source --prefer-stable --prefer-lowest
 script: phpunit
 branches:
   only:
