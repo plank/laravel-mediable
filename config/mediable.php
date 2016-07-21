@@ -4,7 +4,7 @@ return [
     /*
      * FQCN of the model to use for media
      *
-     * Should extend Plank\Mediable\Media::class
+     * Should extend `Plank\Mediable\Media`
      */
     'model' => Plank\Mediable\Media::class,
 
@@ -15,6 +15,8 @@ return [
 
     /*
      * Filesystems that can be used for media storage
+     *
+     * Uploader will throw an exception if a disk not in this list is selected
      */
     'allowed_disks' => [
         'public',
@@ -26,12 +28,13 @@ return [
     'max_size' => 1024 * 1024 * 10,
 
     /*
-     * What to do if a duplicate file is uploaded. Options include:
+     * What to do if a duplicate file is uploaded.
      *
-     * * 'increment': the new file's name is given an incrementing suffix
-     * * 'replace' : the old file and media model is deleted
-     * * 'error': an Exception is thrown
+     * Options include:
      *
+     * * `'increment'`: the new file's name is given an incrementing suffix
+     * * `'replace'` : the old file and media model is deleted
+     * * `'error'`: an Exception is thrown
      */
     'on_duplicate' => Plank\Mediable\MediaUploader::ON_DUPLICATE_INCREMENT,
 
@@ -187,7 +190,8 @@ return [
     ],
 
     /*
-     * List of URL Generators to use for handling various filesystem disks
+     * List of URL Generators to use for handling various filesystem drivers
+     *
      */
     'url_generators' => [
         'local' => Plank\Mediable\UrlGenerators\LocalUrlGenerator::class,
