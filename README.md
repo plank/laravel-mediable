@@ -11,7 +11,7 @@ Laravel-Mediable is a package for easily uploading and attaching media files to 
 
 ## Example Usage
 
-Upload a file to the server, and place it on the filesystem disk named "uploads". This will create a Media record that can be used to refer to the file
+Upload a file to the server, and place it on the filesystem disk named "uploads". This will create a Media record that can be used to refer to the file.
 
 ```php
 $media = MediaUploader::fromSource($request->file('thumb'))

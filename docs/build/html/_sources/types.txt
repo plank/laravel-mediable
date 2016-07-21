@@ -5,6 +5,7 @@ Laravel-Mediable provides functionality for handling multiple kinds of files und
 
 ::
 
+	<?php
     Media::where('aggregate_type', Media::TYPE_IMAGE)->get();
 
 
@@ -12,6 +13,7 @@ You can use this functionality to restrict the uploader to only accept certain t
 
 ::
 
+	<?php
     MediaUploader::fromSource($request->file('thumbnail'))
         ->toDestination('uploads', '')
         ->setAllowedAggregateTypes([Media::TYPE_IMAGE, Media::TYPE_IMAGE_VECTOR])

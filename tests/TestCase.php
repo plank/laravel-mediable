@@ -36,8 +36,10 @@ class TestCase extends BaseTestCase
 
     protected function getEnvironmentSetUp($app)
     {
-        $dotenv = new Dotenv\Dotenv(dirname(__DIR__));
-        $dotenv->load();
+        if(file_exists(dirname(__DIR__) . '/.env')){
+            $dotenv = new Dotenv\Dotenv(dirname(__DIR__));
+            $dotenv->load();
+        }
         //use in-memory database
         $app['config']->set('database.connections.testing', [
             'driver' => 'sqlite',

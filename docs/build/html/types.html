@@ -140,11 +140,13 @@
   <div class="section" id="aggregate-types">
 <h1>Aggregate Types<a class="headerlink" href="#aggregate-types" title="Permalink to this headline">¶</a></h1>
 <p>Laravel-Mediable provides functionality for handling multiple kinds of files under a shared aggregate type. This is intended to make it easy to find similar media without needing to constantly juggle multiple MIME types or file extensions. For example, you might want to query for an image, but not care if it is in JPEG, PNG or GIF format.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Media</span><span class="p">::</span><span class="n">where</span><span class="p">(</span><span class="s1">&#39;aggregate_type&#39;</span><span class="p">,</span> <span class="n">Media</span><span class="p">::</span><span class="n">TYPE_IMAGE</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">get</span><span class="p">();</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span>    &lt;?php
+Media::where(&#39;aggregate_type&#39;, Media::TYPE_IMAGE)-&gt;get();
 </pre></div>
 </div>
 <p>You can use this functionality to restrict the uploader to only accept certain types of files</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>MediaUploader::fromSource($request-&gt;file(&#39;thumbnail&#39;))
+<div class="highlight-default"><div class="highlight"><pre><span></span>    &lt;?php
+MediaUploader::fromSource($request-&gt;file(&#39;thumbnail&#39;))
     -&gt;toDestination(&#39;uploads&#39;, &#39;&#39;)
     -&gt;setAllowedAggregateTypes([Media::TYPE_IMAGE, Media::TYPE_IMAGE_VECTOR])
     -&gt;upload()
