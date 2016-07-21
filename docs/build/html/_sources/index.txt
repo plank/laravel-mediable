@@ -6,6 +6,16 @@
 Plank/Laravel-Mediable
 ============================================
 
+.. image:: https://travis-ci.org/plank/laravel-mediable.svg?branch=master
+    :target: https://travis-ci.org/plank/laravel-mediable
+    :alt: Build Status
+.. image:: https://coveralls.io/repos/github/plank/laravel-mediable/badge.svg?branch=master
+    :target: https://coveralls.io/github/plank/laravel-mediable
+    :alt: Coverage Status
+.. image:: https://insight.sensiolabs.com/projects/0eaf2725-64f4-4494-ae61-ca3961ba50c5/mini.png
+    :target: https://insight.sensiolabs.com/projects/0eaf2725-64f4-4494-ae61-ca3961ba50c5
+    :alt: SensioLabsInsight
+
 Laravel-Mediable is a package for easily uploading and attaching media files to models with Laravel 5.
 
 Features
@@ -18,18 +28,18 @@ Features
 
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Getting Started
+    :maxdepth: 2
+    :caption: Getting Started
 
-   installation
-   configuration
+    installation
+    configuration
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Guides
+    :maxdepth: 2
+    :caption: Guides
 
-   uploader
-   mediable
-   media
-   types
-   commands
+    uploader
+    mediable
+    media
+    types
+    commands
