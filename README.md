@@ -1,5 +1,7 @@
 # Laravel-Mediable
 
+[![Build Status](https://travis-ci.org/plank/laravel-mediable.svg?branch=master)](https://travis-ci.org/plank/laravel-mediable)
+
 Laravel-Mediable is a package for easily uploading and attaching media files to models with Laravel 5.
 
 ## Features
