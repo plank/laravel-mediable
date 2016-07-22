@@ -164,7 +164,7 @@
 </div>
 <div class="section" id="attaching-media">
 <h2>Attaching Media<a class="headerlink" href="#attaching-media" title="Permalink to this headline">¶</a></h2>
-<p>You can attach media to your <code class="docutils literal"><span class="pre">Mediable</span></code> model using the <code class="docutils literal"><span class="pre">attachMedia()</span></code> method. This method takes a second argument, specifying one or more tags which define the relationship between the model and the media.</p>
+<p>You can attach media to your <code class="docutils literal"><span class="pre">Mediable</span></code> model using the <code class="docutils literal"><span class="pre">attachMedia()</span></code> method. This method takes a second argument, specifying one or more tags which define the relationship between the model and the media. Tags are simply strings; you can use any value you need to describe how the model should use its attached media.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="nv">$post</span> <span class="o">=</span> <span class="nx">Post</span><span class="o">::</span><span class="na">first</span><span class="p">();</span>
 <span class="nv">$post</span><span class="o">-&gt;</span><span class="na">attachMedia</span><span class="p">(</span><span class="nv">$media</span><span class="p">,</span> <span class="s1">&#39;thumbnail&#39;</span><span class="p">);</span>

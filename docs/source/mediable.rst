@@ -24,7 +24,7 @@ Add the ``Mediable`` trait to any Eloquent models that you would like to be able
 Attaching Media
 --------------------------
 
-You can attach media to your ``Mediable`` model using the ``attachMedia()`` method. This method takes a second argument, specifying one or more tags which define the relationship between the model and the media.
+You can attach media to your ``Mediable`` model using the ``attachMedia()`` method. This method takes a second argument, specifying one or more tags which define the relationship between the model and the media. Tags are simply strings; you can use any value you need to describe how the model should use its attached media.
 
 ::
 
@@ -50,6 +50,7 @@ You can also assign media to multiple tags with a single call.
 
     <?php
     $post->attachMedia($media, ['gallery', 'featured']);
+
 
 Replacing Media
 --------------------------
