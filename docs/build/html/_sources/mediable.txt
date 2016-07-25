@@ -138,3 +138,76 @@ You can also remove all media assigned to one or more tags
     <?php
     $post->detachMediaTags('feature');
     $post->detachMediaTags(['feature', 'thumbnail']);
+
+Loading Media
+--------------------------
+
+When dealing with any model relationships, taking care to avoid running into the "N+1 problem" is an important optimization consideration. The N+1 problem can be summed up as a separate query being run for the related content of each record of the parent model. Consider the following example:
+
+::
+
+    <?php
+    $posts = Post::limit(10)->get();
+    foreach($posts as $post){
+        echo $post->firstMedia('thumbnail')->getUrl();
+    }
+
+Assuming there are at least 10 Post records available, this code will execute 11 queries: oen query to load the 10 posts from the database, then another 10 queries to load the media for each of the post records indiviudally. This will slow down the rendering of the page.
+
+There are a couple of approaches that can be taken to preload the attached media in order to avoid this issue.
+
+Eager Loading
+^^^^^^^^^^^^^^
+
+The Eloquent query builder's ``with()`` method is the prefered way to eager load related models. This package also provides an alias.
+
+::
+
+    <?php
+    $posts = Post::with('media')->get();
+    // or
+    $posts = Post::withMedia()->get();
+
+You can also load only media attached to specific tags.
+
+::
+
+    <?php
+    $posts = Post::withMedia(['thumbnail', 'featured']);
+
+**Note**: if using this approach to conditionally preload media by tag, you will not be able to access media with other tags using ``getMedia()`` without first reloading the media relationship on that record.
+
+Lazy Eager Loading
+^^^^^^^^^^^^^^^^^^^
+
+If you have already loaded models from the database, you can still load relationships with the ``load()`` method of the Eloquent Collection class. The package also provides an alias.
+
+::
+
+    <?php
+    $posts = Post::all();
+    // ...
+
+    $posts->load('media');
+    // or
+    $posts->loadMedia();
+
+
+You can also load only media attached to specific tags.
+
+::
+
+    <?php
+    $posts->loadMedia(['thumbnail', 'featured']);
+
+
+The same method is available as part of the Mediable trait, and can be used directly on a model instance.
+
+::
+
+    <?php
+    $post = Post::first();
+    $post->loadMedia();
+    $post->loadMedia('gallery');
+
+**Note**: if using this approach to conditionally preload media by tag, you will not be able to access media with other tags using ``getMedia()`` without first reloading the media relationship on that record.

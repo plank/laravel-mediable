@@ -3,6 +3,7 @@
 namespace Plank\Mediable;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 /**
  * Mediable Trait
@@ -65,6 +66,27 @@ trait Mediable
             ->havingRaw('count('.$grammar->wrap($this->media()->getOtherKey()).') = ' . count($tags));
 
         $q->whereRaw('(' . $subquery->toSql() . ') >= 1', $subquery->getBindings());
+    }
+
+    /**
+     * Query scope to eager load attached media.
+     *
+     * @param  Builder $q
+     * @param  string|array $tags
+     * If one or more tags are specified, only media attached to those tags will be loaded.
+     * @return void
+     */
+    public function scopeWithMedia(Builder $q, $tags = [])
+    {
+        $tags = (array)$tags;
+
+        if(empty($tags)){
+            return $q->with('media');
+        }
+
+        $q->with(['media' => function(MorphToMany $q) use($tags){
+            $q->wherePivotIn('tag', $tags);
+        }]);
     }
 
      /**
@@ -235,6 +257,26 @@ trait Mediable
     }
 
     /**
+     * Lazy eager load attached media relationships
+     * @param  string|array  $tags
+     * If one or more tags are specified, only media attached to those tags will be loaded.
+     * @return $this
+     */
+    public function loadMedia($tags = [])
+    {
+        $tags = (array)$tags;
+
+        if(empty($tags)){
+            return $this->load('media');
+        }
+        $this->load(['media' => function(MorphToMany $q) use($tags){
+            $q->wherePivotIn('tag', $tags);
+        }]);
+
+        return $this;
+    }
+
+    /**
      * Indicate that the media attached to the provided tags has been modified
      * @param  string|array $tags
      * @return void
@@ -269,7 +311,7 @@ trait Mediable
     protected function rehydrateMediaIfNecessary($tags = null)
     {
         if ($this->rehydratesMedia() && $this->mediaIsDirty($tags)) {
-            $this->load('media');
+            $this->loadMedia();
         }
     }
 
@@ -299,5 +341,14 @@ trait Mediable
             $this->media_dirty_tags = [];
         }
         return parent::load($relations);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @return MediableCollection
+     */
+    public function newCollection(array $models = [])
+    {
+        return new MediableCollection($models);
     }
 }

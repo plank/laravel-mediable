@@ -1,11 +1,9 @@
 <?php
 
 use Plank\Mediable\Media;
+use Plank\Mediable\MediableCollection;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
-/**
- * @covers Plank\Mediable\Mediable
- */
 class MediableTest extends TestCase
 {
     public function test_it_can_be_related_to_media()
@@ -223,5 +221,59 @@ class MediableTest extends TestCase
         $mediable->media;
         $mediable->attachMedia($media, 'foo');
         $this->assertEquals(0, $mediable->getMedia('foo')->count());
+    }
+
+    public function test_it_can_eager_load_media()
+    {
+        $mediable = factory(SampleMediable::class)->create();
+        $media = factory(Media::class)->create();
+        $mediable->attachMedia($media, 'foo');
+
+        $result = SampleMediable::withMedia()->first();
+        $this->assertTrue($result->relationLoaded('media'));
+    }
+
+    public function test_it_can_eager_load_media_by_tag()
+    {
+        $mediable = factory(SampleMediable::class)->create();
+        $media1 = factory(Media::class)->create(['id' => 1]);
+        $media2 = factory(Media::class)->create(['id' => 2]);
+        $mediable->attachMedia($media1, 'foo');
+        $mediable->attachMedia($media2, 'bar');
+
+        $result = SampleMediable::withMedia(['bar'])->first();
+        $this->assertTrue($result->relationLoaded('media'));
+        $this->assertEquals([2], $result->media->pluck('id')->toArray());
+    }
+
+    public function test_it_can_lazy_eager_load_media()
+    {
+        $mediable = factory(SampleMediable::class)->create();
+        $media = factory(Media::class)->create();
+        $mediable->attachMedia($media, 'foo');
+
+        $result = SampleMediable::first();
+        $this->assertSame($result, $result->loadMedia());
+        $this->assertTrue($result->relationLoaded('media'));
+    }
+
+    public function test_it_can_lazy_eager_load_media_by_tag()
+    {
+        $mediable = factory(SampleMediable::class)->create();
+        $media1 = factory(Media::class)->create(['id' => 1]);
+        $media2 = factory(Media::class)->create(['id' => 2]);
+        $mediable->attachMedia($media1, 'foo');
+        $mediable->attachMedia($media2, 'bar');
+
+        $result = SampleMediable::first();
+        $this->assertSame($result, $result->loadMedia(['bar']));
+        $this->assertTrue($result->relationLoaded('media'));
+        $this->assertEquals([2], $result->media->pluck('id')->toArray());
+    }
+
+    public function test_it_uses_custom_collection()
+    {
+        $mediable = factory(SampleMediable::class)->make();
+        $this->assertInstanceOf(MediableCollection::class, $mediable->newCollection([]));
     }
 }

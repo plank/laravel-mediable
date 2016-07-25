@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Handling Media &mdash; Laravel-Mediable 0.1.0 documentation</title>
+  <title>Handling Media &mdash; Laravel-Mediable 0.3.0 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="Laravel-Mediable 0.1.0 documentation" href="index.html"/>
+    <link rel="top" title="Laravel-Mediable 0.3.0 documentation" href="index.html"/>
         <link rel="next" title="Using Media" href="media.html"/>
         <link rel="prev" title="Uploading Files" href="uploader.html"/> 
 
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.1.0
+                0.3.0
               </div>
             
           
@@ -95,6 +95,11 @@
 <li class="toctree-l2"><a class="reference internal" href="#retrieving-media">Retrieving Media</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#checking-for-the-presence-of-media">Checking for the Presence of Media</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#detaching-media">Detaching Media</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#loading-media">Loading Media</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#eager-loading">Eager Loading</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#lazy-eager-loading">Lazy Eager Loading</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="media.html">Using Media</a></li>
@@ -254,6 +259,61 @@
 </pre></div>
 </div>
 </div>
+<div class="section" id="loading-media">
+<h2>Loading Media<a class="headerlink" href="#loading-media" title="Permalink to this headline">¶</a></h2>
+<p>When dealing with any model relationships, taking care to avoid running into the &#8220;N+1 problem&#8221; is an important optimization consideration. The N+1 problem can be summed up as a separate query being run for the related content of each record of the parent model. Consider the following example:</p>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="nv">$posts</span> <span class="o">=</span> <span class="nx">Post</span><span class="o">::</span><span class="na">limit</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">();</span>
+<span class="k">foreach</span><span class="p">(</span><span class="nv">$posts</span> <span class="k">as</span> <span class="nv">$post</span><span class="p">){</span>
+    <span class="k">echo</span> <span class="nv">$post</span><span class="o">-&gt;</span><span class="na">firstMedia</span><span class="p">(</span><span class="s1">&#39;thumbnail&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">getUrl</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Assuming there are at least 10 Post records available, this code will execute 11 queries: oen query to load the 10 posts from the database, then another 10 queries to load the media for each of the post records indiviudally. This will slow down the rendering of the page.</p>
+<p>There are a couple of approaches that can be taken to preload the attached media in order to avoid this issue.</p>
+<div class="section" id="eager-loading">
+<h3>Eager Loading<a class="headerlink" href="#eager-loading" title="Permalink to this headline">¶</a></h3>
+<p>The Eloquent query builder&#8217;s <code class="docutils literal"><span class="pre">with()</span></code> method is the prefered way to eager load related models. This package also provides an alias.</p>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="nv">$posts</span> <span class="o">=</span> <span class="nx">Post</span><span class="o">::</span><span class="na">with</span><span class="p">(</span><span class="s1">&#39;media&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">();</span>
+<span class="c1">// or</span>
+<span class="nv">$posts</span> <span class="o">=</span> <span class="nx">Post</span><span class="o">::</span><span class="na">withMedia</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>You can also load only media attached to specific tags.</p>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="nv">$posts</span> <span class="o">=</span> <span class="nx">Post</span><span class="o">::</span><span class="na">withMedia</span><span class="p">([</span><span class="s1">&#39;thumbnail&#39;</span><span class="p">,</span> <span class="s1">&#39;featured&#39;</span><span class="p">]);</span>
+</pre></div>
+</div>
+<p><strong>Note</strong>: if using this approach to conditionally preload media by tag, you will not be able to access media with other tags using <code class="docutils literal"><span class="pre">getMedia()</span></code> without first reloading the media relationship on that record.</p>
+</div>
+<div class="section" id="lazy-eager-loading">
+<h3>Lazy Eager Loading<a class="headerlink" href="#lazy-eager-loading" title="Permalink to this headline">¶</a></h3>
+<p>If you have already loaded models from the database, you can still load relationships with the <code class="docutils literal"><span class="pre">load()</span></code> method of the Eloquent Collection class. The package also provides an alias.</p>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="nv">$posts</span> <span class="o">=</span> <span class="nx">Post</span><span class="o">::</span><span class="na">all</span><span class="p">();</span>
+<span class="c1">// ...</span>
+
+<span class="nv">$posts</span><span class="o">-&gt;</span><span class="na">load</span><span class="p">(</span><span class="s1">&#39;media&#39;</span><span class="p">);</span>
+<span class="c1">// or</span>
+<span class="nv">$posts</span><span class="o">-&gt;</span><span class="na">loadMedia</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>You can also load only media attached to specific tags.</p>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="nv">$posts</span><span class="o">-&gt;</span><span class="na">loadMedia</span><span class="p">([</span><span class="s1">&#39;thumbnail&#39;</span><span class="p">,</span> <span class="s1">&#39;featured&#39;</span><span class="p">]);</span>
+</pre></div>
+</div>
+<p>The same method is available as part of the Mediable trait, and can be used directly on a model instance.</p>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="nv">$post</span> <span class="o">=</span> <span class="nx">Post</span><span class="o">::</span><span class="na">first</span><span class="p">();</span>
+<span class="nv">$post</span><span class="o">-&gt;</span><span class="na">loadMedia</span><span class="p">();</span>
+<span class="nv">$post</span><span class="o">-&gt;</span><span class="na">loadMedia</span><span class="p">(</span><span class="s1">&#39;gallery&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p><strong>Note</strong>: if using this approach to conditionally preload media by tag, you will not be able to access media with other tags using <code class="docutils literal"><span class="pre">getMedia()</span></code> without first reloading the media relationship on that record.</p>
+</div>
+</div>
 </div>
 
 
@@ -297,7 +357,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.1.0',
+            VERSION:'0.3.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
