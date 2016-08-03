@@ -246,6 +246,19 @@ class MediableTest extends TestCase
         $this->assertEquals([2], $result->media->pluck('id')->toArray());
     }
 
+    public function test_it_can_eager_load_media_by_tag_matching_all()
+    {
+        $mediable = factory(SampleMediable::class)->create();
+        $media1 = factory(Media::class)->create(['id' => 1]);
+        $media2 = factory(Media::class)->create(['id' => 2]);
+        $mediable->attachMedia($media1, 'foo');
+        $mediable->attachMedia($media2, ['bar', 'foo', 'baz']);
+
+        $result = SampleMediable::withMedia(['bar', 'foo'], true)->first();
+        $this->assertTrue($result->relationLoaded('media'));
+        $this->assertEquals([2, 2], $result->media->pluck('id')->toArray());
+    }
+
     public function test_it_can_lazy_eager_load_media()
     {
         $mediable = factory(SampleMediable::class)->create();
@@ -269,6 +282,20 @@ class MediableTest extends TestCase
         $this->assertSame($result, $result->loadMedia(['bar']));
         $this->assertTrue($result->relationLoaded('media'));
         $this->assertEquals([2], $result->media->pluck('id')->toArray());
+    }
+
+    public function test_it_can_lazy_eager_load_media_by_tag_matching_all()
+    {
+        $mediable = factory(SampleMediable::class)->create();
+        $media1 = factory(Media::class)->create(['id' => 1]);
+        $media2 = factory(Media::class)->create(['id' => 2]);
+        $mediable->attachMedia($media1, 'foo');
+        $mediable->attachMedia($media2, ['bar', 'foo', 'baz']);
+
+        $result = SampleMediable::first();
+        $this->assertSame($result, $result->loadMedia(['bar', 'foo'], true));
+        $this->assertTrue($result->relationLoaded('media'));
+        $this->assertEquals([2, 2], $result->media->pluck('id')->toArray());
     }
 
     public function test_it_uses_custom_collection()

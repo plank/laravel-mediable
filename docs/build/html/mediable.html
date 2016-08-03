@@ -178,12 +178,12 @@
 <p>You can attach multiple media to the same tag with a single call. The <code class="docutils literal"><span class="pre">attachMedia()</span></code> method accept any of the following for its first parameter:</p>
 <ul class="simple">
 <li>a numeric or string id</li>
-<li>an instance <code class="docutils literal"><span class="pre">\Plank\Mediable\Media</span></code></li>
+<li>an instance of <code class="docutils literal"><span class="pre">\Plank\Mediable\Media</span></code></li>
 <li>an array of ids</li>
 <li>an instance of <code class="docutils literal"><span class="pre">\Illuminate\Database\Eloquent\Collection</span></code></li>
 </ul>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
-<span class="nv">$post</span><span class="o">-&gt;</span><span class="na">attachMedia</span><span class="p">([</span><span class="nv">$media1</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">,</span> <span class="nv">$media2</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">],</span> <span class="s1">&#39;gallery&#39;</span><span class="p">);</span>
+<span class="nv">$post</span><span class="o">-&gt;</span><span class="na">attachMedia</span><span class="p">([</span><span class="nv">$media1</span><span class="o">-&gt;</span><span class="na">getKey</span><span class="p">(),</span> <span class="nv">$media2</span><span class="o">-&gt;</span><span class="na">getKey</span><span class="p">()],</span> <span class="s1">&#39;gallery&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>You can also assign media to multiple tags with a single call.</p>
@@ -282,7 +282,8 @@
 </div>
 <p>You can also load only media attached to specific tags.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
-<span class="nv">$posts</span> <span class="o">=</span> <span class="nx">Post</span><span class="o">::</span><span class="na">withMedia</span><span class="p">([</span><span class="s1">&#39;thumbnail&#39;</span><span class="p">,</span> <span class="s1">&#39;featured&#39;</span><span class="p">]);</span>
+<span class="nv">$posts</span> <span class="o">=</span> <span class="nx">Post</span><span class="o">::</span><span class="na">withMedia</span><span class="p">([</span><span class="s1">&#39;thumbnail&#39;</span><span class="p">,</span> <span class="s1">&#39;featured&#39;</span><span class="p">]);</span> <span class="c1">// attached to either tags</span>
+<span class="nv">$posts</span> <span class="o">=</span> <span class="nx">Post</span><span class="o">::</span><span class="na">withMediaMatchAll</span><span class="p">([</span><span class="s1">&#39;thumbnail&#39;</span><span class="p">,</span> <span class="s1">&#39;featured&#39;</span><span class="p">]);</span> <span class="c1">// attached to both tags</span>
 </pre></div>
 </div>
 <p><strong>Note</strong>: if using this approach to conditionally preload media by tag, you will not be able to access media with other tags using <code class="docutils literal"><span class="pre">getMedia()</span></code> without first reloading the media relationship on that record.</p>
@@ -301,14 +302,16 @@
 </div>
 <p>You can also load only media attached to specific tags.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
-<span class="nv">$posts</span><span class="o">-&gt;</span><span class="na">loadMedia</span><span class="p">([</span><span class="s1">&#39;thumbnail&#39;</span><span class="p">,</span> <span class="s1">&#39;featured&#39;</span><span class="p">]);</span>
+<span class="nv">$posts</span><span class="o">-&gt;</span><span class="na">loadMedia</span><span class="p">([</span><span class="s1">&#39;thumbnail&#39;</span><span class="p">,</span> <span class="s1">&#39;featured&#39;</span><span class="p">]);</span> <span class="c1">// attached to either tag</span>
+<span class="nv">$posts</span><span class="o">-&gt;</span><span class="na">loadMediaMatchAll</span><span class="p">([</span><span class="s1">&#39;thumbnail&#39;</span><span class="p">,</span> <span class="s1">&#39;featured&#39;</span><span class="p">]);</span> <span class="c1">// attached to both tags</span>
 </pre></div>
 </div>
 <p>The same method is available as part of the Mediable trait, and can be used directly on a model instance.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="nv">$post</span> <span class="o">=</span> <span class="nx">Post</span><span class="o">::</span><span class="na">first</span><span class="p">();</span>
 <span class="nv">$post</span><span class="o">-&gt;</span><span class="na">loadMedia</span><span class="p">();</span>
-<span class="nv">$post</span><span class="o">-&gt;</span><span class="na">loadMedia</span><span class="p">(</span><span class="s1">&#39;gallery&#39;</span><span class="p">);</span>
+<span class="nv">$post</span><span class="o">-&gt;</span><span class="na">loadMedia</span><span class="p">([</span><span class="s1">&#39;thumbnail&#39;</span><span class="p">,</span> <span class="s1">&#39;featured&#39;</span><span class="p">]);</span> <span class="c1">// attached to either tag</span>
+<span class="nv">$post</span><span class="o">-&gt;</span><span class="na">loadMediaMatchAll</span><span class="p">([</span><span class="s1">&#39;thumbnail&#39;</span><span class="p">,</span> <span class="s1">&#39;featured&#39;</span><span class="p">]);</span> <span class="c1">// attached to all tags</span>
 </pre></div>
 </div>
 <p><strong>Note</strong>: if using this approach to conditionally preload media by tag, you will not be able to access media with other tags using <code class="docutils literal"><span class="pre">getMedia()</span></code> without first reloading the media relationship on that record.</p>

@@ -35,14 +35,14 @@ You can attach media to your ``Mediable`` model using the ``attachMedia()`` meth
 You can attach multiple media to the same tag with a single call. The ``attachMedia()`` method accept any of the following for its first parameter:
 
 - a numeric or string id
-- an instance ``\Plank\Mediable\Media``
+- an instance of ``\Plank\Mediable\Media``
 - an array of ids
 - an instance of ``\Illuminate\Database\Eloquent\Collection``
 
 ::
 
     <?php
-    $post->attachMedia([$media1->id, $media2->id], 'gallery');
+    $post->attachMedia([$media1->getKey(), $media2->getKey()], 'gallery');
 
 You can also assign media to multiple tags with a single call.
 
@@ -173,7 +173,8 @@ You can also load only media attached to specific tags.
 ::
 
     <?php
-    $posts = Post::withMedia(['thumbnail', 'featured']);
+    $posts = Post::withMedia(['thumbnail', 'featured']); // attached to either tags
+    $posts = Post::withMediaMatchAll(['thumbnail', 'featured']); // attached to both tags
 
 **Note**: if using this approach to conditionally preload media by tag, you will not be able to access media with other tags using ``getMedia()`` without first reloading the media relationship on that record.
 
@@ -198,7 +199,8 @@ You can also load only media attached to specific tags.
 ::
 
     <?php
-    $posts->loadMedia(['thumbnail', 'featured']);
+    $posts->loadMedia(['thumbnail', 'featured']); // attached to either tag
+    $posts->loadMediaMatchAll(['thumbnail', 'featured']); // attached to both tags
 
 
 The same method is available as part of the Mediable trait, and can be used directly on a model instance.
@@ -208,6 +210,7 @@ The same method is available as part of the Mediable trait, and can be used dire
     <?php
     $post = Post::first();
     $post->loadMedia();
-    $post->loadMedia('gallery');
+    $post->loadMedia(['thumbnail', 'featured']); // attached to either tag
+    $post->loadMediaMatchAll(['thumbnail', 'featured']); // attached to all tags
 
 **Note**: if using this approach to conditionally preload media by tag, you will not be able to access media with other tags using ``getMedia()`` without first reloading the media relationship on that record.

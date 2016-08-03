@@ -57,14 +57,9 @@ trait Mediable
     public function scopeWhereHasMediaMatchAll(Builder $q, array $tags)
     {
         $grammar = $q->getConnection()->getQueryGrammar();
-        $subquery = $this->media()->newPivotStatement()
+        $subquery = $this->newMatchAllQuery($tags)
             ->selectRaw('count(*)')
-            ->where($this->media()->getMorphType(), $this->media()->getMorphClass())
-            ->whereRaw($grammar->wrap($this->media()->getForeignKey()) . ' = ' . $grammar->wrap($this->getQualifiedKeyName()))
-            ->whereIn('tag', $tags)
-            ->groupBy($this->media()->getOtherKey())
-            ->havingRaw('count('.$grammar->wrap($this->media()->getOtherKey()).') = ' . count($tags));
-
+            ->whereRaw($grammar->wrap($this->media()->getForeignKey()) . ' = ' . $grammar->wrap($this->getQualifiedKeyName()));
         $q->whereRaw('(' . $subquery->toSql() . ') >= 1', $subquery->getBindings());
     }
 
@@ -74,9 +69,11 @@ trait Mediable
      * @param  Builder $q
      * @param  string|array $tags
      * If one or more tags are specified, only media attached to those tags will be loaded.
+     * @param boolean $match_all
+     * Only load media matching all provided tags
      * @return void
      */
-    public function scopeWithMedia(Builder $q, $tags = [])
+    public function scopeWithMedia(Builder $q, $tags = [], $match_all = false)
     {
         $tags = (array)$tags;
 
@@ -84,9 +81,62 @@ trait Mediable
             return $q->with('media');
         }
 
+        if($match_all){
+            return $q->withMediaMatchAll($tags);
+        }
+
         $q->with(['media' => function(MorphToMany $q) use($tags){
             $q->wherePivotIn('tag', $tags);
         }]);
+    }
+
+    /**
+     * Query scope to eager load attached media assigned to multiple tags
+     * @param  Builder $q
+     * @param  array   $tags
+     * @return void
+     */
+    public function scopeWithMediaMatchAll(Builder $q, $tags = [])
+    {
+        $tags = (array)$tags;
+        $q->with(['media' => function(MorphToMany $q) use($tags){
+            $this->addMatchAllToEagerLoadQuery($q, $tags);
+        }]);
+    }
+
+    /**
+     * Lazy eager load attached media relationships
+     * @param  string|array  $tags
+     * If one or more tags are specified, only media attached to those tags will be loaded.
+     * @return $this
+     */
+    public function loadMedia($tags = [], $match_all = false)
+    {
+        $tags = (array)$tags;
+
+        if(empty($tags)){
+            return $this->load('media');
+        }
+
+        if($match_all){
+            return $this->loadMediaMatchAll($tags);
+        }
+
+        $this->load(['media' => function(MorphToMany $q) use($tags){
+            $q->wherePivotIn('tag', $tags);
+        }]);
+
+        return $this;
+    }
+
+    public function loadMediaMatchAll($tags = [])
+    {
+        $tags = (array)$tags;
+        $this->load(['media' => function(MorphToMany $q) use($tags){
+            $this->addMatchAllToEagerLoadQuery($q, $tags);
+        }]);
+
+        return $this;
     }
 
      /**
@@ -257,26 +307,6 @@ trait Mediable
     }
 
     /**
-     * Lazy eager load attached media relationships
-     * @param  string|array  $tags
-     * If one or more tags are specified, only media attached to those tags will be loaded.
-     * @return $this
-     */
-    public function loadMedia($tags = [])
-    {
-        $tags = (array)$tags;
-
-        if(empty($tags)){
-            return $this->load('media');
-        }
-        $this->load(['media' => function(MorphToMany $q) use($tags){
-            $q->wherePivotIn('tag', $tags);
-        }]);
-
-        return $this;
-    }
-
-    /**
      * Indicate that the media attached to the provided tags has been modified
      * @param  string|array $tags
      * @return void
@@ -313,6 +343,37 @@ trait Mediable
         if ($this->rehydratesMedia() && $this->mediaIsDirty($tags)) {
             $this->loadMedia();
         }
+    }
+
+    /**
+     * Generate a query builder for
+     * @param  array  $tags [description]
+     * @return [type]       [description]
+     */
+    protected function newMatchAllQuery($tags = [])
+    {
+        $tags = (array)$tags;
+        $grammar = $this->media()->getConnection()->getQueryGrammar();
+        return $this->media()->newPivotStatement()
+            ->where($this->media()->getMorphType(), $this->media()->getMorphClass())
+            ->whereIn('tag', $tags)
+            ->groupBy($this->media()->getOtherKey())
+            ->havingRaw('count('.$grammar->wrap($this->media()->getOtherKey()).') = ' . count($tags));
+    }
+
+    /**
+     * Modify an eager load query to only load media assigned to all provided tags simultaneously
+     * @param  MorphToMany $q
+     * @param  array       $tags
+     * @return void
+     */
+    protected function addMatchAllToEagerLoadQuery(MorphToMany $q, $tags = [])
+    {
+        $tags = (array)$tags;
+        $grammar = $q->getConnection()->getQueryGrammar();
+        $subquery = $this->newMatchAllQuery($tags)->select($q->getOtherKey());
+        $q->wherePivotIn('tag', $tags)
+            ->whereRaw($grammar->wrap($q->getOtherKey()) . ' IN (' . $subquery->toSql() . ')', $subquery->getBindings());
     }
 
     /**
