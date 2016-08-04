@@ -298,6 +298,7 @@ trait Mediable
      */
     public function getTagsForMedia(Media $media)
     {
+        $this->rehydrateMediaIfNecessary();
         return $this->media->reduce(function ($carry, Media $item) use ($media) {
             if ($item->getKey() === $media->getKey()) {
                 $carry[] = $item->pivot->tag;
@@ -346,6 +347,20 @@ trait Mediable
     }
 
     /**
+     * Check whether the model is allowed to automatically reload media relationship
+     *
+     * Can be overridden by setting protected property `$rehydrates_media` on the model.
+     * @return boolean
+     */
+    protected function rehydratesMedia()
+    {
+        if (property_exists($this, 'rehydrates_media')) {
+            return $this->rehydrates_media;
+        }
+        return config('mediable.rehydrate_media', true);
+    }
+
+    /**
      * Generate a query builder for
      * @param  array  $tags [description]
      * @return [type]       [description]
@@ -377,20 +392,6 @@ trait Mediable
     }
 
     /**
-     * Check whether the model is allowed to automatically reload media relationship
-     *
-     * Can be overridden by setting protected property `$rehydrates_media` on the model.
-     * @return boolean
-     */
-    protected function rehydratesMedia()
-    {
-        if (property_exists($this, 'rehydrates_media')) {
-            return $this->rehydrates_media;
-        }
-        return config('mediable.rehydrate_media', true);
-    }
-
-    /**
      * {@inheritDoc}
      */
     public function load($relations)
@@ -398,7 +399,7 @@ trait Mediable
         if (is_string($relations)) {
             $relations = func_get_args();
         }
-        if (in_array('media', $relations)) {
+        if (array_key_exists('media', $relations) || in_array('media', $relations)) {
             $this->media_dirty_tags = [];
         }
         return parent::load($relations);

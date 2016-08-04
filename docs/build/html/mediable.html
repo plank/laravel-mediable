@@ -100,6 +100,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#lazy-eager-loading">Lazy Eager Loading</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#automatic-rehydration">Automatic Rehydration</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="media.html">Using Media</a></li>
@@ -194,7 +195,7 @@
 </div>
 <div class="section" id="replacing-media">
 <h2>Replacing Media<a class="headerlink" href="#replacing-media" title="Permalink to this headline">¶</a></h2>
-<p>Media and Mediable models share a many-to-many relationship, which allows for any number of media to be added to any key. The <code class="docutils literal"><span class="pre">attachMedia()</span></code> method will add a new association, but will not remove any existing associations to other media. If you want to replace the media previously attached to the specified tag(s) you can use the <code class="docutils literal"><span class="pre">syncMedia()</span></code> method. This method accepts the same inputs as <code class="docutils literal"><span class="pre">attachMedia()</span></code>.</p>
+<p><code class="docutils literal"><span class="pre">Media</span></code> and <code class="docutils literal"><span class="pre">Mediable</span></code> models share a many-to-many relationship, which allows for any number of media to be added to any key. The <code class="docutils literal"><span class="pre">attachMedia()</span></code> method will add a new association, but will not remove any existing associations to other media. If you want to replace the media previously attached to the specified tag(s) you can use the <code class="docutils literal"><span class="pre">syncMedia()</span></code> method. This method accepts the same inputs as <code class="docutils literal"><span class="pre">attachMedia()</span></code>.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="nv">$post</span><span class="o">-&gt;</span><span class="na">syncMedia</span><span class="p">(</span><span class="nv">$media</span><span class="p">,</span> <span class="s1">&#39;thumbnail&#39;</span><span class="p">);</span>
 </pre></div>
@@ -306,15 +307,50 @@
 <span class="nv">$posts</span><span class="o">-&gt;</span><span class="na">loadMediaMatchAll</span><span class="p">([</span><span class="s1">&#39;thumbnail&#39;</span><span class="p">,</span> <span class="s1">&#39;featured&#39;</span><span class="p">]);</span> <span class="c1">// attached to both tags</span>
 </pre></div>
 </div>
-<p>The same method is available as part of the Mediable trait, and can be used directly on a model instance.</p>
+<p>The same method is available as part of the <code class="docutils literal"><span class="pre">Mediable</span></code> trait, and can be used directly on a model instance.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="nv">$post</span> <span class="o">=</span> <span class="nx">Post</span><span class="o">::</span><span class="na">first</span><span class="p">();</span>
 <span class="nv">$post</span><span class="o">-&gt;</span><span class="na">loadMedia</span><span class="p">();</span>
 <span class="nv">$post</span><span class="o">-&gt;</span><span class="na">loadMedia</span><span class="p">([</span><span class="s1">&#39;thumbnail&#39;</span><span class="p">,</span> <span class="s1">&#39;featured&#39;</span><span class="p">]);</span> <span class="c1">// attached to either tag</span>
-<span class="nv">$post</span><span class="o">-&gt;</span><span class="na">loadMediaMatchAll</span><span class="p">([</span><span class="s1">&#39;thumbnail&#39;</span><span class="p">,</span> <span class="s1">&#39;featured&#39;</span><span class="p">]);</span> <span class="c1">// attached to all tags</span>
+<span class="nv">$post</span><span class="o">-&gt;</span><span class="na">loadMediaMatchAll</span><span class="p">([</span><span class="s1">&#39;thumbnail&#39;</span><span class="p">,</span> <span class="s1">&#39;featured&#39;</span><span class="p">]);</span> <span class="c1">// attached to both tags</span>
 </pre></div>
 </div>
+<p>Any of these methods can be used to reload the media relationship of the model.</p>
 <p><strong>Note</strong>: if using this approach to conditionally preload media by tag, you will not be able to access media with other tags using <code class="docutils literal"><span class="pre">getMedia()</span></code> without first reloading the media relationship on that record.</p>
+</div>
+</div>
+<div class="section" id="automatic-rehydration">
+<h2>Automatic Rehydration<a class="headerlink" href="#automatic-rehydration" title="Permalink to this headline">¶</a></h2>
+<p>By default, <code class="docutils literal"><span class="pre">Mediable</span></code> models will automatically reload their media relationship the next time the media at a given tag is accessed after that tag is modified.</p>
+<p>The <code class="docutils literal"><span class="pre">attachMedia()</span></code>, <code class="docutils literal"><span class="pre">syncMedia()</span></code>, <code class="docutils literal"><span class="pre">detachMedia()</span></code>, and <code class="docutils literal"><span class="pre">detachMediaTags()</span></code> methods will mark any tags passed as being dirty, while the <code class="docutils literal"><span class="pre">hasMedia()</span></code> <code class="docutils literal"><span class="pre">getMedia()</span></code>, <code class="docutils literal"><span class="pre">firstMedia()</span></code>, <code class="docutils literal"><span class="pre">getAllMediaByTag()</span></code>, and <code class="docutils literal"><span class="pre">getTagsForMedia()</span></code> methods will execute <code class="docutils literal"><span class="pre">loadMedia()</span></code> to reload all media if they attempt to read a dirty tag.</p>
+<p>For example:</p>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="nv">$post</span><span class="o">-&gt;</span><span class="na">loadMedia</span><span class="p">();</span>
+<span class="nv">$post</span><span class="o">-&gt;</span><span class="na">getMedia</span><span class="p">(</span><span class="s1">&#39;gallery&#39;</span><span class="p">);</span> <span class="c1">// returns an empty collection</span>
+<span class="nv">$post</span><span class="o">-&gt;</span><span class="na">getMedia</span><span class="p">(</span><span class="s1">&#39;thumbnail&#39;</span><span class="p">);</span> <span class="c1">// returns an empty collection</span>
+<span class="nv">$post</span><span class="o">-&gt;</span><span class="na">attachMedia</span><span class="p">(</span><span class="nv">$media</span><span class="p">,</span> <span class="s1">&#39;gallery&#39;</span><span class="p">);</span> <span class="c1">// marks the gallery tag as dirty</span>
+
+<span class="nv">$post</span><span class="o">-&gt;</span><span class="na">getMedia</span><span class="p">(</span><span class="s1">&#39;thumbnail&#39;</span><span class="p">);</span> <span class="c1">// still returns an empty collection</span>
+<span class="nv">$post</span><span class="o">-&gt;</span><span class="na">getMedia</span><span class="p">(</span><span class="s1">&#39;gallery&#39;</span><span class="p">);</span> <span class="c1">// performs a `loadMedia()`, returns a collection with $media</span>
+</pre></div>
+</div>
+<p>You can enable or disable this behaviour on a class-by-class basis by adding the <code class="docutils literal"><span class="pre">$rehydrates_media</span></code> property to your <code class="docutils literal"><span class="pre">Mediable</span></code> model.</p>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="c1">// ...</span>
+
+<span class="k">class</span> <span class="nc">Post</span> <span class="k">extends</span> <span class="nx">Model</span>
+<span class="p">{</span>
+    <span class="k">use</span> <span class="nx">Mediable</span><span class="p">;</span>
+
+    <span class="k">protected</span> <span class="nv">$rehydrates_media</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
+
+    <span class="c1">// ...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>You can also set the application-wide default behaviour in <code class="docutils literal"><span class="pre">config/mediable.php</span></code>.</p>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="x">&#39;rehydrate_media&#39; =&gt; true,</span>
+</pre></div>
 </div>
 </div>
 </div>

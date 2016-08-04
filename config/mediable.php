@@ -199,7 +199,7 @@ return [
     ],
 
     /**
-     * Should mediable instances automatically reload their media relationships after modification are made to the association.
+     * Should mediable instances automatically reload their media relationships after modification are made to a tag.
      *
      * If true, will automatically reload media the next time `getMedia()`, `getMediaMatchAll()` or `getAllMediaByTag()` are called.
      */

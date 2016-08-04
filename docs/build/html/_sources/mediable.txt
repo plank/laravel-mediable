@@ -55,7 +55,7 @@ You can also assign media to multiple tags with a single call.
 Replacing Media
 --------------------------
 
-Media and Mediable models share a many-to-many relationship, which allows for any number of media to be added to any key. The ``attachMedia()`` method will add a new association, but will not remove any existing associations to other media. If you want to replace the media previously attached to the specified tag(s) you can use the ``syncMedia()`` method. This method accepts the same inputs as ``attachMedia()``.
+``Media`` and ``Mediable`` models share a many-to-many relationship, which allows for any number of media to be added to any key. The ``attachMedia()`` method will add a new association, but will not remove any existing associations to other media. If you want to replace the media previously attached to the specified tag(s) you can use the ``syncMedia()`` method. This method accepts the same inputs as ``attachMedia()``.
 
 ::
 
@@ -203,7 +203,7 @@ You can also load only media attached to specific tags.
     $posts->loadMediaMatchAll(['thumbnail', 'featured']); // attached to both tags
 
 
-The same method is available as part of the Mediable trait, and can be used directly on a model instance.
+The same method is available as part of the ``Mediable`` trait, and can be used directly on a model instance.
 
 ::
 
@@ -211,6 +211,51 @@ The same method is available as part of the Mediable trait, and can be used dire
     $post = Post::first();
     $post->loadMedia();
     $post->loadMedia(['thumbnail', 'featured']); // attached to either tag
-    $post->loadMediaMatchAll(['thumbnail', 'featured']); // attached to all tags
+    $post->loadMediaMatchAll(['thumbnail', 'featured']); // attached to both tags
+
+
+Any of these methods can be used to reload the media relationship of the model.
 
 **Note**: if using this approach to conditionally preload media by tag, you will not be able to access media with other tags using ``getMedia()`` without first reloading the media relationship on that record.
+
+Automatic Rehydration
+----------------------
+
+By default, ``Mediable`` models will automatically reload their media relationship the next time the media at a given tag is accessed after that tag is modified.
+
+The ``attachMedia()``, ``syncMedia()``, ``detachMedia()``, and ``detachMediaTags()`` methods will mark any tags passed as being dirty, while the ``hasMedia()`` ``getMedia()``, ``firstMedia()``, ``getAllMediaByTag()``, and ``getTagsForMedia()`` methods will execute ``loadMedia()`` to reload all media if they attempt to read a dirty tag.
+
+For example:
+
+::
+
+    <?php
+    $post->loadMedia();
+    $post->getMedia('gallery'); // returns an empty collection
+    $post->getMedia('thumbnail'); // returns an empty collection
+    $post->attachMedia($media, 'gallery'); // marks the gallery tag as dirty
+
+    $post->getMedia('thumbnail'); // still returns an empty collection
+    $post->getMedia('gallery'); // performs a `loadMedia()`, returns a collection with $media
+
+You can enable or disable this behaviour on a class-by-class basis by adding the ``$rehydrates_media`` property to your ``Mediable`` model.
+
+::
+
+    <?php
+    // ...
+
+    class Post extends Model
+    {
+        use Mediable;
+
+        protected $rehydrates_media = false;
+
+        // ...
+    }
+
+You can also set the application-wide default behaviour in ``config/mediable.php``.
+
+::
+
+    'rehydrate_media' => true,
