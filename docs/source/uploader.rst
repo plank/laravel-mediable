@@ -13,7 +13,7 @@ The easiest way to upload media to your server is with the ``MediaUploader`` cla
         //specify which disk to upload the file to, and where on the disk to put it
         ->toDestination('uploads', 'blog/thumbnails')
         // override the source's filename (optional)
-        ->withFilename('my-thumbnail')
+        ->setFilename('my-thumbnail')
         //perform the file upload
         ->upload();
 
