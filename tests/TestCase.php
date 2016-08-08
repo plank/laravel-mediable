@@ -7,10 +7,6 @@ class TestCase extends BaseTestCase
 {
     protected $queriesCount;
 
-    const DB_NAME     = 'mediable_test';
-    const DB_USERNAME = 'testuser';
-    const DB_PASSWORD = 'password';
-
     public function setUp()
     {
         parent::setUp();
@@ -73,15 +69,6 @@ class TestCase extends BaseTestCase
         $app['config']->set('mediable.allowed_disks', [
             'tmp',
             'uploads'
-        ]);
-
-        //set up glide configs
-        $app['config']->set('laravel-glide', [
-            'source' => ['path' => public_path()],
-            'cache' => ['path' => storage_path('glide/cache')],
-            'baseURL' => 'glide',
-            'maxSize' => 2000 * 2000,
-            'useSecureURLs' => false //can't anticipate the hash
         ]);
     }
 
