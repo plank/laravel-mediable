@@ -1,10 +1,10 @@
 # Laravel-Mediable
 
-[![Build Status](https://travis-ci.org/plank/laravel-mediable.svg?branch=master)](https://travis-ci.org/plank/laravel-mediable)
-[![Coverage Status](https://coveralls.io/repos/github/plank/laravel-mediable/badge.svg?branch=master)](https://coveralls.io/github/plank/laravel-mediable?branch=master)
-[![SensioLabsInsight](https://insight.sensiolabs.com/projects/0eaf2725-64f4-4494-ae61-ca3961ba50c5/mini.png)](https://insight.sensiolabs.com/projects/0eaf2725-64f4-4494-ae61-ca3961ba50c5)
+[![Travis](https://img.shields.io/travis/plank/laravel-mediable/master.svg?style=flat-square)](https://travis-ci.org/plank/laravel-mediable)
+[![Coveralls](https://img.shields.io/coveralls/plank/laravel-mediable.svg?style=flat-square)](https://coveralls.io/github/plank/laravel-mediable)
+[![SensioLabsInsight](https://img.shields.io/sensiolabs/i/0eaf2725-64f4-4494-ae61-ca3961ba50c5.svg?style=flat-square)](https://insight.sensiolabs.com/projects/0eaf2725-64f4-4494-ae61-ca3961ba50c5)
 [![StyleCI](https://styleci.io/repos/63791110/shield)](https://styleci.io/repos/63791110)
-[![Packagist](https://img.shields.io/packagist/v/plank/laravel-mediable.svg)](https://packagist.org/packages/plank/laravel-mediable)
+[![Packagist](https://img.shields.io/packagist/v/plank/laravel-mediable.svg?style=flat-square)](https://packagist.org/packages/plank/laravel-mediable)
 
 Laravel-Mediable is a package for easily uploading and attaching media files to models with Laravel 5.
 

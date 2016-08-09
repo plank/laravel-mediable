@@ -6,19 +6,19 @@
 Plank/Laravel-Mediable
 ============================================
 
-.. image:: https://travis-ci.org/plank/laravel-mediable.svg?branch=master
+.. image:: https://img.shields.io/travis/plank/laravel-mediable/master.svg?style=flat-square
     :target: https://travis-ci.org/plank/laravel-mediable
-    :alt: Build Status
-.. image:: https://coveralls.io/repos/github/plank/laravel-mediable/badge.svg?branch=master
+    :alt: TravisCI
+.. image:: https://img.shields.io/coveralls/plank/laravel-mediable.svg?style=flat-square
     :target: https://coveralls.io/github/plank/laravel-mediable
-    :alt: Coverage Status
-.. image:: https://insight.sensiolabs.com/projects/0eaf2725-64f4-4494-ae61-ca3961ba50c5/mini.png
+    :alt: Coveralls
+.. image:: https://img.shields.io/sensiolabs/i/0eaf2725-64f4-4494-ae61-ca3961ba50c5.svg?style=flat-square
     :target: https://insight.sensiolabs.com/projects/0eaf2725-64f4-4494-ae61-ca3961ba50c5
     :alt: SensioLabsInsight
 .. image:: https://styleci.io/repos/63791110/shield
     :target: https://styleci.io/repos/63791110
     :alt: StyleCI
-.. image:: https://img.shields.io/packagist/v/plank/laravel-mediable.svg
+.. image:: https://img.shields.io/packagist/v/plank/laravel-mediable.svg?style=flat-square
     :target: https://packagist.org/packages/plank/laravel-mediable
     :alt: Packagist
 
