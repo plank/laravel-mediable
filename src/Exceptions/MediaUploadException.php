@@ -21,13 +21,14 @@ class MediaUploadException extends Exception
 
     public static function unrecognizedSource($source)
     {
-        $source = is_object($source) ? get_class($source) : (string)$source;
+        $source = is_object($source) ? get_class($source) : (string) $source;
+
         return new static("Could not recognize source, `{$source}` provided.");
     }
 
     public static function noSourceProvided()
     {
-        return new static("No source provided for upload.");
+        return new static('No source provided for upload.');
     }
 
     public static function diskNotFound($disk)
@@ -62,19 +63,22 @@ class MediaUploadException extends Exception
 
     public static function mimeRestricted($mime, $allowed_mimes)
     {
-        $allowed = implode("`, `", $allowed_mimes);
+        $allowed = implode('`, `', $allowed_mimes);
+
         return new static("Cannot upload file with MIME type `{$mime}`. Only the `{$allowed}` MIME type(s) are permitted.");
     }
 
     public static function extensionRestricted($extension, $allowed_extensions)
     {
-        $allowed = implode("`, `", $allowed_extensions);
+        $allowed = implode('`, `', $allowed_extensions);
+
         return new static("Cannot upload file with extension `{$extension}`. Only the `{$allowed}` extension(s) are permitted.");
     }
 
     public static function aggregateTypeRestricted($type, $allowed_types)
     {
-        $allowed = implode("`, `", $allowed_types);
+        $allowed = implode('`, `', $allowed_types);
+
         return new static("Cannot upload file of aggregate type `{$type}`. Only files of type(s) `{$allowed}` are permitted.");
     }
 

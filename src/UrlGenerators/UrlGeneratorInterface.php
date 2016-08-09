@@ -5,20 +5,20 @@ namespace Plank\Mediable\UrlGenerators;
 use Plank\Mediable\Media;
 
 /**
- * Url Generator Interface
+ * Url Generator Interface.
  *
  * @author Sean Fraser <sean@plankdesign.com>
  */
 interface UrlGeneratorInterface
 {
     /**
-     * Set the media instance for which urls are being generated
+     * Set the media instance for which urls are being generated.
      * @param Media $media
      */
     public function setMedia(Media $media);
 
     /**
-     * Retrieve the absolute path to the file
+     * Retrieve the absolute path to the file.
      *
      * For local files this should return a path
      * For remote files this should return a url
@@ -27,13 +27,13 @@ interface UrlGeneratorInterface
     public function getAbsolutePath();
 
     /**
-     * Check if the file is publicly accessible
-     * @return boolean
+     * Check if the file is publicly accessible.
+     * @return bool
      */
     public function isPubliclyAccessible();
 
     /**
-     * Get a Url to the file
+     * Get a Url to the file.
      * @return string
      */
     public function getUrl();

@@ -7,14 +7,14 @@ use Illuminate\Filesystem\FilesystemManager;
 use Plank\Mediable\Media;
 
 /**
- * Prune Media Artisan Command
+ * Prune Media Artisan Command.
  *
  * @author Sean Fraser <sean@plankdesign.com>
  */
 class PruneMediaCommand extends Command
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      * @var string
      */
     protected $signature = 'media:prune {disk : the name of the filesystem disk.}
@@ -22,19 +22,19 @@ class PruneMediaCommand extends Command
         {--non-recursive : only prune record for files in the specified directory.}';
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      * @var string
      */
     protected $description = 'Delete media records that do not correspond to a file on disk';
 
     /**
-     * Filesystem Manager instance
+     * Filesystem Manager instance.
      * @var FilesystemManager
      */
     protected $filesystem;
 
     /**
-     * Constructor
+     * Constructor.
      * @param FileSystemManager $filesystem
      */
     public function __construct(FileSystemManager $filesystem)
@@ -52,13 +52,13 @@ class PruneMediaCommand extends Command
     {
         $disk = $this->argument('disk');
         $directory = $this->option('directory') ?: '';
-        $recursive = !$this->option('non-recursive');
+        $recursive = ! $this->option('non-recursive');
         $counter = 0;
 
         $records = Media::inDirectory($disk, $directory, $recursive)->get();
 
         foreach ($records as $media) {
-            if (!$media->fileExists()) {
+            if (! $media->fileExists()) {
                 $media->delete();
                 ++$counter;
                 $this->info("Pruned record for file {$media->getDiskPath()}", 'v');

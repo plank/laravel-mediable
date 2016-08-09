@@ -9,15 +9,14 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Media Model
+ * Media Model.
  *
  * @author Sean Fraser <sean@plankdesign.com>
  *
- * @var string $basename
+ * @var string
  */
 class Media extends Model
 {
-
     const TYPE_IMAGE = 'image';
     const TYPE_IMAGE_VECTOR = 'vector';
     const TYPE_PDF = 'pdf';
@@ -32,7 +31,7 @@ class Media extends Model
     protected $guarded = ['id', 'disk', 'directory', 'filename', 'extension', 'size', 'mime', 'aggregate_type'];
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public static function boot()
     {
@@ -45,7 +44,7 @@ class Media extends Model
     }
 
     /**
-     * Retrieve all associated models of given class
+     * Retrieve all associated models of given class.
      * @param  string $class FQCN
      * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
@@ -55,20 +54,20 @@ class Media extends Model
     }
 
     /**
-     * Retrieve the file extension
+     * Retrieve the file extension.
      * @return string
      */
     public function getBasenameAttribute()
     {
-        return $this->filename . '.' . $this->extension;
+        return $this->filename.'.'.$this->extension;
     }
 
     /**
-     * Query scope for to find media in a particular directory
+     * Query scope for to find media in a particular directory.
      * @param  Builder  $q
      * @param  string  $disk      Filesystem disk to search in
      * @param  string  $directory Path relative to disk
-     * @param  boolean $recursive (_optional_) If true, will find media in or under the specified directory
+     * @param  bool $recursive (_optional_) If true, will find media in or under the specified directory
      * @return void
      */
     public function scopeInDirectory(Builder $q, $disk, $directory, $recursive = false)
@@ -83,7 +82,7 @@ class Media extends Model
     }
 
     /**
-     * Query scope for finding media in a particular directory or one of its subdirectories
+     * Query scope for finding media in a particular directory or one of its subdirectories.
      * @param  Builder  $q
      * @param  string  $disk      Filesystem disk to search in
      * @param  string  $directory Path relative to disk
@@ -95,7 +94,7 @@ class Media extends Model
     }
 
     /**
-     * Query scope for finding media by basename
+     * Query scope for finding media by basename.
      * @param  Builder $q
      * @param  string  $basename filename and extension
      * @return void
@@ -107,7 +106,7 @@ class Media extends Model
     }
 
     /**
-     * Query scope finding media at a path relative to a disk
+     * Query scope finding media at a path relative to a disk.
      * @param  Builder $q
      * @param  string  $disk
      * @param  string  $path directory, filename and extension
@@ -122,8 +121,8 @@ class Media extends Model
     }
 
     /**
-     * Calculate the file size in human readable byte notation
-     * @param  integer $precision (_optional_) Number of decimal places to include.
+     * Calculate the file size in human readable byte notation.
+     * @param  int $precision (_optional_) Number of decimal places to include.
      * @return string
      */
     public function readableSize($precision = 1)
@@ -132,16 +131,16 @@ class Media extends Model
     }
 
     /**
-     * Get the path to the file relative to the root of the disk
+     * Get the path to the file relative to the root of the disk.
      * @return string
      */
     public function getDiskPath()
     {
-        return ltrim(rtrim($this->directory, '/') . '/' . ltrim($this->basename, '/'), '/');
+        return ltrim(rtrim($this->directory, '/').'/'.ltrim($this->basename, '/'), '/');
     }
 
     /**
-     * Get the absolute filesystem path to the file
+     * Get the absolute filesystem path to the file.
      * @return string
      */
     public function getAbsolutePath()
@@ -150,8 +149,8 @@ class Media extends Model
     }
 
     /**
-     * Check if the file is located below the public webroot
-     * @return boolean
+     * Check if the file is located below the public webroot.
+     * @return bool
      */
     public function isPubliclyAccessible()
     {
@@ -159,7 +158,7 @@ class Media extends Model
     }
 
     /**
-     * Get the absolute URL to the media file
+     * Get the absolute URL to the media file.
      * @throws MediaUrlException If media's disk is not publicly accessible
      * @return string
      */
@@ -169,8 +168,8 @@ class Media extends Model
     }
 
     /**
-     * Check if the file exists on disk
-     * @return boolean
+     * Check if the file exists on disk.
+     * @return bool
      */
     public function fileExists()
     {
@@ -178,7 +177,7 @@ class Media extends Model
     }
 
     /**
-     * Retrieve the contents of the file
+     * Retrieve the contents of the file.
      * @return string
      */
     public function contents()
@@ -187,7 +186,7 @@ class Media extends Model
     }
 
     /**
-     * Move the file to a new location on disk
+     * Move the file to a new location on disk.
      *
      * Will invoke the `save()` method on the model after the associated file has been moved to prevent synchronization errors
      * @param  string $destination directory relative to disk root
@@ -201,7 +200,7 @@ class Media extends Model
     }
 
     /**
-     * Rename the file in place
+     * Rename the file in place.
      * @param  string $name
      * @return void
      * @see Media::move()
@@ -212,7 +211,7 @@ class Media extends Model
     }
 
     /**
-     * Get the filesystem object for this media
+     * Get the filesystem object for this media.
      * @return \Illuminate\Contracts\Filesystem\Filesystem
      */
     protected function storage()

@@ -6,27 +6,26 @@ use Plank\Mediable\Media;
 use Illuminate\Contracts\Config\Repository as Config;
 
 /**
- * Abstract Url Generator
+ * Abstract Url Generator.
  *
  * @author Sean Fraser <sean@plankdesign.com>
  */
 abstract class BaseUrlGenerator implements UrlGeneratorInterface
 {
-
     /**
-     * Configuration Repository
+     * Configuration Repository.
      * @var Config
      */
     protected $config;
 
     /**
-     * Media instance being linked
+     * Media instance being linked.
      * @var Media
      */
     protected $media;
 
     /**
-     * Constructor
+     * Constructor.
      * @param Config $config
      */
     public function __construct(Config $config)
@@ -35,7 +34,7 @@ abstract class BaseUrlGenerator implements UrlGeneratorInterface
     }
 
     /**
-     * Set the media being operated on
+     * Set the media being operated on.
      * @param Media $media
      */
     public function setMedia(Media $media)
@@ -44,7 +43,7 @@ abstract class BaseUrlGenerator implements UrlGeneratorInterface
     }
 
     /**
-     * Get a config value for the current disk
+     * Get a config value for the current disk.
      * @param  string $key
      * @param  mixed $default
      * @return mixed

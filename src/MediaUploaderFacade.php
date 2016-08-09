@@ -5,7 +5,7 @@ namespace Plank\Mediable;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * Facade for Media Uploader
+ * Facade for Media Uploader.
  * @author Sean Fraser <sean@plankdesign.com>
  */
 class MediaUploaderFacade extends Facade

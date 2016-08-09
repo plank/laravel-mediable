@@ -3,14 +3,14 @@
 namespace Plank\Mediable\Helpers;
 
 /**
- * File Helpers
+ * File Helpers.
  *
  * @author Sean Fraser <sean@plankdesign.com>
  */
 class File
 {
     /**
-     * Get the directory name of path, trimming unecessary `.` and `/` characters
+     * Get the directory name of path, trimming unecessary `.` and `/` characters.
      * @param  string $path
      * @return string
      */
@@ -20,13 +20,14 @@ class File
         if ($dirname == '.') {
             return '';
         }
+
         return trim($dirname, '/');
     }
 
     /**
-     * Generate a human readable bytecount string
-     * @param  integer  $bytes
-     * @param  integer $precision
+     * Generate a human readable bytecount string.
+     * @param  int  $bytes
+     * @param  int $precision
      * @return string
      */
     public static function readableSize($bytes, $precision = 1)
@@ -37,6 +38,7 @@ class File
         }
         $exponent = floor(log($bytes, 1024));
         $value = $bytes / pow(1024, $exponent);
-        return round($value, $precision) . ' ' . $units[$exponent];
+
+        return round($value, $precision).' '.$units[$exponent];
     }
 }

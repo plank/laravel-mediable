@@ -7,21 +7,20 @@ use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Filesystem\FilesystemManager;
 
 /**
- * S3 Url Generator
+ * S3 Url Generator.
  *
  * @author Sean Fraser <sean@plankdesign.com>
  */
 class S3UrlGenerator extends BaseUrlGenerator
 {
-
     /**
-     * Filesystem Manager
+     * Filesystem Manager.
      * @var FilesystemManager
      */
     protected $filesystem;
 
     /**
-     * Constructor
+     * Constructor.
      * @param Config            $config
      * @param FilesystemManager $filesystem
      */
@@ -32,7 +31,7 @@ class S3UrlGenerator extends BaseUrlGenerator
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getAbsolutePath()
     {
@@ -40,7 +39,7 @@ class S3UrlGenerator extends BaseUrlGenerator
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isPubliclyAccessible()
     {
@@ -50,13 +49,14 @@ class S3UrlGenerator extends BaseUrlGenerator
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getUrl()
     {
-        if (!$this->isPubliclyAccessible()) {
+        if (! $this->isPubliclyAccessible()) {
             throw MediaUrlException::cloudMediaNotPubliclyAccessible($this->media->disk);
         }
+
         return $this->filesystem->disk($this->media->disk)->url($this->media->getDiskPath());
     }
 }

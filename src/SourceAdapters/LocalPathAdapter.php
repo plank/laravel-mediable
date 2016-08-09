@@ -3,7 +3,7 @@
 namespace Plank\Mediable\SourceAdapters;
 
 /**
- * Local Path Adapter
+ * Local Path Adapter.
  *
  * Adapts a string representing an absolute path
  *
@@ -11,15 +11,14 @@ namespace Plank\Mediable\SourceAdapters;
  */
 class LocalPathAdapter implements SourceAdapterInterface
 {
-
     /**
-     * The source string
+     * The source string.
      * @var string
      */
     protected $source;
 
     /**
-     * Constructor
+     * Constructor.
      * @param string $source
      */
     public function __construct($source)
@@ -33,7 +32,7 @@ class LocalPathAdapter implements SourceAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function path()
     {
@@ -41,7 +40,7 @@ class LocalPathAdapter implements SourceAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function filename()
     {
@@ -49,7 +48,7 @@ class LocalPathAdapter implements SourceAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function extension()
     {
@@ -57,7 +56,7 @@ class LocalPathAdapter implements SourceAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function mimeType()
     {
@@ -65,7 +64,7 @@ class LocalPathAdapter implements SourceAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function contents()
     {
@@ -73,7 +72,7 @@ class LocalPathAdapter implements SourceAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function valid()
     {
@@ -81,7 +80,7 @@ class LocalPathAdapter implements SourceAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function size()
     {
