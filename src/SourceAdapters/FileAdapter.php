@@ -5,7 +5,7 @@ namespace Plank\Mediable\SourceAdapters;
 use Symfony\Component\HttpFoundation\File\File;
 
 /**
- * File Adapter
+ * File Adapter.
  *
  * Adapts the File class from Symfony Components
  *
@@ -13,15 +13,14 @@ use Symfony\Component\HttpFoundation\File\File;
  */
 class FileAdapter implements SourceAdapterInterface
 {
-
     /**
-     * The source object
+     * The source object.
      * @var File
      */
     protected $source;
 
     /**
-     * Constructor
+     * Constructor.
      * @param File $source
      */
     public function __construct(File $source)
@@ -30,7 +29,7 @@ class FileAdapter implements SourceAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getSource()
     {
@@ -38,7 +37,7 @@ class FileAdapter implements SourceAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function path()
     {
@@ -46,7 +45,7 @@ class FileAdapter implements SourceAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function filename()
     {
@@ -54,7 +53,7 @@ class FileAdapter implements SourceAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function extension()
     {
@@ -62,7 +61,7 @@ class FileAdapter implements SourceAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function mimeType()
     {
@@ -70,7 +69,7 @@ class FileAdapter implements SourceAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function contents()
     {
@@ -78,7 +77,7 @@ class FileAdapter implements SourceAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function valid()
     {
@@ -86,7 +85,7 @@ class FileAdapter implements SourceAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function size()
     {

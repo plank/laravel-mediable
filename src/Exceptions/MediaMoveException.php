@@ -2,7 +2,7 @@
 
 namespace Plank\Mediable\Exceptions;
 
-use \Exception;
+use Exception;
 
 /**
  * @author Sean Fraser <sean@plankdesign.com>

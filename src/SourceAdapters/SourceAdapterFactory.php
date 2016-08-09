@@ -3,10 +3,9 @@
 namespace Plank\Mediable\SourceAdapters;
 
 use Plank\Mediable\Exceptions\MediaUploadException;
-use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
 
 /**
- * Source Adapter Factory
+ * Source Adapter Factory.
  *
  * Generates SourceAdapter instances for different sources
  *
@@ -14,22 +13,21 @@ use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
  */
 class SourceAdapterFactory
 {
-
     /**
-     * Map of which adapters to use for a given source class
+     * Map of which adapters to use for a given source class.
      * @var array
      */
     private $class_adapters = [];
 
     /**
-     * Map of which adapters to use for a given string pattern
+     * Map of which adapters to use for a given string pattern.
      * @var array
      */
     private $pattern_adapters = [];
 
     /**
-     * Create a Source Adapter for the provided source
-     * @param  Object|string $source
+     * Create a Source Adapter for the provided source.
+     * @param  object|string $source
      * @return SourceAdapterInterface
      * @throws MediaUploadException If the provided source does not match any of the mapped classes or patterns
      */
@@ -51,7 +49,7 @@ class SourceAdapterFactory
     }
 
     /**
-     * Specify the FQCN of a SourceAdapter class to use when the source inherits from a given class
+     * Specify the FQCN of a SourceAdapter class to use when the source inherits from a given class.
      * @param string $adapter_class
      * @param string $source_class
      * @return void
@@ -64,7 +62,7 @@ class SourceAdapterFactory
     }
 
     /**
-     * Specify the FQCN of a SourceAdapter class to use when the source is a string matching the given pattern
+     * Specify the FQCN of a SourceAdapter class to use when the source is a string matching the given pattern.
      * @param string $adapter_class
      * @param string $source_class
      * @return void
@@ -77,7 +75,7 @@ class SourceAdapterFactory
     }
 
     /**
-     * Choose an adapter class for the class of the provided object
+     * Choose an adapter class for the class of the provided object.
      * @param  object $source
      * @return SourceAdapterInterface|null
      */
@@ -90,11 +88,10 @@ class SourceAdapterFactory
                 return $adapter;
             }
         }
-        return null;
     }
 
     /**
-     * Choose an adapter class for the provided string
+     * Choose an adapter class for the provided string.
      * @param  string $source
      * @return SourceAdapterInterface|null
      */
@@ -106,18 +103,17 @@ class SourceAdapterFactory
                 return $adapter;
             }
         }
-        return null;
     }
 
     /**
-     * Verify that the provided class implements the SourceAdapter interface
+     * Verify that the provided class implements the SourceAdapter interface.
      * @param  string $class
      * @throws MediaUploadException If class is not valid
      * @return void
      */
     private function validateAdapterClass($class)
     {
-        if (!class_implements($class, SourceAdapterInterface::class)) {
+        if (! class_implements($class, SourceAdapterInterface::class)) {
             throw MediaUploadException::cannotSetAdapter($class);
         }
     }

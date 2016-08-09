@@ -6,20 +6,20 @@ use Plank\Mediable\Exceptions\MediaUrlException;
 use Plank\Mediable\Media;
 
 /**
- * Url Generator Factory
+ * Url Generator Factory.
  *
  * @author Sean Fraser <sean@plankdesign.com>
  */
 class UrlGeneratorFactory
 {
     /**
-     * map of UrlGenerator classes to use for different filesystem drivers
+     * map of UrlGenerator classes to use for different filesystem drivers.
      * @var array
      */
     protected $driver_generators = [];
 
     /**
-     * Get a UrlGenerator instance for a media
+     * Get a UrlGenerator instance for a media.
      * @param  Media  $media
      * @return UrlGenerator
      * @throws MediaUrlException If no generator class has been assigned for the media's disk's driver
@@ -32,6 +32,7 @@ class UrlGeneratorFactory
 
             $generator = app($class);
             $generator->setMedia($media);
+
             return $generator;
         }
 
@@ -39,7 +40,7 @@ class UrlGeneratorFactory
     }
 
     /**
-     * Set a generator subclass to use for media on a disk with a particular driver
+     * Set a generator subclass to use for media on a disk with a particular driver.
      * @param string $generator
      * @param string $driver
      * @return void
@@ -51,20 +52,20 @@ class UrlGeneratorFactory
     }
 
     /**
-     * Verify that a class name is a valid generator
+     * Verify that a class name is a valid generator.
      * @param  string $class
      * @return void
      * @throws MediaUrlException If class does not exist or does not implement `UrlGenerator`
      */
     protected function validateGeneratorClass($class)
     {
-        if (!class_exists($class) || !is_subclass_of($class, UrlGeneratorInterface::class)) {
+        if (! class_exists($class) || ! is_subclass_of($class, UrlGeneratorInterface::class)) {
             throw MediaUrlException::invalidGenerator($class);
         }
     }
 
     /**
-     * Get the driver used by a specified disk
+     * Get the driver used by a specified disk.
      * @param  string $disk
      * @return string
      */

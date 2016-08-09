@@ -10,14 +10,14 @@ use Plank\Mediable\MediaUploader;
 use Plank\Mediable\Exceptions\MediaUploadException;
 
 /**
- * Import Media Artisan Command
+ * Import Media Artisan Command.
  *
  * @author Sean Fraser <sean@plankdesign.com>
  */
 class ImportMediaCommand extends Command
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      * @var string
      */
     protected $signature = 'media:import {disk : the name of the filesystem disk.}
@@ -26,36 +26,36 @@ class ImportMediaCommand extends Command
         {--f|force : re-process existing media.}';
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      * @var string
      */
     protected $description = 'Create a media entity for each file on a disk';
 
     /**
-     * Filesystem Manager instance
+     * Filesystem Manager instance.
      * @var FilesystemManager
      */
     protected $filesystem;
 
     /**
-     * Uploader instance
+     * Uploader instance.
      * @var MediaUploader
      */
     protected $uploader;
 
     /**
-     * Various counters of files being modified
+     * Various counters of files being modified.
      * @var array
      */
     protected $counters = [
         'created' => 0,
         'updated' => 0,
         'skipped' => 0,
-        'unmodified' => 0
+        'unmodified' => 0,
     ];
 
     /**
-     * Constructor
+     * Constructor.
      * @param FileSystemManager $filesystem
      * @param MediaUploader     $uploader
      */
@@ -77,8 +77,8 @@ class ImportMediaCommand extends Command
 
         $disk = $this->argument('disk');
         $directory = $this->option('directory') ?: '';
-        $recursive = !$this->option('non-recursive');
-        $force = !!$this->option('force');
+        $recursive = ! $this->option('non-recursive');
+        $force = (bool) $this->option('force');
 
         $files = $this->listFiles($disk, $directory, $recursive);
         $existing_media = Media::inDirectory($disk, $directory, $recursive)->get();
@@ -97,10 +97,10 @@ class ImportMediaCommand extends Command
     }
 
     /**
-     * Generate a list of all files in the specified directory
+     * Generate a list of all files in the specified directory.
      * @param  atring  $disk
      * @param  string  $directory
-     * @param  boolean $recursive
+     * @param  bool $recursive
      * @return array
      */
     protected function listFiles($disk, $directory = '', $recursive = true)
@@ -113,7 +113,7 @@ class ImportMediaCommand extends Command
     }
 
     /**
-     * Search through the record list for one matching the provided path
+     * Search through the record list for one matching the provided path.
      * @param  string $path
      * @param  \Illuminate\Database\Eloquent\Collection $existing_media
      * @return Media|null
@@ -123,13 +123,14 @@ class ImportMediaCommand extends Command
         $directory = File::cleanDirname($path);
         $filename = pathinfo($path, PATHINFO_FILENAME);
         $extension = pathinfo($path, PATHINFO_EXTENSION);
+
         return $existing_media->filter(function (Media $media) use ($directory, $filename, $extension) {
             return $media->directory == $directory && $media->filename == $filename && $media->extension == $extension;
         })->first();
     }
 
     /**
-     * Generate a new media record
+     * Generate a new media record.
      * @param  string $disk
      * @param  string $path
      * @return void
@@ -153,7 +154,7 @@ class ImportMediaCommand extends Command
     }
 
     /**
-     * Update an existing media record
+     * Update an existing media record.
      * @param  Media $media
      * @param  string $path
      * @return void
@@ -175,7 +176,7 @@ class ImportMediaCommand extends Command
     }
 
     /**
-     * Attempt to find a legal aggregate type for a Media record
+     * Attempt to find a legal aggregate type for a Media record.
      * @param  Media $media
      * @param  string $path
      * @return string|null
@@ -189,30 +190,29 @@ class ImportMediaCommand extends Command
             $this->warn($e->getMessage(), 'vvv');
             $this->info("Skipped unrecognized file at {$path}", 'v');
         }
-        return null;
     }
 
     /**
-     * Send the counter total to the console
-     * @param  boolean $force
+     * Send the counter total to the console.
+     * @param  bool $force
      * @return void
      */
     protected function outputCounters($force)
     {
-        $this->info(sprintf("Imported %d file(s).", $this->counters['created']));
+        $this->info(sprintf('Imported %d file(s).', $this->counters['created']));
         if ($this->counters['skipped'] > 0) {
-            $this->info(sprintf("Skipped %d unrecognized file(s).", $this->counters['skipped']));
+            $this->info(sprintf('Skipped %d unrecognized file(s).', $this->counters['skipped']));
         }
         if ($this->counters['updated'] > 0) {
-            $this->info(sprintf("Updated %d existing record(s).", $this->counters['updated']));
+            $this->info(sprintf('Updated %d existing record(s).', $this->counters['updated']));
         }
         if ($this->counters['unmodified'] > 0) {
-            $this->info(sprintf("Skipped %d unmodified record(s).", $this->counters['unmodified']));
+            $this->info(sprintf('Skipped %d unmodified record(s).', $this->counters['unmodified']));
         }
     }
 
     /**
-     * Reset the counters of processed files
+     * Reset the counters of processed files.
      * @return void
      */
     protected function resetCounters()
@@ -221,7 +221,7 @@ class ImportMediaCommand extends Command
             'created' => 0,
             'updated' => 0,
             'skipped' => 0,
-            'unmodified' => 0
+            'unmodified' => 0,
         ];
     }
 }

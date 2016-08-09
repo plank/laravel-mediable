@@ -5,14 +5,14 @@ namespace Plank\Mediable\Commands;
 use Illuminate\Console\Command;
 
 /**
- * Synchronize Media Artisan Command
+ * Synchronize Media Artisan Command.
  *
  * @author Sean Fraser <sean@plankdesign.com>
  */
 class SyncMediaCommand extends Command
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      * @var string
      */
     protected $signature = 'media:sync {disk : the name of the filesystem disk.}
@@ -21,7 +21,7 @@ class SyncMediaCommand extends Command
         {--f|force : re-process existing media.}';
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      * @var string
      */
     protected $description = 'Synchronize media records with the filesystem.';
@@ -35,20 +35,20 @@ class SyncMediaCommand extends Command
     {
         $disk = $this->argument('disk');
         $directory = $this->option('directory') ?: '';
-        $non_recursive = !!$this->option('non-recursive');
-        $force = !!$this->option('force');
+        $non_recursive = (bool) $this->option('non-recursive');
+        $force = (bool) $this->option('force');
 
         $this->call('media:prune', [
             'disk' => $disk,
             '--directory' => $directory,
-            '--non-recursive' => $non_recursive
+            '--non-recursive' => $non_recursive,
         ]);
 
         $this->call('media:import', [
             'disk' => $disk,
             '--directory' => $directory,
             '--non-recursive' => $non_recursive,
-            '--force' => $force
+            '--force' => $force,
         ]);
     }
 }

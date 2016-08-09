@@ -8,7 +8,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Container\Container;
 
 /**
- * Mediable Service Provider
+ * Mediable Service Provider.
  *
  * Registers Laravel-Mediable package functionality
  *
@@ -28,7 +28,7 @@ class MediableServiceProvider extends ServiceProvider
         ], 'config');
 
         $this->publishes([
-            __DIR__.'/../migrations/2016_06_27_000000_create_mediable_tables.php' => database_path('migrations/2016_06_27_000000_create_mediable_tables.php')
+            __DIR__.'/../migrations/2016_06_27_000000_create_mediable_tables.php' => database_path('migrations/2016_06_27_000000_create_mediable_tables.php'),
         ], 'migrations');
     }
 
@@ -51,7 +51,7 @@ class MediableServiceProvider extends ServiceProvider
     }
 
     /**
-     * Bind an instance of the Source Adapter Factory to the container
+     * Bind an instance of the Source Adapter Factory to the container.
      *
      * Attaches the default adapter types
      * @return void
@@ -76,7 +76,7 @@ class MediableServiceProvider extends ServiceProvider
     }
 
     /**
-     * Bind the Media Uploader to the container
+     * Bind the Media Uploader to the container.
      * @return void
      */
     public function registerUploader()
@@ -88,7 +88,7 @@ class MediableServiceProvider extends ServiceProvider
     }
 
     /**
-     * Bind the Media Uploader to the container
+     * Bind the Media Uploader to the container.
      * @return void
      */
     public function registerMover()
@@ -100,7 +100,7 @@ class MediableServiceProvider extends ServiceProvider
     }
 
     /**
-     * Bind the Media Uploader to the container
+     * Bind the Media Uploader to the container.
      * @return void
      */
     public function registerUrlGeneratorFactory()
@@ -112,13 +112,14 @@ class MediableServiceProvider extends ServiceProvider
             foreach ($config as $driver => $generator) {
                 $factory->setGeneratorForFilesystemDriver($generator, $driver);
             }
+
             return $factory;
         });
         $this->app->alias('mediable.url.factory', UrlGeneratorFactory::class);
     }
 
     /**
-     * Add package commands to artisan console
+     * Add package commands to artisan console.
      * @return void
      */
     public function registerConsoleCommands()

@@ -3,7 +3,7 @@
 namespace Plank\Mediable\SourceAdapters;
 
 /**
- * URL Adapter
+ * URL Adapter.
  *
  * Adapts a string representing a URL
  *
@@ -11,21 +11,20 @@ namespace Plank\Mediable\SourceAdapters;
  */
 class RemoteUrlAdapter implements SourceAdapterInterface
 {
-
     /**
-     * Cache of headers loaded from the remote server
+     * Cache of headers loaded from the remote server.
      * @var array
      */
     private $headers;
 
     /**
-     * The source string
+     * The source string.
      * @var string
      */
     protected $source;
 
     /**
-     * Constructor
+     * Constructor.
      * @param string $source
      */
     public function __construct($source)
@@ -39,7 +38,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function path()
     {
@@ -47,7 +46,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function filename()
     {
@@ -55,7 +54,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function extension()
     {
@@ -63,7 +62,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function mimeType()
     {
@@ -71,7 +70,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function contents()
     {
@@ -79,7 +78,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function valid()
     {
@@ -87,7 +86,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function size()
     {
@@ -95,13 +94,13 @@ class RemoteUrlAdapter implements SourceAdapterInterface
     }
 
     /**
-     * Read the headers of the remote content
+     * Read the headers of the remote content.
      * @param  string $key Header name
      * @return mixed
      */
     private function getHeader($key)
     {
-        if (!$this->headers) {
+        if (! $this->headers) {
             $this->headers = get_headers($this->source, 1);
         }
         if (array_key_exists($key, $this->headers)) {
@@ -112,6 +111,5 @@ class RemoteUrlAdapter implements SourceAdapterInterface
                 return $this->headers[$key];
             }
         }
-        return null;
     }
 }

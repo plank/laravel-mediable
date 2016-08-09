@@ -5,7 +5,7 @@ namespace Plank\Mediable\SourceAdapters;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
- * Uploaded File Adapter
+ * Uploaded File Adapter.
  *
  * Adapts the UploadedFile class from Symfony Components.
  *
@@ -13,15 +13,14 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  */
 class UploadedFileAdapter implements SourceAdapterInterface
 {
-
     /**
-     * The source object
+     * The source object.
      * @var UploadedFile
      */
     protected $source;
 
     /**
-     * Constructor
+     * Constructor.
      * @param UploadedFile $source
      */
     public function __construct(UploadedFile $source)
@@ -35,7 +34,7 @@ class UploadedFileAdapter implements SourceAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function path()
     {
@@ -43,7 +42,7 @@ class UploadedFileAdapter implements SourceAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function filename()
     {
@@ -51,7 +50,7 @@ class UploadedFileAdapter implements SourceAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function extension()
     {
@@ -59,7 +58,7 @@ class UploadedFileAdapter implements SourceAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function mimeType()
     {
@@ -67,7 +66,7 @@ class UploadedFileAdapter implements SourceAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function contents()
     {
@@ -75,7 +74,7 @@ class UploadedFileAdapter implements SourceAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function valid()
     {
@@ -83,7 +82,7 @@ class UploadedFileAdapter implements SourceAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function size()
     {
