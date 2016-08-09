@@ -6,6 +6,11 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Closure;
 
+/**
+ * Collection of Mediable Models.
+ *
+ * @author Sean Fraser <sean@plankdesign.com>
+ */
 class MediableCollection extends Collection
 {
     /**
