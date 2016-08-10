@@ -99,7 +99,9 @@ ul.search {
 
 ul.search li {
     padding: 5px 0 5px 20px;
-    background: url(file.png) no-repeat 0 7px;
+    background-image: url(file.png);
+    background-repeat: no-repeat;
+    background-position: 0 7px;
 }
 
 ul.search li a {
@@ -304,7 +306,7 @@ div.admonition dl {
 }
 
 p.admonition-title {
-    margin: 0 10px 5px 0;
+    margin: 0px 10px 5px 0px;
     font-weight: bold;
 }
 
@@ -403,7 +405,7 @@ dl {
 }
 
 dd p {
-    margin-top: 0;
+    margin-top: 0px;
 }
 
 dd ul, dd table {
@@ -493,7 +495,7 @@ pre {
 }
 
 td.linenos pre {
-    padding: 5px 0;
+    padding: 5px 0px;
     border: 0;
     background-color: transparent;
     color: #aaa;

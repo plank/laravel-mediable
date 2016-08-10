@@ -89,6 +89,7 @@
 <p class="caption"><span class="caption-text">Guides</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Uploading Files</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#specifying-destination">Specifying Destination</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#validation">Validation</a></li>
 </ul>
 </li>
@@ -143,39 +144,71 @@
   <div class="section" id="uploading-files">
 <h1>Uploading Files<a class="headerlink" href="#uploading-files" title="Permalink to this headline">¶</a></h1>
 <p>The easiest way to upload media to your server is with the <code class="docutils literal"><span class="pre">MediaUploader</span></code> class, which handles validating the file, moving it to its destination and creating a <code class="docutils literal"><span class="pre">Media</span></code> record to reference it. You can get an instance of the MediaUploader using the Facade and configure it with a fluent interface.</p>
+<p>To upload a file to the root of the default disk (set in <code class="docutils literal"><span class="pre">config/mediable.php</span></code>), all you need to do is the following:</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
-<span class="c1">//provide the source file</span>
-<span class="nv">$media</span> <span class="o">=</span> <span class="nx">MediaUploader</span><span class="o">::</span><span class="na">fromSource</span><span class="p">(</span><span class="nv">$request</span><span class="o">-&gt;</span><span class="na">file</span><span class="p">(</span><span class="s1">&#39;thumbnail&#39;</span><span class="p">))</span>
-    <span class="c1">//specify which disk to upload the file to, and where on the disk to put it</span>
-    <span class="o">-&gt;</span><span class="na">toDestination</span><span class="p">(</span><span class="s1">&#39;uploads&#39;</span><span class="p">,</span> <span class="s1">&#39;blog/thumbnails&#39;</span><span class="p">)</span>
-    <span class="c1">// override the source&#39;s filename (optional)</span>
-    <span class="o">-&gt;</span><span class="na">setFilename</span><span class="p">(</span><span class="s1">&#39;my-thumbnail&#39;</span><span class="p">)</span>
-    <span class="c1">//perform the file upload</span>
-    <span class="o">-&gt;</span><span class="na">upload</span><span class="p">();</span>
+<span class="nv">$media</span> <span class="o">=</span> <span class="nx">MediaUploader</span><span class="o">::</span><span class="na">fromSource</span><span class="p">(</span><span class="nv">$request</span><span class="o">-&gt;</span><span class="na">file</span><span class="p">(</span><span class="s1">&#39;thumbnail&#39;</span><span class="p">))</span><span class="o">-&gt;</span><span class="na">upload</span><span class="p">();</span>
 </pre></div>
 </div>
 <p>The <code class="docutils literal"><span class="pre">fromSource()</span></code> method will accept either</p>
 <ul class="simple">
-<li>an instance of <code class="docutils literal"><span class="pre">Symfony\Component\HttpFoundation\File</span></code></li>
-<li>an instance of <code class="docutils literal"><span class="pre">Symfony\Component\HttpFoundation\UploadedFile</span></code></li>
-<li>a URL as a string.</li>
-<li>an absolute path as a string.</li>
+<li>an instance of <code class="docutils literal"><span class="pre">Symfony\Component\HttpFoundation\File</span></code>.</li>
+<li>an instance of <code class="docutils literal"><span class="pre">Symfony\Component\HttpFoundation\UploadedFile</span></code>.</li>
+<li>a URL as a string, beginning with <code class="docutils literal"><span class="pre">http://</span></code> or <code class="docutils literal"><span class="pre">https://</span></code>.</li>
+<li>an absolute path as a string, beginning with <code class="docutils literal"><span class="pre">/</span></code>.</li>
 </ul>
+<div class="section" id="specifying-destination">
+<h2>Specifying Destination<a class="headerlink" href="#specifying-destination" title="Permalink to this headline">¶</a></h2>
+<p>You can customize where the uploader will put the file on your server before you invoke the <code class="docutils literal"><span class="pre">upload()</span></code> method.</p>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="nv">$uploader</span> <span class="o">=</span> <span class="nx">MediaUploader</span><span class="o">::</span><span class="na">fromSource</span><span class="p">(</span><span class="nv">$request</span><span class="o">-&gt;</span><span class="na">file</span><span class="p">(</span><span class="s1">&#39;thumbnail&#39;</span><span class="p">))</span>
+
+<span class="c1">// specify a disk to use instead of the default</span>
+<span class="o">-&gt;</span><span class="na">setDisk</span><span class="p">(</span><span class="s1">&#39;s3&#39;</span><span class="p">);</span>
+
+<span class="c1">// place the file in a directory relative to the disk root</span>
+<span class="o">-&gt;</span><span class="na">setDirectory</span><span class="p">(</span><span class="s1">&#39;user/john/profile&#39;</span><span class="p">)</span>
+
+<span class="c1">// alternatively, specify both the disk and directory at once</span>
+<span class="o">-&gt;</span><span class="na">toDestination</span><span class="p">(</span><span class="s1">&#39;s3&#39;</span><span class="p">,</span> <span class="s1">&#39;user/john/profile&#39;</span><span class="p">)</span>
+
+<span class="c1">// Overide the filename of the source file</span>
+<span class="o">-&gt;</span><span class="na">setFilename</span><span class="p">(</span><span class="s1">&#39;profile.jpg&#39;</span><span class="p">)</span>
+
+<span class="o">-&gt;</span><span class="na">upload</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="validation">
 <h2>Validation<a class="headerlink" href="#validation" title="Permalink to this headline">¶</a></h2>
 <p>The <code class="docutils literal"><span class="pre">MediaUpload</span></code> will perform a number of validation checks on the source file. If any of the checks fail, a <code class="docutils literal"><span class="pre">Plank\Mediable\MediaUploaderException</span></code> will be through with a message indicating why the file was rejected.</p>
 <p>You can override the most validation configuration values set in <code class="docutils literal"><span class="pre">config/mediable.php</span></code> on a case-by-case basis using the same fluent interface.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="nv">$media</span> <span class="o">=</span> <span class="nx">MediaUploader</span><span class="o">::</span><span class="na">fromSource</span><span class="p">(</span><span class="nv">$request</span><span class="o">-&gt;</span><span class="na">file</span><span class="p">(</span><span class="s1">&#39;image&#39;</span><span class="p">))</span>
-    <span class="o">-&gt;</span><span class="na">toDestination</span><span class="p">(</span><span class="s1">&#39;uploads&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+
+    <span class="c1">// model class to use</span>
     <span class="o">-&gt;</span><span class="na">setModelClass</span><span class="p">(</span><span class="nx">MediaSubclass</span><span class="o">::</span><span class="na">class</span><span class="p">)</span>
+
+    <span class="c1">// maximum filesize in bytes</span>
     <span class="o">-&gt;</span><span class="na">setMaximumSize</span><span class="p">(</span><span class="mi">99999</span><span class="p">)</span>
+
+    <span class="c1">// how to handle a file that already exists at the destination</span>
     <span class="o">-&gt;</span><span class="na">setOnDuplicateBehavior</span><span class="p">(</span><span class="nx">Media</span><span class="o">::</span><span class="na">ON_DUPLICATE_REPLACE</span><span class="p">)</span>
+
+    <span class="c1">// whether the aggregate type must match both the MIME type and extension</span>
     <span class="o">-&gt;</span><span class="na">setStrictTypeChecking</span><span class="p">(</span><span class="k">true</span><span class="p">)</span>
+
+    <span class="c1">// whether to allow the &#39;other&#39; aggregate type</span>
     <span class="o">-&gt;</span><span class="na">setAllowUnrecognizedTypes</span><span class="p">(</span><span class="k">true</span><span class="p">)</span>
+
+    <span class="c1">// only allow files of specific MIME types</span>
     <span class="o">-&gt;</span><span class="na">setAllowedMimeTypes</span><span class="p">([</span><span class="s1">&#39;image/jpeg&#39;</span><span class="p">])</span>
+
+    <span class="c1">// only allow files of specifc extensions</span>
     <span class="o">-&gt;</span><span class="na">setAllowedExtensions</span><span class="p">([</span><span class="s1">&#39;jpg&#39;</span><span class="p">,</span> <span class="s1">&#39;jpeg&#39;</span><span class="p">])</span>
+
+    <span class="c1">// only allow files of specific aggregate types</span>
     <span class="o">-&gt;</span><span class="na">setAllowedAggregateTypes</span><span class="p">([</span><span class="s1">&#39;image&#39;</span><span class="p">])</span>
+
     <span class="o">-&gt;</span><span class="na">upload</span><span class="p">();</span>
 </pre></div>
 </div>
