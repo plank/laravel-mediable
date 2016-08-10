@@ -204,4 +204,9 @@ return [
      * If true, will automatically reload media the next time `getMedia()`, `getMediaMatchAll()` or `getAllMediaByTag()` are called.
      */
     'rehydrate_media' => true,
+
+    /**
+     * Detach associated media when mediable model is soft deleted.
+     */
+    'detach_on_soft_delete' => false,
 ];
