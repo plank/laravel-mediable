@@ -118,6 +118,9 @@ class MediaTest extends TestCase
 
     public function test_it_can_generate_a_url_to_the_file_on_s3()
     {
+        if(!$this->s3ConfigLoaded()){
+            $this->markTestSkipped('S3 Credentials not available.');
+        }
         $media = factory(Media::class)->make(['disk' => 's3', 'directory' => 'foo/bar', 'filename' => 'baz', 'extension' => 'jpg']);
         $this->assertEquals('https://s3.amazonaws.com/' . env('S3_BUCKET') . '/foo/bar/baz.jpg', $media->getUrl());
     }

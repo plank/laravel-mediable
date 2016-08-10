@@ -8,6 +8,14 @@ use Illuminate\Routing\UrlGenerator as Url;
 
 class S3UrlGeneratorTest extends TestCase
 {
+    public function setUp()
+    {
+        parent::setup();
+        if (!$this->s3ConfigLoaded()) {
+            $this->markTestSkipped('S3 Credentials not available.');
+        }
+    }
+
     public function test_it_generates_absolute_path()
     {
         $generator = $this->setupGenerator();

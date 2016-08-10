@@ -93,6 +93,11 @@ class TestCase extends BaseTestCase
         app('filesystem')->disk($media->disk)->put($media->getDiskPath(), $contents);
     }
 
+    protected function s3ConfigLoaded()
+    {
+        return env('S3_KEY') && env('S3_SECRET') && env('S3_REGION') && env('S3_BUCKET');
+    }
+
     private function resetDatabase()
     {
         $artisan = $this->app->make('Illuminate\Contracts\Console\Kernel');
