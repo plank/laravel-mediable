@@ -18,7 +18,7 @@ Delete any media records representing a file that no longer exists on the disk.
 
     $ php artisan media:purge [disk]
 
-To perform both commands together, you can use
+To perform both commands together, you can use:
 
 ::
 

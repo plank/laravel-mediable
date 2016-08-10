@@ -131,7 +131,7 @@ You can remove a media record from a model with the ``detachMedia()`` method.
     $post->detachMedia($media, ['feature', 'thumbnail']); //remove media from multiple tags
 
 
-You can also remove all media assigned to one or more tags
+You can also remove all media assigned to one or more tags.
 
 ::
 

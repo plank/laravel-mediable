@@ -11,7 +11,7 @@ Laravel-Mediable provides functionality for handling multiple kinds of files und
     Media::where('aggregate_type', Media::TYPE_IMAGE)->get();
 
 
-You can use this functionality to restrict the uploader to only accept certain types of files
+You can use this functionality to restrict the uploader to only accept certain types of files.
 
 ::
 
@@ -21,4 +21,4 @@ You can use this functionality to restrict the uploader to only accept certain t
         ->setAllowedAggregateTypes([Media::TYPE_IMAGE, Media::TYPE_IMAGE_VECTOR])
         ->upload()
 
-To customize the aggregate type definitions for your project, see :ref:`Configuring Aggregate Types <aggregate_types>`
+To customize the aggregate type definitions for your project, see :ref:`Configuring Aggregate Types <aggregate_types>`.

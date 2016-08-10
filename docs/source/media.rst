@@ -6,7 +6,7 @@ Using Media
 Media Paths & URLs
 ---------------------
 
-``Media`` records keep track of the location of their file and are able to generate a number of paths and URLs relative to the file. Consider the following example, given a ``Media`` instance with the following attributes,
+``Media`` records keep track of the location of their file and are able to generate a number of paths and URLs relative to the file. Consider the following example, given a ``Media`` instance with the following attributes:
 
 
 ::
@@ -19,7 +19,7 @@ Media Paths & URLs
 		// ...
 	];
 
-the following attributes and methods would be exposed
+The following attributes and methods would be exposed:
 
 ::
 

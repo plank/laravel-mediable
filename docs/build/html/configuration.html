@@ -232,7 +232,7 @@
 <div class="section" id="aggregate-types">
 <span id="id3"></span><h2>Aggregate Types<a class="headerlink" href="#aggregate-types" title="Permalink to this headline">¶</a></h2>
 <p>Laravel-Mediable provides functionality for handling multiple kinds of files under a shared aggregate type. This is intended to make it easy to find similar media without needing to constantly juggle multiple MIME types or file extensions.</p>
-<p>The package defines a number of common file types in the config file (config/mediable.php). Feel free to modify the default types provided by the package or add your own. Each aggregate type requires a key used to identify the type and a list of MIME types and file extensions that should be recognized as belonging to that aggregate type. For example, if you wanted to</p>
+<p>The package defines a number of common file types in the config file (config/mediable.php). Feel free to modify the default types provided by the package or add your own. Each aggregate type requires a key used to identify the type and a list of MIME types and file extensions that should be recognized as belonging to that aggregate type. For example, if you wanted to add an aggregate type for different types of markup, you could do the following.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="x">//...</span>
 <span class="x">&#39;aggregate_types&#39; =&gt; [</span>
 <span class="x">    //...</span>
