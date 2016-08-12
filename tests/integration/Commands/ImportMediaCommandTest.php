@@ -63,7 +63,7 @@ class ImportMediaCommandTest extends TestCase
         $uploader->setAllowUnrecognizedTypes(false);
         $command = new ImportMediaCommand($filesystem, $uploader);
 
-        $media1 = factory(Media::class)->make(['disk' => 'tmp']);
+        $media1 = factory(Media::class)->make(['disk' => 'tmp', 'extension' => 'foo', 'mime_type' => 'bar']);
         $this->seedFileForMedia($media1);
 
         $artisan->registerCommand($command);
