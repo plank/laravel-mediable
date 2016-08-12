@@ -9,6 +9,7 @@ To upload a file to the root of the default disk (set in ``config/mediable.php``
 ::
 
     <?php
+    use MediaUploader; //use the facade
     $media = MediaUploader::fromSource($request->file('thumbnail'))->upload();
 
 

@@ -146,6 +146,7 @@
 <p>The easiest way to upload media to your server is with the <code class="docutils literal"><span class="pre">MediaUploader</span></code> class, which handles validating the file, moving it to its destination and creating a <code class="docutils literal"><span class="pre">Media</span></code> record to reference it. You can get an instance of the MediaUploader using the Facade and configure it with a fluent interface.</p>
 <p>To upload a file to the root of the default disk (set in <code class="docutils literal"><span class="pre">config/mediable.php</span></code>), all you need to do is the following:</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="k">use</span> <span class="nx">MediaUploader</span><span class="p">;</span> <span class="c1">//use the facade</span>
 <span class="nv">$media</span> <span class="o">=</span> <span class="nx">MediaUploader</span><span class="o">::</span><span class="na">fromSource</span><span class="p">(</span><span class="nv">$request</span><span class="o">-&gt;</span><span class="na">file</span><span class="p">(</span><span class="s1">&#39;thumbnail&#39;</span><span class="p">))</span><span class="o">-&gt;</span><span class="na">upload</span><span class="p">();</span>
 </pre></div>
 </div>
