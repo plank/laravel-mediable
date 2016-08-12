@@ -28,7 +28,7 @@ trait Mediable
      */
     public function media()
     {
-        return $this->morphToMany(Media::class, 'mediable')->withPivot('tag');
+        return $this->morphToMany(config('mediable.model'), 'mediable')->withPivot('tag');
     }
 
     /**
