@@ -7,6 +7,7 @@ use Plank\Mediable\Exceptions\MediaMoveException;
 use Plank\Mediable\Helpers\File;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 /**
  * Media Model.
@@ -39,7 +40,7 @@ class Media extends Model
 
         //remove file on deletion
         static::deleted(function (Media $media) {
-            $media->storage()->delete($media->getDiskPath());
+            $media->handleMediaDeletion();
         });
     }
 
@@ -208,6 +209,22 @@ class Media extends Model
     public function rename($filename)
     {
         $this->move($this->directory, $filename);
+    }
+
+    protected function handleMediaDeletion()
+    {
+        // optionally detach mediable relationships on soft delete
+        if (static::hasGlobalScope(SoftDeletingScope::class) && !$this->forceDeleting) {
+            if (config('mediable.detach_on_soft_delete')) {
+                $this->newBaseQueryBuilder()
+                    ->table('mediables')
+                    ->where('media_id', $this->getKey())
+                    ->delete();
+            }
+        // unlink associated file on delete
+        } else {
+            $this->storage()->delete($this->getDiskPath());
+        }
     }
 
     /**

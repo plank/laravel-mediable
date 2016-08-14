@@ -6,7 +6,7 @@ use Illuminate\Database\Migrations\Migration;
 /**
  * Create table for mock mediable model
  */
-class CreateSampleMediablesTable extends Migration
+class CreateMediableTestTables extends Migration
 {
     /**
      * Run the migrations.
@@ -18,6 +18,11 @@ class CreateSampleMediablesTable extends Migration
         Schema::create('sample_mediables', function(Blueprint $table){
             $table->increments('id');
             $table->timestamps();
+            $table->softDeletes();
+        });
+
+        Schema::table('media', function(Blueprint $table){
+            $table->softDeletes();
         });
     }
 
@@ -28,6 +33,9 @@ class CreateSampleMediablesTable extends Migration
      */
     public function down()
     {
+        Schema::table('media', function(Blueprint $table){
+            $table->dropColumn('deleted_at');
+        });
         Schema::drop('sample_mediables');
     }
 }

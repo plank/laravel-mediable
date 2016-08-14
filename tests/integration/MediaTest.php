@@ -118,7 +118,7 @@ class MediaTest extends TestCase
 
     public function test_it_can_generate_a_url_to_the_file_on_s3()
     {
-        if(!$this->s3ConfigLoaded()){
+        if (!$this->s3ConfigLoaded()) {
             $this->markTestSkipped('S3 Credentials not available.');
         }
         $media = factory(Media::class)->make(['disk' => 's3', 'directory' => 'foo/bar', 'filename' => 'baz', 'extension' => 'jpg']);
@@ -180,5 +180,47 @@ class MediaTest extends TestCase
         $this->assertFileExists($path);
         $media->delete();
         $this->assertFalse(file_exists($path));
+    }
+
+    public function test_it_cascades_relationship_on_delete()
+    {
+        $media = factory(Media::class)->create();
+        $mediable = factory(SampleMediable::class)->create();
+        $mediable->attachMedia($media, 'foo');
+
+        $media->delete();
+        $this->assertEquals(0, $mediable->getMedia('foo')->count());
+    }
+
+    public function test_it_doesnt_cascade_relationship_on_soft_delete()
+    {
+        $media = factory(MediaSoftDelete::class)->create();
+        $mediable = factory(SampleMediable::class)->create();
+        $mediable->attachMedia($media, 'foo');
+
+        $media->delete();
+        $this->assertEquals(1, $mediable->getMedia('foo')->count());
+    }
+
+    public function test_it_cascades_relationships_on_soft_delete_with_config()
+    {
+        $mediable = factory(SampleMediable::class)->create();
+        $media = factory(MediaSoftDelete::class)->create();
+        $mediable->attachMedia($media, 'foo');
+
+        config()->set('mediable.detach_on_soft_delete', true);
+
+        $media->delete();
+        $this->assertEquals(0, $mediable->getMedia('foo')->count());
+    }
+
+    public function test_it_cascades_relationship_on_force_delete()
+    {
+        $mediable = factory(SampleMediableSoftDelete::class)->create();
+        $media = factory(Media::class)->create();
+        $mediable->attachMedia($media, 'foo');
+
+        $media->forceDelete();
+        $this->assertEquals(0, $mediable->getMedia('foo')->count());
     }
 }

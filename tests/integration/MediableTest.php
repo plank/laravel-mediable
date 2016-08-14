@@ -303,4 +303,47 @@ class MediableTest extends TestCase
         $mediable = factory(SampleMediable::class)->make();
         $this->assertInstanceOf(MediableCollection::class, $mediable->newCollection([]));
     }
+
+
+    public function test_it_cascades_relationship_on_delete()
+    {
+        $mediable = factory(SampleMediable::class)->create();
+        $media = factory(Media::class)->create();
+        $mediable->attachMedia($media, 'foo');
+
+        $mediable->delete();
+        $this->assertEquals(0, $mediable->getMedia('foo')->count());
+    }
+
+    public function test_it_doesnt_cascade_relationship_on_soft_delete()
+    {
+        $mediable = factory(SampleMediableSoftDelete::class)->create();
+        $media = factory(Media::class)->create();
+        $mediable->attachMedia($media, 'foo');
+
+        $mediable->delete();
+        $this->assertEquals(1, $mediable->getMedia('foo')->count());
+    }
+
+    public function test_it_cascades_relationships_on_soft_delete_with_config()
+    {
+        $mediable = factory(SampleMediableSoftDelete::class)->create();
+        $media = factory(Media::class)->create();
+        $mediable->attachMedia($media, 'foo');
+
+        config()->set('mediable.detach_on_soft_delete', true);
+
+        $mediable->delete();
+        $this->assertEquals(0, $mediable->getMedia('foo')->count());
+    }
+
+    public function test_it_cascades_relationship_on_force_delete()
+    {
+        $mediable = factory(SampleMediableSoftDelete::class)->create();
+        $media = factory(Media::class)->create();
+        $mediable->attachMedia($media, 'foo');
+
+        $mediable->forceDelete();
+        $this->assertEquals(0, $mediable->getMedia('foo')->count());
+    }
 }

@@ -32,7 +32,7 @@ class TestCase extends BaseTestCase
 
     protected function getEnvironmentSetUp($app)
     {
-        if(file_exists(dirname(__DIR__) . '/.env')){
+        if (file_exists(dirname(__DIR__) . '/.env')) {
             $dotenv = new Dotenv\Dotenv(dirname(__DIR__));
             $dotenv->load();
         }

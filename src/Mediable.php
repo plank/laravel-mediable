@@ -5,6 +5,7 @@ namespace Plank\Mediable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 /**
  * Mediable Trait.
@@ -24,18 +25,14 @@ trait Mediable
     private $media_dirty_tags = [];
 
     /**
-     * Boot method executed by Laravel (convention).
+     * Boot the Mediable trait
+     *
      * @return void
      */
     public static function bootMediable()
     {
-        static::deleted(function(Model $model) {
-
-            // cascade soft deletes only when configured
-            if(! $model->exists || config('mediable.detach_on_soft_delete')) {
-
-                $model->media()->detach();
-            }
+        static::deleted(function (Model $model) {
+            $model->handleMediableDeletion();
         });
     }
 
@@ -413,6 +410,23 @@ trait Mediable
         $subquery = $this->newMatchAllQuery($tags)->select($q->getOtherKey());
         $q->wherePivotIn('tag', $tags)
             ->whereRaw($grammar->wrap($q->getOtherKey()).' IN ('.$subquery->toSql().')', $subquery->getBindings());
+    }
+
+    /**
+     * Determine whether media relationships should be detached when the model is deleted or soft deleted.
+     * @return void
+     */
+    protected function handleMediableDeletion()
+    {
+        // only cascade soft deletes when configured
+        if (static::hasGlobalScope(SoftDeletingScope::class) && !$this->forceDeleting) {
+            if (config('mediable.detach_on_soft_delete')) {
+                $this->media()->detach();
+            }
+        // always cascade for hard deletes
+        } else {
+            $this->media()->detach();
+        }
     }
 
     /**
