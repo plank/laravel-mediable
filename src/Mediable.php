@@ -25,7 +25,7 @@ trait Mediable
     private $media_dirty_tags = [];
 
     /**
-     * Boot the Mediable trait
+     * Boot the Mediable trait.
      *
      * @return void
      */
@@ -419,7 +419,7 @@ trait Mediable
     protected function handleMediableDeletion()
     {
         // only cascade soft deletes when configured
-        if (static::hasGlobalScope(SoftDeletingScope::class) && !$this->forceDeleting) {
+        if (static::hasGlobalScope(SoftDeletingScope::class) && ! $this->forceDeleting) {
             if (config('mediable.detach_on_soft_delete')) {
                 $this->media()->detach();
             }
