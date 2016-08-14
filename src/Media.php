@@ -217,7 +217,7 @@ class Media extends Model
         if (static::hasGlobalScope(SoftDeletingScope::class) && !$this->forceDeleting) {
             if (config('mediable.detach_on_soft_delete')) {
                 $this->newBaseQueryBuilder()
-                    ->table('mediables')
+                    ->from('mediables')
                     ->where('media_id', $this->getKey())
                     ->delete();
             }
