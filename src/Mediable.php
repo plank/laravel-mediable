@@ -3,6 +3,7 @@
 namespace Plank\Mediable;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 /**
@@ -21,6 +22,22 @@ trait Mediable
      * @var array
      */
     private $media_dirty_tags = [];
+
+    /**
+     * Boot method executed by Laravel (convention).
+     * @return void
+     */
+    public static function bootMediable()
+    {
+        static::deleted(function(Model $model) {
+
+            // cascade soft deletes only when configured
+            if(! $model->exists || config('mediable.detach_on_soft_delete')) {
+
+                $model->media()->detach();
+            }
+        });
+    }
 
     /**
      * Relationship for all attached media.
