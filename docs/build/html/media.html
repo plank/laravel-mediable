@@ -94,7 +94,10 @@
 <li class="toctree-l2"><a class="reference internal" href="#media-paths-urls">Media Paths &amp; URLs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#querying-media">Querying Media</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#moving-media">Moving Media</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#deleting-media">Deleting Media</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#deleting-media">Deleting Media</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#soft-deletes">Soft Deletes</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="types.html">Aggregate Types</a></li>
@@ -206,15 +209,20 @@
 </div>
 <div class="section" id="deleting-media">
 <h2>Deleting Media<a class="headerlink" href="#deleting-media" title="Permalink to this headline">¶</a></h2>
-<p>You can delete media with standard Eloquent model <code class="docutils literal"><span class="pre">delete()</span></code> method. This will also delete the file associated with the record.</p>
+<p>You can delete media with standard Eloquent model <code class="docutils literal"><span class="pre">delete()</span></code> method. This will also delete the file associated with the record and detach any associated <code class="docutils literal"><span class="pre">Mediable</span></code> models.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="nv">$media</span><span class="o">-&gt;</span><span class="na">delete</span><span class="p">();</span>
 </pre></div>
 </div>
-<p><strong>Note</strong>: The <code class="docutils literal"><span class="pre">delete()</span></code> method on the query builder <em>will not</em> delete the associated file.</p>
+<p><strong>Note</strong>: The <code class="docutils literal"><span class="pre">delete()</span></code> method on the query builder <em>will not</em> delete the associated file. It will still purge relationships due to the cascading foreign key.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="nx">Media</span><span class="o">::</span><span class="na">where</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">delete</span><span class="p">();</span> <span class="c1">//will not delete files</span>
 </pre></div>
+</div>
+<div class="section" id="soft-deletes">
+<h3>Soft Deletes<a class="headerlink" href="#soft-deletes" title="Permalink to this headline">¶</a></h3>
+<p>If you subclass the <code class="docutils literal"><span class="pre">Media</span></code> class and add Laravel&#8217;s <code class="docutils literal"><span class="pre">SoftDeletes</span></code> trait, the media will only delete its associated file and detach its relationship if <code class="docutils literal"><span class="pre">forceDelete()</span></code> is used.</p>
+<p>You can change the <code class="docutils literal"><span class="pre">detach_on_soft_delete</span></code> setting to <code class="docutils literal"><span class="pre">true</span></code> in <code class="docutils literal"><span class="pre">config/mediable.php</span></code> to have relationships automatically detach when either the <code class="docutils literal"><span class="pre">Media</span></code> record or <code class="docutils literal"><span class="pre">Mediable</span></code> model are soft deleted.</p>
 </div>
 </div>
 </div>

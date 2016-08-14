@@ -77,7 +77,7 @@ You can change the location of a media file on disk. You cannot move a media to 
 Deleting Media
 ---------------------
 
-You can delete media with standard Eloquent model ``delete()`` method. This will also delete the file associated with the record.
+You can delete media with standard Eloquent model ``delete()`` method. This will also delete the file associated with the record and detach any associated ``Mediable`` models.
 
 ::
 
@@ -85,9 +85,16 @@ You can delete media with standard Eloquent model ``delete()`` method. This will
 	$media->delete();
 
 
-**Note**: The ``delete()`` method on the query builder *will not* delete the associated file.
+**Note**: The ``delete()`` method on the query builder *will not* delete the associated file. It will still purge relationships due to the cascading foreign key.
 
 ::
 
 	<?php
 	Media::where(...)->delete(); //will not delete files
+
+Soft Deletes
+^^^^^^^^^^^^
+
+If you subclass the ``Media`` class and add Laravel's ``SoftDeletes`` trait, the media will only delete its associated file and detach its relationship if ``forceDelete()`` is used.
+
+You can change the ``detach_on_soft_delete`` setting to ``true`` in ``config/mediable.php`` to have relationships automatically detach when either the ``Media`` record or ``Mediable`` model are soft deleted.

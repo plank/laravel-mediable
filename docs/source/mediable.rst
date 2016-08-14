@@ -259,3 +259,28 @@ You can also set the application-wide default behaviour in ``config/mediable.php
 ::
 
     'rehydrate_media' => true,
+
+Deleting Mediables
+--------------------
+
+You can delete mediable model with standard Eloquent model ``delete()`` method. This will also detach any associated ``Mediable`` models.
+
+::
+
+    <?php
+    $post->delete();
+
+
+**Note**: The ``delete()`` method on the query builder *will not* purge media relationships.
+
+::
+
+    <?php
+    Media::where(...)->delete(); //will not detach relationships
+
+Soft Deletes
+^^^^^^^^^^^^
+
+If your ``Mediable`` class uses Laravel's ``SoftDeletes`` trait, the model will only detach its media relationships if ``forceDelete()`` is used.
+
+You can change the ``detach_on_soft_delete`` setting to ``true`` in ``config/mediable.php`` to have relationships automatically detach when either the ``Media`` record or ``Mediable`` model are soft deleted.

@@ -101,6 +101,10 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#automatic-rehydration">Automatic Rehydration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#deleting-mediables">Deleting Mediables</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#soft-deletes">Soft Deletes</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="media.html">Using Media</a></li>
@@ -351,6 +355,24 @@
 <p>You can also set the application-wide default behaviour in <code class="docutils literal"><span class="pre">config/mediable.php</span></code>.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="x">&#39;rehydrate_media&#39; =&gt; true,</span>
 </pre></div>
+</div>
+</div>
+<div class="section" id="deleting-mediables">
+<h2>Deleting Mediables<a class="headerlink" href="#deleting-mediables" title="Permalink to this headline">¶</a></h2>
+<p>You can delete mediable model with standard Eloquent model <code class="docutils literal"><span class="pre">delete()</span></code> method. This will also detach any associated <code class="docutils literal"><span class="pre">Mediable</span></code> models.</p>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="nv">$post</span><span class="o">-&gt;</span><span class="na">delete</span><span class="p">();</span>
+</pre></div>
+</div>
+<p><strong>Note</strong>: The <code class="docutils literal"><span class="pre">delete()</span></code> method on the query builder <em>will not</em> purge media relationships.</p>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="nx">Media</span><span class="o">::</span><span class="na">where</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">delete</span><span class="p">();</span> <span class="c1">//will not detach relationships</span>
+</pre></div>
+</div>
+<div class="section" id="soft-deletes">
+<h3>Soft Deletes<a class="headerlink" href="#soft-deletes" title="Permalink to this headline">¶</a></h3>
+<p>If your <code class="docutils literal"><span class="pre">Mediable</span></code> class uses Laravel&#8217;s <code class="docutils literal"><span class="pre">SoftDeletes</span></code> trait, the model will only detach its media relationships if <code class="docutils literal"><span class="pre">forceDelete()</span></code> is used.</p>
+<p>You can change the <code class="docutils literal"><span class="pre">detach_on_soft_delete</span></code> setting to <code class="docutils literal"><span class="pre">true</span></code> in <code class="docutils literal"><span class="pre">config/mediable.php</span></code> to have relationships automatically detach when either the <code class="docutils literal"><span class="pre">Media</span></code> record or <code class="docutils literal"><span class="pre">Mediable</span></code> model are soft deleted.</p>
 </div>
 </div>
 </div>
