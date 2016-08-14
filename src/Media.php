@@ -214,7 +214,7 @@ class Media extends Model
     protected function handleMediaDeletion()
     {
         // optionally detach mediable relationships on soft delete
-        if (static::hasGlobalScope(SoftDeletingScope::class) && !$this->forceDeleting) {
+        if (static::hasGlobalScope(SoftDeletingScope::class) && ! $this->forceDeleting) {
             if (config('mediable.detach_on_soft_delete')) {
                 $this->newBaseQueryBuilder()
                     ->from('mediables')
