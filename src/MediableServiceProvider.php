@@ -6,6 +6,7 @@ use Plank\Mediable\SourceAdapters\SourceAdapterFactory;
 use Plank\Mediable\UrlGenerators\UrlGeneratorFactory;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Container\Container;
+use CreateMediableTables;
 
 /**
  * Mediable Service Provider.
@@ -27,9 +28,11 @@ class MediableServiceProvider extends ServiceProvider
             __DIR__.'/../config/mediable.php' => config_path('mediable.php'),
         ], 'config');
 
-        $this->publishes([
-            __DIR__.'/../migrations/2016_06_27_000000_create_mediable_tables.php' => database_path('migrations/'.date('Y_m_d_His').'_create_mediable_tables.php'),
-        ], 'migrations');
+        if (! class_exists(CreateMediableTables::class)) {
+            $this->publishes([
+                __DIR__.'/../migrations/2016_06_27_000000_create_mediable_tables.php' => database_path('migrations/'.date('Y_m_d_His').'_create_mediable_tables.php'),
+            ], 'migrations');
+        }
     }
 
     /**
