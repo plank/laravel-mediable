@@ -109,7 +109,7 @@ class MediaUploaderTest extends TestCase
         $uploader = $this->mockUploader();
         $method = $this->getPrivateMethod($uploader, 'verifySource');
 
-        $this->setExpectedException(MediaUploadException::class);
+        $this->expectException(MediaUploadException::class);
         $method->invoke($uploader);
     }
 
@@ -192,7 +192,7 @@ class MediaUploaderTest extends TestCase
         $uploader = $this->mockDuplicateUploader();
         $uploader->setOnDuplicateBehavior(MediaUploader::ON_DUPLICATE_ERROR);
         $method = $this->getPrivateMethod($uploader, 'verifyDestination');
-        $this->setExpectedException(MediaUploadException::class);
+        $this->expectException(MediaUploadException::class);
         $method->invoke($uploader, $this->createMock(Media::class));
     }
 
@@ -246,6 +246,32 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('image/png', $media->mime_type);
         $this->assertEquals(8444, $media->size);
         $this->assertEquals('image', $media->aggregate_type);
+    }
+
+    public function test_it_imports_existing_files()
+    {
+        $media = factory(Media::class)->make([
+            'disk' => 'tmp',
+            'directory' => 'foo',
+            'filename' => 'bar',
+            'extension' => 'png',
+            'mime_type' => 'image/png'
+        ]);
+        $this->seedFileForMedia($media, fopen(__DIR__ . '/../_data/plank.png', 'r'));
+
+        $media = Facade::importPath('tmp', 'foo/bar.png');
+        $this->assertInstanceOf(Media::class, $media);
+        $this->assertEquals('tmp', $media->disk);
+        $this->assertEquals('foo/bar.png', $media->getDiskPath());
+        $this->assertEquals('image/png', $media->mime_type);
+        $this->assertEquals(8444, $media->size);
+        $this->assertEquals('image', $media->aggregate_type);
+    }
+
+    public function test_it_throws_exception_when_importing_missing_file()
+    {
+        $this->expectException(MediaUploadException::class);
+        Facade::import('tmp', 'non', 'existing', 'jpg');
     }
 
     protected function mockUploader($filesystem = null, $factory = null)
