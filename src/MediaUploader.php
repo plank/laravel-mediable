@@ -350,7 +350,7 @@ class MediaUploader
 
         $model->disk = $this->disk ?: $this->config['default_disk'];
         $model->directory = $this->directory;
-        $model->filename = $this->filename ?: $this->sanitizeFilename($this->source->filename());
+        $model->filename = $this->filename ?: $this->generateHashFilename($this->source);
 
         $this->verifyDestination($model);
 
@@ -493,6 +493,11 @@ class MediaUploader
         } while ($storage->has($path));
 
         return $filename;
+    }
+
+    private function generateHashFilename($source)
+    {
+        return md5($source->contents());
     }
 
     /**
