@@ -65,7 +65,7 @@ You can override the most validation configuration values set in ``config/mediab
         ->setMaximumSize(99999)
 
         // how to handle a file that already exists at the destination
-        ->setOnDuplicateBehavior(Media::ON_DUPLICATE_REPLACE)
+        ->setOnDuplicateBehavior(MediaUploader::ON_DUPLICATE_REPLACE)
 
         // whether the aggregate type must match both the MIME type and extension
         ->setStrictTypeChecking(true)
