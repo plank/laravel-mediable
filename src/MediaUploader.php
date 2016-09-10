@@ -179,6 +179,46 @@ class MediaUploader
     }
 
     /**
+     * Get current behavior when duplicate file is uploaded
+     *
+     * @return string
+     */
+    public function getOnDuplicateBehavior()
+    {
+        return $this->config['on_duplicate'];
+    }
+
+    /**
+     * Throw an exception when file already exists at the destination.
+     *
+     * @return static
+     */
+    public function onDuplicateError()
+    {
+        return $this->setOnDuplicateBehavior(self::ON_DUPLICATE_ERROR);
+    }
+
+    /**
+     * Append incremented counter to file name when file already exists at destination.
+     *
+     * @return static
+     */
+    public function onDuplicateIncrement()
+    {
+        return $this->setOnDuplicateBehavior(self::ON_DUPLICATE_INCREMENT);
+    }
+
+    /**
+     * Overwrite existing file when file already exists at destination.
+     *
+     * @return static
+     */
+    public function onDuplicateReplace()
+    {
+        return $this->setOnDuplicateBehavior(self::ON_DUPLICATE_REPLACE);
+    }
+
+    /**
      * Change whether both the MIME type and extensions must match the same aggregate type.
      * @param bool $strict
      * @return static
