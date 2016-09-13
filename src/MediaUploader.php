@@ -347,6 +347,7 @@ class MediaUploader
 
         return $this;
     }
+    
     /**
      * Process the file upload.
      *
