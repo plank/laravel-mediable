@@ -60,6 +60,11 @@ class MediaUploader
     private $filename;
 
     /**
+     * @var bool
+     */
+    private $useHashForFilename = false;
+
+    /**
      * Constructor.
      * @param FileSystemManager    $filesystem
      * @param SourceAdapterFactory $factory
@@ -331,6 +336,18 @@ class MediaUploader
     }
 
     /**
+     * Indicates the uploader to use the source contents hash as the filename.
+     *
+     * This only applies if the filename is not set.
+     * @return static
+     */
+    public function useHashForFilename()
+    {
+        $this->useHashForFilename = true;
+
+        return $this;
+    }
+    /**
      * Process the file upload.
      *
      * Validates the source, then stores the file onto the disk and creates and stores a new Media instance.
@@ -350,7 +367,7 @@ class MediaUploader
 
         $model->disk = $this->disk ?: $this->config['default_disk'];
         $model->directory = $this->directory;
-        $model->filename = $this->filename ?: $this->generateHashFilename($this->source);
+        $model->filename = $this->filename ?: ($this->useHashForFilename ? $this->generateHashFilename($this->source) : $this->sanitizeFileName($this->source->filename()));
 
         $this->verifyDestination($model);
 
@@ -495,9 +512,13 @@ class MediaUploader
         return $filename;
     }
 
+    /**
+     * Calculate hash of source contents.
+     * @return string
+     */
     private function generateHashFilename($source)
     {
-        return md5($source->contents());
+        return md5_file($source->path());
     }
 
     /**

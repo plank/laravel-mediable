@@ -248,6 +248,16 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('image', $media->aggregate_type);
     }
 
+    public function test_it_use_hash_for_filename()
+    {
+        $media = Facade::fromSource(__DIR__ . '/../_data/plank.png')
+            ->toDestination('tmp', 'foo')
+            ->useHashForFilename()
+            ->upload();
+
+        $this->assertEquals('8177ed8b17b9cd56510ce51dd95ede36', $media->filename);
+    }
+
     protected function mockUploader($filesystem = null, $factory = null)
     {
         return new MediaUploader(
