@@ -12,11 +12,13 @@ To upload a file to the root of the default disk (set in ``config/mediable.php``
     use MediaUploader; //use the facade
     $media = MediaUploader::fromSource($request->file('thumbnail'))->upload();
 
+Source Files
+----------------------
 
-The ``fromSource()`` method will accept either
+The ``fromSource()`` method will accept any of the following:
 
+- an instance of ``Symfony\Component\HttpFoundation\UploadedFile``, which is returned by ``$request->file()``.
 - an instance of ``Symfony\Component\HttpFoundation\File``.
-- an instance of ``Symfony\Component\HttpFoundation\UploadedFile``.
 - a URL as a string, beginning with ``http://`` or ``https://``.
 - an absolute path as a string, beginning with ``/``.
 
@@ -31,10 +33,10 @@ By default, the uploader will place the file in the root of the default disk spe
     $uploader = MediaUploader::fromSource($request->file('thumbnail'))
 
     // specify a disk to use instead of the default
-    ->setDisk('s3');
+    ->toDisk('s3');
 
     // place the file in a directory relative to the disk root
-    ->setDirectory('user/john/profile')
+    ->toDirectory('user/john/profile')
 
     // alternatively, specify both the disk and directory at once
     ->toDestination('s3', 'user/john/profile')
@@ -50,7 +52,7 @@ By default, the uploader will copy the source file while maintaining its origina
 
     <?php
     MediaUploader::fromSource(...)
-        ->setFilename('profile')
+        ->useFilename('profile')
         ->upload();
 
 You can also tell the uploader to generate a filename based on the MD5 hash of the file's contents.
@@ -62,7 +64,7 @@ You can also tell the uploader to generate a filename based on the MD5 hash of t
         ->useHashForFilename()
         ->upload();
 
-You can restore the default behaviour with ``useDefaultFilename()``
+You can restore the default behaviour with ``useOriginalFilename()``.
 
 
 

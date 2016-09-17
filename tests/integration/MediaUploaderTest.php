@@ -236,7 +236,7 @@ class MediaUploaderTest extends TestCase
     {
         $media = Facade::fromSource(__DIR__ . '/../_data/plank.png')
             ->toDestination('tmp', 'foo')
-            ->setFilename('bar')
+            ->useFilename('bar')
             ->upload();
 
         $this->assertInstanceOf(Media::class, $media);

@@ -98,7 +98,7 @@ class MediaUploader
      */
     public function toDestination($disk, $directory)
     {
-        return $this->setDisk($disk)->setDirectory($directory);
+        return $this->toDisk($disk)->toDirectory($directory);
     }
 
     /**
@@ -107,7 +107,7 @@ class MediaUploader
      * @return static
      * @throws MediaUploadException if the disk is not found or not allowed for upload
      */
-    public function setDisk($disk)
+    public function toDisk($disk)
     {
         $this->disk = $this->verifyDisk($disk);
 
@@ -119,7 +119,7 @@ class MediaUploader
      * @param string $directory
      * @return static
      */
-    public function setDirectory($directory)
+    public function toDirectory($directory)
     {
         $this->directory = trim($this->sanitizePath($directory), DIRECTORY_SEPARATOR);
 
@@ -127,13 +127,37 @@ class MediaUploader
     }
 
     /**
-     * Override the filename of the source file.
+     * Specify the filename to copy to the file to.
      * @param string $filename
      * @return static
      */
-    public function setFilename($filename)
+    public function useFilename($filename)
     {
         $this->filename = $this->sanitizeFilename($filename);
+        $this->hash_filename = false;
+
+        return $this;
+    }
+
+    /**
+     * Indicates to the uploader to generate a filename using the file's MD5 hash.
+     * @return static
+     */
+    public function useHashForFilename()
+    {
+        $this->hash_filename = true;
+        $this->filename = null;
+
+        return $this;
+    }
+
+    /**
+     * Restore the default behaviour of using the source file's filename.
+     * @return static
+     */
+    public function useOriginalFilename()
+    {
+        $this->filename = null;
         $this->hash_filename = false;
 
         return $this;
@@ -329,30 +353,6 @@ class MediaUploader
         }
 
         return $types;
-    }
-
-    /**
-     * Indicates the uploader to use the source filename.
-     * @return static
-     */
-    public function useDefaultFilename()
-    {
-        $this->filename = null;
-        $this->hash_filename = false;
-
-        return $this;
-    }
-
-    /**
-     * Indicates the uploader to use the source contents hash as the filename.
-     * @return static
-     */
-    public function useHashForFilename()
-    {
-        $this->hash_filename = true;
-        $this->filename = null;
-
-        return $this;
     }
 
     /**

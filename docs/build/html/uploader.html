@@ -89,6 +89,7 @@
 <p class="caption"><span class="caption-text">Guides</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Uploading Files</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#source-files">Source Files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#specifying-destination">Specifying Destination</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#specifying-filename">Specifying Filename</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#validation">Validation</a></li>
@@ -153,13 +154,16 @@
 <span class="nv">$media</span> <span class="o">=</span> <span class="nx">MediaUploader</span><span class="o">::</span><span class="na">fromSource</span><span class="p">(</span><span class="nv">$request</span><span class="o">-&gt;</span><span class="na">file</span><span class="p">(</span><span class="s1">&#39;thumbnail&#39;</span><span class="p">))</span><span class="o">-&gt;</span><span class="na">upload</span><span class="p">();</span>
 </pre></div>
 </div>
-<p>The <code class="docutils literal"><span class="pre">fromSource()</span></code> method will accept either</p>
+<div class="section" id="source-files">
+<h2>Source Files<a class="headerlink" href="#source-files" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal"><span class="pre">fromSource()</span></code> method will accept any of the following:</p>
 <ul class="simple">
+<li>an instance of <code class="docutils literal"><span class="pre">Symfony\Component\HttpFoundation\UploadedFile</span></code>, which is returned by <code class="docutils literal"><span class="pre">$request-&gt;file()</span></code>.</li>
 <li>an instance of <code class="docutils literal"><span class="pre">Symfony\Component\HttpFoundation\File</span></code>.</li>
-<li>an instance of <code class="docutils literal"><span class="pre">Symfony\Component\HttpFoundation\UploadedFile</span></code>.</li>
 <li>a URL as a string, beginning with <code class="docutils literal"><span class="pre">http://</span></code> or <code class="docutils literal"><span class="pre">https://</span></code>.</li>
 <li>an absolute path as a string, beginning with <code class="docutils literal"><span class="pre">/</span></code>.</li>
 </ul>
+</div>
 <div class="section" id="specifying-destination">
 <h2>Specifying Destination<a class="headerlink" href="#specifying-destination" title="Permalink to this headline">¶</a></h2>
 <p>By default, the uploader will place the file in the root of the default disk specified in <code class="docutils literal"><span class="pre">config/mediable.php</span></code>. You can customize where the uploader will put the file on your server before you invoke the <code class="docutils literal"><span class="pre">upload()</span></code> method.</p>
@@ -167,10 +171,10 @@
 <span class="nv">$uploader</span> <span class="o">=</span> <span class="nx">MediaUploader</span><span class="o">::</span><span class="na">fromSource</span><span class="p">(</span><span class="nv">$request</span><span class="o">-&gt;</span><span class="na">file</span><span class="p">(</span><span class="s1">&#39;thumbnail&#39;</span><span class="p">))</span>
 
 <span class="c1">// specify a disk to use instead of the default</span>
-<span class="o">-&gt;</span><span class="na">setDisk</span><span class="p">(</span><span class="s1">&#39;s3&#39;</span><span class="p">);</span>
+<span class="o">-&gt;</span><span class="na">toDisk</span><span class="p">(</span><span class="s1">&#39;s3&#39;</span><span class="p">);</span>
 
 <span class="c1">// place the file in a directory relative to the disk root</span>
-<span class="o">-&gt;</span><span class="na">setDirectory</span><span class="p">(</span><span class="s1">&#39;user/john/profile&#39;</span><span class="p">)</span>
+<span class="o">-&gt;</span><span class="na">toDirectory</span><span class="p">(</span><span class="s1">&#39;user/john/profile&#39;</span><span class="p">)</span>
 
 <span class="c1">// alternatively, specify both the disk and directory at once</span>
 <span class="o">-&gt;</span><span class="na">toDestination</span><span class="p">(</span><span class="s1">&#39;s3&#39;</span><span class="p">,</span> <span class="s1">&#39;user/john/profile&#39;</span><span class="p">)</span>
@@ -184,7 +188,7 @@
 <p>By default, the uploader will copy the source file while maintaining its original filename. You can override this behaviour by providing a custom filename.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="nx">MediaUploader</span><span class="o">::</span><span class="na">fromSource</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-    <span class="o">-&gt;</span><span class="na">setFilename</span><span class="p">(</span><span class="s1">&#39;profile&#39;</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">useFilename</span><span class="p">(</span><span class="s1">&#39;profile&#39;</span><span class="p">)</span>
     <span class="o">-&gt;</span><span class="na">upload</span><span class="p">();</span>
 </pre></div>
 </div>
@@ -195,7 +199,7 @@
     <span class="o">-&gt;</span><span class="na">upload</span><span class="p">();</span>
 </pre></div>
 </div>
-<p>You can restore the default behaviour with <code class="docutils literal"><span class="pre">useDefaultFilename()</span></code></p>
+<p>You can restore the default behaviour with <code class="docutils literal"><span class="pre">useOriginalFilename()</span></code>.</p>
 </div>
 <div class="section" id="validation">
 <h2>Validation<a class="headerlink" href="#validation" title="Permalink to this headline">¶</a></h2>
