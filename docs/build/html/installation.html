@@ -146,7 +146,7 @@
 <p>Register the package&#8217;s servive provider in <cite>config/app.php</cite>.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;providers&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
     <span class="o">//...</span>
-    <span class="s1">&#39;Plank\Mediable\MediableServiceProvider&#39;</span><span class="p">,</span>
+    <span class="n">Plank</span>\<span class="n">Mediable</span>\<span class="n">MediableServiceProvider</span><span class="p">::</span><span class="n">class</span><span class="p">,</span>
     <span class="o">//...</span>
 <span class="p">];</span>
 </pre></div>
@@ -154,7 +154,7 @@
 <p>The package comes with a Facade for the image uploader, which you can optionally register as well.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;aliases&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
     <span class="o">//...</span>
-    <span class="s1">&#39;MediaUploader&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Plank\Mediable\MediaUploaderFacade&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;MediaUploader&#39;</span> <span class="o">=&gt;</span> <span class="n">Plank</span>\<span class="n">Mediable</span>\<span class="n">MediaUploaderFacade</span><span class="p">::</span><span class="n">class</span><span class="p">,</span>
     <span class="o">//...</span>
 <span class="p">]</span>
 </pre></div>
