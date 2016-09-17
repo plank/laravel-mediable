@@ -91,6 +91,8 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Uploading Files</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#specifying-destination">Specifying Destination</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#validation">Validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#importing-files">Importing Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#updating-files">Updating Files</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="mediable.html">Handling Media</a></li>
@@ -211,6 +213,24 @@
     <span class="o">-&gt;</span><span class="na">setAllowedAggregateTypes</span><span class="p">([</span><span class="s1">&#39;image&#39;</span><span class="p">])</span>
 
     <span class="o">-&gt;</span><span class="na">upload</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="importing-files">
+<h2>Importing Files<a class="headerlink" href="#importing-files" title="Permalink to this headline">¶</a></h2>
+<p>If you need to create a media record for a file that is already in place on the filesystem disk, you can use one the import methods instead</p>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="nv">$media</span> <span class="o">=</span> <span class="nx">MediaUploader</span><span class="o">::</span><span class="na">import</span><span class="p">(</span><span class="nv">$disk</span><span class="p">,</span> <span class="nv">$directory</span><span class="p">,</span> <span class="nv">$filename</span><span class="p">,</span> <span class="nv">$extension</span><span class="p">);</span>
+<span class="c1">// or</span>
+<span class="nv">$media</span> <span class="o">=</span> <span class="nx">MediaUploader</span><span class="o">::</span><span class="na">importPath</span><span class="p">(</span><span class="nv">$disk</span><span class="p">,</span> <span class="nv">$path</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="updating-files">
+<h2>Updating Files<a class="headerlink" href="#updating-files" title="Permalink to this headline">¶</a></h2>
+<p>If a file has changed on disk, you can re-evaluate its attributes with the <code class="docutils literal"><span class="pre">update()</span></code> method. This will reassign the media record&#8217;s <code class="docutils literal"><span class="pre">mime_type</span></code>, <code class="docutils literal"><span class="pre">aggregate_type</span></code> and <code class="docutils literal"><span class="pre">size</span></code> attributes and will save the changes to the database, if any.</p>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="nx">MediaUploader</span><span class="o">::</span><span class="na">update</span><span class="p">(</span><span class="nv">$media</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>

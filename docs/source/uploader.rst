@@ -83,3 +83,25 @@ You can override the most validation configuration values set in ``config/mediab
         ->setAllowedAggregateTypes(['image'])
 
         ->upload();
+
+Importing Files
+--------------------
+
+If you need to create a media record for a file that is already in place on the filesystem disk, you can use one the import methods instead
+
+::
+
+    <?php
+    $media = MediaUploader::import($disk, $directory, $filename, $extension);
+    // or
+    $media = MediaUploader::importPath($disk, $path);
+
+Updating Files
+---------------
+
+If a file has changed on disk, you can re-evaluate its attributes with the ``update()`` method. This will reassign the media record's ``mime_type``, ``aggregate_type`` and ``size`` attributes and will save the changes to the database, if any.
+
+::
+
+    <?php
+    MediaUploader::update($media);
