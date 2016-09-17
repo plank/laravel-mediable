@@ -61,6 +61,12 @@ class MediaUploader
     private $filename;
 
     /**
+     * If true the contents hash of the source will be used as the filename.
+     * @var bool
+     */
+    private $hash_filename = false;
+
+    /**
      * Constructor.
      * @param FileSystemManager    $filesystem
      * @param SourceAdapterFactory $factory
@@ -128,6 +134,7 @@ class MediaUploader
     public function setFilename($filename)
     {
         $this->filename = $this->sanitizeFilename($filename);
+        $this->hash_filename = false;
 
         return $this;
     }
@@ -325,6 +332,30 @@ class MediaUploader
     }
 
     /**
+     * Indicates the uploader to use the source filename.
+     * @return static
+     */
+    public function useDefaultFilename()
+    {
+        $this->filename = null;
+        $this->hash_filename = false;
+
+        return $this;
+    }
+
+    /**
+     * Indicates the uploader to use the source contents hash as the filename.
+     * @return static
+     */
+    public function useHashForFilename()
+    {
+        $this->hash_filename = true;
+        $this->filename = null;
+
+        return $this;
+    }
+
+    /**
      * Process the file upload.
      *
      * Validates the source, then stores the file onto the disk and creates and stores a new Media instance.
@@ -344,7 +375,7 @@ class MediaUploader
 
         $model->disk = $this->disk ?: $this->config['default_disk'];
         $model->directory = $this->directory;
-        $model->filename = $this->filename ?: $this->sanitizeFilename($this->source->filename());
+        $model->filename = $this->generateFilename();
 
         $this->verifyDestination($model);
 
@@ -578,6 +609,32 @@ class MediaUploader
         } while ($storage->has($path));
 
         return $filename;
+    }
+
+    /**
+     * Generate the model's filename.
+     * @return string
+     */
+    private function generateFilename()
+    {
+        if ($this->filename) {
+            return $this->filename;
+        }
+
+        if ($this->hash_filename) {
+            return $this->generateHash($this->source);
+        }
+
+        return $this->sanitizeFileName($this->source->filename());
+    }
+
+    /**
+     * Calculate hash of source contents.
+     * @return string
+     */
+    private function generateHash($source)
+    {
+        return md5_file($source->path());
     }
 
     /**
