@@ -90,6 +90,7 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Uploading Files</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#specifying-destination">Specifying Destination</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#specifying-filename">Specifying Filename</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#validation">Validation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#importing-files">Importing Files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#updating-files">Updating Files</a></li>
@@ -161,7 +162,7 @@
 </ul>
 <div class="section" id="specifying-destination">
 <h2>Specifying Destination<a class="headerlink" href="#specifying-destination" title="Permalink to this headline">¶</a></h2>
-<p>You can customize where the uploader will put the file on your server before you invoke the <code class="docutils literal"><span class="pre">upload()</span></code> method.</p>
+<p>By default, the uploader will place the file in the root of the default disk specified in <code class="docutils literal"><span class="pre">config/mediable.php</span></code>. You can customize where the uploader will put the file on your server before you invoke the <code class="docutils literal"><span class="pre">upload()</span></code> method.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="nv">$uploader</span> <span class="o">=</span> <span class="nx">MediaUploader</span><span class="o">::</span><span class="na">fromSource</span><span class="p">(</span><span class="nv">$request</span><span class="o">-&gt;</span><span class="na">file</span><span class="p">(</span><span class="s1">&#39;thumbnail&#39;</span><span class="p">))</span>
 
@@ -174,12 +175,27 @@
 <span class="c1">// alternatively, specify both the disk and directory at once</span>
 <span class="o">-&gt;</span><span class="na">toDestination</span><span class="p">(</span><span class="s1">&#39;s3&#39;</span><span class="p">,</span> <span class="s1">&#39;user/john/profile&#39;</span><span class="p">)</span>
 
-<span class="c1">// Overide the filename of the source file</span>
-<span class="o">-&gt;</span><span class="na">setFilename</span><span class="p">(</span><span class="s1">&#39;profile.jpg&#39;</span><span class="p">)</span>
-
 <span class="o">-&gt;</span><span class="na">upload</span><span class="p">();</span>
 </pre></div>
 </div>
+</div>
+<div class="section" id="specifying-filename">
+<h2>Specifying Filename<a class="headerlink" href="#specifying-filename" title="Permalink to this headline">¶</a></h2>
+<p>By default, the uploader will copy the source file while maintaining its original filename. You can override this behaviour by providing a custom filename.</p>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="nx">MediaUploader</span><span class="o">::</span><span class="na">fromSource</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">setFilename</span><span class="p">(</span><span class="s1">&#39;profile&#39;</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">upload</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>You can also tell the uploader to generate a filename based on the MD5 hash of the file&#8217;s contents.</p>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="nx">MediaUploader</span><span class="o">::</span><span class="na">fromSource</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">useHashForFilename</span><span class="p">()</span>
+    <span class="o">-&gt;</span><span class="na">upload</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>You can restore the default behaviour with <code class="docutils literal"><span class="pre">useDefaultFilename()</span></code></p>
 </div>
 <div class="section" id="validation">
 <h2>Validation<a class="headerlink" href="#validation" title="Permalink to this headline">¶</a></h2>

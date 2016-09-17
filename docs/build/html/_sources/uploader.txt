@@ -23,7 +23,7 @@ The ``fromSource()`` method will accept either
 Specifying Destination
 ----------------------
 
-You can customize where the uploader will put the file on your server before you invoke the ``upload()`` method.
+By default, the uploader will place the file in the root of the default disk specified in ``config/mediable.php``. You can customize where the uploader will put the file on your server before you invoke the ``upload()`` method.
 
 ::
 
@@ -39,10 +39,31 @@ You can customize where the uploader will put the file on your server before you
     // alternatively, specify both the disk and directory at once
     ->toDestination('s3', 'user/john/profile')
 
-    // Overide the filename of the source file
-    ->setFilename('profile.jpg')
-
     ->upload();
+
+Specifying Filename
+--------------------
+
+By default, the uploader will copy the source file while maintaining its original filename. You can override this behaviour by providing a custom filename.
+
+::
+
+    <?php
+    MediaUploader::fromSource(...)
+        ->setFilename('profile')
+        ->upload();
+
+You can also tell the uploader to generate a filename based on the MD5 hash of the file's contents.
+
+::
+
+    <?php
+    MediaUploader::fromSource(...)
+        ->useHashForFilename()
+        ->upload();
+
+You can restore the default behaviour with ``useDefaultFilename()``
+
 
 
 Validation
