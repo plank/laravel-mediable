@@ -355,7 +355,7 @@ class MediaUploader
     }
 
     /**
-     * Create a `Media` record for a file already on a disk
+     * Create a `Media` record for a file already on a disk.
      * @param  string $disk
      * @param  string $path Path to file, relative to disk root
      * @return Media
@@ -370,7 +370,7 @@ class MediaUploader
     }
 
     /**
-     * Create a `Media` record for a file already on a disk
+     * Create a `Media` record for a file already on a disk.
      * @param  string $disk
      * @param  string $directory
      * @param  string $filename
@@ -403,9 +403,9 @@ class MediaUploader
     }
 
     /**
-     * Reanalyze a media record's file and adjust the aggregate type and size, if necessary
+     * Reanalyze a media record's file and adjust the aggregate type and size, if necessary.
      * @param  Media  $media
-     * @return boolean Whether the model was modified
+     * @return bool Whether the model was modified
      * @throws MediaUploadException if the file does not pass the uploader's validation
      */
     public function update(Media $media)
@@ -419,11 +419,12 @@ class MediaUploader
         if ($dirty = $media->isDirty()) {
             $media->save();
         }
+
         return $dirty;
     }
 
     /**
-     * Generate an instance of the `Media` class
+     * Generate an instance of the `Media` class.
      * @return Media
      */
     private function makeModel()
@@ -434,7 +435,7 @@ class MediaUploader
     }
 
     /**
-     * Ensure that the provided filesystem disk name exists and is allowed
+     * Ensure that the provided filesystem disk name exists and is allowed.
      * @param  string $disk
      * @return string
      * @throws MediaUploadException If the disk does not exist or is not included in the `allowed_disks` config.
