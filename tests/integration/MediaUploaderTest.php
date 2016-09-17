@@ -18,7 +18,7 @@ class MediaUploaderTest extends TestCase
 
     public function test_it_can_be_instantiated_via_facade()
     {
-        $this->assertInstanceOf(MediaUploader::class, Facade::setDirectory('foo'));
+        $this->assertInstanceOf(MediaUploader::class, Facade::toDirectory('foo'));
     }
 
     public function test_it_can_set_on_duplicate_behavior_via_facade()
@@ -89,7 +89,7 @@ class MediaUploaderTest extends TestCase
     {
         $uploader = $this->mockUploader();
         $this->expectException(MediaUploadException::class);
-        $uploader->setDisk('abc');
+        $uploader->toDisk('abc');
     }
 
     public function test_it_throws_exception_for_disallowed_disk()
@@ -97,7 +97,7 @@ class MediaUploaderTest extends TestCase
         $uploader = $this->mockUploader();
         config()->set('filesystems.disks.foo', []);
         $this->expectException(MediaUploadException::class);
-        $uploader->setDisk('foo');
+        $uploader->toDisk('foo');
     }
 
     public function test_it_can_change_model_class()
