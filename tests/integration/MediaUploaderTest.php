@@ -268,6 +268,25 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('image', $media->aggregate_type);
     }
 
+    public function test_it_updates_existing_media()
+    {
+        $media = factory(Media::class)->create([
+            'disk' => 'tmp',
+            'extension' => 'png',
+            'mime_type' => 'video/mpeg',
+            'aggregate_type' => 'video',
+            'size' => 999,
+        ]);
+        $this->seedFileForMedia($media, fopen(__DIR__ . '/../_data/plank.png', 'r'));
+
+        $result = Facade::update($media);
+
+        $this->assertTrue($result);
+        $this->assertEquals('image/png', $media->mime_type);
+        $this->assertEquals('image', $media->aggregate_type);
+        $this->assertEquals(8444, $media->size);
+    }
+
     public function test_it_throws_exception_when_importing_missing_file()
     {
         $this->expectException(MediaUploadException::class);
