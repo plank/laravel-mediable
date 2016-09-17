@@ -2,4 +2,3 @@ vendor/
 composer.lock
 coverage/
 .env
-.DS_Store
