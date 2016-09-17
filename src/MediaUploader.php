@@ -58,7 +58,7 @@ class MediaUploader
      * Name of the new file.
      * @var string
      */
-    private $filename;
+    private $filename = null;
 
     /**
      * If true the contents hash of the source will be used as the filename.

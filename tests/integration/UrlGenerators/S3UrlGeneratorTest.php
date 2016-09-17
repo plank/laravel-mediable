@@ -28,6 +28,14 @@ class S3UrlGeneratorTest extends TestCase
         $this->assertEquals('https://s3.amazonaws.com/' . env('S3_BUCKET') . '/foo/bar.jpg', $generator->getUrl());
     }
 
+    public function test_it_throws_exception_if_not_available()
+    {
+        config()->set('filesystems.disks.s3.visibility', 'private');
+        $generator = $this->setupGenerator();
+        $this->expectException(MediaUrlException::class);
+        $generator->getUrl();
+    }
+
     protected function setupGenerator()
     {
         $media = factory(Media::class)->make([
