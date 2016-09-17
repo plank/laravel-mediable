@@ -21,6 +21,18 @@ class MediaUploaderTest extends TestCase
         $this->assertInstanceOf(MediaUploader::class, Facade::setDirectory('foo'));
     }
 
+    public function test_it_can_set_on_duplicate_behavior_via_facade()
+    {
+        $uploader = Facade::onDuplicateError();
+        $this->assertEquals(MediaUploader::ON_DUPLICATE_ERROR, $uploader->getOnDuplicateBehavior());
+
+        $uploader = Facade::onDuplicateIncrement();
+        $this->assertEquals(MediaUploader::ON_DUPLICATE_INCREMENT, $uploader->getOnDuplicateBehavior());
+
+        $uploader = Facade::onDuplicateReplace();
+        $this->assertEquals(MediaUploader::ON_DUPLICATE_REPLACE, $uploader->getOnDuplicateBehavior());
+    }
+
     public function test_it_can_determine_media_type_by_extension_and_mime()
     {
         $uploader = $this->mockUploader();
