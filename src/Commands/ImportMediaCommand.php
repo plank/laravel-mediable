@@ -136,7 +136,7 @@ class ImportMediaCommand extends Command
      */
     protected function createRecordForFile($disk, $path)
     {
-        try{
+        try {
             $this->uploader->importPath($disk, $path);
             ++$this->counters['created'];
             $this->info("Created Record for file at {$path}", 'v');
@@ -155,7 +155,7 @@ class ImportMediaCommand extends Command
      */
     protected function updateRecordForFile(Media $media, $path)
     {
-        try{
+        try {
             if ($this->uploader->update($media)) {
                 ++$this->counters['updated'];
                 $this->info("Updated record for {$path}", 'v');
