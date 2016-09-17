@@ -175,7 +175,7 @@ trait Mediable
 
         $this->media()->attach($media, [
             'tag' => $tags,
-            'order' => $this->getNextOrderValueForTag($tags)
+            'order' => $this->getNextOrderValueForTag($tags),
         ]);
         $this->markMediaDirty($tags);
     }
