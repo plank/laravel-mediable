@@ -92,6 +92,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#source-files">Source Files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#specifying-destination">Specifying Destination</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#specifying-filename">Specifying Filename</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#handling-duplicates">Handling Duplicates</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#validation">Validation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#importing-files">Importing Files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#updating-files">Updating Files</a></li>
@@ -201,6 +202,21 @@
 </div>
 <p>You can restore the default behaviour with <code class="docutils literal"><span class="pre">useOriginalFilename()</span></code>.</p>
 </div>
+<div class="section" id="handling-duplicates">
+<h2>Handling Duplicates<a class="headerlink" href="#handling-duplicates" title="Permalink to this headline">¶</a></h2>
+<p>Occasionally, a file with a matching name might already exist at the destination you would like to upload to. The uploader allows you to configure how it should respond to this scenario. There are three possible behaviours:</p>
+<dl class="docutils">
+<dt>::</dt>
+<dd><p class="first">&lt;?php</p>
+<p>// keep both, append incrementing counter to new file name
+$uploader-&gt;onDuplicateIncrement();</p>
+<p>// replace old file with new one
+$uploader-&gt;onDuplicateReplace();</p>
+<p class="last">// cancel upload, throw an exception
+$uploader-&gt;onDuplicateError();</p>
+</dd>
+</dl>
+</div>
 <div class="section" id="validation">
 <h2>Validation<a class="headerlink" href="#validation" title="Permalink to this headline">¶</a></h2>
 <p>The <code class="docutils literal"><span class="pre">MediaUpload</span></code> will perform a number of validation checks on the source file. If any of the checks fail, a <code class="docutils literal"><span class="pre">Plank\Mediable\MediaUploaderException</span></code> will be through with a message indicating why the file was rejected.</p>
@@ -213,9 +229,6 @@
 
     <span class="c1">// maximum filesize in bytes</span>
     <span class="o">-&gt;</span><span class="na">setMaximumSize</span><span class="p">(</span><span class="mi">99999</span><span class="p">)</span>
-
-    <span class="c1">// how to handle a file that already exists at the destination</span>
-    <span class="o">-&gt;</span><span class="na">setOnDuplicateBehavior</span><span class="p">(</span><span class="nx">MediaUploader</span><span class="o">::</span><span class="na">ON_DUPLICATE_REPLACE</span><span class="p">)</span>
 
     <span class="c1">// whether the aggregate type must match both the MIME type and extension</span>
     <span class="o">-&gt;</span><span class="na">setStrictTypeChecking</span><span class="p">(</span><span class="k">true</span><span class="p">)</span>
@@ -238,7 +251,7 @@
 </div>
 <div class="section" id="importing-files">
 <h2>Importing Files<a class="headerlink" href="#importing-files" title="Permalink to this headline">¶</a></h2>
-<p>If you need to create a media record for a file that is already in place on the filesystem disk, you can use one the import methods instead</p>
+<p>If you need to create a media record for a file that is already in place on the desired filesystem disk, you can use one the import methods instead.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="nv">$media</span> <span class="o">=</span> <span class="nx">MediaUploader</span><span class="o">::</span><span class="na">import</span><span class="p">(</span><span class="nv">$disk</span><span class="p">,</span> <span class="nv">$directory</span><span class="p">,</span> <span class="nv">$filename</span><span class="p">,</span> <span class="nv">$extension</span><span class="p">);</span>
 <span class="c1">// or</span>

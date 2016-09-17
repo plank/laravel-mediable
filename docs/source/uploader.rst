@@ -66,6 +66,22 @@ You can also tell the uploader to generate a filename based on the MD5 hash of t
 
 You can restore the default behaviour with ``useOriginalFilename()``.
 
+Handling Duplicates
+----------------------
+
+Occasionally, a file with a matching name might already exist at the destination you would like to upload to. The uploader allows you to configure how it should respond to this scenario. There are three possible behaviours:
+
+::
+    <?php
+
+    // keep both, append incrementing counter to new file name
+    $uploader->onDuplicateIncrement();
+
+    // replace old file with new one
+    $uploader->onDuplicateReplace();
+
+    // cancel upload, throw an exception
+    $uploader->onDuplicateError();
 
 
 Validation
@@ -87,9 +103,6 @@ You can override the most validation configuration values set in ``config/mediab
         // maximum filesize in bytes
         ->setMaximumSize(99999)
 
-        // how to handle a file that already exists at the destination
-        ->setOnDuplicateBehavior(MediaUploader::ON_DUPLICATE_REPLACE)
-
         // whether the aggregate type must match both the MIME type and extension
         ->setStrictTypeChecking(true)
 
@@ -110,7 +123,7 @@ You can override the most validation configuration values set in ``config/mediab
 Importing Files
 --------------------
 
-If you need to create a media record for a file that is already in place on the filesystem disk, you can use one the import methods instead
+If you need to create a media record for a file that is already in place on the desired filesystem disk, you can use one the import methods instead.
 
 ::
 
@@ -118,6 +131,7 @@ If you need to create a media record for a file that is already in place on the 
     $media = MediaUploader::import($disk, $directory, $filename, $extension);
     // or
     $media = MediaUploader::importPath($disk, $path);
+
 
 Updating Files
 ---------------
