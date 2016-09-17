@@ -204,7 +204,7 @@ class MediaUploader
     }
 
     /**
-     * Get current behavior when duplicate file is uploaded
+     * Get current behavior when duplicate file is uploaded.
      *
      * @return string
      */
