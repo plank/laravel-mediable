@@ -93,6 +93,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#attaching-media">Attaching Media</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#replacing-media">Replacing Media</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#retrieving-media">Retrieving Media</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#media-order">Media Order</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#checking-for-the-presence-of-media">Checking for the Presence of Media</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#detaching-media">Detaching Media</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#loading-media">Loading Media</a><ul>
@@ -229,6 +230,17 @@
 <p>You can also get all media attached to a model, grouped by tag.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="nv">$post</span><span class="o">-&gt;</span><span class="na">getAllMediaByTag</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="media-order">
+<h2>Media Order<a class="headerlink" href="#media-order" title="Permalink to this headline">¶</a></h2>
+<p>The system keeps track of the order in which <code class="docutils literal"><span class="pre">Media</span></code> are attached to each <code class="docutils literal"><span class="pre">Mediable</span></code> model&#8217;s tags and are always returned in the same order.</p>
+<p>To change the order of media assigned to a given tag, or to insert a new item at a particular index manipulate the eloquent collection then use the <code class="docutils literal"><span class="pre">syncMedia()</span></code> method to commit the changes.</p>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="nv">$media</span> <span class="o">=</span> <span class="nv">$post</span><span class="o">-&gt;</span><span class="na">getMedia</span><span class="p">(</span><span class="s1">&#39;gallery&#39;</span><span class="p">);</span>
+<span class="nv">$media</span> <span class="o">=</span> <span class="nv">$media</span><span class="o">-&gt;</span><span class="na">prepend</span><span class="p">(</span><span class="nv">$new_media</span><span class="p">);</span>
+<span class="nv">$post</span><span class="o">-&gt;</span><span class="na">syncMedia</span><span class="p">(</span><span class="nv">$media</span><span class="p">,</span> <span class="s1">&#39;gallery&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
