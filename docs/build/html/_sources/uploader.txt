@@ -12,18 +12,20 @@ To upload a file to the root of the default disk (set in ``config/mediable.php``
     use MediaUploader; //use the facade
     $media = MediaUploader::fromSource($request->file('thumbnail'))->upload();
 
+Source Files
+----------------------
 
-The ``fromSource()`` method will accept either
+The ``fromSource()`` method will accept any of the following:
 
+- an instance of ``Symfony\Component\HttpFoundation\UploadedFile``, which is returned by ``$request->file()``.
 - an instance of ``Symfony\Component\HttpFoundation\File``.
-- an instance of ``Symfony\Component\HttpFoundation\UploadedFile``.
 - a URL as a string, beginning with ``http://`` or ``https://``.
 - an absolute path as a string, beginning with ``/``.
 
 Specifying Destination
 ----------------------
 
-You can customize where the uploader will put the file on your server before you invoke the ``upload()`` method.
+By default, the uploader will place the file in the root of the default disk specified in ``config/mediable.php``. You can customize where the uploader will put the file on your server before you invoke the ``upload()`` method.
 
 ::
 
@@ -31,18 +33,55 @@ You can customize where the uploader will put the file on your server before you
     $uploader = MediaUploader::fromSource($request->file('thumbnail'))
 
     // specify a disk to use instead of the default
-    ->setDisk('s3');
+    ->toDisk('s3');
 
     // place the file in a directory relative to the disk root
-    ->setDirectory('user/john/profile')
+    ->toDirectory('user/john/profile')
 
     // alternatively, specify both the disk and directory at once
     ->toDestination('s3', 'user/john/profile')
 
-    // Overide the filename of the source file
-    ->setFilename('profile.jpg')
-
     ->upload();
+
+Specifying Filename
+--------------------
+
+By default, the uploader will copy the source file while maintaining its original filename. You can override this behaviour by providing a custom filename.
+
+::
+
+    <?php
+    MediaUploader::fromSource(...)
+        ->useFilename('profile')
+        ->upload();
+
+You can also tell the uploader to generate a filename based on the MD5 hash of the file's contents.
+
+::
+
+    <?php
+    MediaUploader::fromSource(...)
+        ->useHashForFilename()
+        ->upload();
+
+You can restore the default behaviour with ``useOriginalFilename()``.
+
+Handling Duplicates
+----------------------
+
+Occasionally, a file with a matching name might already exist at the destination you would like to upload to. The uploader allows you to configure how it should respond to this scenario. There are three possible behaviours:
+
+::
+    <?php
+
+    // keep both, append incrementing counter to new file name
+    $uploader->onDuplicateIncrement();
+
+    // replace old file with new one
+    $uploader->onDuplicateReplace();
+
+    // cancel upload, throw an exception
+    $uploader->onDuplicateError();
 
 
 Validation
@@ -64,9 +103,6 @@ You can override the most validation configuration values set in ``config/mediab
         // maximum filesize in bytes
         ->setMaximumSize(99999)
 
-        // how to handle a file that already exists at the destination
-        ->setOnDuplicateBehavior(MediaUploader::ON_DUPLICATE_REPLACE)
-
         // whether the aggregate type must match both the MIME type and extension
         ->setStrictTypeChecking(true)
 
@@ -83,3 +119,26 @@ You can override the most validation configuration values set in ``config/mediab
         ->setAllowedAggregateTypes(['image'])
 
         ->upload();
+
+Importing Files
+--------------------
+
+If you need to create a media record for a file that is already in place on the desired filesystem disk, you can use one the import methods instead.
+
+::
+
+    <?php
+    $media = MediaUploader::import($disk, $directory, $filename, $extension);
+    // or
+    $media = MediaUploader::importPath($disk, $path);
+
+
+Updating Files
+---------------
+
+If a file has changed on disk, you can re-evaluate its attributes with the ``update()`` method. This will reassign the media record's ``mime_type``, ``aggregate_type`` and ``size`` attributes and will save the changes to the database, if any.
+
+::
+
+    <?php
+    MediaUploader::update($media);

@@ -51,7 +51,7 @@ class Media extends Model
      */
     public function models($class)
     {
-        return $this->morphedByMany($class, 'mediable')->withPivot('tag');
+        return $this->morphedByMany($class, 'mediable')->withPivot('tag', 'order');
     }
 
     /**

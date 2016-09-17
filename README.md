@@ -51,7 +51,7 @@ Register the package's servive provider in `config/app.php`
 ```php
 'providers' => [
     ...
-    'Plank\Mediable\MediableServiceProvider',
+    Plank\Mediable\MediableServiceProvider::class,
     ...
 ];
 ```
@@ -61,7 +61,7 @@ The package comes with a Facade for the image uploader, which you can optionally
 ```php
 'aliases' => [
 	...
-    'MediaUploader' => 'Plank\Mediable\MediaUploaderFacade',
+    'MediaUploader' => Plank\Mediable\MediaUploaderFacade::class,
     ...
 ]
 ```

@@ -51,7 +51,6 @@ class ImportMediaCommand extends Command
         'created' => 0,
         'updated' => 0,
         'skipped' => 0,
-        'unmodified' => 0,
     ];
 
     /**
@@ -137,19 +136,14 @@ class ImportMediaCommand extends Command
      */
     protected function createRecordForFile($disk, $path)
     {
-        $class = config('mediable.model');
-        $media = new $class;
-        $media->disk = $disk;
-        $media->directory = File::cleanDirname($path);
-        $media->filename = pathinfo($path, PATHINFO_FILENAME);
-        $media->extension = pathinfo($path, PATHINFO_EXTENSION);
-        $media->size = $this->filesystem->disk($disk)->size($path);
-        $media->mime_type = $this->filesystem->disk($disk)->mimeType($path);
-
-        if ($media->aggregate_type = $this->determineAggregateType($media, $path)) {
-            $media->save();
+        try {
+            $this->uploader->importPath($disk, $path);
             ++$this->counters['created'];
-            $this->info("Created record for {$path}", 'v');
+            $this->info("Created Record for file at {$path}", 'v');
+        } catch (MediaUploadException $e) {
+            $this->warn($e->getMessage(), 'vvv');
+            ++$this->counters['skipped'];
+            $this->info("Skipped file at {$path}", 'v');
         }
     }
 
@@ -161,34 +155,18 @@ class ImportMediaCommand extends Command
      */
     protected function updateRecordForFile(Media $media, $path)
     {
-        $media->size = $this->filesystem->disk($media->disk)->size($path);
-        $media->mime_type = $this->filesystem->disk($media->disk)->mimeType($path);
-
-        if ($media->aggregate_type = $this->determineAggregateType($media, $path)) {
-            if ($media->isDirty()) {
-                $media->save();
+        try {
+            if ($this->uploader->update($media)) {
                 ++$this->counters['updated'];
                 $this->info("Updated record for {$path}", 'v');
             } else {
-                ++$this->counters['unmodified'];
+                ++$this->counters['skipped'];
+                $this->info("Skipped unmodified file at {$path}", 'v');
             }
-        }
-    }
-
-    /**
-     * Attempt to find a legal aggregate type for a Media record.
-     * @param  Media $media
-     * @param  string $path
-     * @return string|null
-     */
-    protected function determineAggregateType(Media $media, $path)
-    {
-        try {
-            return $this->uploader->inferAggregateType($media->mime_type, $media->extensions);
         } catch (MediaUploadException $e) {
-            ++$this->counters['skipped'];
             $this->warn($e->getMessage(), 'vvv');
-            $this->info("Skipped unrecognized file at {$path}", 'v');
+            ++$this->counters['skipped'];
+            $this->info("Skipped file at {$path}", 'v');
         }
     }
 
@@ -200,14 +178,11 @@ class ImportMediaCommand extends Command
     protected function outputCounters($force)
     {
         $this->info(sprintf('Imported %d file(s).', $this->counters['created']));
-        if ($this->counters['skipped'] > 0) {
-            $this->info(sprintf('Skipped %d unrecognized file(s).', $this->counters['skipped']));
-        }
         if ($this->counters['updated'] > 0) {
-            $this->info(sprintf('Updated %d existing record(s).', $this->counters['updated']));
+            $this->info(sprintf('Updated %d record(s).', $this->counters['updated']));
         }
-        if ($this->counters['unmodified'] > 0) {
-            $this->info(sprintf('Skipped %d unmodified record(s).', $this->counters['unmodified']));
+        if ($this->counters['skipped'] > 0) {
+            $this->info(sprintf('Skipped %d file(s).', $this->counters['skipped']));
         }
     }
 
@@ -221,7 +196,6 @@ class ImportMediaCommand extends Command
             'created' => 0,
             'updated' => 0,
             'skipped' => 0,
-            'unmodified' => 0,
         ];
     }
 }

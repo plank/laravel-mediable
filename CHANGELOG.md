@@ -1,7 +1,13 @@
 # Changelog
 
+## 2.0.0 - 2016-09-17
+- `Mediable` models now remember the order in which `Media` is attached to each tag.
+- Renamed a few `MediaUploader` methods.
+- Facilitated setting `MediaUploader` on-duplicate behaviour. Thanks @jdhmtl.
+- `MediaUploader` can now generate filenames using hash of file contents. Thanks @geidelguerra!
+
 ## 1.1.1 - 2016-08-16
-- Published migration file now uses dynamic timestamp
+- Published migration file now uses dynamic timestamp. Thanks @borisdamevin!
 
 ## 1.1.0 - 2016-08-14
 - Added behaviour for detaching mediable relationships when Media or Mediable models are deleted or soft deleted.

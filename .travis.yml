@@ -12,6 +12,7 @@ after_script:
 branches:
   only:
   - master
+  - develop
   - stable
 cache:
   directories:

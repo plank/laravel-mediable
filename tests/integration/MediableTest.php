@@ -346,4 +346,17 @@ class MediableTest extends TestCase
         $mediable->forceDelete();
         $this->assertEquals(0, $mediable->getMedia('foo')->count());
     }
+
+    public function test_it_increments_order()
+    {
+        $mediable = factory(SampleMediable::class)->create();
+        $media1 = factory(Media::class)->create(['id' => 1]);
+        $media2 = factory(Media::class)->create(['id' => 2]);
+
+        $mediable->attachMedia($media1, 'foo');
+        $mediable->attachMedia($media2, 'foo');
+        $mediable->attachMedia($media1, 'bar');
+
+        $this->assertEquals([1, 1, 2], $mediable->media()->pluck('order')->toArray());
+    }
 }

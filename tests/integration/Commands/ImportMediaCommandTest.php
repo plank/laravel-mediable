@@ -64,13 +64,13 @@ class ImportMediaCommandTest extends TestCase
         $uploader->setAllowUnrecognizedTypes(false);
         $command = new ImportMediaCommand($filesystem, $uploader);
 
-        $media1 = factory(Media::class)->make(['disk' => 'tmp', 'extension' => 'foo', 'mime_type' => 'bar']);
-        $this->seedFileForMedia($media1);
+        $media = factory(Media::class)->make(['disk' => 'tmp', 'extension' => 'foo', 'mime_type' => 'bar']);
+        $this->seedFileForMedia($media);
 
         $artisan->registerCommand($command);
 
         $artisan->call('media:import', ['disk' => 'tmp']);
-        $this->assertEquals("Imported 0 file(s).\nSkipped 1 unrecognized file(s).\n", $artisan->output());
+        $this->assertEquals("Imported 0 file(s).\nSkipped 1 file(s).\n", $artisan->output());
     }
 
     public function test_it_updates_existing_media()
@@ -80,6 +80,7 @@ class ImportMediaCommandTest extends TestCase
             'disk' => 'tmp',
             'filename' => 'bar',
             'extension' => 'png',
+            'mime_type' => 'image/png',
             'aggregate_type' => 'foo']);
         $media2 = factory(Media::class)->create([
             'disk' => 'tmp',
@@ -93,7 +94,7 @@ class ImportMediaCommandTest extends TestCase
 
         $artisan->call('media:import', ['disk' => 'tmp', '--force' => true]);
         $this->assertEquals(['image', 'image'], Media::pluck('aggregate_type')->toArray());
-        $this->assertEquals("Imported 0 file(s).\nUpdated 1 existing record(s).\nSkipped 1 unmodified record(s).\n", $artisan->output());
+        $this->assertEquals("Imported 0 file(s).\nUpdated 1 record(s).\nSkipped 1 file(s).\n", $artisan->output());
     }
 
     protected function getArtisan()

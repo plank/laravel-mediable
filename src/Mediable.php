@@ -42,7 +42,9 @@ trait Mediable
      */
     public function media()
     {
-        return $this->morphToMany(config('mediable.model'), 'mediable')->withPivot('tag');
+        return $this->morphToMany(config('mediable.model'), 'mediable')
+            ->withPivot('tag', 'order')
+            ->orderBy('order');
     }
 
     /**
@@ -171,7 +173,10 @@ trait Mediable
             return;
         }
 
-        $this->media()->attach($media, ['tag' => $tags]);
+        $this->media()->attach($media, [
+            'tag' => $tags,
+            'order' => $this->getNextOrderValueForTag($tags),
+        ]);
         $this->markMediaDirty($tags);
     }
 
@@ -427,6 +432,13 @@ trait Mediable
         } else {
             $this->media()->detach();
         }
+    }
+
+    private function getNextOrderValueForTag($tag)
+    {
+        return 1 + $this->media()
+            ->where('tag', $tag)
+            ->max('order');
     }
 
     /**

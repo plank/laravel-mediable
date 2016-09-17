@@ -18,7 +18,19 @@ class MediaUploaderTest extends TestCase
 
     public function test_it_can_be_instantiated_via_facade()
     {
-        $this->assertInstanceOf(MediaUploader::class, Facade::setDirectory('foo'));
+        $this->assertInstanceOf(MediaUploader::class, Facade::toDirectory('foo'));
+    }
+
+    public function test_it_can_set_on_duplicate_behavior_via_facade()
+    {
+        $uploader = Facade::onDuplicateError();
+        $this->assertEquals(MediaUploader::ON_DUPLICATE_ERROR, $uploader->getOnDuplicateBehavior());
+
+        $uploader = Facade::onDuplicateIncrement();
+        $this->assertEquals(MediaUploader::ON_DUPLICATE_INCREMENT, $uploader->getOnDuplicateBehavior());
+
+        $uploader = Facade::onDuplicateReplace();
+        $this->assertEquals(MediaUploader::ON_DUPLICATE_REPLACE, $uploader->getOnDuplicateBehavior());
     }
 
     public function test_it_can_determine_media_type_by_extension_and_mime()
@@ -77,7 +89,7 @@ class MediaUploaderTest extends TestCase
     {
         $uploader = $this->mockUploader();
         $this->expectException(MediaUploadException::class);
-        $uploader->setDisk('abc');
+        $uploader->toDisk('abc');
     }
 
     public function test_it_throws_exception_for_disallowed_disk()
@@ -85,7 +97,7 @@ class MediaUploaderTest extends TestCase
         $uploader = $this->mockUploader();
         config()->set('filesystems.disks.foo', []);
         $this->expectException(MediaUploadException::class);
-        $uploader->setDisk('foo');
+        $uploader->toDisk('foo');
     }
 
     public function test_it_can_change_model_class()
@@ -109,7 +121,7 @@ class MediaUploaderTest extends TestCase
         $uploader = $this->mockUploader();
         $method = $this->getPrivateMethod($uploader, 'verifySource');
 
-        $this->setExpectedException(MediaUploadException::class);
+        $this->expectException(MediaUploadException::class);
         $method->invoke($uploader);
     }
 
@@ -192,7 +204,7 @@ class MediaUploaderTest extends TestCase
         $uploader = $this->mockDuplicateUploader();
         $uploader->setOnDuplicateBehavior(MediaUploader::ON_DUPLICATE_ERROR);
         $method = $this->getPrivateMethod($uploader, 'verifyDestination');
-        $this->setExpectedException(MediaUploadException::class);
+        $this->expectException(MediaUploadException::class);
         $method->invoke($uploader, $this->createMock(Media::class));
     }
 
@@ -236,7 +248,7 @@ class MediaUploaderTest extends TestCase
     {
         $media = Facade::fromSource(__DIR__ . '/../_data/plank.png')
             ->toDestination('tmp', 'foo')
-            ->setFilename('bar')
+            ->useFilename('bar')
             ->upload();
 
         $this->assertInstanceOf(Media::class, $media);
@@ -246,6 +258,51 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('image/png', $media->mime_type);
         $this->assertEquals(8444, $media->size);
         $this->assertEquals('image', $media->aggregate_type);
+    }
+
+    public function test_it_imports_existing_files()
+    {
+        $media = factory(Media::class)->make([
+            'disk' => 'tmp',
+            'directory' => 'foo',
+            'filename' => 'bar',
+            'extension' => 'png',
+            'mime_type' => 'image/png'
+        ]);
+        $this->seedFileForMedia($media, fopen(__DIR__ . '/../_data/plank.png', 'r'));
+
+        $media = Facade::importPath('tmp', 'foo/bar.png');
+        $this->assertInstanceOf(Media::class, $media);
+        $this->assertEquals('tmp', $media->disk);
+        $this->assertEquals('foo/bar.png', $media->getDiskPath());
+        $this->assertEquals('image/png', $media->mime_type);
+        $this->assertEquals(8444, $media->size);
+        $this->assertEquals('image', $media->aggregate_type);
+    }
+
+    public function test_it_updates_existing_media()
+    {
+        $media = factory(Media::class)->create([
+            'disk' => 'tmp',
+            'extension' => 'png',
+            'mime_type' => 'video/mpeg',
+            'aggregate_type' => 'video',
+            'size' => 999,
+        ]);
+        $this->seedFileForMedia($media, fopen(__DIR__ . '/../_data/plank.png', 'r'));
+
+        $result = Facade::update($media);
+
+        $this->assertTrue($result);
+        $this->assertEquals('image/png', $media->mime_type);
+        $this->assertEquals('image', $media->aggregate_type);
+        $this->assertEquals(8444, $media->size);
+    }
+
+    public function test_it_throws_exception_when_importing_missing_file()
+    {
+        $this->expectException(MediaUploadException::class);
+        Facade::import('tmp', 'non', 'existing', 'jpg');
     }
 
     public function test_it_use_hash_for_filename()

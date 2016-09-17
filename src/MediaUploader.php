@@ -3,6 +3,7 @@
 namespace Plank\Mediable;
 
 use Plank\Mediable\Exceptions\MediaUploadException;
+use Plank\Mediable\Helpers\File;
 use Plank\Mediable\SourceAdapters\SourceAdapterFactory;
 use Illuminate\Filesystem\FilesystemManager;
 
@@ -57,7 +58,7 @@ class MediaUploader
      * Name of the new file.
      * @var string
      */
-    private $filename;
+    private $filename = null;
 
     /**
      * If true the contents hash of the source will be used as the filename.
@@ -97,7 +98,7 @@ class MediaUploader
      */
     public function toDestination($disk, $directory)
     {
-        return $this->setDisk($disk)->setDirectory($directory);
+        return $this->toDisk($disk)->toDirectory($directory);
     }
 
     /**
@@ -106,16 +107,9 @@ class MediaUploader
      * @return static
      * @throws MediaUploadException if the disk is not found or not allowed for upload
      */
-    public function setDisk($disk)
+    public function toDisk($disk)
     {
-        if (! array_key_exists($disk, config('filesystems.disks'))) {
-            throw MediaUploadException::diskNotFound($disk);
-        }
-
-        if (! in_array($disk, $this->config['allowed_disks'])) {
-            throw MediaUploadException::diskNotAllowed($disk);
-        }
-        $this->disk = $disk;
+        $this->disk = $this->verifyDisk($disk);
 
         return $this;
     }
@@ -125,7 +119,7 @@ class MediaUploader
      * @param string $directory
      * @return static
      */
-    public function setDirectory($directory)
+    public function toDirectory($directory)
     {
         $this->directory = trim($this->sanitizePath($directory), DIRECTORY_SEPARATOR);
 
@@ -133,13 +127,37 @@ class MediaUploader
     }
 
     /**
-     * Override the filename of the source file.
+     * Specify the filename to copy to the file to.
      * @param string $filename
      * @return static
      */
-    public function setFilename($filename)
+    public function useFilename($filename)
     {
         $this->filename = $this->sanitizeFilename($filename);
+        $this->hash_filename = false;
+
+        return $this;
+    }
+
+    /**
+     * Indicates to the uploader to generate a filename using the file's MD5 hash.
+     * @return static
+     */
+    public function useHashForFilename()
+    {
+        $this->hash_filename = true;
+        $this->filename = null;
+
+        return $this;
+    }
+
+    /**
+     * Restore the default behaviour of using the source file's filename.
+     * @return static
+     */
+    public function useOriginalFilename()
+    {
+        $this->filename = null;
         $this->hash_filename = false;
 
         return $this;
@@ -183,6 +201,46 @@ class MediaUploader
         $this->config['on_duplicate'] = (string) $behavior;
 
         return $this;
+    }
+
+    /**
+     * Get current behavior when duplicate file is uploaded.
+     *
+     * @return string
+     */
+    public function getOnDuplicateBehavior()
+    {
+        return $this->config['on_duplicate'];
+    }
+
+    /**
+     * Throw an exception when file already exists at the destination.
+     *
+     * @return static
+     */
+    public function onDuplicateError()
+    {
+        return $this->setOnDuplicateBehavior(self::ON_DUPLICATE_ERROR);
+    }
+
+    /**
+     * Append incremented counter to file name when file already exists at destination.
+     *
+     * @return static
+     */
+    public function onDuplicateIncrement()
+    {
+        return $this->setOnDuplicateBehavior(self::ON_DUPLICATE_INCREMENT);
+    }
+
+    /**
+     * Overwrite existing file when file already exists at destination.
+     *
+     * @return static
+     */
+    public function onDuplicateReplace()
+    {
+        return $this->setOnDuplicateBehavior(self::ON_DUPLICATE_REPLACE);
     }
 
     /**
@@ -338,30 +396,6 @@ class MediaUploader
     }
 
     /**
-     * Indicates the uploader to use the source filename.
-     * @return static
-     */
-    public function useDefaultFilename()
-    {
-        $this->filename = null;
-        $this->hash_filename = false;
-
-        return $this;
-    }
-
-    /**
-     * Indicates the uploader to use the source contents hash as the filename.
-     * @return static
-     */
-    public function useHashForFilename()
-    {
-        $this->hash_filename = true;
-        $this->filename = null;
-
-        return $this;
-    }
-
-    /**
      * Process the file upload.
      *
      * Validates the source, then stores the file onto the disk and creates and stores a new Media instance.
@@ -391,11 +425,103 @@ class MediaUploader
         return $model;
     }
 
+    /**
+     * Create a `Media` record for a file already on a disk.
+     * @param  string $disk
+     * @param  string $path Path to file, relative to disk root
+     * @return Media
+     */
+    public function importPath($disk, $path)
+    {
+        $directory = File::cleanDirname($path);
+        $filename = pathinfo($path, PATHINFO_FILENAME);
+        $extension = pathinfo($path, PATHINFO_EXTENSION);
+
+        return $this->import($disk, $directory, $filename, $extension);
+    }
+
+    /**
+     * Create a `Media` record for a file already on a disk.
+     * @param  string $disk
+     * @param  string $directory
+     * @param  string $filename
+     * @param  string $extension
+     * @return Media
+     * @throws MediaUploadException if the file does not pass the uploader's validation
+     */
+    public function import($disk, $directory, $filename, $extension)
+    {
+        $disk = $this->verifyDisk($disk);
+        $storage = $this->filesystem->disk($disk);
+
+        $model = $this->makeModel();
+        $model->disk = $disk;
+        $model->directory = $directory;
+        $model->filename = $filename;
+        $model->extension = $this->verifyExtension($extension);
+
+        if (! $storage->has($model->getDiskPath())) {
+            throw MediaUploadException::fileNotFound($model->getDiskPath());
+        }
+
+        $model->mime_type = $this->verifyMimeType($storage->mimeType($model->getDiskPath()));
+        $model->aggregate_type = $this->inferAggregateType($model->mime_type, $model->extension);
+        $model->size = $this->verifyFileSize($storage->size($model->getDiskPath()));
+
+        $model->save();
+
+        return $model;
+    }
+
+    /**
+     * Reanalyze a media record's file and adjust the aggregate type and size, if necessary.
+     * @param  Media  $media
+     * @return bool Whether the model was modified
+     * @throws MediaUploadException if the file does not pass the uploader's validation
+     */
+    public function update(Media $media)
+    {
+        $storage = $this->filesystem->disk($media->disk);
+
+        $media->size = $this->verifyFileSize($storage->size($media->getDiskPath()));
+        $media->mime_type = $this->verifyMimeType($storage->mimeType($media->getDiskPath()));
+        $media->aggregate_type = $this->inferAggregateType($media->mime_type, $media->extension);
+
+        if ($dirty = $media->isDirty()) {
+            $media->save();
+        }
+
+        return $dirty;
+    }
+
+    /**
+     * Generate an instance of the `Media` class.
+     * @return Media
+     */
     private function makeModel()
     {
         $class = $this->config['model'];
 
         return new $class;
+    }
+
+    /**
+     * Ensure that the provided filesystem disk name exists and is allowed.
+     * @param  string $disk
+     * @return string
+     * @throws MediaUploadException If the disk does not exist or is not included in the `allowed_disks` config.
+     */
+    private function verifyDisk($disk)
+    {
+        if (! array_key_exists($disk, config('filesystems.disks'))) {
+            throw MediaUploadException::diskNotFound($disk);
+        }
+
+        if (! in_array($disk, $this->config['allowed_disks'])) {
+            throw MediaUploadException::diskNotAllowed($disk);
+        }
+
+        return $disk;
     }
 
     /**
