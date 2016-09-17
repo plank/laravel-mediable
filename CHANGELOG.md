@@ -5,6 +5,7 @@
 - Renamed a few `MediaUploader` methods.
 - Facilitated setting `MediaUploader` on-duplicate behaviour. Thanks @jdhmtl.
 - `MediaUploader` can now generate filenames using hash of file contents. Thanks @geidelguerra!
+- Added `import()` and `update()` methods to `MediaUploader`.
 
 ## 1.1.1 - 2016-08-16
 - Published migration file now uses dynamic timestamp. Thanks @borisdamevin!
