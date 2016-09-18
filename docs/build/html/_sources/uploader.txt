@@ -72,6 +72,7 @@ Handling Duplicates
 Occasionally, a file with a matching name might already exist at the destination you would like to upload to. The uploader allows you to configure how it should respond to this scenario. There are three possible behaviours:
 
 ::
+
     <?php
 
     // keep both, append incrementing counter to new file name
