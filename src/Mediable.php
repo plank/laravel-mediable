@@ -145,6 +145,11 @@ trait Mediable
         return $this;
     }
 
+    /**
+     * Lazy eager load attached media relationships matching all provided tags.
+     * @param  string|array  $tags one or more tags
+     * @return $this
+     */
     public function loadMediaMatchAll($tags = [])
     {
         $tags = (array) $tags;
@@ -434,6 +439,11 @@ trait Mediable
         }
     }
 
+    /**
+     * Determine the order value to assign to the next media assigned to a given tag.
+     * @param  string $tag
+     * @return integer
+     */
     private function getNextOrderValueForTag($tag)
     {
         return 1 + $this->media()
