@@ -164,18 +164,18 @@ class MediableTest extends TestCase
     public function test_it_can_sync_media_to_multiple_tags()
     {
         $mediable = factory(SampleMediable::class)->create();
-        $media1 = factory(Media::class)->create(['id' => 2]);
-        $media2 = factory(Media::class)->create(['id' => 3]);
-        $media3 = factory(Media::class)->create(['id' => 4]);
+        $media1 = factory(Media::class)->create(['id' => 1]);
+        $media2 = factory(Media::class)->create(['id' => 2]);
+        $media3 = factory(Media::class)->create(['id' => 3]);
 
         $mediable->attachMedia($media1, 'foo');
         $mediable->attachMedia($media1, 'bar');
 
         $mediable->syncMedia([$media2->id, $media3->id], ['bar', 'baz']);
 
-        $this->assertEquals([2], $mediable->getMedia('foo')->pluck('id')->toArray());
-        $this->assertEquals([3, 4], $mediable->getMedia('bar')->pluck('id')->toArray());
-        $this->assertEquals([3, 4], $mediable->getMedia('baz')->pluck('id')->toArray());
+        $this->assertEquals([1], $mediable->getMedia('foo')->pluck('id')->toArray());
+        $this->assertEquals([2, 3], $mediable->getMedia('bar')->pluck('id')->toArray());
+        $this->assertEquals([2, 3], $mediable->getMedia('baz')->pluck('id')->toArray());
     }
 
     public function test_it_can_be_queried_by_tag()
@@ -209,7 +209,8 @@ class MediableTest extends TestCase
         $mediable->attachMedia($media, 'foo');
         $mediable->attachMedia($media, 'bar');
 
-        $this->assertEquals(['foo', 'bar'], $mediable->getTagsForMedia($media));
+        $this->assertContains('foo', $mediable->getTagsForMedia($media));
+        $this->assertContains('bar', $mediable->getTagsForMedia($media));
     }
 
     public function test_it_can_disable_automatic_rehydration()
@@ -352,11 +353,27 @@ class MediableTest extends TestCase
         $mediable = factory(SampleMediable::class)->create();
         $media1 = factory(Media::class)->create(['id' => 1]);
         $media2 = factory(Media::class)->create(['id' => 2]);
+        $media3 = factory(Media::class)->create(['id' => 3]);
 
-        $mediable->attachMedia($media1, 'foo');
         $mediable->attachMedia($media2, 'foo');
+        $mediable->attachMedia($media3, 'foo');
         $mediable->attachMedia($media1, 'bar');
+        $mediable->attachMedia($media1, 'foo');
 
-        $this->assertEquals([1, 1, 2], $mediable->media()->pluck('order')->toArray());
+
+        $this->assertEquals([2 => 1, 3 => 2, 1 => 3], $mediable->getMedia('foo')->pluck('pivot.order', 'id')->toArray());
+        $this->assertEquals([1 => 1], $mediable->getMedia('bar')->pluck('pivot.order', 'id')->toArray());
+    }
+
+    public function test_it_increments_order_when_attaching_multiple()
+    {
+        $mediable = factory(SampleMediable::class)->create();
+        $media1 = factory(Media::class)->create(['id' => 1]);
+        $media2 = factory(Media::class)->create(['id' => 2]);
+        $media3 = factory(Media::class)->create(['id' => 3]);
+
+        $mediable->attachMedia([2, 3, 1], 'foo');
+
+        $this->assertEquals([2 => 1, 3 => 2, 1 => 3], $mediable->getMedia('foo')->pluck('pivot.order', 'id')->toArray());
     }
 }
