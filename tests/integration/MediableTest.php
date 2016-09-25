@@ -348,6 +348,17 @@ class MediableTest extends TestCase
         $this->assertEquals(0, $mediable->getMedia('foo')->count());
     }
 
+    public function test_it_reads_highest_order()
+    {
+        $mediable = factory(SampleMediable::class)->create();
+        $media = factory(Media::class)->create(['id' => 1]);
+        $method = $this->getPrivateMethod($mediable, 'getOrderValueForTags');
+
+        $this->assertEquals(['foo' => 0], $method->invoke($mediable, 'foo'));
+        $mediable->attachMedia($media, 'foo');
+        $this->assertEquals(['foo' => 1], $method->invoke($mediable, 'foo'));
+    }
+
     public function test_it_increments_order()
     {
         $mediable = factory(SampleMediable::class)->create();
@@ -359,7 +370,6 @@ class MediableTest extends TestCase
         $mediable->attachMedia($media3, 'foo');
         $mediable->attachMedia($media1, 'bar');
         $mediable->attachMedia($media1, 'foo');
-
 
         $this->assertEquals([2 => 1, 3 => 2, 1 => 3], $mediable->getMedia('foo')->pluck('pivot.order', 'id')->toArray());
         $this->assertEquals([1 => 1], $mediable->getMedia('bar')->pluck('pivot.order', 'id')->toArray());
