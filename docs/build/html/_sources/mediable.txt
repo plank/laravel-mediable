@@ -111,7 +111,7 @@ To change the order of media assigned to a given tag, or to insert a new item at
     $media = $media->prepend($new_media);
     $post->syncMedia($media, 'gallery');
 
-An `ORDER BY` clause is automatically applied to all queries run on the `media()` relationship. To disable this default behaviour, use the `unordered()` query scope.
+An ``ORDER BY`` clause is automatically applied to all queries run on the ``media()`` relationship. To disable this default behaviour, use the ``unordered()`` query scope.
 
 ::
 
