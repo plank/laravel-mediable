@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Eloquent\Collection;
-use Plank\Mediable\Media;
 
 /**
  * Mediable Trait.
@@ -447,7 +446,7 @@ trait Mediable
     /**
      * Determine the highest order value assigned to each provided tag.
      * @param  string $tag
-     * @return integer
+     * @return int
      */
     private function getOrderValueForTags($tags)
     {
@@ -461,11 +460,12 @@ trait Mediable
             ->pluck('aggregate', 'tag');
 
         $empty = array_combine($tags, array_fill(0, count($tags), 0));
+
         return array_merge($empty, $result);
     }
 
     /**
-     * Convert mixed input to array of ids
+     * Convert mixed input to array of ids.
      * @param  mixed $input
      * @return array
      */
