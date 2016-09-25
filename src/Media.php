@@ -122,6 +122,19 @@ class Media extends Model
     }
 
     /**
+     * Query scope to remove the order by clause from the query.
+     * @param  Builder $q
+     * @return void
+     */
+    public function scopeUnordered(Builder $q)
+    {
+        $query = $q->getQuery();
+        if ($query->orders) {
+            $query->orders = null;
+        }
+    }
+
+    /**
      * Calculate the file size in human readable byte notation.
      * @param  int $precision (_optional_) Number of decimal places to include.
      * @return string

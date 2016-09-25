@@ -376,4 +376,13 @@ class MediableTest extends TestCase
 
         $this->assertEquals([2 => 1, 3 => 2, 1 => 3], $mediable->getMedia('foo')->pluck('pivot.order', 'id')->toArray());
     }
+
+    public function test_it_can_unset_order()
+    {
+        $mediable = factory(SampleMediable::class)->make();
+
+        $query = $mediable->media()->unordered()->toSql();
+
+        $this->assertNotRegExp('/order by `order`/i', $query);
+    }
 }
