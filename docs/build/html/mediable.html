@@ -243,6 +243,13 @@
 <span class="nv">$post</span><span class="o">-&gt;</span><span class="na">syncMedia</span><span class="p">(</span><span class="nv">$media</span><span class="p">,</span> <span class="s1">&#39;gallery&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
+<p>An <cite>ORDER BY</cite> clause is automatically applied to all queries run on the <cite>media()</cite> relationship. To disable this default behaviour, use the <cite>unordered()</cite> query scope.</p>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="nv">$mediable</span><span class="o">-&gt;</span><span class="na">media</span><span class="p">()</span>
+    <span class="o">-&gt;</span><span class="na">unordered</span><span class="p">()</span>
+    <span class="o">-&gt;...</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="checking-for-the-presence-of-media">
 <h2>Checking for the Presence of Media<a class="headerlink" href="#checking-for-the-presence-of-media" title="Permalink to this headline">¶</a></h2>
