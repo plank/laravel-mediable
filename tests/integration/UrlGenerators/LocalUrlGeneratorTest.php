@@ -31,7 +31,6 @@ class LocalUrlGeneratorTest extends TestCase
     {
         $generator = $this->setupGenerator('public_storage');
         $this->assertEquals('http://localhost/prefix/foo/bar.jpg', $generator->getUrl());
-
     }
 
     protected function setupGenerator($disk = 'uploads')
