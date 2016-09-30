@@ -47,10 +47,10 @@ class LocalUrlGenerator extends BaseUrlGenerator
         if (! $this->isPubliclyAccessible()) {
             throw MediaUrlException::mediaNotPubliclyAccessible($this->getAbsolutePath(), public_path());
         }
-        if($this->isInWebroot()){
+        if ($this->isInWebroot()) {
             $path = str_replace(public_path(), '', $this->getAbsolutePath());
-        }else{
-            $path = rtrim($this->getDiskConfig('prefix', 'storage'), '/') . '/' . $this->media->getDiskPath();
+        } else {
+            $path = rtrim($this->getDiskConfig('prefix', 'storage'), '/').'/'.$this->media->getDiskPath();
         }
 
         return $this->cleanDirectorySeparators($path);
