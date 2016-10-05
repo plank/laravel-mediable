@@ -609,7 +609,7 @@ class MediaUploader
     {
         switch ($this->config['on_duplicate']) {
             case static::ON_DUPLICATE_ERROR:
-                throw MediaUploadException::fileExists($model->getDiskpath);
+                throw MediaUploadException::fileExists($model->getDiskPath());
                 break;
             case static::ON_DUPLICATE_REPLACE:
                 $this->deleteExistingMedia($model);
