@@ -33,6 +33,8 @@ class SourceAdapterFactory
      */
     public function create($source)
     {
+        $adapter = null;
+
         if ($source instanceof SourceAdapterInterface) {
             return $source;
         } elseif (is_object($source)) {

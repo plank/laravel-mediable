@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * Mediable Trait.
@@ -145,6 +146,11 @@ trait Mediable
         return $this;
     }
 
+    /**
+     * Lazy eager load attached media relationships matching all provided tags.
+     * @param  string|array  $tags one or more tags
+     * @return $this
+     */
     public function loadMediaMatchAll($tags = [])
     {
         $tags = (array) $tags;
@@ -165,18 +171,21 @@ trait Mediable
      */
     public function attachMedia($media, $tags)
     {
-        if (is_array($tags)) {
-            foreach ($tags as $tag) {
-                $this->attachMedia($media, $tag);
-            }
+        $tags = (array) $tags;
+        $increments = $this->getOrderValueForTags($tags);
+        $ids = $this->extractIds($media);
 
-            return;
+        foreach ($tags as $tag) {
+            $attach = [];
+            foreach ($ids as $id) {
+                $attach[$id] = [
+                    'tag' => $tag,
+                    'order' => ++$increments[$tag],
+                ];
+            }
+            $this->media()->attach($attach);
         }
 
-        $this->media()->attach($media, [
-            'tag' => $tags,
-            'order' => $this->getNextOrderValueForTag($tags),
-        ]);
         $this->markMediaDirty($tags);
     }
 
@@ -434,11 +443,43 @@ trait Mediable
         }
     }
 
-    private function getNextOrderValueForTag($tag)
+    /**
+     * Determine the highest order value assigned to each provided tag.
+     * @param  string $tag
+     * @return int
+     */
+    private function getOrderValueForTags($tags)
     {
-        return 1 + $this->media()
-            ->where('tag', $tag)
-            ->max('order');
+        $tags = (array) $tags;
+        $result = $this->media()->newPivotStatement()
+            ->selectRaw('`tag`, max(`order`) as aggregate')
+            ->where('mediable_type', $this->getMorphClass())
+            ->where('mediable_id', $this->getKey())
+            ->whereIn('tag', $tags)
+            ->groupBy('tag')
+            ->pluck('aggregate', 'tag');
+
+        $empty = array_combine($tags, array_fill(0, count($tags), 0));
+
+        return array_merge($empty, collect($result)->toArray());
+    }
+
+    /**
+     * Convert mixed input to array of ids.
+     * @param  mixed $input
+     * @return array
+     */
+    private function extractIds($input)
+    {
+        if ($input instanceof Collection) {
+            return $input->modelKeys();
+        }
+
+        if ($input instanceof Media) {
+            return [$input->getKey()];
+        }
+
+        return (array) $input;
     }
 
     /**
@@ -449,6 +490,7 @@ trait Mediable
         if (is_string($relations)) {
             $relations = func_get_args();
         }
+
         if (array_key_exists('media', $relations) || in_array('media', $relations)) {
             $this->media_dirty_tags = [];
         }

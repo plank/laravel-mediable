@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Uploading Files &mdash; Laravel-Mediable 2.0.0 documentation</title>
+  <title>Uploading Files &mdash; Laravel-Mediable 2.2.0 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="Laravel-Mediable 2.0.0 documentation" href="index.html"/>
+    <link rel="top" title="Laravel-Mediable 2.2.0 documentation" href="index.html"/>
         <link rel="next" title="Handling Media" href="mediable.html"/>
         <link rel="prev" title="Configuration" href="configuration.html"/> 
 
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                2.0.0
+                2.2.0
               </div>
             
           
@@ -205,17 +205,18 @@
 <div class="section" id="handling-duplicates">
 <h2>Handling Duplicates<a class="headerlink" href="#handling-duplicates" title="Permalink to this headline">¶</a></h2>
 <p>Occasionally, a file with a matching name might already exist at the destination you would like to upload to. The uploader allows you to configure how it should respond to this scenario. There are three possible behaviours:</p>
-<dl class="docutils">
-<dt>::</dt>
-<dd><p class="first">&lt;?php</p>
-<p>// keep both, append incrementing counter to new file name
-$uploader-&gt;onDuplicateIncrement();</p>
-<p>// replace old file with new one
-$uploader-&gt;onDuplicateReplace();</p>
-<p class="last">// cancel upload, throw an exception
-$uploader-&gt;onDuplicateError();</p>
-</dd>
-</dl>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+
+<span class="c1">// keep both, append incrementing counter to new file name</span>
+<span class="nv">$uploader</span><span class="o">-&gt;</span><span class="na">onDuplicateIncrement</span><span class="p">();</span>
+
+<span class="c1">// replace old file with new one</span>
+<span class="nv">$uploader</span><span class="o">-&gt;</span><span class="na">onDuplicateReplace</span><span class="p">();</span>
+
+<span class="c1">// cancel upload, throw an exception</span>
+<span class="nv">$uploader</span><span class="o">-&gt;</span><span class="na">onDuplicateError</span><span class="p">();</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="validation">
 <h2>Validation<a class="headerlink" href="#validation" title="Permalink to this headline">¶</a></h2>
@@ -310,7 +311,7 @@ $uploader-&gt;onDuplicateError();</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'2.0.0',
+            VERSION:'2.2.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

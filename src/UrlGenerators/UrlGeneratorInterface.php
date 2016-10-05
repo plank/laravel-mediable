@@ -28,6 +28,8 @@ interface UrlGeneratorInterface
 
     /**
      * Check if the file is publicly accessible.
+     *
+     * Disks configs should indicate this with the visibility key
      * @return bool
      */
     public function isPubliclyAccessible();

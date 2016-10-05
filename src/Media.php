@@ -29,7 +29,7 @@ class Media extends Model
     const TYPE_OTHER = 'other';
     const TYPE_ALL = 'all';
 
-    protected $guarded = ['id', 'disk', 'directory', 'filename', 'extension', 'size', 'mime', 'aggregate_type'];
+    protected $guarded = ['id', 'disk', 'directory', 'filename', 'extension', 'size', 'mime_type', 'aggregate_type'];
 
     /**
      * {@inheritdoc}
@@ -119,6 +119,19 @@ class Media extends Model
             ->where('directory', pathinfo($path, PATHINFO_DIRNAME))
             ->where('filename', pathinfo($path, PATHINFO_FILENAME))
             ->where('extension', pathinfo($path, PATHINFO_EXTENSION));
+    }
+
+    /**
+     * Query scope to remove the order by clause from the query.
+     * @param  Builder $q
+     * @return void
+     */
+    public function scopeUnordered(Builder $q)
+    {
+        $query = $q->getQuery();
+        if ($query->orders) {
+            $query->orders = null;
+        }
     }
 
     /**

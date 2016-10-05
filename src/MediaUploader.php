@@ -663,7 +663,7 @@ class MediaUploader
         }
 
         if ($this->hash_filename) {
-            return $this->generateHash($this->source);
+            return $this->generateHash();
         }
 
         return $this->sanitizeFileName($this->source->filename());
@@ -673,9 +673,9 @@ class MediaUploader
      * Calculate hash of source contents.
      * @return string
      */
-    private function generateHash($source)
+    private function generateHash()
     {
-        return md5_file($source->path());
+        return md5_file($this->source->path());
     }
 
     /**

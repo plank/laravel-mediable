@@ -41,16 +41,6 @@ class S3UrlGenerator extends BaseUrlGenerator
     /**
      * {@inheritdoc}
      */
-    public function isPubliclyAccessible()
-    {
-        //file permissions are set on the buckets themselves
-        //use config value if possible
-        return $this->getDiskConfig('visibility', 'public') == 'public';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getUrl()
     {
         if (! $this->isPubliclyAccessible()) {

@@ -34,7 +34,7 @@ class LocalUrlGenerator extends BaseUrlGenerator
      */
     public function isPubliclyAccessible()
     {
-        return strpos($this->getAbsolutePath(), public_path()) === 0;
+        return  parent::isPubliclyAccessible() || $this->isInWebroot();
     }
 
     /**
@@ -47,7 +47,11 @@ class LocalUrlGenerator extends BaseUrlGenerator
         if (! $this->isPubliclyAccessible()) {
             throw MediaUrlException::mediaNotPubliclyAccessible($this->getAbsolutePath(), public_path());
         }
-        $path = str_replace(public_path(), '', $this->getAbsolutePath());
+        if ($this->isInWebroot()) {
+            $path = str_replace(public_path(), '', $this->getAbsolutePath());
+        } else {
+            $path = rtrim($this->getDiskConfig('prefix', 'storage'), '/').'/'.$this->media->getDiskPath();
+        }
 
         return $this->cleanDirectorySeparators($path);
     }
@@ -81,5 +85,10 @@ class LocalUrlGenerator extends BaseUrlGenerator
         }
 
         return $path;
+    }
+
+    private function isInWebroot()
+    {
+        return strpos($this->getAbsolutePath(), public_path()) === 0;
     }
 }
