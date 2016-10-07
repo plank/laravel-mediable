@@ -82,6 +82,18 @@ class MediaTest extends TestCase
         $this->assertEquals(4, Media::forPathOnDisk('tmp', 'foo/bar/baz/bat.jpg')->first()->id);
     }
 
+    public function test_it_can_be_queried_by_path_on_disk_when_directory_is_empty()
+    {
+        factory(Media::class)->create([
+            'id' => 4,
+            'disk' => 'tmp',
+            'directory' => '',
+            'filename' => 'bat',
+            'extension' => 'jpg'
+        ]);
+        $this->assertEquals(4, Media::forPathOnDisk('tmp', 'bat.jpg')->first()->id);
+    }
+
     public function test_it_can_view_human_readable_file_size()
     {
         $media = factory(Media::class)->make(['size' => 0]);
