@@ -116,7 +116,7 @@ class Media extends Model
     public function scopeForPathOnDisk(Builder $q, $disk, $path)
     {
         $q->where('disk', $disk)
-            ->where('directory', pathinfo($path, PATHINFO_DIRNAME))
+            ->where('directory', File::cleanDirname($path))
             ->where('filename', pathinfo($path, PATHINFO_FILENAME))
             ->where('extension', pathinfo($path, PATHINFO_EXTENSION));
     }
