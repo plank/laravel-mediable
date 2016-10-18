@@ -7,7 +7,6 @@ use Plank\Mediable\Media;
 
 class UrlGeneratorFactoryTest extends TestCase
 {
-
     public function test_it_sets_generator_for_driver()
     {
         $factory = new UrlGeneratorFactory;
