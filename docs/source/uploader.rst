@@ -88,7 +88,7 @@ Occasionally, a file with a matching name might already exist at the destination
 Validation
 --------------------
 
-The ``MediaUpload`` will perform a number of validation checks on the source file. If any of the checks fail, a ``Plank\Mediable\MediaUploaderException`` will be through with a message indicating why the file was rejected.
+The ``MediaUpload`` will perform a number of validation checks on the source file. If any of the checks fail, a ``Plank\Mediable\MediaUploadException`` will be thrown with a message indicating why the file was rejected.
 
 
 You can override the most validation configuration values set in ``config/mediable.php`` on a case-by-case basis using the same fluent interface.
@@ -113,13 +113,40 @@ You can override the most validation configuration values set in ``config/mediab
         // only allow files of specific MIME types
         ->setAllowedMimeTypes(['image/jpeg'])
 
-        // only allow files of specifc extensions
+        // only allow files of specific extensions
         ->setAllowedExtensions(['jpg', 'jpeg'])
 
         // only allow files of specific aggregate types
         ->setAllowedAggregateTypes(['image'])
 
         ->upload();
+
+Handling Exceptions
+--------------------
+
+If you want to return more granular HTTP status codes when a ``Plank\Mediable\MediaUploadException`` is thrown, you can use the ``Plank\Mediable\HandlesMediaExceptions`` trait in your app's `Exceptions\Handler`. For example, if you have set a maximum file size, an HTTP code 413 (Request Entity Too Large) will be returned instead of a 500.
+
+Call the ``prepareMediaUploadException`` method on the ``render`` method, and a ``HttpException`` with the appropriate status code will be returned. Take a look at the ``HandlesMediaExceptions`` source code for the table of associated status codes and exceptions.
+
+::
+
+    <?php
+
+    namespace App\Exceptions;
+
+    use Plank\Mediable\HandlesMediaExceptions;
+
+    class Handler
+    {
+        use HandlesMediaExceptions;
+
+        public function render($request, $e)
+        {
+            $e = $this->prepareMediaUploadException($e);
+
+            return parent::render($request, $e);
+        }
+    }
 
 Importing Files
 --------------------

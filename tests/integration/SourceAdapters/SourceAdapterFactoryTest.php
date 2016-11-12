@@ -30,6 +30,7 @@ class SourceAdapterFactoryTest extends TestCase
     {
         $factory = new SourceAdapterFactory;
         $this->expectException(MediaUploadException::class);
+        $this->expectExceptionCode(101);
         $factory->setAdapterForClass(stdClass::class, stdClass::class);
     }
 
@@ -37,6 +38,7 @@ class SourceAdapterFactoryTest extends TestCase
     {
         $factory = new SourceAdapterFactory;
         $this->expectException(MediaUploadException::class);
+        $this->expectExceptionCode(101);
         $factory->setAdapterForPattern(stdClass::class, 'foo');
     }
 
@@ -44,6 +46,7 @@ class SourceAdapterFactoryTest extends TestCase
     {
         $factory = new SourceAdapterFactory;
         $this->expectException(MediaUploadException::class);
+        $this->expectExceptionCode(103);
         $factory->create(new stdClass);
     }
 
@@ -51,6 +54,7 @@ class SourceAdapterFactoryTest extends TestCase
     {
         $factory = new SourceAdapterFactory;
         $this->expectException(MediaUploadException::class);
+        $this->expectExceptionCode(103);
         $factory->create('foo');
     }
 

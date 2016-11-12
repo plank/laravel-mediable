@@ -56,6 +56,7 @@ class MediaUploaderTest extends TestCase
         $uploader->setTypeDefinition('bar', ['text/bar'], ['bar']);
         $uploader->setStrictTypeChecking(true);
         $this->expectException(MediaUploadException::class);
+        $this->expectExceptionCode(109);
         $uploader->inferAggregateType('text/foo', 'bar');
     }
 
@@ -71,6 +72,7 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('bar', $uploader->inferAggregateType('text/bar', 'bar'), 'With Restriction');
 
         $this->expectException(MediaUploadException::class);
+        $this->expectExceptionCode(113);
         $uploader->inferAggregateType('text/foo', 'bar');
     }
 
@@ -82,6 +84,7 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals(Media::TYPE_OTHER, $uploader->inferAggregateType('text/foo', 'bar'));
         $uploader->setAllowUnrecognizedTypes(false);
         $this->expectException(MediaUploadException::class);
+        $this->expectExceptionCode(110);
         $uploader->inferAggregateType('text/foo', 'bar');
     }
 
@@ -89,6 +92,7 @@ class MediaUploaderTest extends TestCase
     {
         $uploader = $this->mockUploader();
         $this->expectException(MediaUploadException::class);
+        $this->expectExceptionCode(105);
         $uploader->toDisk('abc');
     }
 
@@ -97,6 +101,7 @@ class MediaUploaderTest extends TestCase
         $uploader = $this->mockUploader();
         config()->set('filesystems.disks.foo', []);
         $this->expectException(MediaUploadException::class);
+        $this->expectExceptionCode(106);
         $uploader->toDisk('foo');
     }
 
@@ -113,6 +118,7 @@ class MediaUploaderTest extends TestCase
     {
         $uploader = $this->mockUploader();
         $this->expectException(MediaUploadException::class);
+        $this->expectExceptionCode(102);
         $uploader->setModelClass(stdClass::class);
     }
 
@@ -122,6 +128,7 @@ class MediaUploaderTest extends TestCase
         $method = $this->getPrivateMethod($uploader, 'verifySource');
 
         $this->expectException(MediaUploadException::class);
+        $this->expectExceptionCode(104);
         $method->invoke($uploader);
     }
 
@@ -148,6 +155,7 @@ class MediaUploaderTest extends TestCase
         $uploader->fromSource($source);
 
         $this->expectException(MediaUploadException::class);
+        $this->expectExceptionCode(107);
         $method->invoke($uploader);
     }
 
@@ -162,6 +170,7 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('text/bar', $method->invoke($uploader, 'text/bar'), 'With Restriction');
 
         $this->expectException(MediaUploadException::class);
+        $this->expectExceptionCode(111);
         $method->invoke($uploader, 'text/foo');
     }
 
@@ -176,6 +185,7 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('bar', $method->invoke($uploader, 'bar'), 'With Restriction');
 
         $this->expectException(MediaUploadException::class);
+        $this->expectExceptionCode(112);
         $method->invoke($uploader, 'foo');
     }
 
@@ -187,6 +197,7 @@ class MediaUploaderTest extends TestCase
 
         $this->assertEquals(1, $method->invoke($uploader, 1));
         $this->expectException(MediaUploadException::class);
+        $this->expectExceptionCode(114);
         $method->invoke($uploader, 3);
     }
 
@@ -205,6 +216,7 @@ class MediaUploaderTest extends TestCase
         $uploader->setOnDuplicateBehavior(MediaUploader::ON_DUPLICATE_ERROR);
         $method = $this->getPrivateMethod($uploader, 'verifyDestination');
         $this->expectException(MediaUploadException::class);
+        $this->expectExceptionCode(108);
         $method->invoke($uploader, $this->createMock(Media::class));
     }
 
@@ -302,6 +314,7 @@ class MediaUploaderTest extends TestCase
     public function test_it_throws_exception_when_importing_missing_file()
     {
         $this->expectException(MediaUploadException::class);
+        $this->expectExceptionCode(107);
         Facade::import('tmp', 'non', 'existing', 'jpg');
     }
 
