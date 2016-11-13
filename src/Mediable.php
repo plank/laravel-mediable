@@ -450,9 +450,11 @@ trait Mediable
      */
     private function getOrderValueForTags($tags)
     {
+        $q = $this->media()->newPivotStatement();
         $tags = (array) $tags;
-        $result = $this->media()->newPivotStatement()
-            ->selectRaw('`tag`, max(`order`) as aggregate')
+        $grammar = $q->getConnection()->getQueryGrammar();
+
+        $result = $q->selectRaw($grammar->wrap('tag').', max('.$grammar->wrap('order').') as aggregate')
             ->where('mediable_type', $this->getMorphClass())
             ->where('mediable_id', $this->getKey())
             ->whereIn('tag', $tags)
