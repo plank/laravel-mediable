@@ -72,7 +72,7 @@ You can retrieve media attached to a file by refering to the tag to which it was
     <?php
     $media = $post->getMedia('thumbnail');
 
-This returns a collection of all media assigned to that tag. In cases where you only need one `Media` entity, you can instead use `firstMedia()`.
+This returns a collection of all media assigned to that tag. In cases where you only need one ``Media`` entity, you can instead use ``firstMedia()``.
 
 ::
 

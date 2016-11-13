@@ -54,7 +54,12 @@ class TestCase extends BaseTestCase
             'uploads' => [
                 'driver' => 'local',
                 'root' => public_path('uploads'),
-                'visibility' => 'public'
+            ],
+            'public_storage' => [
+                'driver' => 'local',
+                'root' => storage_path('public'),
+                'visibility' => 'public',
+                'prefix' => 'prefix'
             ],
             's3' => [
                 'driver' => 's3',
@@ -62,7 +67,8 @@ class TestCase extends BaseTestCase
                 'secret' => env('S3_SECRET'),
                 'region' => env('S3_REGION'),
                 'bucket' => env('S3_BUCKET'),
-                'version' => 'latest'
+                'version' => 'latest',
+                'visibility' => 'public'
             ]
         ]);
 

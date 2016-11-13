@@ -14,6 +14,7 @@ An example setup with one private disk (``local``) and one publicly accessible d
 
 ::
 
+    <?php
     //...
     'disks' => [
         'local' => [
@@ -33,6 +34,7 @@ Once you have set up as many disks as you need, edit ``config/mediable.php`` to 
 
 ::
 
+    <?php
     //...
     /*
      * Filesystem disk to use if none is specified
@@ -47,6 +49,85 @@ Once you have set up as many disks as you need, edit ``config/mediable.php`` to 
     ],
     //...
 
+
+Disk Visibility
+^^^^^^^^^^^^^^^
+
+This package is able to generate public URLs for accessing media, and uses the disk config to determine how this should be done.
+
+URLs can always be generated for ``Media`` placed on a disk located below the webroot.
+
+::
+
+    <?php
+    'disks' => [
+        'uploads' => [
+            'driver' => 'local',
+            'root' => public_path('uploads'),
+        ],
+    ]
+
+    //...
+
+    $media->getUrl(); // returns http://domain.com/uploads/foo.jpg
+
+``Media`` placed on a disk located elsewhere will throw an exception.
+
+::
+
+    <?php
+    'disks' => [
+        'private' => [
+            'driver' => 'local',
+            'root' => storage_path('private'),
+        ],
+    ]
+
+    //...
+
+    $media->getUrl(); // Throws a Plank\Mediable\Exceptions\MediableUrlException
+
+If you are using symbolic links to make local disks accessible, you can instruct the package to generate URLs with the ``'visibility' => 'public'`` key. By default, the package will assume that the symlink is named ``'storage'``, as per `laravel's documentation <https://laravel.com/docs/5.3/filesystem#the-public-disk>`_. This can be modified with the ``'prefix'`` key.
+
+::
+
+    <?php
+    'disks' => [
+        'public' => [
+            'driver' => 'local',
+            'root' => storage_path('public'),
+            'visibility' => 'public',
+            'prefix' => 'assets'
+        ],
+    ]
+
+    //...
+
+    $media->getUrl(); // returns http://domain.com/assets/foo.jpg
+
+
+Permissions for S3-based disks is set on the buckets themselves. You can inform the package that ``Media`` on an S3 disk can be linked by URL by adding the ``'visibility' => 'public'`` key to the disk congfig.
+
+::
+
+    <?php
+    'disks' => [
+        'cloud' => [
+            'driver' => 's3',
+            'key'    => env('S3_KEY'),
+            'secret' => env('S3_SECRET'),
+            'region' => env('S3_REGION'),
+            'bucket' => env('S3_BUCKET'),
+            'version' => 'latest',
+            'visibility' => 'public'
+        ],
+    ]
+
+    //...
+
+    $media->getUrl(); // returns https://s3.amazonaws.com/bucket/foo.jpg
+
+
 .. _validation:
 
 Validation
@@ -56,6 +137,7 @@ The `config/mediable.php` offers a number of options for configuring how media u
 
 ::
 
+    <?php
     //...
     /*
      * The maximum file size in bytes for a single uploaded file
@@ -106,10 +188,11 @@ Aggregate Types
 
 Laravel-Mediable provides functionality for handling multiple kinds of files under a shared aggregate type. This is intended to make it easy to find similar media without needing to constantly juggle multiple MIME types or file extensions.
 
-The package defines a number of common file types in the config file (config/mediable.php). Feel free to modify the default types provided by the package or add your own. Each aggregate type requires a key used to identify the type and a list of MIME types and file extensions that should be recognized as belonging to that aggregate type. For example, if you wanted to add an aggregate type for different types of markup, you could do the following.
+The package defines a number of common file types in the config file (``config/mediable.php``). Feel free to modify the default types provided by the package or add your own. Each aggregate type requires a key used to identify the type and a list of MIME types and file extensions that should be recognized as belonging to that aggregate type. For example, if you wanted to add an aggregate type for different types of markup, you could do the following.
 
 ::
 
+    <?php
     //...
     'aggregate_types' => [
         //...
@@ -145,6 +228,7 @@ The ``config/mediable.php`` file lets you specify a number of classes to be use 
 
 ::
 
+    <?php
     /*
      * FQCN of the model to use for media
      *

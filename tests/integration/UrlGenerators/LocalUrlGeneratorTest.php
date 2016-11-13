@@ -27,6 +27,12 @@ class LocalUrlGeneratorTest extends TestCase
         $generator->getPublicPath();
     }
 
+    public function test_it_accepts_public_visiblity()
+    {
+        $generator = $this->setupGenerator('public_storage');
+        $this->assertEquals('http://localhost/prefix/foo/bar.jpg', $generator->getUrl());
+    }
+
     protected function setupGenerator($disk = 'uploads')
     {
         $media = factory(Media::class)->make([

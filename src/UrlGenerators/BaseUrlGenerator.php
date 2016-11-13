@@ -43,6 +43,14 @@ abstract class BaseUrlGenerator implements UrlGeneratorInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function isPubliclyAccessible()
+    {
+        return $this->getDiskConfig('visibility', 'private') == 'public';
+    }
+
+    /**
      * Get a config value for the current disk.
      * @param  string $key
      * @param  mixed $default
