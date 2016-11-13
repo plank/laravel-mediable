@@ -3,6 +3,7 @@
 namespace Plank\Mediable;
 
 use Plank\Mediable\Exceptions\MediaMoveException;
+use Plank\Mediable\Exceptions\MediaExistsException;
 use Illuminate\Filesystem\FilesystemManager;
 
 /**
@@ -34,7 +35,8 @@ class MediaMover
      * @param  string $directory directory relative to disk root
      * @param  string $name        filename. Do not include extension
      * @return void
-     * @throws  MediaMoveException If attempting to change the file extension or a file with the same name already exists at the destination
+     * @throws MediaExistsException If attempting to change the file extension or a file with the same name already exists at the destination
+     * @throws MediaMoveException If moving the file fails
      */
     public function move(Media $media, $directory, $filename = null)
     {
@@ -50,10 +52,13 @@ class MediaMover
         $target_path = $directory.'/'.$filename.'.'.$media->extension;
 
         if ($storage->has($target_path)) {
-            throw MediaMoveException::destinationExists($target_path);
+            throw MediaExistsException::fileExists($target_path);
         }
 
-        $storage->move($media->getDiskPath(), $target_path);
+        if (! $storage->move($media->getDiskPath(), $target_path)) {
+            throw MediaMoveException::failed($media->getDiskPath(), $directory);
+        }
+
         $media->filename = $filename;
         $media->directory = $directory;
         $media->save();

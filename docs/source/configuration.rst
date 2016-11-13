@@ -106,7 +106,7 @@ If you are using symbolic links to make local disks accessible, you can instruct
     $media->getUrl(); // returns http://domain.com/assets/foo.jpg
 
 
-Permissions for S3-based disks is set on the buckets themselves. You can inform the package that ``Media`` on an S3 disk can be linked by URL by adding the ``'visibility' => 'public'`` key to the disk congfig.
+Permissions for S3-based disks is set on the buckets themselves. You can inform the package that ``Media`` on an S3 disk can be linked by URL by adding the ``'visibility' => 'public'`` key to the disk config.
 
 ::
 

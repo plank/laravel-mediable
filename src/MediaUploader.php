@@ -2,7 +2,12 @@
 
 namespace Plank\Mediable;
 
-use Plank\Mediable\Exceptions\MediaUploadException;
+use Plank\Mediable\Exceptions\MediaSizeException;
+use Plank\Mediable\Exceptions\MediaExistsException;
+use Plank\Mediable\Exceptions\MediaNotFoundException;
+use Plank\Mediable\Exceptions\MediaForbiddenException;
+use Plank\Mediable\Exceptions\MediaNotSupportedException;
+use Plank\Mediable\Exceptions\MediaConfigurationException;
 use Plank\Mediable\Helpers\File;
 use Plank\Mediable\SourceAdapters\SourceAdapterFactory;
 use Illuminate\Filesystem\FilesystemManager;
@@ -105,7 +110,6 @@ class MediaUploader
      * Set the filesystem disk on which the file will be saved.
      * @param string $disk
      * @return static
-     * @throws MediaUploadException if the disk is not found or not allowed for upload
      */
     public function toDisk($disk)
     {
@@ -167,12 +171,12 @@ class MediaUploader
      * Change the class to use for generated Media.
      * @param string $class
      * @return static
-     * @throws MediaUploadException if $class does not extend Plank\Mediable\Media
+     * @throws MediaConfigurationException if $class does not extend Plank\Mediable\Media
      */
     public function setModelClass($class)
     {
         if (! is_subclass_of($class, Media::class)) {
-            throw MediaUploadException::cannotSetModel($class);
+            throw MediaConfigurationException::cannotSetModel($class);
         }
         $this->config['model'] = $class;
 
@@ -325,7 +329,9 @@ class MediaUploader
      * @param  string $mime_type
      * @param  string $extension
      * @return string
-     * @throws  MediaUploadException If a legal aggregate type cannot be determined
+     * @throws MediaNotSupportedException If the file type is not recognized
+     * @throws MediaNotSupportedException If the file type is restricted
+     * @throws MediaNotSupportedException If the aggregate type is restricted
      */
     public function inferAggregateType($mime_type, $extension)
     {
@@ -343,19 +349,19 @@ class MediaUploader
             $type = $intersection[0];
         } elseif (empty($types_for_mime) && empty($types_for_extension)) {
             if (! $this->config['allow_unrecognized_types']) {
-                throw MediaUploadException::unrecognizedFileType($mime_type, $extension);
+                throw MediaNotSupportedException::unrecognizedFileType($mime_type, $extension);
             }
             $type = Media::TYPE_OTHER;
         } else {
             if ($this->config['strict_type_checking']) {
-                throw MediaUploadException::strictTypeMismatch($mime_type, $extension);
+                throw MediaNotSupportedException::strictTypeMismatch($mime_type, $extension);
             }
             $merged = array_merge($types_for_mime, $types_for_extension);
             $type = reset($merged);
         }
 
         if (count($allowed_types) && ! in_array($type, $allowed_types)) {
-            throw MediaUploadException::aggregateTypeRestricted($type, $allowed_types);
+            throw MediaNotSupportedException::aggregateTypeRestricted($type, $allowed_types);
         }
 
         return $type;
@@ -400,7 +406,6 @@ class MediaUploader
      *
      * Validates the source, then stores the file onto the disk and creates and stores a new Media instance.
      * @return Media
-     * @throws MediaUploadException If any validation checks fail
      */
     public function upload()
     {
@@ -447,7 +452,7 @@ class MediaUploader
      * @param  string $filename
      * @param  string $extension
      * @return Media
-     * @throws MediaUploadException if the file does not pass the uploader's validation
+     * @throws MediaNotFoundException If the file does not exist
      */
     public function import($disk, $directory, $filename, $extension)
     {
@@ -461,7 +466,7 @@ class MediaUploader
         $model->extension = $this->verifyExtension($extension);
 
         if (! $storage->has($model->getDiskPath())) {
-            throw MediaUploadException::fileNotFound($model->getDiskPath());
+            throw MediaNotFoundException::fileNotFound($model->getDiskPath());
         }
 
         $model->mime_type = $this->verifyMimeType($storage->mimeType($model->getDiskPath()));
@@ -477,7 +482,6 @@ class MediaUploader
      * Reanalyze a media record's file and adjust the aggregate type and size, if necessary.
      * @param  Media  $media
      * @return bool Whether the model was modified
-     * @throws MediaUploadException if the file does not pass the uploader's validation
      */
     public function update(Media $media)
     {
@@ -509,16 +513,17 @@ class MediaUploader
      * Ensure that the provided filesystem disk name exists and is allowed.
      * @param  string $disk
      * @return string
-     * @throws MediaUploadException If the disk does not exist or is not included in the `allowed_disks` config.
+     * @throws MediaConfigurationException If the disk does not exist
+     * @throws MediaForbiddenException If the disk is not included in the `allowed_disks` config.
      */
     private function verifyDisk($disk)
     {
         if (! array_key_exists($disk, config('filesystems.disks'))) {
-            throw MediaUploadException::diskNotFound($disk);
+            throw MediaConfigurationException::diskNotFound($disk);
         }
 
         if (! in_array($disk, $this->config['allowed_disks'])) {
-            throw MediaUploadException::diskNotAllowed($disk);
+            throw MediaForbiddenException::diskNotAllowed($disk);
         }
 
         return $disk;
@@ -527,15 +532,16 @@ class MediaUploader
     /**
      * Ensure that a valid source has been provided.
      * @return void
-     * @throws MediaUploadException If no source is provided or is invalid
+     * @throws MediaConfigurationException If no source is provided
+     * @throws MediaNotFoundException If the source is invalid
      */
     private function verifySource()
     {
         if (empty($this->source)) {
-            throw MediaUploadException::noSourceProvided();
+            throw MediaConfigurationException::noSourceProvided();
         }
         if (! $this->source->valid()) {
-            throw MediaUploadException::fileNotFound($this->source->path());
+            throw MediaNotFoundException::fileNotFound($this->source->path());
         }
     }
 
@@ -543,12 +549,13 @@ class MediaUploader
      * Ensure that the file's mime type is allowed.
      * @param  string $mime_type
      * @return string
+     * @throws MediaNotSupportedException If the mime type is not allowed
      */
     private function verifyMimeType($mime_type)
     {
         $allowed = $this->config['allowed_mime_types'];
         if (! empty($allowed) && ! in_array($mime_type, $allowed)) {
-            throw MediaUploadException::mimeRestricted($mime_type, $allowed);
+            throw MediaNotSupportedException::mimeRestricted($mime_type, $allowed);
         }
 
         return $mime_type;
@@ -558,12 +565,13 @@ class MediaUploader
      * Ensure that the file's extension is allowed.
      * @param  string $extension
      * @return string
+     * @throws MediaNotSupportedException If the file extension is not allowed
      */
     private function verifyExtension($extension)
     {
         $allowed = $this->config['allowed_extensions'];
         if (! empty($allowed) && ! in_array($extension, $allowed)) {
-            throw MediaUploadException::extensionRestricted($extension, $allowed);
+            throw MediaNotSupportedException::extensionRestricted($extension, $allowed);
         }
 
         return $extension;
@@ -573,13 +581,13 @@ class MediaUploader
      * Verify that the file being uploaded is not larger than the maximum.
      * @param  Media $model
      * @return int
-     * @throws MediaUploadException If the file is too large
+     * @throws MediaSizeException If the file is too large
      */
     private function verifyFileSize($size)
     {
         $max = $this->config['max_size'];
         if ($max > 0 && $size > $max) {
-            throw MediaUploadException::fileIsTooBig($size, $max);
+            throw MediaSizeException::fileIsTooBig($size, $max);
         }
 
         return $size;
@@ -589,7 +597,6 @@ class MediaUploader
      * Verify that the intended destination is available and handle any duplications.
      * @param  Media  $model
      * @return void
-     * @throws MediaUploadException If directory is not writable or file already exists at the destination and on_duplicate is set to 'error'
      */
     private function verifyDestination(Media $model)
     {
@@ -604,12 +611,13 @@ class MediaUploader
      * Decide what to do about duplicated files.
      * @param  Media  $model
      * @return void
+     * @throws MediaExistsException If directory is not writable or file already exists at the destination and on_duplicate is set to 'error'
      */
     private function handleDuplicate(Media $model)
     {
         switch ($this->config['on_duplicate']) {
             case static::ON_DUPLICATE_ERROR:
-                throw MediaUploadException::fileExists($model->getDiskPath());
+                throw MediaExistsException::fileExists($model->getDiskPath());
                 break;
             case static::ON_DUPLICATE_REPLACE:
                 $this->deleteExistingMedia($model);

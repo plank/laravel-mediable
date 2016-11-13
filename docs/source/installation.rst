@@ -8,7 +8,7 @@ Add the package to your Laravel app using composer.
     $ composer require plank/laravel-mediable
 
 
-Register the package's servive provider in `config/app.php`.
+Register the package's service provider in `config/app.php`.
 
 ::
 

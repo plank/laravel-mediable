@@ -1,8 +1,7 @@
 <?php
 
 use Plank\Mediable\Media;
-use Plank\Mediable\Exceptions\MediaUrlException;
-use Plank\Mediable\Exceptions\MediaMoveException;
+use Plank\Mediable\Exceptions\MediaExistsException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
@@ -167,7 +166,7 @@ class MediaTest extends TestCase
         $this->seedFileForMedia($media1);
         $this->seedFileForMedia($media2);
 
-        $this->expectException(MediaMoveException::class);
+        $this->expectException(MediaExistsException::class);
         $media1->move('', 'bar.baz');
     }
 

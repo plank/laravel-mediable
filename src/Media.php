@@ -3,7 +3,6 @@
 namespace Plank\Mediable;
 
 use Plank\Mediable\Exceptions\MediaUrlException;
-use Plank\Mediable\Exceptions\MediaMoveException;
 use Plank\Mediable\Helpers\File;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -206,7 +205,6 @@ class Media extends Model
      * @param  string $destination directory relative to disk root
      * @param  string $name        filename. Do not include extension
      * @return void
-     * @throws  MediaMoveException If attempting to change the file extension or a file with the same name already exists at the destination
      */
     public function move($destination, $filename = null)
     {

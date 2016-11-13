@@ -4,7 +4,12 @@ use Plank\Mediable\Media;
 use Plank\Mediable\MediaUploader;
 use Plank\Mediable\SourceAdapters\SourceAdapterFactory;
 use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
-use Plank\Mediable\Exceptions\MediaUploadException;
+use Plank\Mediable\Exceptions\MediaSizeException;
+use Plank\Mediable\Exceptions\MediaExistsException;
+use Plank\Mediable\Exceptions\MediaNotFoundException;
+use Plank\Mediable\Exceptions\MediaForbiddenException;
+use Plank\Mediable\Exceptions\MediaNotSupportedException;
+use Plank\Mediable\Exceptions\MediaConfigurationException;
 use MediaUploader as Facade;
 use Illuminate\Filesystem\FilesystemManager;
 use League\Flysystem\Filesystem;
@@ -55,8 +60,7 @@ class MediaUploaderTest extends TestCase
         $uploader->setTypeDefinition('foo', ['text/foo'], ['foo']);
         $uploader->setTypeDefinition('bar', ['text/bar'], ['bar']);
         $uploader->setStrictTypeChecking(true);
-        $this->expectException(MediaUploadException::class);
-        $this->expectExceptionCode(109);
+        $this->expectException(MediaNotSupportedException::class);
         $uploader->inferAggregateType('text/foo', 'bar');
     }
 
@@ -71,8 +75,7 @@ class MediaUploaderTest extends TestCase
         $uploader->setAllowedAggregateTypes(['bar']);
         $this->assertEquals('bar', $uploader->inferAggregateType('text/bar', 'bar'), 'With Restriction');
 
-        $this->expectException(MediaUploadException::class);
-        $this->expectExceptionCode(113);
+        $this->expectException(MediaNotSupportedException::class);
         $uploader->inferAggregateType('text/foo', 'bar');
     }
 
@@ -83,16 +86,14 @@ class MediaUploaderTest extends TestCase
         $uploader->setAllowUnrecognizedTypes(true);
         $this->assertEquals(Media::TYPE_OTHER, $uploader->inferAggregateType('text/foo', 'bar'));
         $uploader->setAllowUnrecognizedTypes(false);
-        $this->expectException(MediaUploadException::class);
-        $this->expectExceptionCode(110);
+        $this->expectException(MediaNotSupportedException::class);
         $uploader->inferAggregateType('text/foo', 'bar');
     }
 
     public function test_it_throws_exception_for_non_existent_disk()
     {
         $uploader = $this->mockUploader();
-        $this->expectException(MediaUploadException::class);
-        $this->expectExceptionCode(105);
+        $this->expectException(MediaConfigurationException::class);
         $uploader->toDisk('abc');
     }
 
@@ -100,8 +101,7 @@ class MediaUploaderTest extends TestCase
     {
         $uploader = $this->mockUploader();
         config()->set('filesystems.disks.foo', []);
-        $this->expectException(MediaUploadException::class);
-        $this->expectExceptionCode(106);
+        $this->expectException(MediaForbiddenException::class);
         $uploader->toDisk('foo');
     }
 
@@ -117,8 +117,7 @@ class MediaUploaderTest extends TestCase
     public function test_it_throw_exception_for_invalid_model()
     {
         $uploader = $this->mockUploader();
-        $this->expectException(MediaUploadException::class);
-        $this->expectExceptionCode(102);
+        $this->expectException(MediaConfigurationException::class);
         $uploader->setModelClass(stdClass::class);
     }
 
@@ -127,8 +126,7 @@ class MediaUploaderTest extends TestCase
         $uploader = $this->mockUploader();
         $method = $this->getPrivateMethod($uploader, 'verifySource');
 
-        $this->expectException(MediaUploadException::class);
-        $this->expectExceptionCode(104);
+        $this->expectException(MediaConfigurationException::class);
         $method->invoke($uploader);
     }
 
@@ -154,8 +152,7 @@ class MediaUploaderTest extends TestCase
         $source->method('valid')->willReturn(false);
         $uploader->fromSource($source);
 
-        $this->expectException(MediaUploadException::class);
-        $this->expectExceptionCode(107);
+        $this->expectException(MediaNotFoundException::class);
         $method->invoke($uploader);
     }
 
@@ -169,8 +166,7 @@ class MediaUploaderTest extends TestCase
         $uploader->setAllowedMimeTypes(['text/bar']);
         $this->assertEquals('text/bar', $method->invoke($uploader, 'text/bar'), 'With Restriction');
 
-        $this->expectException(MediaUploadException::class);
-        $this->expectExceptionCode(111);
+        $this->expectException(MediaNotSupportedException::class);
         $method->invoke($uploader, 'text/foo');
     }
 
@@ -184,8 +180,7 @@ class MediaUploaderTest extends TestCase
         $uploader->setAllowedExtensions(['bar']);
         $this->assertEquals('bar', $method->invoke($uploader, 'bar'), 'With Restriction');
 
-        $this->expectException(MediaUploadException::class);
-        $this->expectExceptionCode(112);
+        $this->expectException(MediaNotSupportedException::class);
         $method->invoke($uploader, 'foo');
     }
 
@@ -196,8 +191,7 @@ class MediaUploaderTest extends TestCase
         $method = $this->getPrivateMethod($uploader, 'verifyFileSize');
 
         $this->assertEquals(1, $method->invoke($uploader, 1));
-        $this->expectException(MediaUploadException::class);
-        $this->expectExceptionCode(114);
+        $this->expectException(MediaSizeException::class);
         $method->invoke($uploader, 3);
     }
 
@@ -215,8 +209,7 @@ class MediaUploaderTest extends TestCase
         $uploader = $this->mockDuplicateUploader();
         $uploader->setOnDuplicateBehavior(MediaUploader::ON_DUPLICATE_ERROR);
         $method = $this->getPrivateMethod($uploader, 'verifyDestination');
-        $this->expectException(MediaUploadException::class);
-        $this->expectExceptionCode(108);
+        $this->expectException(MediaExistsException::class);
         $method->invoke($uploader, $this->createMock(Media::class));
     }
 
@@ -313,8 +306,7 @@ class MediaUploaderTest extends TestCase
 
     public function test_it_throws_exception_when_importing_missing_file()
     {
-        $this->expectException(MediaUploadException::class);
-        $this->expectExceptionCode(107);
+        $this->expectException(MediaNotFoundException::class);
         Facade::import('tmp', 'non', 'existing', 'jpg');
     }
 

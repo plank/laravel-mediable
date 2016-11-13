@@ -2,7 +2,7 @@
 
 namespace Plank\Mediable\SourceAdapters;
 
-use Plank\Mediable\Exceptions\MediaUploadException;
+use Plank\Mediable\Exceptions\MediaConfigurationException;
 
 /**
  * Source Adapter Factory.
@@ -29,7 +29,7 @@ class SourceAdapterFactory
      * Create a Source Adapter for the provided source.
      * @param  object|string $source
      * @return SourceAdapterInterface
-     * @throws MediaUploadException If the provided source does not match any of the mapped classes or patterns
+     * @throws MediaConfigurationException If the provided source does not match any of the mapped classes or patterns
      */
     public function create($source)
     {
@@ -47,7 +47,7 @@ class SourceAdapterFactory
             return new $adapter($source);
         }
 
-        throw MediaUploadException::unrecognizedSource($source);
+        throw MediaConfigurationException::unrecognizedSource($source);
     }
 
     /**
@@ -55,7 +55,6 @@ class SourceAdapterFactory
      * @param string $adapter_class
      * @param string $source_class
      * @return void
-     * @throws MediaUploadException If class is not valid
      */
     public function setAdapterForClass($adapter_class, $source_class)
     {
@@ -68,7 +67,6 @@ class SourceAdapterFactory
      * @param string $adapter_class
      * @param string $source_class
      * @return void
-     * @throws MediaUploadException If class is not valid
      */
     public function setAdapterForPattern($adapter_class, $source_pattern)
     {
@@ -110,13 +108,13 @@ class SourceAdapterFactory
     /**
      * Verify that the provided class implements the SourceAdapter interface.
      * @param  string $class
-     * @throws MediaUploadException If class is not valid
+     * @throws MediaConfigurationException If class is not valid
      * @return void
      */
     private function validateAdapterClass($class)
     {
         if (! class_implements($class, SourceAdapterInterface::class)) {
-            throw MediaUploadException::cannotSetAdapter($class);
+            throw MediaConfigurationException::cannotSetAdapter($class);
         }
     }
 }
