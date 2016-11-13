@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.2.3 - 2016-11-13
+- Fixed SQL escaping issue in `Mediable::getOrderValueForTags`.
+
+## 2.2.2 - 2016-10-07
+- Fixed `Media::scopeForPathOnDisk` not working when path does not contain a directory (Thanks @geidelguerra!).
+
+## 2.2.1 - 2016-10-05
+- Fixed typo in `MediaUploader`'s `OnDuplicateError` behaviour (Thanks @geidelguerra!).
+
+## 2.2.0 - 2016-09-30
+- Added handling for symlinked local disks.
+- fixed minor issue where variable could be undefined.
+
 ## 2.1.0 - 2016-09-24
 - Added means of removing order by from media relation query.
 - Fixed multiple media passed to `attachMedia()` or `syncMedia()` receiving the same order value.
@@ -11,11 +24,11 @@
 - `Mediable` models now remember the order in which `Media` is attached to each tag.
 - Renamed a few `MediaUploader` methods.
 - Facilitated setting `MediaUploader` on-duplicate behaviour. Thanks @jdhmtl.
-- `MediaUploader` can now generate filenames using hash of file contents. Thanks @geidelguerra!
+- `MediaUploader` can now generate filenames using hash of file contents (Thanks @geidelguerra!).
 - Added `import()` and `update()` methods to `MediaUploader`.
 
 ## 1.1.1 - 2016-08-16
-- Published migration file now uses dynamic timestamp. Thanks @borisdamevin!
+- Published migration file now uses dynamic timestamp (Thanks @borisdamevin!).
 
 ## 1.1.0 - 2016-08-14
 - Added behaviour for detaching mediable relationships when Media or Mediable models are deleted or soft deleted.
