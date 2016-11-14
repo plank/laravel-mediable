@@ -1,8 +1,10 @@
 <?php
 
-namespace Plank\Mediable\Exceptions;
+namespace Plank\Mediable\Exceptions\MediaUpload;
 
-class MediaForbiddenException extends MediaUploadException
+use Plank\Mediable\Exceptions\MediaUploadException;
+
+class ForbiddenException extends MediaUploadException
 {
     public static function diskNotAllowed($disk)
     {

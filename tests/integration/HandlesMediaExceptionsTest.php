@@ -1,10 +1,10 @@
 <?php
 
-use Plank\Mediable\Exceptions\MediaSizeException;
-use Plank\Mediable\Exceptions\MediaExistsException;
-use Plank\Mediable\Exceptions\MediaNotFoundException;
-use Plank\Mediable\Exceptions\MediaForbiddenException;
-use Plank\Mediable\Exceptions\MediaNotSupportedException;
+use Plank\Mediable\Exceptions\MediaUpload\FileSizeException;
+use Plank\Mediable\Exceptions\MediaUpload\FileExistsException;
+use Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException;
+use Plank\Mediable\Exceptions\MediaUpload\ForbiddenException;
+use Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class HandlesMediaExceptionsTest extends TestCase
@@ -12,7 +12,7 @@ class HandlesMediaExceptionsTest extends TestCase
     public function test_it_returns_a_403_for_dissalowed_disk()
     {
         $e = (new SampleExceptionHandler())->render(
-            MediaForbiddenException::diskNotAllowed('foo')
+            ForbiddenException::diskNotAllowed('foo')
         );
 
         $this->assertHttpException($e, 403);
@@ -21,7 +21,7 @@ class HandlesMediaExceptionsTest extends TestCase
     public function test_it_returns_a_404_for_missing_file()
     {
         $e = (new SampleExceptionHandler())->render(
-            MediaNotFoundException::fileNotFound('non/existing.jpg')
+            FileNotFoundException::fileNotFound('non/existing.jpg')
         );
 
         $this->assertHttpException($e, 404);
@@ -30,7 +30,7 @@ class HandlesMediaExceptionsTest extends TestCase
     public function test_it_returns_a_409_on_duplicate_file()
     {
         $e = (new SampleExceptionHandler())->render(
-            MediaExistsException::fileExists('already/existing.jpg')
+            FileExistsException::fileExists('already/existing.jpg')
         );
 
         $this->assertHttpException($e, 409);
@@ -39,7 +39,7 @@ class HandlesMediaExceptionsTest extends TestCase
     public function test_it_returns_a_413_for_too_big_file()
     {
         $e = (new SampleExceptionHandler())->render(
-            MediaSizeException::fileIsTooBig(3, 2)
+            FileSizeException::fileIsTooBig(3, 2)
         );
 
         $this->assertHttpException($e, 413);
@@ -48,7 +48,7 @@ class HandlesMediaExceptionsTest extends TestCase
     public function test_it_returns_a_415_for_type_mismatch()
     {
         $e = (new SampleExceptionHandler())->render(
-            MediaNotSupportedException::strictTypeMismatch('text/foo', 'bar')
+            FileNotSupportedException::strictTypeMismatch('text/foo', 'bar')
         );
 
         $this->assertHttpException($e, 415);
@@ -57,7 +57,7 @@ class HandlesMediaExceptionsTest extends TestCase
     public function test_it_returns_a_415_for_unknown_type()
     {
         $e = (new SampleExceptionHandler())->render(
-            MediaNotSupportedException::unrecognizedFileType('text/foo', 'bar')
+            FileNotSupportedException::unrecognizedFileType('text/foo', 'bar')
         );
 
         $this->assertHttpException($e, 415);
@@ -66,7 +66,7 @@ class HandlesMediaExceptionsTest extends TestCase
     public function test_it_returns_a_415_for_restricted_type()
     {
         $e = (new SampleExceptionHandler())->render(
-            MediaNotSupportedException::mimeRestricted('text/foo', ['text/bar'])
+            FileNotSupportedException::mimeRestricted('text/foo', ['text/bar'])
         );
 
         $this->assertHttpException($e, 415);
@@ -75,7 +75,7 @@ class HandlesMediaExceptionsTest extends TestCase
     public function test_it_returns_a_415_for_restricted_extension()
     {
         $e = (new SampleExceptionHandler())->render(
-            MediaNotSupportedException::extensionRestricted('foo', ['bar'])
+            FileNotSupportedException::extensionRestricted('foo', ['bar'])
         );
 
         $this->assertHttpException($e, 415);
@@ -84,7 +84,7 @@ class HandlesMediaExceptionsTest extends TestCase
     public function test_it_returns_a_415_for_restricted_aggregate_type()
     {
         $e = (new SampleExceptionHandler())->render(
-            MediaNotSupportedException::aggregateTypeRestricted('foo', ['bar'])
+            FileNotSupportedException::aggregateTypeRestricted('foo', ['bar'])
         );
 
         $this->assertHttpException($e, 415);

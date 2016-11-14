@@ -3,11 +3,11 @@
 namespace Plank\Mediable;
 
 use Exception;
-use Plank\Mediable\Exceptions\MediaSizeException;
-use Plank\Mediable\Exceptions\MediaExistsException;
-use Plank\Mediable\Exceptions\MediaNotFoundException;
-use Plank\Mediable\Exceptions\MediaForbiddenException;
-use Plank\Mediable\Exceptions\MediaNotSupportedException;
+use Plank\Mediable\Exceptions\MediaUpload\FileSizeException;
+use Plank\Mediable\Exceptions\MediaUpload\FileExistsException;
+use Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException;
+use Plank\Mediable\Exceptions\MediaUpload\ForbiddenException;
+use Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -21,37 +21,37 @@ trait HandlesMediaExceptions
     protected $statusCodes = [
         // 403
         Response::HTTP_FORBIDDEN => [
-            MediaForbiddenException::class,
+            ForbiddenException::class,
         ],
 
         // 404
         Response::HTTP_NOT_FOUND => [
-            MediaNotFoundException::class,
+            FileNotFoundException::class,
         ],
 
         // 409
         Response::HTTP_CONFLICT => [
-            MediaExistsException::class,
+            FileExistsException::class,
         ],
 
         // 413
         Response::HTTP_REQUEST_ENTITY_TOO_LARGE => [
-            MediaSizeException::class,
+            FileSizeException::class,
         ],
 
         // 415
         Response::HTTP_UNSUPPORTED_MEDIA_TYPE => [
-            MediaNotSupportedException::class,
+            FileNotSupportedException::class,
         ],
     ];
 
     /**
-     * Prepare MediaUploadException for rendering.
+     * Transform a MediaUploadException into an HttpException.
      *
      * @param  \Exception  $e
-     * @return \Exception
+     * @return \Symfony\Component\HttpKernel\Exception\HttpException|\Exception
      */
-    protected function prepareMediaUploadException(Exception $e)
+    protected function transformToHttpException(Exception $e)
     {
         if ($statusCode = $this->getStatusCodeForMediaException($e)) {
             return new HttpException($statusCode, $e->getMessage(), $e);

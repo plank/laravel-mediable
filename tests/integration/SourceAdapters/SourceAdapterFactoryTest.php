@@ -2,7 +2,7 @@
 
 use Plank\Mediable\SourceAdapters\SourceAdapterFactory;
 use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
-use Plank\Mediable\Exceptions\MediaConfigurationException;
+use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 
 class SourceAdapterFactoryTest extends TestCase
 {
@@ -29,28 +29,28 @@ class SourceAdapterFactoryTest extends TestCase
     public function test_it_throws_exception_if_invalid_adapter_for_class()
     {
         $factory = new SourceAdapterFactory;
-        $this->expectException(MediaConfigurationException::class);
+        $this->expectException(ConfigurationException::class);
         $factory->setAdapterForClass(stdClass::class, stdClass::class);
     }
 
     public function test_it_throws_exception_if_invalid_adapter_for_pattern()
     {
         $factory = new SourceAdapterFactory;
-        $this->expectException(MediaConfigurationException::class);
+        $this->expectException(ConfigurationException::class);
         $factory->setAdapterForPattern(stdClass::class, 'foo');
     }
 
     public function test_it_throws_exception_if_no_match_for_class()
     {
         $factory = new SourceAdapterFactory;
-        $this->expectException(MediaConfigurationException::class);
+        $this->expectException(ConfigurationException::class);
         $factory->create(new stdClass);
     }
 
     public function test_it_throws_exception_if_no_match_for_pattern()
     {
         $factory = new SourceAdapterFactory;
-        $this->expectException(MediaConfigurationException::class);
+        $this->expectException(ConfigurationException::class);
         $factory->create('foo');
     }
 

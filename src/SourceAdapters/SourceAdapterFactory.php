@@ -2,7 +2,7 @@
 
 namespace Plank\Mediable\SourceAdapters;
 
-use Plank\Mediable\Exceptions\MediaConfigurationException;
+use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 
 /**
  * Source Adapter Factory.
@@ -28,8 +28,8 @@ class SourceAdapterFactory
     /**
      * Create a Source Adapter for the provided source.
      * @param  object|string $source
-     * @return SourceAdapterInterface
-     * @throws MediaConfigurationException If the provided source does not match any of the mapped classes or patterns
+     * @return \Plank\Mediable\SourceAdapters\SourceAdapterInterface
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\ConfigurationException If the provided source does not match any of the mapped classes or patterns
      */
     public function create($source)
     {
@@ -47,7 +47,7 @@ class SourceAdapterFactory
             return new $adapter($source);
         }
 
-        throw MediaConfigurationException::unrecognizedSource($source);
+        throw ConfigurationException::unrecognizedSource($source);
     }
 
     /**
@@ -108,13 +108,13 @@ class SourceAdapterFactory
     /**
      * Verify that the provided class implements the SourceAdapter interface.
      * @param  string $class
-     * @throws MediaConfigurationException If class is not valid
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\ConfigurationException If class is not valid
      * @return void
      */
     private function validateAdapterClass($class)
     {
         if (! class_implements($class, SourceAdapterInterface::class)) {
-            throw MediaConfigurationException::cannotSetAdapter($class);
+            throw ConfigurationException::cannotSetAdapter($class);
         }
     }
 }

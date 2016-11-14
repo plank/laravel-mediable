@@ -1,8 +1,10 @@
 <?php
 
-namespace Plank\Mediable\Exceptions;
+namespace Plank\Mediable\Exceptions\MediaUpload;
 
-class MediaNotSupportedException extends MediaUploadException
+use Plank\Mediable\Exceptions\MediaUploadException;
+
+class FileNotSupportedException extends MediaUploadException
 {
     public static function strictTypeMismatch($mime, $ext)
     {

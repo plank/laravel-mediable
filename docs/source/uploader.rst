@@ -124,9 +124,9 @@ You can override the most validation configuration values set in ``config/mediab
 Handling Exceptions
 --------------------
 
-If you want to return more granular HTTP status codes when a ``Plank\Mediable\MediaUploadException`` is thrown, you can use the ``Plank\Mediable\HandlesMediaExceptions`` trait in your app's `Exceptions\Handler`. For example, if you have set a maximum file size, an HTTP code 413 (Request Entity Too Large) will be returned instead of a 500.
+If you want to return more granular HTTP status codes when a ``Plank\Mediable\MediaUploadException`` is thrown, you can use the ``Plank\Mediable\HandlesMediaExceptions`` trait in your app's `Exceptions\Handler` or your controllers. For example, if you have set a maximum file size, an HTTP code 413 (Request Entity Too Large) will be returned instead of a 500.
 
-Call the ``prepareMediaUploadException`` method on the ``render`` method, and a ``HttpException`` with the appropriate status code will be returned. Take a look at the ``HandlesMediaExceptions`` source code for the table of associated status codes and exceptions.
+Call the ``transformToHttpException`` method on the ``render`` method, and a ``HttpException`` with the appropriate status code will be returned. Take a look at the ``HandlesMediaExceptions`` source code for the table of associated status codes and exceptions.
 
 ::
 
@@ -142,7 +142,7 @@ Call the ``prepareMediaUploadException`` method on the ``render`` method, and a 
 
         public function render($request, $e)
         {
-            $e = $this->prepareMediaUploadException($e);
+            $e = $this->transformToHttpException($e);
 
             return parent::render($request, $e);
         }

@@ -1,8 +1,10 @@
 <?php
 
-namespace Plank\Mediable\Exceptions;
+namespace Plank\Mediable\Exceptions\MediaUpload;
 
-class MediaConfigurationException extends MediaUploadException
+use Plank\Mediable\Exceptions\MediaUploadException;
+
+class ConfigurationException extends MediaUploadException
 {
     public static function cannotSetAdapter($class)
     {

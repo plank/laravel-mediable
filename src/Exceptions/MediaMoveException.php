@@ -9,8 +9,8 @@ use Exception;
  */
 class MediaMoveException extends Exception
 {
-    public static function failed($path, $destination)
+    public static function destinationExists($path)
     {
-        return new static("Failed to move file `{$path}` to `{$destination}`");
+        return new static("Another file already exists at `{$path}`");
     }
 }

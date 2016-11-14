@@ -1,8 +1,10 @@
 <?php
 
-namespace Plank\Mediable\Exceptions;
+namespace Plank\Mediable\Exceptions\MediaUpload;
 
-class MediaSizeException extends MediaUploadException
+use Plank\Mediable\Exceptions\MediaUploadException;
+
+class FileSizeException extends MediaUploadException
 {
     public static function fileIsTooBig($size, $max)
     {

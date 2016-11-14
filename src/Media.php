@@ -172,7 +172,7 @@ class Media extends Model
 
     /**
      * Get the absolute URL to the media file.
-     * @throws MediaUrlException If media's disk is not publicly accessible
+     * @throws \Plank\Mediable\Exceptions\MediaUrlException If media's disk is not publicly accessible
      * @return string
      */
     public function getUrl()
