@@ -15,13 +15,13 @@ class UploadedFileAdapter implements SourceAdapterInterface
 {
     /**
      * The source object.
-     * @var UploadedFile
+     * @var \Symfony\Component\HttpFoundation\File\UploadedFile
      */
     protected $source;
 
     /**
      * Constructor.
-     * @param UploadedFile $source
+     * @param \Symfony\Component\HttpFoundation\File\UploadedFile $source
      */
     public function __construct(UploadedFile $source)
     {

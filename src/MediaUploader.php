@@ -73,8 +73,9 @@ class MediaUploader
 
     /**
      * Constructor.
-     * @param FileSystemManager    $filesystem
-     * @param SourceAdapterFactory $factory
+     * @param \Illuminate\Filesystem\FilesystemManager            $filesystem
+     * @param \Plank\Mediable\SourceAdapters\SourceAdapterFactory $factory
+     * @param array|null                                          $config
      */
     public function __construct(FileSystemManager $filesystem, SourceAdapterFactory $factory, $config = null)
     {
@@ -405,7 +406,7 @@ class MediaUploader
      * Process the file upload.
      *
      * Validates the source, then stores the file onto the disk and creates and stores a new Media instance.
-     * @return Media
+     * @return \Plank\Mediable\Media
      */
     public function upload()
     {
@@ -434,7 +435,7 @@ class MediaUploader
      * Create a `Media` record for a file already on a disk.
      * @param  string $disk
      * @param  string $path Path to file, relative to disk root
-     * @return Media
+     * @return \Plank\Mediable\Media
      */
     public function importPath($disk, $path)
     {
@@ -480,7 +481,7 @@ class MediaUploader
 
     /**
      * Reanalyze a media record's file and adjust the aggregate type and size, if necessary.
-     * @param  Media  $media
+     * @param  \Plank\Mediable\Media  $media
      * @return bool Whether the model was modified
      */
     public function update(Media $media)
@@ -500,7 +501,7 @@ class MediaUploader
 
     /**
      * Generate an instance of the `Media` class.
-     * @return Media
+     * @return \Plank\Mediable\Media
      */
     private function makeModel()
     {
@@ -579,7 +580,7 @@ class MediaUploader
 
     /**
      * Verify that the file being uploaded is not larger than the maximum.
-     * @param  Media $model
+     * @param  int $size
      * @return int
      * @throws \Plank\Mediable\Exceptions\MediaUpload\FileSizeException If the file is too large
      */
@@ -595,7 +596,7 @@ class MediaUploader
 
     /**
      * Verify that the intended destination is available and handle any duplications.
-     * @param  Media  $model
+     * @param  \Plank\Mediable\Media  $model
      * @return void
      */
     private function verifyDestination(Media $model)
@@ -609,7 +610,7 @@ class MediaUploader
 
     /**
      * Decide what to do about duplicated files.
-     * @param  Media  $model
+     * @param  \Plank\Mediable\Media  $model
      * @return void
      * @throws \Plank\Mediable\Exceptions\MediaUpload\FileExistsException If directory is not writable or file already exists at the destination and on_duplicate is set to 'error'
      */
@@ -630,7 +631,7 @@ class MediaUploader
 
     /**
      * Delete the media that previously existed at a destination.
-     * @param  Media  $model
+     * @param  \Plank\Mediable\Media  $model
      * @return void
      */
     private function deleteExistingMedia(Media $model)
@@ -644,7 +645,7 @@ class MediaUploader
 
     /**
      * Increment model's filename until one is found that doesn't already exist.
-     * @param  Media $model
+     * @param  \Plank\Mediable\Media $model
      * @return void
      */
     private function generateUniqueFilename(Media $model)

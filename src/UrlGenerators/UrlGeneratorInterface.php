@@ -13,7 +13,7 @@ interface UrlGeneratorInterface
 {
     /**
      * Set the media instance for which urls are being generated.
-     * @param Media $media
+     * @param \Plank\Mediable\Media $media
      */
     public function setMedia(Media $media);
 

@@ -20,7 +20,7 @@ class UrlGeneratorFactory
 
     /**
      * Get a UrlGenerator instance for a media.
-     * @param  Media  $media
+     * @param  \Plank\Mediable\Media  $media
      * @return UrlGenerator
      * @throws \Plank\Mediable\Exceptions\MediaUrlException If no generator class has been assigned for the media's disk's driver
      */

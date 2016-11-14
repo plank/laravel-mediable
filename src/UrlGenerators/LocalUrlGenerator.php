@@ -14,14 +14,14 @@ use Illuminate\Routing\UrlGenerator as Url;
 class LocalUrlGenerator extends BaseUrlGenerator
 {
     /**
-     * @var Url
+     * @var \Illuminate\Routing\UrlGenerator
      */
     protected $url;
 
     /**
      * Constructor.
-     * @param Config $config
-     * @param Url    $url
+     * @param \Illuminate\Contracts\Config\Repository $config
+     * @param \Illuminate\Routing\UrlGenerator        $url
      */
     public function __construct(Config $config, Url $url)
     {
@@ -39,8 +39,8 @@ class LocalUrlGenerator extends BaseUrlGenerator
 
     /**
      * Get the path to relative to the webroot.
-     * @throws MediaUrlException If media's disk is not publicly accessible
      * @return string
+     * @throws \Plank\Mediable\Exceptions\MediaUrlException If media's disk is not publicly accessible
      */
     public function getPublicPath()
     {
@@ -58,7 +58,7 @@ class LocalUrlGenerator extends BaseUrlGenerator
 
     /**
      * {@inheritdoc}
-     * @throws MediaUrlException If media's disk is not publicly accessible
+     * @throws \Plank\Mediable\Exceptions\MediaUrlException If media's disk is not publicly accessible
      */
     public function getUrl()
     {

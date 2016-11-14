@@ -77,7 +77,7 @@ class SourceAdapterFactory
     /**
      * Choose an adapter class for the class of the provided object.
      * @param  object $source
-     * @return SourceAdapterInterface|null
+     * @return \Plank\Mediable\SourceAdapters\SourceAdapterInterface|null
      */
     private function adaptClass($source)
     {
@@ -93,7 +93,7 @@ class SourceAdapterFactory
     /**
      * Choose an adapter class for the provided string.
      * @param  string $source
-     * @return SourceAdapterInterface|null
+     * @return \Plank\Mediable\SourceAdapters\SourceAdapterInterface|null
      */
     private function adaptString($source)
     {
