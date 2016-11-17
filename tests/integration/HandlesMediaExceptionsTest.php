@@ -1,5 +1,6 @@
 <?php
 
+use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Plank\Mediable\Exceptions\MediaUpload\FileSizeException;
 use Plank\Mediable\Exceptions\MediaUpload\FileExistsException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException;
@@ -88,6 +89,15 @@ class HandlesMediaExceptionsTest extends TestCase
         );
 
         $this->assertHttpException($e, 415);
+    }
+
+    public function test_it_returns_a_500_for_other_exception_types()
+    {
+        $e = (new SampleExceptionHandler())->render(
+            new ConfigurationException()
+        );
+
+        $this->assertHttpException($e, 500);
     }
 
     public function test_it_skips_any_other_exception()

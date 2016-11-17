@@ -94,6 +94,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#specifying-filename">Specifying Filename</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#handling-duplicates">Handling Duplicates</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#validation">Validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#handling-exceptions">Handling Exceptions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#importing-files">Importing Files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#updating-files">Updating Files</a></li>
 </ul>
@@ -220,7 +221,7 @@
 </div>
 <div class="section" id="validation">
 <h2>Validation<a class="headerlink" href="#validation" title="Permalink to this headline">¶</a></h2>
-<p>The <code class="docutils literal"><span class="pre">MediaUpload</span></code> will perform a number of validation checks on the source file. If any of the checks fail, a <code class="docutils literal"><span class="pre">Plank\Mediable\MediaUploaderException</span></code> will be through with a message indicating why the file was rejected.</p>
+<p>The <code class="docutils literal"><span class="pre">MediaUpload</span></code> will perform a number of validation checks on the source file. If any of the checks fail, a <code class="docutils literal"><span class="pre">Plank\Mediable\MediaUploadException</span></code> will be thrown with a message indicating why the file was rejected.</p>
 <p>You can override the most validation configuration values set in <code class="docutils literal"><span class="pre">config/mediable.php</span></code> on a case-by-case basis using the same fluent interface.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="nv">$media</span> <span class="o">=</span> <span class="nx">MediaUploader</span><span class="o">::</span><span class="na">fromSource</span><span class="p">(</span><span class="nv">$request</span><span class="o">-&gt;</span><span class="na">file</span><span class="p">(</span><span class="s1">&#39;image&#39;</span><span class="p">))</span>
@@ -240,13 +241,57 @@
     <span class="c1">// only allow files of specific MIME types</span>
     <span class="o">-&gt;</span><span class="na">setAllowedMimeTypes</span><span class="p">([</span><span class="s1">&#39;image/jpeg&#39;</span><span class="p">])</span>
 
-    <span class="c1">// only allow files of specifc extensions</span>
+    <span class="c1">// only allow files of specific extensions</span>
     <span class="o">-&gt;</span><span class="na">setAllowedExtensions</span><span class="p">([</span><span class="s1">&#39;jpg&#39;</span><span class="p">,</span> <span class="s1">&#39;jpeg&#39;</span><span class="p">])</span>
 
     <span class="c1">// only allow files of specific aggregate types</span>
     <span class="o">-&gt;</span><span class="na">setAllowedAggregateTypes</span><span class="p">([</span><span class="s1">&#39;image&#39;</span><span class="p">])</span>
 
     <span class="o">-&gt;</span><span class="na">upload</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="handling-exceptions">
+<h2>Handling Exceptions<a class="headerlink" href="#handling-exceptions" title="Permalink to this headline">¶</a></h2>
+<p>If you want to return more granular HTTP status codes when a <code class="docutils literal"><span class="pre">Plank\Mediable\MediaUploadException</span></code> is thrown, you can use the <code class="docutils literal"><span class="pre">Plank\Mediable\HandlesMediaUploadExceptions</span></code> trait in your app&#8217;s <cite>ExceptionsHandler</cite> or in your controller. For example, if you have set a maximum file size, an 413 HTTP response code (Request Entity Too Large) will be returned instead of a 500.</p>
+<p>Call the <code class="docutils literal"><span class="pre">transformMediaUploadException</span></code> method as part of the <code class="docutils literal"><span class="pre">render</span></code> method of the exception handler, and a <code class="docutils literal"><span class="pre">HttpException</span></code> with the appropriate status code will be returned. Take a look at the <code class="docutils literal"><span class="pre">HandlesMediaExceptions</span></code> source code for the table of associated status codes and exceptions.</p>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+
+<span class="k">namespace</span> <span class="nx">App\Exceptions</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Plank\Mediable\HandlesMediaExceptions</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">Handler</span>
+<span class="p">{</span>
+    <span class="k">use</span> <span class="nx">HandlesMediaExceptions</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">render</span><span class="p">(</span><span class="nv">$request</span><span class="p">,</span> <span class="nv">$e</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$e</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">transformMediaUploadException</span><span class="p">(</span><span class="nv">$e</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="k">parent</span><span class="o">::</span><span class="na">render</span><span class="p">(</span><span class="nv">$request</span><span class="p">,</span> <span class="nv">$e</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>If you only want some actions to throw an <code class="docutils literal"><span class="pre">HttpException</span></code>, you can apply the trait to the controller instead.</p>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+
+<span class="k">class</span> <span class="nc">ExampleController</span> <span class="k">extends</span> <span class="nx">Controller</span>
+<span class="p">{</span>
+    <span class="k">use</span> <span class="nx">HandlesMediaExceptions</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">upload</span><span class="p">(</span><span class="nx">Request</span> <span class="nv">$request</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">try</span><span class="p">{</span>
+            <span class="nx">MediaUploader</span><span class="o">::</span><span class="na">fromSource</span><span class="p">(</span><span class="nv">$request</span><span class="o">-&gt;</span><span class="na">file</span><span class="p">(</span><span class="s1">&#39;file&#39;</span><span class="p">))</span>
+                <span class="o">-&gt;</span><span class="na">toDestination</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+                <span class="o">-&gt;</span><span class="na">upload</span><span class="p">();</span>
+        <span class="p">}</span><span class="k">catch</span><span class="p">(</span><span class="nx">MediaUploadException</span> <span class="nv">$e</span><span class="p">){</span>
+            <span class="k">throw</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">transformMediaUploadException</span><span class="p">(</span><span class="nv">$e</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 </div>

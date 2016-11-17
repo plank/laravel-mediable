@@ -1,15 +1,15 @@
 <?php
 
-use Plank\Mediable\HandlesMediaExceptions;
+use Plank\Mediable\HandlesMediaUploadExceptions;
 
 class SampleExceptionHandler
 {
-    use HandlesMediaExceptions;
+    use HandlesMediaUploadExceptions;
 
     /**
      * Render an exception into a HttpException for testing purposes.
      *
-     * In laravel's exception handler we would call transformToHttpException()
+     * In laravel's exception handler we would call transformMediaUploadException()
      * inside the render() method, but instead of returning its result,
      * we would pass it to the parent::render().
      *
@@ -18,6 +18,6 @@ class SampleExceptionHandler
      */
     public function render(Exception $e)
     {
-        return $this->transformToHttpException($e);
+        return $this->transformMediaUploadException($e);
     }
 }

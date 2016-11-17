@@ -65,7 +65,7 @@ Replacing Media
 Retrieving Media
 --------------------------
 
-You can retrieve media attached to a file by refering to the tag to which it was previously assigned.
+You can retrieve media attached to a file by referring to the tag to which it was previously assigned.
 
 ::
 
@@ -176,14 +176,14 @@ When dealing with any model relationships, taking care to avoid running into the
         echo $post->firstMedia('thumbnail')->getUrl();
     }
 
-Assuming there are at least 10 Post records available, this code will execute 11 queries: oen query to load the 10 posts from the database, then another 10 queries to load the media for each of the post records indiviudally. This will slow down the rendering of the page.
+Assuming there are at least 10 Post records available, this code will execute 11 queries: one query to load the 10 posts from the database, then another 10 queries to load the media for each of the post records individually. This will slow down the rendering of the page.
 
 There are a couple of approaches that can be taken to preload the attached media in order to avoid this issue.
 
 Eager Loading
 ^^^^^^^^^^^^^^
 
-The Eloquent query builder's ``with()`` method is the prefered way to eager load related models. This package also provides an alias.
+The Eloquent query builder's ``with()`` method is the preferred way to eager load related models. This package also provides an alias.
 
 ::
 

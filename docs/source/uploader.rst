@@ -124,9 +124,9 @@ You can override the most validation configuration values set in ``config/mediab
 Handling Exceptions
 --------------------
 
-If you want to return more granular HTTP status codes when a ``Plank\Mediable\MediaUploadException`` is thrown, you can use the ``Plank\Mediable\HandlesMediaExceptions`` trait in your app's `Exceptions\Handler` or your controllers. For example, if you have set a maximum file size, an HTTP code 413 (Request Entity Too Large) will be returned instead of a 500.
+If you want to return more granular HTTP status codes when a ``Plank\Mediable\MediaUploadException`` is thrown, you can use the ``Plank\Mediable\HandlesMediaUploadExceptions`` trait in your app's `Exceptions\Handler` or in your controller. For example, if you have set a maximum file size, an 413 HTTP response code (Request Entity Too Large) will be returned instead of a 500.
 
-Call the ``transformToHttpException`` method on the ``render`` method, and a ``HttpException`` with the appropriate status code will be returned. Take a look at the ``HandlesMediaExceptions`` source code for the table of associated status codes and exceptions.
+Call the ``transformMediaUploadException`` method as part of the ``render`` method of the exception handler, and a ``HttpException`` with the appropriate status code will be returned. Take a look at the ``HandlesMediaExceptions`` source code for the table of associated status codes and exceptions.
 
 ::
 
@@ -142,9 +142,31 @@ Call the ``transformToHttpException`` method on the ``render`` method, and a ``H
 
         public function render($request, $e)
         {
-            $e = $this->transformToHttpException($e);
+            $e = $this->transformMediaUploadException($e);
 
             return parent::render($request, $e);
+        }
+    }
+
+If you only want some actions to throw an ``HttpException``, you can apply the trait to the controller instead.
+
+::
+
+    <?php
+
+    class ExampleController extends Controller
+    {
+        use HandlesMediaExceptions;
+
+        public function upload(Request $request)
+        {
+            try{
+                MediaUploader::fromSource($request->file('file'))
+                    ->toDestination(...)
+                    ->upload();
+            }catch(MediaUploadException $e){
+                throw $this->transformMediaUploadException($e);
+            }
         }
     }
 

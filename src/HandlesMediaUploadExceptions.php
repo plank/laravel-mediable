@@ -3,6 +3,7 @@
 namespace Plank\Mediable;
 
 use Exception;
+use Plank\Mediable\Exceptions\MediaUploadException;
 use Plank\Mediable\Exceptions\MediaUpload\FileSizeException;
 use Plank\Mediable\Exceptions\MediaUpload\FileExistsException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException;
@@ -11,14 +12,14 @@ use Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-trait HandlesMediaExceptions
+trait HandlesMediaUploadExceptions
 {
     /**
      * Table of HTTP status codes associated with the exception codes.
      *
      * @var array
      */
-    protected $statusCodes = [
+    private $status_codes = [
         // 403
         Response::HTTP_FORBIDDEN => [
             ForbiddenException::class,
@@ -49,12 +50,13 @@ trait HandlesMediaExceptions
      * Transform a MediaUploadException into an HttpException.
      *
      * @param  \Exception  $e
-     * @return \Symfony\Component\HttpKernel\Exception\HttpException|\Exception
+     * @return \Symfony\Component\HttpKernel\Exception\HttpException
      */
-    protected function transformToHttpException(Exception $e)
+    protected function transformMediaUploadException(Exception $e)
     {
-        if ($statusCode = $this->getStatusCodeForMediaException($e)) {
-            return new HttpException($statusCode, $e->getMessage(), $e);
+        if ($e instanceof MediaUploadException) {
+            $status_code = $this->getStatusCodeForMediaUploadException($e);
+            return new HttpException($status_code, $e->getMessage(), $e);
         }
 
         return $e;
@@ -63,20 +65,17 @@ trait HandlesMediaExceptions
     /**
      * Get the appropriate HTTP status code for the exception.
      *
-     * It accepts a generic \Exception so the trait can be extended to
-     * handle more exception types like MediaUrlException in the future.
-     *
-     * @param  \Exception $e
-     * @return int|bool
+     * @param  \Plank\Mediable\Exceptions\MediaUploadException $e
+     * @return integer
      */
-    protected function getStatusCodeForMediaException(Exception $e)
+    private function getStatusCodeForMediaUploadException(MediaUploadException $e)
     {
-        foreach ($this->statusCodes as $statusCode => $exceptions) {
+        foreach ($this->status_codes as $status_code => $exceptions) {
             if (in_array(get_class($e), $exceptions)) {
-                return $statusCode;
+                return $status_code;
             }
         }
 
-        return false;
+        return 500;
     }
 }

@@ -88,7 +88,7 @@ Occasionally, a file with a matching name might already exist at the destination
 Validation
 --------------------
 
-The ``MediaUpload`` will perform a number of validation checks on the source file. If any of the checks fail, a ``Plank\Mediable\MediaUploaderException`` will be through with a message indicating why the file was rejected.
+The ``MediaUpload`` will perform a number of validation checks on the source file. If any of the checks fail, a ``Plank\Mediable\MediaUploadException`` will be thrown with a message indicating why the file was rejected.
 
 
 You can override the most validation configuration values set in ``config/mediable.php`` on a case-by-case basis using the same fluent interface.
@@ -113,13 +113,62 @@ You can override the most validation configuration values set in ``config/mediab
         // only allow files of specific MIME types
         ->setAllowedMimeTypes(['image/jpeg'])
 
-        // only allow files of specifc extensions
+        // only allow files of specific extensions
         ->setAllowedExtensions(['jpg', 'jpeg'])
 
         // only allow files of specific aggregate types
         ->setAllowedAggregateTypes(['image'])
 
         ->upload();
+
+Handling Exceptions
+--------------------
+
+If you want to return more granular HTTP status codes when a ``Plank\Mediable\MediaUploadException`` is thrown, you can use the ``Plank\Mediable\HandlesMediaUploadExceptions`` trait in your app's `Exceptions\Handler` or in your controller. For example, if you have set a maximum file size, an 413 HTTP response code (Request Entity Too Large) will be returned instead of a 500.
+
+Call the ``transformMediaUploadException`` method as part of the ``render`` method of the exception handler, and a ``HttpException`` with the appropriate status code will be returned. Take a look at the ``HandlesMediaExceptions`` source code for the table of associated status codes and exceptions.
+
+::
+
+    <?php
+
+    namespace App\Exceptions;
+
+    use Plank\Mediable\HandlesMediaExceptions;
+
+    class Handler
+    {
+        use HandlesMediaExceptions;
+
+        public function render($request, $e)
+        {
+            $e = $this->transformMediaUploadException($e);
+
+            return parent::render($request, $e);
+        }
+    }
+
+If you only want some actions to throw an ``HttpException``, you can apply the trait to the controller instead.
+
+::
+
+    <?php
+
+    class ExampleController extends Controller
+    {
+        use HandlesMediaExceptions;
+
+        public function upload(Request $request)
+        {
+            try{
+                MediaUploader::fromSource($request->file('file'))
+                    ->toDestination(...)
+                    ->upload();
+            }catch(MediaUploadException $e){
+                throw $this->transformMediaUploadException($e);
+            }
+        }
+    }
 
 Importing Files
 --------------------
