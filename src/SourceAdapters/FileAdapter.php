@@ -15,13 +15,13 @@ class FileAdapter implements SourceAdapterInterface
 {
     /**
      * The source object.
-     * @var File
+     * @var \Symfony\Component\HttpFoundation\File\File
      */
     protected $source;
 
     /**
      * Constructor.
-     * @param File $source
+     * @param \Symfony\Component\HttpFoundation\File\File $source
      */
     public function __construct(File $source)
     {

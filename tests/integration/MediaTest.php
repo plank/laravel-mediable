@@ -1,7 +1,6 @@
 <?php
 
 use Plank\Mediable\Media;
-use Plank\Mediable\Exceptions\MediaUrlException;
 use Plank\Mediable\Exceptions\MediaMoveException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;

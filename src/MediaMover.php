@@ -19,7 +19,7 @@ class MediaMover
 
     /**
      * Constructor.
-     * @param FilesystemManager $filesystem
+     * @param \Illuminate\Filesystem\FilesystemManager $filesystem
      */
     public function __construct(FilesystemManager $filesystem)
     {
@@ -30,11 +30,11 @@ class MediaMover
      * Move the file to a new location on disk.
      *
      * Will invoke the `save()` method on the model after the associated file has been moved to prevent synchronization errors
-     * @param  Media $media
-     * @param  string $directory directory relative to disk root
-     * @param  string $name        filename. Do not include extension
+     * @param  \Plank\Mediable\Media $media
+     * @param  string                $directory directory relative to disk root
+     * @param  string                $name      filename. Do not include extension
      * @return void
-     * @throws  MediaMoveException If attempting to change the file extension or a file with the same name already exists at the destination
+     * @throws \Plank\Mediable\Exceptions\MediaMoveException If attempting to change the file extension or a file with the same name already exists at the destination
      */
     public function move(Media $media, $directory, $filename = null)
     {
@@ -54,6 +54,7 @@ class MediaMover
         }
 
         $storage->move($media->getDiskPath(), $target_path);
+
         $media->filename = $filename;
         $media->directory = $directory;
         $media->save();
@@ -62,6 +63,7 @@ class MediaMover
     /**
      * Remove the media's extension from a filename.
      * @param  string $filename
+     * @param  string $extension
      * @return string
      */
     protected function removeExtensionFromFilename($filename, $extension)

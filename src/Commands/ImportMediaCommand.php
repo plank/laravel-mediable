@@ -33,13 +33,13 @@ class ImportMediaCommand extends Command
 
     /**
      * Filesystem Manager instance.
-     * @var FilesystemManager
+     * @var \Illuminate\Filesystem\FilesystemManager
      */
     protected $filesystem;
 
     /**
      * Uploader instance.
-     * @var MediaUploader
+     * @var \Plank\Mediable\MediaUploader
      */
     protected $uploader;
 
@@ -55,8 +55,8 @@ class ImportMediaCommand extends Command
 
     /**
      * Constructor.
-     * @param FileSystemManager $filesystem
-     * @param MediaUploader     $uploader
+     * @param \Illuminate\Filesystem\FilesystemManager $filesystem
+     * @param \Plank\Mediable\MediaUploader            $uploader
      */
     public function __construct(FileSystemManager $filesystem, MediaUploader $uploader)
     {
@@ -115,7 +115,7 @@ class ImportMediaCommand extends Command
      * Search through the record list for one matching the provided path.
      * @param  string $path
      * @param  \Illuminate\Database\Eloquent\Collection $existing_media
-     * @return Media|null
+     * @return \Plank\Mediable\Media|null
      */
     protected function getRecordForFile($path, $existing_media)
     {
@@ -149,7 +149,7 @@ class ImportMediaCommand extends Command
 
     /**
      * Update an existing media record.
-     * @param  Media $media
+     * @param  \Plank\Mediable\Media $media
      * @param  string $path
      * @return void
      */

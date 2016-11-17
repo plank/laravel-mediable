@@ -3,7 +3,6 @@
 namespace Plank\Mediable;
 
 use Plank\Mediable\Exceptions\MediaUrlException;
-use Plank\Mediable\Exceptions\MediaMoveException;
 use Plank\Mediable\Helpers\File;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -65,10 +64,10 @@ class Media extends Model
 
     /**
      * Query scope for to find media in a particular directory.
-     * @param  Builder  $q
-     * @param  string  $disk      Filesystem disk to search in
-     * @param  string  $directory Path relative to disk
-     * @param  bool $recursive (_optional_) If true, will find media in or under the specified directory
+     * @param  \Illuminate\Database\Eloquent\Builder  $q
+     * @param  string                                 $disk      Filesystem disk to search in
+     * @param  string                                 $directory Path relative to disk
+     * @param  bool                                   $recursive (_optional_) If true, will find media in or under the specified directory
      * @return void
      */
     public function scopeInDirectory(Builder $q, $disk, $directory, $recursive = false)
@@ -84,9 +83,9 @@ class Media extends Model
 
     /**
      * Query scope for finding media in a particular directory or one of its subdirectories.
-     * @param  Builder  $q
-     * @param  string  $disk      Filesystem disk to search in
-     * @param  string  $directory Path relative to disk
+     * @param  \Illuminate\Database\Eloquent\Builder  $q
+     * @param  string                                 $disk      Filesystem disk to search in
+     * @param  string                                 $directory Path relative to disk
      * @return void
      */
     public function scopeInOrUnderDirectory(Builder $q, $disk, $directory)
@@ -96,8 +95,8 @@ class Media extends Model
 
     /**
      * Query scope for finding media by basename.
-     * @param  Builder $q
-     * @param  string  $basename filename and extension
+     * @param  \Illuminate\Database\Eloquent\Builder $q
+     * @param  string                                $basename filename and extension
      * @return void
      */
     public function scopeWhereBasename(Builder $q, $basename)
@@ -108,9 +107,9 @@ class Media extends Model
 
     /**
      * Query scope finding media at a path relative to a disk.
-     * @param  Builder $q
-     * @param  string  $disk
-     * @param  string  $path directory, filename and extension
+     * @param  \Illuminate\Database\Eloquent\Builder $q
+     * @param  string                                $disk
+     * @param  string                                $path directory, filename and extension
      * @return void
      */
     public function scopeForPathOnDisk(Builder $q, $disk, $path)
@@ -123,7 +122,7 @@ class Media extends Model
 
     /**
      * Query scope to remove the order by clause from the query.
-     * @param  Builder $q
+     * @param  \Illuminate\Database\Eloquent\Builder $q
      * @return void
      */
     public function scopeUnordered(Builder $q)
@@ -173,7 +172,7 @@ class Media extends Model
 
     /**
      * Get the absolute URL to the media file.
-     * @throws MediaUrlException If media's disk is not publicly accessible
+     * @throws \Plank\Mediable\Exceptions\MediaUrlException If media's disk is not publicly accessible
      * @return string
      */
     public function getUrl()
@@ -204,9 +203,8 @@ class Media extends Model
      *
      * Will invoke the `save()` method on the model after the associated file has been moved to prevent synchronization errors
      * @param  string $destination directory relative to disk root
-     * @param  string $name        filename. Do not include extension
+     * @param  string $filename    filename. Do not include extension
      * @return void
-     * @throws  MediaMoveException If attempting to change the file extension or a file with the same name already exists at the destination
      */
     public function move($destination, $filename = null)
     {
@@ -217,7 +215,7 @@ class Media extends Model
      * Rename the file in place.
      * @param  string $name
      * @return void
-     * @see Media::move()
+     * @see \Plank\Mediable\Media::move()
      */
     public function rename($filename)
     {
