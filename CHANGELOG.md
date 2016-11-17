@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.3.0 - 2016-11-17
+- Separated MediaUploadException into a number of subclasses for more granular exception handling (Thanks @sebdesign!).
+- Added HandlesMediaUploadExceptions trait for converting MediaUploadExceptions into HttpException with appropriate error codes (Thanks @sebdesign).
+
 ## 2.2.3 - 2016-11-13
 - Fixed SQL escaping issue in `Mediable::getOrderValueForTags`.
 
