@@ -259,11 +259,11 @@
 
 <span class="k">namespace</span> <span class="nx">App\Exceptions</span><span class="p">;</span>
 
-<span class="k">use</span> <span class="nx">Plank\Mediable\HandlesMediaExceptions</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Plank\Mediable\HandlesMediaUploadExceptions</span><span class="p">;</span>
 
 <span class="k">class</span> <span class="nc">Handler</span>
 <span class="p">{</span>
-    <span class="k">use</span> <span class="nx">HandlesMediaExceptions</span><span class="p">;</span>
+    <span class="k">use</span> <span class="nx">HandlesMediaUploadExceptions</span><span class="p">;</span>
 
     <span class="k">public</span> <span class="k">function</span> <span class="nf">render</span><span class="p">(</span><span class="nv">$request</span><span class="p">,</span> <span class="nv">$e</span><span class="p">)</span>
     <span class="p">{</span>
@@ -279,7 +279,7 @@
 
 <span class="k">class</span> <span class="nc">ExampleController</span> <span class="k">extends</span> <span class="nx">Controller</span>
 <span class="p">{</span>
-    <span class="k">use</span> <span class="nx">HandlesMediaExceptions</span><span class="p">;</span>
+    <span class="k">use</span> <span class="nx">HandlesMediaUploadExceptions</span><span class="p">;</span>
 
     <span class="k">public</span> <span class="k">function</span> <span class="nf">upload</span><span class="p">(</span><span class="nx">Request</span> <span class="nv">$request</span><span class="p">)</span>
     <span class="p">{</span>

@@ -134,11 +134,11 @@ Call the ``transformMediaUploadException`` method as part of the ``render`` meth
 
     namespace App\Exceptions;
 
-    use Plank\Mediable\HandlesMediaExceptions;
+    use Plank\Mediable\HandlesMediaUploadExceptions;
 
     class Handler
     {
-        use HandlesMediaExceptions;
+        use HandlesMediaUploadExceptions;
 
         public function render($request, $e)
         {
@@ -156,7 +156,7 @@ If you only want some actions to throw an ``HttpException``, you can apply the t
 
     class ExampleController extends Controller
     {
-        use HandlesMediaExceptions;
+        use HandlesMediaUploadExceptions;
 
         public function upload(Request $request)
         {
