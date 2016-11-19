@@ -243,6 +243,7 @@ The ``config/mediable.php`` file lets you specify a number of classes to be use 
      */
     'source_adapters' => [
         'class' => [
+            Plank\Mediable\Helpers\TemporaryFile::class => Plank\Mediable\SourceAdapters\TemporaryFileAdapter::class,
             Symfony\Component\HttpFoundation\File\UploadedFile::class => Plank\Mediable\SourceAdapters\UploadedFileAdapter::class,
             Symfony\Component\HttpFoundation\File\File::class => Plank\Mediable\SourceAdapters\FileAdapter::class,
         ],

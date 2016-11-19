@@ -9,6 +9,7 @@ use Plank\Mediable\Exceptions\MediaUpload\ForbiddenException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException;
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Plank\Mediable\Helpers\File;
+use Plank\Mediable\Helpers\TemporaryFile;
 use Plank\Mediable\SourceAdapters\SourceAdapterFactory;
 use Illuminate\Filesystem\FilesystemManager;
 
@@ -94,6 +95,17 @@ class MediaUploader
         $this->source = $this->factory->create($source);
 
         return $this;
+    }
+
+    /**
+     * Set raw file contents to a temporary file source.
+     * @param  mixed  $contents
+     * @param  string $filename
+     * @return static
+     */
+    public function fromContents($contents, $filename)
+    {
+        return $this->fromSource(new TemporaryFile($contents, $filename));
     }
 
     /**
