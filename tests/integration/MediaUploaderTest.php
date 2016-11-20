@@ -265,11 +265,11 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('image', $media->aggregate_type);
     }
 
-    public function test_it_imports_raw_contents()
+    public function test_it_imports_string_contents()
     {
-        $resource = fopen('https://www.plankdesign.com/externaluse/plank.png', 'r');
+        $string = file_get_contents('https://www.plankdesign.com/externaluse/plank.png');
 
-        $media = Facade::fromContents($resource, 'plank.png')
+        $media = Facade::fromString($string)
             ->toDestination('tmp', 'foo')
             ->useFilename('bar')
             ->upload();

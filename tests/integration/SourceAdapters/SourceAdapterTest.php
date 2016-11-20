@@ -1,8 +1,7 @@
 <?php
 
-use Plank\Mediable\Helpers\TemporaryFile;
 use Plank\Mediable\SourceAdapters\FileAdapter;
-use Plank\Mediable\SourceAdapters\TemporaryFileAdapter;
+use Plank\Mediable\SourceAdapters\StringAdapter;
 use Plank\Mediable\SourceAdapters\UploadedFileAdapter;
 use Plank\Mediable\SourceAdapters\LocalPathAdapter;
 use Plank\Mediable\SourceAdapters\RemoteUrlAdapter;
@@ -25,14 +24,14 @@ class SourceAdapterTest extends TestCase
     public function adapterProvider()
     {
         $file = realpath(__DIR__.'/../../_data/plank.png');
-        $tempFile = new TemporaryFile(file_get_contents($file), 'plank.png');
+        $string = file_get_contents($file);
         $url = 'https://www.plankdesign.com/externaluse/plank.png';
         $data = [
-            [FileAdapter::class, new File($file), $file],
-            [UploadedFileAdapter::class, new UploadedFile($file, 'plank.png', 'image/png', 8444, UPLOAD_ERR_OK, true), $file],
-            [LocalPathAdapter::class, $file, $file],
-            [RemoteUrlAdapter::class, $url, $url],
-            [TemporaryFileAdapter::class, $tempFile, $tempFile->getRealPath()]
+            [FileAdapter::class, new File($file), $file, 'plank'],
+            [UploadedFileAdapter::class, new UploadedFile($file, 'plank.png', 'image/png', 8444, UPLOAD_ERR_OK, true), $file, 'plank'],
+            [LocalPathAdapter::class, $file, $file, 'plank'],
+            [RemoteUrlAdapter::class, $url, $url, 'plank'],
+            [StringAdapter::class, $string, null, null],
         ];
         return $data;
     }
@@ -44,7 +43,6 @@ class SourceAdapterTest extends TestCase
             [new FileAdapter(new File($file, false))],
             [new LocalPathAdapter($file)],
             [new UploadedFileAdapter(new UploadedFile($file, 'invalid.png', 'image/png', 8444, UPLOAD_ERR_CANT_WRITE, false))],
-            [new TemporaryFileAdapter(new TemporaryFile(@file_get_contents($file), 'invalid.png', false))],
         ];
     }
 
@@ -69,10 +67,10 @@ class SourceAdapterTest extends TestCase
     /**
      * @dataProvider adapterProvider
      */
-    public function test_it_adapts_filename($adapter, $source)
+    public function test_it_adapts_filename($adapter, $source, $path, $filename)
     {
         $adapter = new $adapter($source);
-        $this->assertEquals('plank', $adapter->filename());
+        $this->assertEquals($filename, $adapter->filename());
     }
 
     /**

@@ -19,7 +19,6 @@ The ``fromSource()`` method will accept any of the following:
 
 - an instance of ``Symfony\Component\HttpFoundation\UploadedFile``, which is returned by ``$request->file()``.
 - an instance of ``Symfony\Component\HttpFoundation\File``.
-- an instance of ``Plank\Mediable\Helpers\TemporaryFile``, which accepts file contents as a string, array or stream resource.
 - a URL as a string, beginning with ``http://`` or ``https://``.
 - an absolute path as a string, beginning with ``/``.
 
@@ -183,7 +182,7 @@ If you need to create a media record for a file that is already in place on the 
     // or
     $media = MediaUploader::importPath($disk, $path);
 
-If you have raw file data, you can import it using the `fromContents` method, along with a filename.
+If you have string file data, you can import it using the `fromString` method.
 The data can be a string, an array, or a stream resource.
 
 ::
@@ -192,19 +191,9 @@ The data can be a string, an array, or a stream resource.
     // Encoded image converted to string
     $jpg = Image::make('https://www.plankdesign.com/externaluse/plank.png')->encode('jpg');
 
-    MediaUploader::fromContents($jpg, 'plank.jpg')
+    MediaUploader::fromString($jpg)
         ->toDestination(...)
         ->upload();
-
-    // or
-
-    // Open image as a stream resource
-    $resource = fopen('https://www.plankdesign.com/externaluse/plank.png', 'r');
-
-    MediaUploader::fromContents($resource, 'plank.png')
-        ->toDestination(...)
-        ->upload();
-
 
 Updating Files
 ---------------
