@@ -127,6 +127,13 @@ class MediaTest extends TestCase
         $this->assertEquals('http://localhost/uploads/foo/bar/baz.jpg', $media->getUrl());
     }
 
+    public function test_it_can_generate_a_custom_url_to_the_local_file()
+    {
+        $this->app['config']->set('filesystems.disks.uploads.url', 'http://example.com');
+        $media = factory(Media::class)->make(['disk' => 'uploads', 'directory' => 'foo/bar', 'filename' => 'baz', 'extension' => 'jpg']);
+        $this->assertEquals('http://example.com/foo/bar/baz.jpg', $media->getUrl());
+    }
+
     public function test_it_can_generate_a_url_to_the_file_on_s3()
     {
         if (!$this->s3ConfigLoaded()) {
