@@ -20,6 +20,20 @@ class LocalUrlGeneratorTest extends TestCase
         $this->assertEquals('http://localhost/uploads/foo/bar.jpg', $generator->getUrl());
     }
 
+    public function test_it_generates_custom_url()
+    {
+        $this->app['config']->set('filesystems.disks.uploads.url', 'http://example.com');
+        $generator = $this->setupGenerator();
+        $this->assertEquals('http://example.com/foo/bar.jpg', $generator->getUrl());
+    }
+
+    public function test_it_generates_prefixed_custom_url()
+    {
+        $this->app['config']->set('filesystems.disks.public_storage.url', 'http://example.com');
+        $generator = $this->setupGenerator('public_storage');
+        $this->assertEquals('http://example.com/prefix/foo/bar.jpg', $generator->getUrl());
+    }
+
     public function test_it_throws_exception_for_non_public_disk()
     {
         $generator = $this->setupGenerator('tmp');

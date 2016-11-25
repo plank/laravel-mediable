@@ -105,6 +105,42 @@ If you are using symbolic links to make local disks accessible, you can instruct
 
     $media->getUrl(); // returns http://domain.com/assets/foo.jpg
 
+Whether you are using symbolic links or not, you can set the ``'url'`` config value to generate disk urls on another domain. Note that you can specify any path in the url, as the root path doesn't have to match, as long as you have set up your web server accordingly.
+
+::
+
+    <?php
+    'disks' => [
+        'uploads' => [
+            'driver' => 'local',
+            'root' => public_path('uploads'),
+            'url' => 'http://example.com/assets',
+        ],
+    ]
+
+    //...
+
+    $media->getUrl(); // returns http://example.com/assets/foo.jpg
+
+However, if you are using a symbolic link to make a local disk accessible, the prefix will be appended to the disk url.
+
+::
+
+    <?php
+    'disks' => [
+        'public' => [
+            'driver' => 'local',
+            'root' => storage_path('public'),
+            'visibility' => 'public',
+            'prefix' => 'assets',
+            'url' => 'http://example.com',
+        ],
+    ]
+
+    //...
+
+    $media->getUrl(); // returns http://example.com/assets/foo.jpg
+
 
 Permissions for S3-based disks is set on the buckets themselves. You can inform the package that ``Media`` on an S3 disk can be linked by URL by adding the ``'visibility' => 'public'`` key to the disk config.
 

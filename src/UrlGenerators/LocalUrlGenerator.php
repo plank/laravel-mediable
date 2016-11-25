@@ -62,7 +62,19 @@ class LocalUrlGenerator extends BaseUrlGenerator
      */
     public function getUrl()
     {
-        return $this->url->asset($this->getPublicPath());
+        $path = $this->getPublicPath();
+
+        $url = $this->getDiskConfig('url');
+
+        if ($url) {
+            if ($this->isInWebroot()) {
+                $path = $this->media->getDiskPath();
+            }
+
+            return rtrim($url, '/').'/'.trim($path, '/');
+        }
+
+        return $this->url->asset($path);
     }
 
     /**
