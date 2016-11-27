@@ -20,6 +20,12 @@ class SourceAdapterFactory
     private $class_adapters = [];
 
     /**
+     * Map of which adapters to use for a given stream wrapper.
+     * @var array
+     */
+    private $stream_adapters = [];
+
+    /**
      * Map of which adapters to use for a given string pattern.
      * @var array
      */
@@ -39,6 +45,8 @@ class SourceAdapterFactory
             return $source;
         } elseif (is_object($source)) {
             $adapter = $this->adaptClass($source);
+        } elseif (is_resource($source)) {
+            $adapter = $this->adaptResource($source);
         } elseif (is_string($source)) {
             $adapter = $this->adaptString($source);
         }
@@ -60,6 +68,18 @@ class SourceAdapterFactory
     {
         $this->validateAdapterClass($adapter_class);
         $this->class_adapters[$source_class] = $adapter_class;
+    }
+
+    /**
+     * Specify the FQCN of a SourceAdapter class to use when the source is a stream resource implementing a given stream wrapper.
+     * @param string $adapter_class
+     * @param string $source_wrapper
+     * @return void
+     */
+    public function setAdapterForStream($adapter_class, $source_wrapper)
+    {
+        $this->validateAdapterClass($adapter_class);
+        $this->stream_adapters[$source_wrapper] = $adapter_class;
     }
 
     /**
@@ -86,6 +106,36 @@ class SourceAdapterFactory
         foreach ($this->class_adapters as $class => $adapter) {
             if (in_array($class, $tree)) {
                 return $adapter;
+            }
+        }
+    }
+
+    /**
+     * Choose an adapter class for the provided resource.
+     * @param  resource $source
+     * @return \Plank\Mediable\SourceAdapters\SourceAdapterInterface|null
+     */
+    private function adaptResource($source)
+    {
+        $type = get_resource_type($source);
+
+        if ($type === 'stream') {
+            return $this->adaptStream($source);
+        }
+    }
+
+    /**
+     * Choose an adapter class for the provided stream resource.
+     * @param  resource $source
+     * @return \Plank\Mediable\SourceAdapters\SourceAdapterInterface|null
+     */
+    private function adaptStream($source)
+    {
+        $metadata = stream_get_meta_data($source);
+
+        foreach ($this->stream_adapters as $wrapper => $class) {
+            if ($metadata['wrapper_type'] === $wrapper) {
+                return $class;
             }
         }
     }

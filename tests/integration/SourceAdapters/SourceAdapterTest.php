@@ -1,6 +1,9 @@
 <?php
 
 use Plank\Mediable\SourceAdapters\FileAdapter;
+use Plank\Mediable\SourceAdapters\FileStreamAdapter;
+use Plank\Mediable\SourceAdapters\HttpStreamAdapter;
+use Plank\Mediable\SourceAdapters\IoStreamAdapter;
 use Plank\Mediable\SourceAdapters\StringAdapter;
 use Plank\Mediable\SourceAdapters\UploadedFileAdapter;
 use Plank\Mediable\SourceAdapters\LocalPathAdapter;
@@ -26,12 +29,20 @@ class SourceAdapterTest extends TestCase
         $file = realpath(__DIR__.'/../../_data/plank.png');
         $string = file_get_contents($file);
         $url = 'https://www.plankdesign.com/externaluse/plank.png';
+        $fileResource = fopen($file, 'rb');
+        $httpResource = fopen($url, 'rb');
+        $memoryResource = fopen('php://memory', 'w+b');
+        fwrite($memoryResource, $string);
+        rewind($memoryResource);
         $data = [
             [FileAdapter::class, new File($file), $file, 'plank'],
             [UploadedFileAdapter::class, new UploadedFile($file, 'plank.png', 'image/png', 8444, UPLOAD_ERR_OK, true), $file, 'plank'],
             [LocalPathAdapter::class, $file, $file, 'plank'],
             [RemoteUrlAdapter::class, $url, $url, 'plank'],
             [StringAdapter::class, $string, null, null],
+            [FileStreamAdapter::class, $fileResource, $file, 'plank'],
+            [HttpStreamAdapter::class, $httpResource, $url, 'plank'],
+            [IoStreamAdapter::class, $memoryResource, 'php://memory', null],
         ];
         return $data;
     }
@@ -39,10 +50,14 @@ class SourceAdapterTest extends TestCase
     public function invalidAdapterProvider()
     {
         $file = __DIR__ . '/../../_data/invalid.png';
+        $url = 'https://www.plankdesign.com/externaluse/invalid.png';
+
         return [
             [new FileAdapter(new File($file, false))],
             [new LocalPathAdapter($file)],
             [new UploadedFileAdapter(new UploadedFile($file, 'invalid.png', 'image/png', 8444, UPLOAD_ERR_CANT_WRITE, false))],
+            [new FileStreamAdapter(@fopen($file, 'r'))],
+            [new HttpStreamAdapter(@fopen($url, 'r'))],
         ];
     }
 

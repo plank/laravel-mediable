@@ -19,6 +19,7 @@ The ``fromSource()`` method will accept any of the following:
 
 - an instance of ``Symfony\Component\HttpFoundation\UploadedFile``, which is returned by ``$request->file()``.
 - an instance of ``Symfony\Component\HttpFoundation\File``.
+- a stream resource handle. The ``file://``, ``http://`` and ``php://`` wrappers are supported.
 - a URL as a string, beginning with ``http://`` or ``https://``.
 - an absolute path as a string, beginning with ``/``.
 
@@ -183,7 +184,6 @@ If you need to create a media record for a file that is already in place on the 
     $media = MediaUploader::importPath($disk, $path);
 
 If you have string file data, you can import it using the `fromString` method.
-The data can be a string, an array, or a stream resource.
 
 ::
     <?php
@@ -194,6 +194,7 @@ The data can be a string, an array, or a stream resource.
     MediaUploader::fromString($jpg)
         ->toDestination(...)
         ->upload();
+
 
 Updating Files
 ---------------

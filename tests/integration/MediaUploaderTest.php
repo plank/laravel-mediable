@@ -283,6 +283,25 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('image', $media->aggregate_type);
     }
 
+    public function test_it_imports_stream_contents()
+    {
+        $resource = fopen(realpath(__DIR__.'/../_data/plank.png'), 'r');
+        // $resource = fopen('https://www.plankdesign.com/externaluse/plank.png', 'r');
+
+        $media = Facade::fromStream($resource)
+            ->toDestination('tmp', 'foo')
+            ->useFilename('bar')
+            ->upload();
+
+        $this->assertInstanceOf(Media::class, $media);
+        $this->assertTrue($media->fileExists());
+        $this->assertEquals('tmp', $media->disk);
+        $this->assertEquals('foo/bar.png', $media->getDiskPath());
+        $this->assertEquals('image/png', $media->mime_type);
+        $this->assertEquals(8444, $media->size);
+        $this->assertEquals('image', $media->aggregate_type);
+    }
+
     public function test_it_imports_existing_files()
     {
         $media = factory(Media::class)->make([

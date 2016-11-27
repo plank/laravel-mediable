@@ -176,12 +176,26 @@ return [
     /*
      * List of adapters to use for various source inputs
      *
-     * Adapters can map either to a class or a pattern (regex)
+     * Adapters can map either to a class, a stream wrapper, or a pattern (regex)
      */
     'source_adapters' => [
         'class' => [
             Symfony\Component\HttpFoundation\File\UploadedFile::class => Plank\Mediable\SourceAdapters\UploadedFileAdapter::class,
             Symfony\Component\HttpFoundation\File\File::class => Plank\Mediable\SourceAdapters\FileAdapter::class,
+        ],
+        'stream' => [
+            'file' => Plank\Mediable\SourceAdapters\FileStreamAdapter::class,
+            'http' => Plank\Mediable\SourceAdapters\HttpStreamAdapter::class,
+            // 'ftp' => Plank\Mediable\SourceAdapters\FtpStreamAdapter,
+            'php' => Plank\Mediable\SourceAdapters\IoStreamAdapter::class,
+            // 'zlib' => Plank\Mediable\SourceAdapters\ZlibStreamAdapter,
+            // 'RFC2397' => Plank\Mediable\SourceAdapters\DataStreamAdapter,
+            // 'glob' => Plank\Mediable\SourceAdapters\GlobStreamAdapter,
+            // 'phar' => Plank\Mediable\SourceAdapters\PharStreamAdapter,
+            // 'ssh2' => Plank\Mediable\SourceAdapters\Ssh2StreamAdapter,
+            // 'rar' => Plank\Mediable\SourceAdapters\RarStreamAdapter,
+            // 'ogg' => Plank\Mediable\SourceAdapters\OggStreamAdapter,
+            // 'expect' => Plank\Mediable\SourceAdapters\ExpectStreamAdapter,
         ],
         'pattern' => [
             '^https?://' => Plank\Mediable\SourceAdapters\RemoteUrlAdapter::class,
