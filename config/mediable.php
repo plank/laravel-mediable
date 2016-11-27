@@ -184,7 +184,7 @@ return [
             Symfony\Component\HttpFoundation\File\File::class => Plank\Mediable\SourceAdapters\FileAdapter::class,
         ],
         'stream' => [
-            'file' => Plank\Mediable\SourceAdapters\FileStreamAdapter::class,
+            'plainfile' => Plank\Mediable\SourceAdapters\FileStreamAdapter::class,
             'http' => Plank\Mediable\SourceAdapters\HttpStreamAdapter::class,
             // 'ftp' => Plank\Mediable\SourceAdapters\FtpStreamAdapter,
             'php' => Plank\Mediable\SourceAdapters\IoStreamAdapter::class,
