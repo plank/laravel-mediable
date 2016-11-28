@@ -2,7 +2,6 @@
 
 namespace Plank\Mediable;
 
-use Plank\Mediable\Exceptions\MediaUrlException;
 use Plank\Mediable\Helpers\File;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
