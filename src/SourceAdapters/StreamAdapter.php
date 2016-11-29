@@ -105,7 +105,8 @@ abstract class StreamAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function size() {
+    public function size()
+    {
         return $this->source->getSize();
     }
 
