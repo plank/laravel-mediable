@@ -3,6 +3,8 @@
 namespace Plank\Mediable\SourceAdapters;
 
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
+use Plank\Mediable\Stream;
+use Psr\Http\Message\StreamInterface;
 
 /**
  * Source Adapter Factory.
@@ -43,6 +45,8 @@ class SourceAdapterFactory
 
         if ($source instanceof SourceAdapterInterface) {
             return $source;
+        } elseif ($source instanceof StreamInterface) {
+            $adapter = $this->adaptStream($source);
         } elseif (is_object($source)) {
             $adapter = $this->adaptClass($source);
         } elseif (is_resource($source)) {
@@ -111,33 +115,37 @@ class SourceAdapterFactory
     }
 
     /**
+     * Choose an adapter class for the provided stream object.
+     * @param  StreamInterface $source
+     * @return \Plank\Mediable\SourceAdapters\SourceAdapterInterface|null
+     */
+    private function adaptStream(StreamInterface $source)
+    {
+        return $this->adaptStreamWrapper($source->getMetadata('wrapper_type'));
+    }
+
+    /**
      * Choose an adapter class for the provided resource.
      * @param  resource $source
      * @return \Plank\Mediable\SourceAdapters\SourceAdapterInterface|null
      */
     private function adaptResource($source)
     {
-        $type = get_resource_type($source);
+        if (get_resource_type($source) === 'stream') {
+            $metadata = stream_get_meta_data($source);
 
-        if ($type === 'stream') {
-            return $this->adaptStream($source);
+            return $this->adaptStreamWrapper($metadata['wrapper_type']);
         }
     }
 
     /**
-     * Choose an adapter class for the provided stream resource.
-     * @param  resource $source
+     * Choose an adapter class for the provided stream wrapper.
+     * @param  string $wrapper
      * @return \Plank\Mediable\SourceAdapters\SourceAdapterInterface|null
      */
-    private function adaptStream($source)
+    private function adaptStreamWrapper($wrapper)
     {
-        $metadata = stream_get_meta_data($source);
-
-        foreach ($this->stream_adapters as $wrapper => $class) {
-            if ($metadata['wrapper_type'] === $wrapper) {
-                return $class;
-            }
-        }
+        return array_get($this->stream_adapters, $wrapper);
     }
 
     /**

@@ -2,32 +2,43 @@
 
 namespace Plank\Mediable\SourceAdapters;
 
+use Plank\Mediable\Stream;
+use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
+use Psr\Http\Message\StreamInterface;
+
 /**
  * Stream Adapter.
  *
- * Adapts a stream resource representing a file.
+ * Adapts a stream object or resource.
  */
 abstract class StreamAdapter implements SourceAdapterInterface
 {
     /**
      * The source object.
-     * @var resource
+     * @var \Psr\Http\Message\StreamInterface
      */
     protected $source;
 
     /**
-     * The resource metadata.
-     * @var array
+     * The resource.
+     * @var resource|null
      */
-    protected $metadata = [];
+    protected $resource;
 
     /**
      * Constructor.
-     * @param resource $source
+     * @param \Psr\Http\Message\StreamInterface|resource $source
      */
     public function __construct($source)
     {
-        $this->source = $source;
+        if (is_resource($source) && get_resource_type($source) === 'stream') {
+            $this->resource = $source;
+            $this->source = new Stream($source);
+        } elseif ($source instanceof StreamInterface) {
+            $this->source = $source;
+        } else {
+            throw ConfigurationException::unrecognizedSource($source);
+        }
     }
 
     /**
@@ -35,6 +46,10 @@ abstract class StreamAdapter implements SourceAdapterInterface
      */
     public function getSource()
     {
+        if ($this->resource) {
+            return $this->resource;
+        }
+
         return $this->source;
     }
 
@@ -43,7 +58,7 @@ abstract class StreamAdapter implements SourceAdapterInterface
      */
     public function path()
     {
-        return $this->getMedatata('uri');
+        return $this->source->getMetadata('uri');
     }
 
     /**
@@ -72,7 +87,11 @@ abstract class StreamAdapter implements SourceAdapterInterface
      */
     public function contents()
     {
-        return $this->source;
+        if ($this->resource) {
+            return $this->resource;
+        }
+
+        return (string) $this->source;
     }
 
     /**
@@ -80,21 +99,14 @@ abstract class StreamAdapter implements SourceAdapterInterface
      */
     public function valid()
     {
-        return $this->isStream();
+        return $this->source->isReadable();
     }
 
     /**
      * {@inheritdoc}
      */
-    abstract public function size();
-
-    /**
-     * Check if the stream is seekable.
-     * @return bool
-     */
-    protected function isSeekable()
-    {
-        return $this->getMedatata('seekable');
+    public function size() {
+        return $this->source->getSize();
     }
 
     /**
@@ -104,22 +116,7 @@ abstract class StreamAdapter implements SourceAdapterInterface
      */
     protected function getWrapperData()
     {
-        return $this->getMedatata('wrapper_data', []);
-    }
-
-    /**
-     * Get a metadata value by key.
-     * @param  string $key
-     * @param  mixed $default
-     * @return mixed
-     */
-    protected function getMedatata($key, $default = null)
-    {
-        if (empty($this->metadata)) {
-            $this->metadata = stream_get_meta_data($this->source);
-        }
-
-        return array_get($this->metadata, $key, $default);
+        return $this->source->getMetadata('wrapper_data') ?: [];
     }
 
     /**
@@ -129,18 +126,5 @@ abstract class StreamAdapter implements SourceAdapterInterface
     protected function getStats()
     {
         return fstat($this->source);
-    }
-
-    /**
-     * Check if the source is a stream resource.
-     * @return bool
-     */
-    protected function isStream()
-    {
-        if (! is_resource($this->source)) {
-            return false;
-        }
-
-        return get_resource_type($this->source) === 'stream';
     }
 }

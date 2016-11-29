@@ -1,5 +1,6 @@
 <?php
 
+use Plank\Mediable\Stream;
 use Plank\Mediable\SourceAdapters\FileAdapter;
 use Plank\Mediable\SourceAdapters\FileStreamAdapter;
 use Plank\Mediable\SourceAdapters\HttpStreamAdapter;
@@ -10,6 +11,7 @@ use Plank\Mediable\SourceAdapters\LocalPathAdapter;
 use Plank\Mediable\SourceAdapters\RemoteUrlAdapter;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Psr\Http\Message\StreamInterface;
 
 class SourceAdapterTest extends TestCase
 {
@@ -30,6 +32,7 @@ class SourceAdapterTest extends TestCase
         $string = file_get_contents($file);
         $url = 'https://www.plankdesign.com/externaluse/plank.png';
         $fileResource = fopen($file, 'rb');
+        $fileStream = new Stream(fopen($file, 'rb'));
         $httpResource = fopen($url, 'rb');
         $memoryResource = fopen('php://memory', 'w+b');
         fwrite($memoryResource, $string);
@@ -41,6 +44,7 @@ class SourceAdapterTest extends TestCase
             [RemoteUrlAdapter::class, $url, $url, 'plank'],
             [StringAdapter::class, $string, null, null],
             [FileStreamAdapter::class, $fileResource, $file, 'plank'],
+            [FileStreamAdapter::class, $fileStream, $file, 'plank'],
             [HttpStreamAdapter::class, $httpResource, $url, 'plank'],
             [IoStreamAdapter::class, $memoryResource, 'php://memory', null],
         ];
@@ -113,8 +117,12 @@ class SourceAdapterTest extends TestCase
     {
         $adapter = new $adapter($source);
         $contents = $adapter->contents();
-        $this->assertTrue(is_resource($contents));
-        $this->assertEquals(get_resource_type($contents), 'stream');
+
+        if (is_resource($contents)) {
+            $this->assertEquals(get_resource_type($contents), 'stream');
+        } else {
+            $this->assertInternalType('string', $contents);
+        }
     }
 
     /**

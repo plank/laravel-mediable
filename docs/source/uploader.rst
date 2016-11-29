@@ -19,6 +19,7 @@ The ``fromSource()`` method will accept any of the following:
 
 - an instance of ``Symfony\Component\HttpFoundation\UploadedFile``, which is returned by ``$request->file()``.
 - an instance of ``Symfony\Component\HttpFoundation\File``.
+- an instance of ``Psr\Http\Message\StreamInterface``, which is returned by libraries using PSR-7 HTTP message interfaces, like Guzzle.
 - a stream resource handle. The ``file://``, ``http://`` and ``php://`` wrappers are supported.
 - a URL as a string, beginning with ``http://`` or ``https://``.
 - an absolute path as a string, beginning with ``/``.

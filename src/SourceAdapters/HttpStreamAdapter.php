@@ -5,7 +5,7 @@ namespace Plank\Mediable\SourceAdapters;
 /**
  * HTTP Stream Adapter.
  *
- * Adapts a stream resource representing an http:// stream.
+ * Adapts a stream object or resource representing an http:// stream.
  */
 class HttpStreamAdapter extends StreamAdapter
 {
@@ -27,7 +27,13 @@ class HttpStreamAdapter extends StreamAdapter
      */
     public function size()
     {
-        return array_get($this->getHeaders(), 'Content-Length', 0);
+        $size = $this->source->getSize();
+
+        if (! is_null($size)) {
+            return $size;
+        }
+
+        return array_get($this->getHeaders(), 'Content-Length');
     }
 
     /**

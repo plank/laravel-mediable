@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
 /**
  * I/O Stream Adapter.
  *
- * Adapts a stream resource representing a php:// stream.
+ * Adapts a stream object or resource representing a php:// stream.
  */
 class IoStreamAdapter extends StreamAdapter
 {
@@ -36,7 +36,7 @@ class IoStreamAdapter extends StreamAdapter
     {
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
 
-        return $finfo->buffer($this->toString());
+        return $finfo->buffer((string) $this->source);
     }
 
     /**
@@ -44,27 +44,16 @@ class IoStreamAdapter extends StreamAdapter
      */
     public function size()
     {
+        $size = $this->source->getSize();
+
+        if (! is_null($size)) {
+            return $size;
+        }
+
         $stats = $this->getStats();
 
         if (is_array($stats)) {
-            return array_get($stats, 'size', 0);
+            return array_get($stats, 'size');
         }
-
-        return 0;
-    }
-
-    /**
-     * Get the stream contents.
-     * @return string
-     */
-    protected function toString()
-    {
-        $source = stream_get_contents($this->source);
-
-        if ($this->isSeekable()) {
-            rewind($this->source);
-        }
-
-        return $source;
     }
 }
