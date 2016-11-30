@@ -60,8 +60,8 @@ class SourceAdapterTest extends TestCase
             [new FileAdapter(new File($file, false))],
             [new LocalPathAdapter($file)],
             [new UploadedFileAdapter(new UploadedFile($file, 'invalid.png', 'image/png', 8444, UPLOAD_ERR_CANT_WRITE, false))],
-            [new FileStreamAdapter(@fopen($file, 'r'))],
-            [new HttpStreamAdapter(@fopen($url, 'r'))],
+            [new FileStreamAdapter(fopen(realpath(__DIR__.'/../../_data/plank.png'), 'a'))],
+            [new IoStreamAdapter(fopen('php://stdin', 'w'))],
         ];
     }
 
