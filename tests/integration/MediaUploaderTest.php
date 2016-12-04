@@ -2,6 +2,7 @@
 
 use Plank\Mediable\Media;
 use Plank\Mediable\MediaUploader;
+use Plank\Mediable\Stream;
 use Plank\Mediable\SourceAdapters\SourceAdapterFactory;
 use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
 use Plank\Mediable\Exceptions\MediaUpload\FileSizeException;
@@ -252,6 +253,78 @@ class MediaUploaderTest extends TestCase
     public function test_it_uploads_files()
     {
         $media = Facade::fromSource(__DIR__ . '/../_data/plank.png')
+            ->toDestination('tmp', 'foo')
+            ->useFilename('bar')
+            ->upload();
+
+        $this->assertInstanceOf(Media::class, $media);
+        $this->assertTrue($media->fileExists());
+        $this->assertEquals('tmp', $media->disk);
+        $this->assertEquals('foo/bar.png', $media->getDiskPath());
+        $this->assertEquals('image/png', $media->mime_type);
+        $this->assertEquals(8444, $media->size);
+        $this->assertEquals('image', $media->aggregate_type);
+    }
+
+    public function test_it_imports_string_contents()
+    {
+        $string = file_get_contents('https://www.plankdesign.com/externaluse/plank.png');
+
+        $media = Facade::fromString($string)
+            ->toDestination('tmp', 'foo')
+            ->useFilename('bar')
+            ->upload();
+
+        $this->assertInstanceOf(Media::class, $media);
+        $this->assertTrue($media->fileExists());
+        $this->assertEquals('tmp', $media->disk);
+        $this->assertEquals('foo/bar.png', $media->getDiskPath());
+        $this->assertEquals('image/png', $media->mime_type);
+        $this->assertEquals(8444, $media->size);
+        $this->assertEquals('image', $media->aggregate_type);
+    }
+
+    public function test_it_imports_file_stream_contents()
+    {
+        $resource = fopen(realpath(__DIR__.'/../_data/plank.png'), 'r');
+
+        $media = Facade::fromSource($resource)
+            ->toDestination('tmp', 'foo')
+            ->useFilename('bar')
+            ->upload();
+
+        $this->assertInstanceOf(Media::class, $media);
+        $this->assertTrue($media->fileExists());
+        $this->assertEquals('tmp', $media->disk);
+        $this->assertEquals('foo/bar.png', $media->getDiskPath());
+        $this->assertEquals('image/png', $media->mime_type);
+        $this->assertEquals(8444, $media->size);
+        $this->assertEquals('image', $media->aggregate_type);
+    }
+
+    public function test_it_imports_http_stream_contents()
+    {
+        $resource = fopen('https://www.plankdesign.com/externaluse/plank.png', 'r');
+
+        $media = Facade::fromSource($resource)
+            ->toDestination('tmp', 'foo')
+            ->useFilename('bar')
+            ->upload();
+
+        $this->assertInstanceOf(Media::class, $media);
+        $this->assertTrue($media->fileExists());
+        $this->assertEquals('tmp', $media->disk);
+        $this->assertEquals('foo/bar.png', $media->getDiskPath());
+        $this->assertEquals('image/png', $media->mime_type);
+        $this->assertEquals(8444, $media->size);
+        $this->assertEquals('image', $media->aggregate_type);
+    }
+
+    public function test_it_imports_stream_objects()
+    {
+        $resource = new Stream(fopen('https://www.plankdesign.com/externaluse/plank.png', 'r'));
+
+        $media = Facade::fromSource($resource)
             ->toDestination('tmp', 'foo')
             ->useFilename('bar')
             ->upload();

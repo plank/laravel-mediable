@@ -1,11 +1,17 @@
 <?php
 
+use Plank\Mediable\Stream;
 use Plank\Mediable\SourceAdapters\FileAdapter;
+use Plank\Mediable\SourceAdapters\FileStreamAdapter;
+use Plank\Mediable\SourceAdapters\HttpStreamAdapter;
+use Plank\Mediable\SourceAdapters\IoStreamAdapter;
+use Plank\Mediable\SourceAdapters\StringAdapter;
 use Plank\Mediable\SourceAdapters\UploadedFileAdapter;
 use Plank\Mediable\SourceAdapters\LocalPathAdapter;
 use Plank\Mediable\SourceAdapters\RemoteUrlAdapter;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Psr\Http\Message\StreamInterface;
 
 class SourceAdapterTest extends TestCase
 {
@@ -23,12 +29,24 @@ class SourceAdapterTest extends TestCase
     public function adapterProvider()
     {
         $file = realpath(__DIR__.'/../../_data/plank.png');
+        $string = file_get_contents($file);
         $url = 'https://www.plankdesign.com/externaluse/plank.png';
+        $fileResource = fopen($file, 'rb');
+        $fileStream = new Stream(fopen($file, 'rb'));
+        $httpResource = fopen($url, 'rb');
+        $memoryResource = fopen('php://memory', 'w+b');
+        fwrite($memoryResource, $string);
+        rewind($memoryResource);
         $data = [
-            [FileAdapter::class, new File($file), $file],
-            [UploadedFileAdapter::class, new UploadedFile($file, 'plank.png', 'image/png', 8444, UPLOAD_ERR_OK, true), $file],
-            [LocalPathAdapter::class, $file, $file],
-            [RemoteUrlAdapter::class, $url, $url]
+            [FileAdapter::class, new File($file), $file, 'plank'],
+            [UploadedFileAdapter::class, new UploadedFile($file, 'plank.png', 'image/png', 8444, UPLOAD_ERR_OK, true), $file, 'plank'],
+            [LocalPathAdapter::class, $file, $file, 'plank'],
+            [RemoteUrlAdapter::class, $url, $url, 'plank'],
+            [StringAdapter::class, $string, null, null],
+            [FileStreamAdapter::class, $fileResource, $file, 'plank'],
+            [FileStreamAdapter::class, $fileStream, $file, 'plank'],
+            [HttpStreamAdapter::class, $httpResource, $url, 'plank'],
+            [IoStreamAdapter::class, $memoryResource, 'php://memory', null],
         ];
         return $data;
     }
@@ -36,10 +54,14 @@ class SourceAdapterTest extends TestCase
     public function invalidAdapterProvider()
     {
         $file = __DIR__ . '/../../_data/invalid.png';
+        $url = 'https://www.plankdesign.com/externaluse/invalid.png';
+
         return [
             [new FileAdapter(new File($file, false))],
             [new LocalPathAdapter($file)],
             [new UploadedFileAdapter(new UploadedFile($file, 'invalid.png', 'image/png', 8444, UPLOAD_ERR_CANT_WRITE, false))],
+            [new FileStreamAdapter(fopen(realpath(__DIR__.'/../../_data/plank.png'), 'a'))],
+            [new IoStreamAdapter(fopen('php://stdin', 'w'))],
         ];
     }
 
@@ -64,10 +86,10 @@ class SourceAdapterTest extends TestCase
     /**
      * @dataProvider adapterProvider
      */
-    public function test_it_adapts_filename($adapter, $source)
+    public function test_it_adapts_filename($adapter, $source, $path, $filename)
     {
         $adapter = new $adapter($source);
-        $this->assertEquals('plank', $adapter->filename());
+        $this->assertEquals($filename, $adapter->filename());
     }
 
     /**
@@ -95,8 +117,12 @@ class SourceAdapterTest extends TestCase
     {
         $adapter = new $adapter($source);
         $contents = $adapter->contents();
-        $this->assertTrue(is_resource($contents));
-        $this->assertEquals(get_resource_type($contents), 'stream');
+
+        if (is_resource($contents)) {
+            $this->assertEquals(get_resource_type($contents), 'stream');
+        } else {
+            $this->assertInternalType('string', $contents);
+        }
     }
 
     /**

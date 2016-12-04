@@ -23,7 +23,13 @@ class ConfigurationException extends MediaUploadException
 
     public static function unrecognizedSource($source)
     {
-        $source = is_object($source) ? get_class($source) : (string) $source;
+        if (is_object($source)) {
+            $source = get_class($source);
+        } elseif (is_resource($source)) {
+            $source = get_resource_type($source);
+        } else {
+            $source = (string) $source;
+        }
 
         return new static("Could not recognize source, `{$source}` provided.");
     }

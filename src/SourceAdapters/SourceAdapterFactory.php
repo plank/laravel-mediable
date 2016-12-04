@@ -3,6 +3,8 @@
 namespace Plank\Mediable\SourceAdapters;
 
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
+use Plank\Mediable\Stream;
+use Psr\Http\Message\StreamInterface;
 
 /**
  * Source Adapter Factory.
@@ -18,6 +20,12 @@ class SourceAdapterFactory
      * @var array
      */
     private $class_adapters = [];
+
+    /**
+     * Map of which adapters to use for a given stream wrapper.
+     * @var array
+     */
+    private $stream_adapters = [];
 
     /**
      * Map of which adapters to use for a given string pattern.
@@ -37,8 +45,12 @@ class SourceAdapterFactory
 
         if ($source instanceof SourceAdapterInterface) {
             return $source;
+        } elseif ($source instanceof StreamInterface) {
+            $adapter = $this->adaptStream($source);
         } elseif (is_object($source)) {
             $adapter = $this->adaptClass($source);
+        } elseif (is_resource($source)) {
+            $adapter = $this->adaptResource($source);
         } elseif (is_string($source)) {
             $adapter = $this->adaptString($source);
         }
@@ -60,6 +72,18 @@ class SourceAdapterFactory
     {
         $this->validateAdapterClass($adapter_class);
         $this->class_adapters[$source_class] = $adapter_class;
+    }
+
+    /**
+     * Specify the FQCN of a SourceAdapter class to use when the source is a stream resource implementing a given stream wrapper.
+     * @param string $adapter_class
+     * @param string $source_wrapper
+     * @return void
+     */
+    public function setAdapterForStream($adapter_class, $source_wrapper)
+    {
+        $this->validateAdapterClass($adapter_class);
+        $this->stream_adapters[$source_wrapper] = $adapter_class;
     }
 
     /**
@@ -88,6 +112,40 @@ class SourceAdapterFactory
                 return $adapter;
             }
         }
+    }
+
+    /**
+     * Choose an adapter class for the provided stream object.
+     * @param  StreamInterface $source
+     * @return \Plank\Mediable\SourceAdapters\SourceAdapterInterface|null
+     */
+    private function adaptStream(StreamInterface $source)
+    {
+        return $this->adaptStreamWrapper($source->getMetadata('wrapper_type'));
+    }
+
+    /**
+     * Choose an adapter class for the provided resource.
+     * @param  resource $source
+     * @return \Plank\Mediable\SourceAdapters\SourceAdapterInterface|null
+     */
+    private function adaptResource($source)
+    {
+        if (get_resource_type($source) === 'stream') {
+            $metadata = stream_get_meta_data($source);
+
+            return $this->adaptStreamWrapper($metadata['wrapper_type']);
+        }
+    }
+
+    /**
+     * Choose an adapter class for the provided stream wrapper.
+     * @param  string $wrapper
+     * @return \Plank\Mediable\SourceAdapters\SourceAdapterInterface|null
+     */
+    private function adaptStreamWrapper($wrapper)
+    {
+        return array_get($this->stream_adapters, $wrapper);
     }
 
     /**

@@ -176,12 +176,17 @@ return [
     /*
      * List of adapters to use for various source inputs
      *
-     * Adapters can map either to a class or a pattern (regex)
+     * Adapters can map either to a class, a stream wrapper, or a pattern (regex)
      */
     'source_adapters' => [
         'class' => [
             Symfony\Component\HttpFoundation\File\UploadedFile::class => Plank\Mediable\SourceAdapters\UploadedFileAdapter::class,
             Symfony\Component\HttpFoundation\File\File::class => Plank\Mediable\SourceAdapters\FileAdapter::class,
+        ],
+        'stream' => [
+            'plainfile' => Plank\Mediable\SourceAdapters\FileStreamAdapter::class,
+            'http' => Plank\Mediable\SourceAdapters\HttpStreamAdapter::class,
+            'php' => Plank\Mediable\SourceAdapters\IoStreamAdapter::class,
         ],
         'pattern' => [
             '^https?://' => Plank\Mediable\SourceAdapters\RemoteUrlAdapter::class,
