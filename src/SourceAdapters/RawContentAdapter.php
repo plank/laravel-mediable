@@ -5,11 +5,11 @@ namespace Plank\Mediable\SourceAdapters;
 use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
 
 /**
- * Blob/stream Adapter.
+ * Raw content Adapter.
  *
- * Adapts a string representing file contents.
+ * Adapts a string representing raw contents.
  */
-class StringAdapter implements SourceAdapterInterface
+class RawContentAdapter implements SourceAdapterInterface
 {
     /**
      * The source object.

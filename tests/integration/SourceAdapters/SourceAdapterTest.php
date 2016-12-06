@@ -5,7 +5,7 @@ use Plank\Mediable\SourceAdapters\FileAdapter;
 use Plank\Mediable\SourceAdapters\FileStreamAdapter;
 use Plank\Mediable\SourceAdapters\HttpStreamAdapter;
 use Plank\Mediable\SourceAdapters\IoStreamAdapter;
-use Plank\Mediable\SourceAdapters\StringAdapter;
+use Plank\Mediable\SourceAdapters\RawContentAdapter;
 use Plank\Mediable\SourceAdapters\UploadedFileAdapter;
 use Plank\Mediable\SourceAdapters\LocalPathAdapter;
 use Plank\Mediable\SourceAdapters\RemoteUrlAdapter;
@@ -42,7 +42,7 @@ class SourceAdapterTest extends TestCase
             [UploadedFileAdapter::class, new UploadedFile($file, 'plank.png', 'image/png', 8444, UPLOAD_ERR_OK, true), $file, 'plank'],
             [LocalPathAdapter::class, $file, $file, 'plank'],
             [RemoteUrlAdapter::class, $url, $url, 'plank'],
-            [StringAdapter::class, $string, null, null],
+            [RawContentAdapter::class, $string, null, null],
             [FileStreamAdapter::class, $fileResource, $file, 'plank'],
             [FileStreamAdapter::class, $fileStream, $file, 'plank'],
             [HttpStreamAdapter::class, $httpResource, $url, 'plank'],

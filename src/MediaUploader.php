@@ -9,7 +9,7 @@ use Plank\Mediable\Exceptions\MediaUpload\ForbiddenException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException;
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Plank\Mediable\Helpers\File;
-use Plank\Mediable\SourceAdapters\StringAdapter;
+use Plank\Mediable\SourceAdapters\RawContentAdapter;
 use Plank\Mediable\SourceAdapters\SourceAdapterFactory;
 use Illuminate\Filesystem\FilesystemManager;
 
@@ -104,7 +104,7 @@ class MediaUploader
      */
     public function fromString($source)
     {
-        $this->source = new StringAdapter($source);
+        $this->source = new RawContentAdapter($source);
 
         return $this;
     }
