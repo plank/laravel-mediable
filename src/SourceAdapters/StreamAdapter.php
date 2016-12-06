@@ -87,10 +87,6 @@ abstract class StreamAdapter implements SourceAdapterInterface
      */
     public function contents()
     {
-        if ($this->resource) {
-            return $this->resource;
-        }
-
         return (string) $this->source;
     }
 

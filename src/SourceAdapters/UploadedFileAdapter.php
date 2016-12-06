@@ -70,7 +70,7 @@ class UploadedFileAdapter implements SourceAdapterInterface
      */
     public function contents()
     {
-        return fopen($this->path(), 'r');
+        return file_get_contents($this->path());
     }
 
     /**

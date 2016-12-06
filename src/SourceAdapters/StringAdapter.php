@@ -94,12 +94,7 @@ class StringAdapter implements SourceAdapterInterface
      */
     public function contents()
     {
-        $source = fopen('php://memory', 'w+b');
-
-        fwrite($source, $this->source);
-        rewind($source);
-
-        return $source;
+        return $this->source;
     }
     /**
      * {@inheritdoc}

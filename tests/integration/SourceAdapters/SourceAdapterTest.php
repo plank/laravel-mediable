@@ -116,13 +116,8 @@ class SourceAdapterTest extends TestCase
     public function test_it_adapts_file_contents($adapter, $source)
     {
         $adapter = new $adapter($source);
-        $contents = $adapter->contents();
 
-        if (is_resource($contents)) {
-            $this->assertEquals(get_resource_type($contents), 'stream');
-        } else {
-            $this->assertInternalType('string', $contents);
-        }
+        $this->assertInternalType('string', $adapter->contents());
     }
 
     /**
