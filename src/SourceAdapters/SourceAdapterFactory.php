@@ -105,10 +105,8 @@ class SourceAdapterFactory
      */
     private function adaptClass($source)
     {
-        $tree = class_parents($source);
-        array_unshift($tree, get_class($source));
         foreach ($this->class_adapters as $class => $adapter) {
-            if (in_array($class, $tree)) {
+            if ($source instanceof $class) {
                 return $adapter;
             }
         }
