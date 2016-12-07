@@ -2,8 +2,7 @@
 
 namespace Plank\Mediable\SourceAdapters;
 
-use Plank\Mediable\Stream;
-use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
+use Plank\Mediable\Helpers\File;
 use Psr\Http\Message\StreamInterface;
 
 /**
@@ -11,7 +10,7 @@ use Psr\Http\Message\StreamInterface;
  *
  * Adapts a stream object or resource.
  */
-abstract class StreamAdapter implements SourceAdapterInterface
+class StreamAdapter implements SourceAdapterInterface
 {
     /**
      * The source object.
@@ -20,25 +19,18 @@ abstract class StreamAdapter implements SourceAdapterInterface
     protected $source;
 
     /**
-     * The resource.
-     * @var resource|null
+     * The contents of the stream.
+     * @var string
      */
-    protected $resource;
+    protected $contents;
 
     /**
      * Constructor.
-     * @param \Psr\Http\Message\StreamInterface|resource $source
+     * @param \Psr\Http\Message\StreamInterface $source
      */
-    public function __construct($source)
+    public function __construct(StreamInterface $source)
     {
-        if (is_resource($source) && get_resource_type($source) === 'stream') {
-            $this->resource = $source;
-            $this->source = new Stream($source);
-        } elseif ($source instanceof StreamInterface) {
-            $this->source = $source;
-        } else {
-            throw ConfigurationException::unrecognizedSource($source);
-        }
+        $this->source = $source;
     }
 
     /**
@@ -46,10 +38,6 @@ abstract class StreamAdapter implements SourceAdapterInterface
      */
     public function getSource()
     {
-        if ($this->resource) {
-            return $this->resource;
-        }
-
         return $this->source;
     }
 
@@ -74,20 +62,39 @@ abstract class StreamAdapter implements SourceAdapterInterface
      */
     public function extension()
     {
-        return pathinfo($this->path(), PATHINFO_EXTENSION);
+        $extension = pathinfo($this->path(), PATHINFO_EXTENSION);
+
+        if ($extension) {
+            return $extension;
+        }
+
+        return File::guessExtension($this->mimeType());
     }
 
     /**
      * {@inheritdoc}
      */
-    abstract public function mimeType();
+    public function mimeType()
+    {
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+
+        return $finfo->buffer($this->contents());
+    }
 
     /**
      * {@inheritdoc}
      */
     public function contents()
     {
-        return (string) $this->source;
+        if (is_null($this->contents)) {
+            if ($this->source->isSeekable()) {
+                $this->contents = (string) $this->source;
+            } else {
+                $this->contents = (string) $this->source->getContents();
+            }
+        }
+
+        return $this->contents;
     }
 
     /**
@@ -103,25 +110,12 @@ abstract class StreamAdapter implements SourceAdapterInterface
      */
     public function size()
     {
-        return $this->source->getSize();
-    }
+        $size = $this->source->getSize();
 
-    /**
-     * Get the stream wrapper data.
-     *
-     * @return array
-     */
-    protected function getWrapperData()
-    {
-        return $this->source->getMetadata('wrapper_data') ?: [];
-    }
+        if (! is_null($size)) {
+            return $size;
+        }
 
-    /**
-     * Get information about the resource.
-     * @return array|bool
-     */
-    protected function getStats()
-    {
-        return fstat($this->source);
+        return mb_strlen($this->contents(), '8bit');
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Plank\Mediable\SourceAdapters;
 
-use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
+use Plank\Mediable\Helpers\File;
 
 /**
  * Raw content Adapter.
@@ -55,28 +55,7 @@ class RawContentAdapter implements SourceAdapterInterface
      */
     public function extension()
     {
-        return $this->guessExtension();
-    }
-
-    /**
-     * Returns the extension based on the mime type.
-     *
-     * If the mime type is unknown, returns null.
-     *
-     * This method uses the mime type as guessed by mimeType()
-     * to guess the file extension.
-     *
-     * @return string|null The guessed extension or null if it cannot be guessed
-     *
-     * @see ExtensionGuesser
-     * @see mimeType()
-     */
-    protected function guessExtension()
-    {
-        $type = $this->mimeType();
-        $guesser = ExtensionGuesser::getInstance();
-
-        return $guesser->guess($type);
+        return File::guessExtension($this->mimeType());
     }
 
     /**
