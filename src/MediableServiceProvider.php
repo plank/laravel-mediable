@@ -69,10 +69,6 @@ class MediableServiceProvider extends ServiceProvider
                 $factory->setAdapterForClass($adapter, $source);
             }
 
-            foreach ($adapters['stream'] as $source => $adapter) {
-                $factory->setAdapterForStream($adapter, $source);
-            }
-
             foreach ($adapters['pattern'] as $source => $adapter) {
                 $factory->setAdapterForPattern($adapter, $source);
             }

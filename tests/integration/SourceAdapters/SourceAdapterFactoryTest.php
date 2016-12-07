@@ -17,16 +17,6 @@ class SourceAdapterFactoryTest extends TestCase
         $this->assertInstanceOf($adapter_class, $factory->create($source));
     }
 
-    public function test_it_allows_setting_adapter_for_stream()
-    {
-        $factory = new SourceAdapterFactory;
-        $source = fopen('data:image/png;base64,foobar', 'r');
-        $adapter_class = $this->getMockClass(SourceAdapterInterface::class);
-
-        $factory->setAdapterForStream($adapter_class, 'RFC2397');
-        $this->assertInstanceOf($adapter_class, $factory->create($source));
-    }
-
     public function test_it_allows_setting_adapter_for_pattern()
     {
         $factory = new SourceAdapterFactory;
@@ -41,13 +31,6 @@ class SourceAdapterFactoryTest extends TestCase
         $factory = new SourceAdapterFactory;
         $this->expectException(ConfigurationException::class);
         $factory->setAdapterForClass(stdClass::class, stdClass::class);
-    }
-
-    public function test_it_throws_exception_if_invalid_adapter_for_stream()
-    {
-        $factory = new SourceAdapterFactory;
-        $this->expectException(ConfigurationException::class);
-        $factory->setAdapterForStream(stdClass::class, 'foo');
     }
 
     public function test_it_throws_exception_if_invalid_adapter_for_pattern()

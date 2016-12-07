@@ -9,7 +9,7 @@ use Plank\Mediable\Exceptions\MediaUpload\ForbiddenException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException;
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Plank\Mediable\Helpers\File;
-use Plank\Mediable\SourceAdapters\StringAdapter;
+use Plank\Mediable\SourceAdapters\RawContentAdapter;
 use Plank\Mediable\SourceAdapters\SourceAdapterFactory;
 use Illuminate\Filesystem\FilesystemManager;
 
@@ -104,7 +104,7 @@ class MediaUploader
      */
     public function fromString($source)
     {
-        $this->source = new StringAdapter($source);
+        $this->source = new RawContentAdapter($source);
 
         return $this;
     }
@@ -699,13 +699,11 @@ class MediaUploader
     {
         $ctx = hash_init('md5');
 
-        // We don't need to open a stream if we have a path
+        // We don't need to read the file contents if the source has a path
         if ($this->source->path()) {
             hash_update_file($ctx, $this->source->path());
         } else {
-            $contents = $this->source->contents();
-            hash_update_stream($ctx, $contents);
-            fclose($contents);
+            hash_update($ctx, $this->source->contents());
         }
 
         return hash_final($ctx);

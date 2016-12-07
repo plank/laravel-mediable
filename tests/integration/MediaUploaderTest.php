@@ -322,9 +322,9 @@ class MediaUploaderTest extends TestCase
 
     public function test_it_imports_stream_objects()
     {
-        $resource = new Stream(fopen('https://www.plankdesign.com/externaluse/plank.png', 'r'));
+        $stream = new Stream(fopen('https://www.plankdesign.com/externaluse/plank.png', 'r'));
 
-        $media = Facade::fromSource($resource)
+        $media = Facade::fromSource($stream)
             ->toDestination('tmp', 'foo')
             ->useFilename('bar')
             ->upload();
