@@ -3,7 +3,7 @@
 ## 2.4.0 - 2016-12-10
 - Added support for raw content strings to `MediaUploader` (Thanks @sebdesign)
 - Added support for stream resources to `MediaUploader` (Thanks @sebdesign)
-- Added support for PSR-7 StreamInterface objects to ` (Thanks @sebdesign)MediaUploader`
+- Added support for PSR-7 StreamInterface objects to `MediaUploader` (Thanks @sebdesign)
 - All SourceAdapters now properly adhere to the described interface.
 - Refactored test suite for speed.
 
