@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.4.0 - 2016-12-10
+- Added support for raw content strings to `MediaUploader` (Thanks @sebdesign)
+- Added support for stream resources to `MediaUploader` (Thanks @sebdesign)
+- Added support for PSR-7 StreamInterface objects to ` (Thanks @sebdesign)MediaUploader`
+- All SourceAdapters now properly adhere to the described interface.
+- Refactored test suite for speed.
+
 ## 2.3.0 - 2016-11-17
 - Separated MediaUploadException into a number of subclasses for more granular exception handling (Thanks @sebdesign!).
 - Added HandlesMediaUploadExceptions trait for converting MediaUploadExceptions into HttpException with appropriate error codes (Thanks @sebdesign).
