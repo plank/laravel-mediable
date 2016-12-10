@@ -8,8 +8,6 @@ use Illuminate\Routing\UrlGenerator as Url;
 
 class LocalUrlGeneratorTest extends TestCase
 {
-
-
     public function test_it_generates_absolute_path()
     {
         $generator = $this->setupGenerator();
