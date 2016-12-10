@@ -74,7 +74,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
      */
     public function contents()
     {
-        return fopen($this->source, 'r');
+        return file_get_contents($this->source);
     }
 
     /**

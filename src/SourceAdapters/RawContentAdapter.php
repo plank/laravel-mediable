@@ -2,28 +2,26 @@
 
 namespace Plank\Mediable\SourceAdapters;
 
-use Symfony\Component\HttpFoundation\File\File;
+use Plank\Mediable\Helpers\File;
 
 /**
- * File Adapter.
+ * Raw content Adapter.
  *
- * Adapts the File class from Symfony Components
- *
- * @author Sean Fraser <sean@plankdesign.com>
+ * Adapts a string representing raw contents.
  */
-class FileAdapter implements SourceAdapterInterface
+class RawContentAdapter implements SourceAdapterInterface
 {
     /**
      * The source object.
-     * @var \Symfony\Component\HttpFoundation\File\File
+     * @var string
      */
     protected $source;
 
     /**
      * Constructor.
-     * @param \Symfony\Component\HttpFoundation\File\File $source
+     * @param string $source
      */
-    public function __construct(File $source)
+    public function __construct($source)
     {
         $this->source = $source;
     }
@@ -41,7 +39,7 @@ class FileAdapter implements SourceAdapterInterface
      */
     public function path()
     {
-        return $this->source->getPath().'/'.$this->source->getFilename();
+        return null;
     }
 
     /**
@@ -49,7 +47,7 @@ class FileAdapter implements SourceAdapterInterface
      */
     public function filename()
     {
-        return pathinfo($this->source->getFilename(), PATHINFO_FILENAME);
+        return null;
     }
 
     /**
@@ -57,7 +55,7 @@ class FileAdapter implements SourceAdapterInterface
      */
     public function extension()
     {
-        return pathinfo($this->source->getFilename(), PATHINFO_EXTENSION);
+        return File::guessExtension($this->mimeType());
     }
 
     /**
@@ -65,7 +63,9 @@ class FileAdapter implements SourceAdapterInterface
      */
     public function mimeType()
     {
-        return $this->source->getMimeType();
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+
+        return $finfo->buffer($this->source) ?: null;
     }
 
     /**
@@ -73,15 +73,14 @@ class FileAdapter implements SourceAdapterInterface
      */
     public function contents()
     {
-        return file_get_contents($this->path());
+        return $this->source;
     }
-
     /**
      * {@inheritdoc}
      */
     public function valid()
     {
-        return file_exists($this->path());
+        return true;
     }
 
     /**
@@ -89,6 +88,6 @@ class FileAdapter implements SourceAdapterInterface
      */
     public function size()
     {
-        return filesize($this->path());
+        return mb_strlen($this->source, '8bit');
     }
 }

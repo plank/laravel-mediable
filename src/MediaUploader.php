@@ -9,6 +9,7 @@ use Plank\Mediable\Exceptions\MediaUpload\ForbiddenException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException;
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Plank\Mediable\Helpers\File;
+use Plank\Mediable\SourceAdapters\RawContentAdapter;
 use Plank\Mediable\SourceAdapters\SourceAdapterFactory;
 use Illuminate\Filesystem\FilesystemManager;
 
@@ -92,6 +93,18 @@ class MediaUploader
     public function fromSource($source)
     {
         $this->source = $this->factory->create($source);
+
+        return $this;
+    }
+
+    /**
+     * Set the source for the string data.
+     * @param  string $source
+     * @return static
+     */
+    public function fromString($source)
+    {
+        $this->source = new RawContentAdapter($source);
 
         return $this;
     }
@@ -684,7 +697,16 @@ class MediaUploader
      */
     private function generateHash()
     {
-        return md5_file($this->source->path());
+        $ctx = hash_init('md5');
+
+        // We don't need to read the file contents if the source has a path
+        if ($this->source->path()) {
+            hash_update_file($ctx, $this->source->path());
+        } else {
+            hash_update($ctx, $this->source->contents());
+        }
+
+        return hash_final($ctx);
     }
 
     /**

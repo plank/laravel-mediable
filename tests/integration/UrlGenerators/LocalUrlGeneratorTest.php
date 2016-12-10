@@ -55,6 +55,7 @@ class LocalUrlGeneratorTest extends TestCase
             'filename' => 'bar',
             'extension' => 'jpg'
         ]);
+        $this->useFilesystem($disk);
         $this->seedFileForMedia($media);
         $generator = new LocalUrlGenerator(config(), url());
         $generator->setMedia($media);

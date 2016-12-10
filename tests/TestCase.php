@@ -11,9 +11,6 @@ class TestCase extends BaseTestCase
     {
         parent::setUp();
         $this->withFactories(__DIR__.'/_factories');
-        $this->resetDatabase();
-        $this->emptyFilesystem('tmp');
-        $this->emptyFilesystem('uploads');
     }
 
     protected function getPackageProviders($app)
@@ -104,7 +101,7 @@ class TestCase extends BaseTestCase
         return env('S3_KEY') && env('S3_SECRET') && env('S3_REGION') && env('S3_BUCKET');
     }
 
-    private function resetDatabase()
+    protected function useDatabase()
     {
         $artisan = $this->app->make('Illuminate\Contracts\Console\Kernel');
         $database = $this->app['config']->get('database.default');
@@ -116,7 +113,7 @@ class TestCase extends BaseTestCase
         ]);
     }
 
-    private function emptyFilesystem($disk)
+    protected function useFilesystem($disk)
     {
         if (!$this->app['config']->has('filesystems.disks.' . $disk)) {
             return;
@@ -124,5 +121,13 @@ class TestCase extends BaseTestCase
         $root = $this->app['config']->get('filesystems.disks.' . $disk . '.root');
         $filesystem =  $this->app->make(Illuminate\Filesystem\Filesystem::class);
         $filesystem->cleanDirectory($root);
+    }
+
+    protected function useFilesystems()
+    {
+        $disks = $this->app['config']->get('filesystems.disks');
+        foreach ($disks as $disk) {
+            $this->useFilesystem($disk);
+        }
     }
 }

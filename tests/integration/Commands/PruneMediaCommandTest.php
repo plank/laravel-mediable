@@ -5,6 +5,13 @@ use Illuminate\Contracts\Console\Kernel as Artisan;
 
 class PruneMediaCommandTest extends TestCase
 {
+    public function setUp()
+    {
+        parent::setUp();
+        $this->useDatabase();
+        $this->useFilesystem('tmp');
+    }
+
     public function test_it_deletes_media_without_files()
     {
         $artisan = $this->getArtisan();

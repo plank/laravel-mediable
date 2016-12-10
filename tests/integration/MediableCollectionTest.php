@@ -5,6 +5,12 @@ use Plank\Mediable\MediableCollection;
 
 class MediableCollectionTest extends TestCase
 {
+    public function setUp()
+    {
+        parent::setUp();
+        $this->useDatabase();
+    }
+
     public function test_it_can_lazy_eager_load_media()
     {
         $mediable = factory(SampleMediable::class)->create();

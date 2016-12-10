@@ -2,6 +2,8 @@
 
 namespace Plank\Mediable\Helpers;
 
+use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
+
 /**
  * File Helpers.
  *
@@ -40,5 +42,22 @@ class File
         $value = $bytes / pow(1024, $exponent);
 
         return round($value, $precision).' '.$units[$exponent];
+    }
+
+    /**
+     * Returns the extension based on the mime type.
+     *
+     * If the mime type is unknown, returns null.
+     *
+     * @param  string $mimeType
+     * @return string|null The guessed extension or null if it cannot be guessed
+     *
+     * @see Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser
+     */
+    public static function guessExtension($mimeType)
+    {
+        $guesser = ExtensionGuesser::getInstance();
+
+        return $guesser->guess($mimeType);
     }
 }

@@ -3,6 +3,7 @@
 namespace Plank\Mediable\SourceAdapters;
 
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
+use Plank\Mediable\SourceAdapters\StreamResourceAdapter;
 
 /**
  * Source Adapter Factory.
@@ -39,6 +40,8 @@ class SourceAdapterFactory
             return $source;
         } elseif (is_object($source)) {
             $adapter = $this->adaptClass($source);
+        } elseif (is_resource($source)) {
+            $adapter = StreamResourceAdapter::class;
         } elseif (is_string($source)) {
             $adapter = $this->adaptString($source);
         }
@@ -81,10 +84,8 @@ class SourceAdapterFactory
      */
     private function adaptClass($source)
     {
-        $tree = class_parents($source);
-        array_unshift($tree, get_class($source));
         foreach ($this->class_adapters as $class => $adapter) {
-            if (in_array($class, $tree)) {
+            if ($source instanceof $class) {
                 return $adapter;
             }
         }

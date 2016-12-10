@@ -44,6 +44,7 @@ class S3UrlGeneratorTest extends TestCase
             'filename' => 'bar',
             'extension' => 'jpg'
         ]);
+        $this->useFilesystem('s3');
         $generator = new S3UrlGenerator(config(), app(Illuminate\Filesystem\FilesystemManager::class));
         $generator->setMedia($media);
         return $generator;

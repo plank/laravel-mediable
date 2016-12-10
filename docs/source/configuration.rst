@@ -281,6 +281,7 @@ The ``config/mediable.php`` file lets you specify a number of classes to be use 
         'class' => [
             Symfony\Component\HttpFoundation\File\UploadedFile::class => Plank\Mediable\SourceAdapters\UploadedFileAdapter::class,
             Symfony\Component\HttpFoundation\File\File::class => Plank\Mediable\SourceAdapters\FileAdapter::class,
+            Psr\Http\Message\StreamInterface::class => Plank\Mediable\SourceAdapters\StreamAdapter::class,
         ],
         'pattern' => [
             '^https?://' => Plank\Mediable\SourceAdapters\RemoteUrlAdapter::class,
