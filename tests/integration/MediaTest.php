@@ -39,6 +39,8 @@ class MediaTest extends TestCase
 
     public function test_it_can_be_queried_by_directory()
     {
+        $this->useDatabase();
+
         factory(Media::class)->create(['directory' => 'foo']);
         factory(Media::class)->create(['directory' => 'foo']);
         factory(Media::class)->create(['directory' => 'bar']);
@@ -50,6 +52,8 @@ class MediaTest extends TestCase
 
     public function test_it_can_be_queried_by_directory_recursively()
     {
+        $this->useDatabase();
+
         factory(Media::class)->create(['directory' => 'foo']);
         factory(Media::class)->create(['directory' => 'foo/bar']);
         factory(Media::class)->create(['directory' => 'foo/bar']);
@@ -62,6 +66,8 @@ class MediaTest extends TestCase
 
     public function test_it_can_be_queried_by_basename()
     {
+        $this->useDatabase();
+
         factory(Media::class)->create(['filename' => 'foo', 'extension' => 'bar']);
         factory(Media::class)->create(['id' => 99, 'filename' => 'baz', 'extension' => 'bat']);
         factory(Media::class)->create(['filename' => 'bar', 'extension' => 'foo']);
@@ -71,6 +77,8 @@ class MediaTest extends TestCase
 
     public function test_it_can_be_queried_by_path_on_disk()
     {
+        $this->useDatabase();
+
         factory(Media::class)->create([
             'id' => 4,
             'disk' => 'tmp',
@@ -83,6 +91,8 @@ class MediaTest extends TestCase
 
     public function test_it_can_be_queried_by_path_on_disk_when_directory_is_empty()
     {
+        $this->useDatabase();
+
         factory(Media::class)->create([
             'id' => 4,
             'disk' => 'tmp',
@@ -145,7 +155,9 @@ class MediaTest extends TestCase
 
     public function test_it_can_check_if_its_file_exists()
     {
-        $media = factory(Media::class)->make();
+        $this->useFilesystem('tmp');
+
+        $media = factory(Media::class)->make(['disk' => 'tmp']);
         $this->assertFalse($media->fileExists());
         $this->seedFileForMedia($media);
         $this->assertTrue($media->fileExists());
@@ -153,7 +165,10 @@ class MediaTest extends TestCase
 
     public function test_it_can_be_moved_on_disk()
     {
-        $media = factory(Media::class)->make(['directory' => 'foo', 'filename' => 'bar', 'extension' => 'baz']);
+        $this->useFilesystem('tmp');
+        $this->useDatabase();
+
+        $media = factory(Media::class)->make(['disk' => 'tmp', 'directory' => 'foo', 'filename' => 'bar', 'extension' => 'baz']);
         $this->seedFileForMedia($media);
 
         $media->move('alpha/beta');
@@ -168,8 +183,20 @@ class MediaTest extends TestCase
 
     public function test_it_throws_an_exception_if_moving_to_existing_file()
     {
-        $media1 = factory(Media::class)->make(['directory'=>'', 'filename' => 'foo', 'extension' => 'baz']);
-        $media2 = factory(Media::class)->make(['directory'=>'', 'filename' => 'bar', 'extension' => 'baz']);
+        $this->useFilesystem('tmp');
+
+        $media1 = factory(Media::class)->make([
+            'disk' => 'tmp',
+            'directory'=> '',
+            'filename' => 'foo',
+            'extension' => 'baz'
+        ]);
+        $media2 = factory(Media::class)->make([
+            'disk' => 'tmp',
+            'directory'=> '',
+            'filename' => 'bar',
+            'extension' => 'baz'
+        ]);
         $this->seedFileForMedia($media1);
         $this->seedFileForMedia($media2);
 
@@ -179,13 +206,21 @@ class MediaTest extends TestCase
 
     public function test_it_can_access_file_contents()
     {
-        $media = factory(Media::class)->make(['extension' => 'html']);
+        $this->useFilesystem('tmp');
+
+        $media = factory(Media::class)->make([
+            'disk' => 'tmp',
+            'extension' => 'html'
+        ]);
         $this->seedFileForMedia($media, '<h1>Hello World</h1>');
         $this->assertEquals('<h1>Hello World</h1>', $media->contents());
     }
 
     public function test_it_deletes_its_file_on_deletion()
     {
+        $this->useDatabase();
+        $this->useFilesystem('tmp');
+
         $media = factory(Media::class)->create([
             'disk' => 'tmp',
             'directory' => '',
@@ -202,6 +237,8 @@ class MediaTest extends TestCase
 
     public function test_it_cascades_relationship_on_delete()
     {
+        $this->useDatabase();
+
         $media = factory(Media::class)->create();
         $mediable = factory(SampleMediable::class)->create();
         $mediable->attachMedia($media, 'foo');
@@ -212,6 +249,8 @@ class MediaTest extends TestCase
 
     public function test_it_doesnt_cascade_relationship_on_soft_delete()
     {
+        $this->useDatabase();
+
         $media = factory(MediaSoftDelete::class)->create();
         $mediable = factory(SampleMediable::class)->create();
         $mediable->attachMedia($media, 'foo');
@@ -222,6 +261,8 @@ class MediaTest extends TestCase
 
     public function test_it_cascades_relationships_on_soft_delete_with_config()
     {
+        $this->useDatabase();
+
         $mediable = factory(SampleMediable::class)->create();
         $media = factory(MediaSoftDelete::class)->create();
         $mediable->attachMedia($media, 'foo');
@@ -234,6 +275,8 @@ class MediaTest extends TestCase
 
     public function test_it_cascades_relationship_on_force_delete()
     {
+        $this->useDatabase();
+
         $mediable = factory(SampleMediableSoftDelete::class)->create();
         $media = factory(Media::class)->create();
         $mediable->attachMedia($media, 'foo');

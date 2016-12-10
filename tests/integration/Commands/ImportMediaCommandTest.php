@@ -6,6 +6,13 @@ use Illuminate\Contracts\Console\Kernel as Artisan;
 
 class ImportMediaCommandTest extends TestCase
 {
+    public function setUp()
+    {
+        parent::setUp();
+        $this->useDatabase();
+        $this->useFilesystem('tmp');
+    }
+
     public function getEnvironmentSetUp($app)
     {
         parent::getEnvironmentSetUp($app);

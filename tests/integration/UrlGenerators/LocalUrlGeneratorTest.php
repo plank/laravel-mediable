@@ -8,6 +8,8 @@ use Illuminate\Routing\UrlGenerator as Url;
 
 class LocalUrlGeneratorTest extends TestCase
 {
+
+
     public function test_it_generates_absolute_path()
     {
         $generator = $this->setupGenerator();
@@ -55,6 +57,7 @@ class LocalUrlGeneratorTest extends TestCase
             'filename' => 'bar',
             'extension' => 'jpg'
         ]);
+        $this->useFilesystem($disk);
         $this->seedFileForMedia($media);
         $generator = new LocalUrlGenerator(config(), url());
         $generator->setMedia($media);

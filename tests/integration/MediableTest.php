@@ -6,6 +6,12 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class MediableTest extends TestCase
 {
+    public function setUp()
+    {
+        parent::setUp();
+        $this->useDatabase();
+    }
+
     public function test_it_can_be_related_to_media()
     {
         $mediable = factory(SampleMediable::class)->make();

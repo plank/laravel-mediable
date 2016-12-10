@@ -11,7 +11,7 @@ use Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException;
 use Plank\Mediable\Exceptions\MediaUpload\ForbiddenException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException;
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
-use MediaUploader as Facade;
+use Plank\Mediable\MediaUploaderFacade as Facade;
 use Illuminate\Filesystem\FilesystemManager;
 use League\Flysystem\Filesystem;
 
@@ -216,6 +216,9 @@ class MediaUploaderTest extends TestCase
 
     public function test_it_can_replace_duplicate_files()
     {
+        $this->useDatabase();
+        $this->useFilesystem('tmp');
+
         $uploader = $this->mockDuplicateUploader();
         $uploader->setOnDuplicateBehavior(MediaUploader::ON_DUPLICATE_REPLACE);
         $method = $this->getPrivateMethod($uploader, 'verifyDestination');
@@ -234,6 +237,9 @@ class MediaUploaderTest extends TestCase
 
     public function test_it_can_increment_filename_on_duplicate_files()
     {
+        $this->useDatabase();
+        $this->useFilesystem('tmp');
+
         $uploader = $this->mockDuplicateUploader();
         $uploader->setOnDuplicateBehavior(MediaUploader::ON_DUPLICATE_INCREMENT);
         $method = $this->getPrivateMethod($uploader, 'verifyDestination');
@@ -252,6 +258,9 @@ class MediaUploaderTest extends TestCase
 
     public function test_it_uploads_files()
     {
+        $this->useDatabase();
+        $this->useFilesystem('tmp');
+
         $media = Facade::fromSource(__DIR__ . '/../_data/plank.png')
             ->toDestination('tmp', 'foo')
             ->useFilename('bar')
@@ -268,6 +277,9 @@ class MediaUploaderTest extends TestCase
 
     public function test_it_imports_string_contents()
     {
+        $this->useDatabase();
+        $this->useFilesystem('tmp');
+
         $string = file_get_contents('https://www.plankdesign.com/externaluse/plank.png');
 
         $media = Facade::fromString($string)
@@ -286,6 +298,9 @@ class MediaUploaderTest extends TestCase
 
     public function test_it_imports_file_stream_contents()
     {
+        $this->useDatabase();
+        $this->useFilesystem('tmp');
+
         $resource = fopen(realpath(__DIR__.'/../_data/plank.png'), 'r');
 
         $media = Facade::fromSource($resource)
@@ -304,6 +319,9 @@ class MediaUploaderTest extends TestCase
 
     public function test_it_imports_http_stream_contents()
     {
+        $this->useDatabase();
+        $this->useFilesystem('tmp');
+
         $resource = fopen('https://www.plankdesign.com/externaluse/plank.png', 'r');
 
         $media = Facade::fromSource($resource)
@@ -322,6 +340,9 @@ class MediaUploaderTest extends TestCase
 
     public function test_it_imports_stream_objects()
     {
+        $this->useDatabase();
+        $this->useFilesystem('tmp');
+
         $stream = new Stream(fopen('https://www.plankdesign.com/externaluse/plank.png', 'r'));
 
         $media = Facade::fromSource($stream)
@@ -340,6 +361,9 @@ class MediaUploaderTest extends TestCase
 
     public function test_it_imports_existing_files()
     {
+        $this->useFilesystem('tmp');
+        $this->useDatabase();
+
         $media = factory(Media::class)->make([
             'disk' => 'tmp',
             'directory' => 'foo',
@@ -360,6 +384,9 @@ class MediaUploaderTest extends TestCase
 
     public function test_it_updates_existing_media()
     {
+        $this->useDatabase();
+        $this->useFilesystem('tmp');
+
         $media = factory(Media::class)->create([
             'disk' => 'tmp',
             'extension' => 'png',
@@ -385,6 +412,9 @@ class MediaUploaderTest extends TestCase
 
     public function test_it_use_hash_for_filename()
     {
+        $this->useFilesystem('tmp');
+        $this->useDatabase();
+
         $media = Facade::fromSource(__DIR__ . '/../_data/plank.png')
             ->toDestination('tmp', 'foo')
             ->useHashForFilename()

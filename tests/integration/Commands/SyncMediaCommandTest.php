@@ -6,6 +6,7 @@ use Illuminate\Contracts\Console\Kernel as Artisan;
 
 class SyncMediaCommandTest extends TestCase
 {
+
     public function test_it_calls_prune_and_install()
     {
         $command = $this->getMockBuilder(SyncMediaCommand::class)->setMethods(['call', 'option', 'argument'])->getMock();
