@@ -653,7 +653,11 @@ class MediaUploader
             ->where('directory', $model->directory)
             ->where('filename', $model->filename)
             ->where('extension', $model->extension)
-            ->first()->delete();
+            ->first();
+
+        if($model) {
+            $model->delete();
+        }
     }
 
     /**
