@@ -653,11 +653,9 @@ class MediaUploader
             ->where('directory', $model->directory)
             ->where('filename', $model->filename)
             ->where('extension', $model->extension)
-            ->first();
+            ->delete();
 
-        if($model) {
-            $model->delete();
-        }
+        $this->filesystem->disk($model->disk)->delete($model->getDiskPath());
     }
 
     /**
