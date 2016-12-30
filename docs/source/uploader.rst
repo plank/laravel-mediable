@@ -187,8 +187,8 @@ If you need to create a media record for a file that is already in place on the 
 If you have string file data, you can import it using the `fromString` method.
 
 ::
-    <?php
 
+    <?php
     // Encoded image converted to string
     $jpg = Image::make('https://www.plankdesign.com/externaluse/plank.png')->encode('jpg');
 
