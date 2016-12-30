@@ -3,7 +3,6 @@
 namespace Plank\Mediable\SourceAdapters;
 
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
-use Plank\Mediable\HttpStream;
 use Plank\Mediable\Stream;
 
 /**
