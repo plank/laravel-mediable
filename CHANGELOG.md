@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.4.1 - 2016-12-30
+- The `onDuplicateDelete` action of the `MediaUploader` now manually deletes the `Media` record and the file on disk, instead of depending on the record existing to clean its own file.
+
 ## 2.4.0 - 2016-12-10
 - Added support for raw content strings to `MediaUploader` (Thanks @sebdesign)
 - Added support for stream resources to `MediaUploader` (Thanks @sebdesign)
