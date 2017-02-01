@@ -6,12 +6,12 @@ use Plank\Mediable\Exceptions\MediaUploadException;
 
 class ConfigurationException extends MediaUploadException
 {
-    public static function cannotSetAdapter($class)
+    public static function cannotSetAdapter(string $class)
     {
         return new static("Could not set adapter of class `{$class}`. Must implement `\Plank\Mediable\SourceAdapters\SourceAdapterInterface`.");
     }
 
-    public static function cannotSetModel($class)
+    public static function cannotSetModel(string $class)
     {
         return new static("Could not set `{$class}` as Media model class. Must extend `\Plank\Mediable\Media`.");
     }
@@ -34,7 +34,7 @@ class ConfigurationException extends MediaUploadException
         return new static("Could not recognize source, `{$source}` provided.");
     }
 
-    public static function diskNotFound($disk)
+    public static function diskNotFound(string $disk)
     {
         return new static("Cannot find disk named `{$disk}`.");
     }

@@ -6,7 +6,7 @@ use Plank\Mediable\Exceptions\MediaUploadException;
 
 class FileExistsException extends MediaUploadException
 {
-    public static function fileExists($path)
+    public static function fileExists(string $path)
     {
         return new static("A file already exists at `{$path}`.");
     }

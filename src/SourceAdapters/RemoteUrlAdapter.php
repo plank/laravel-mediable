@@ -27,7 +27,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
      * Constructor.
      * @param string $source
      */
-    public function __construct($source)
+    public function __construct(string $source)
     {
         $this->source = $source;
     }

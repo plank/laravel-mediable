@@ -4,6 +4,7 @@ namespace Plank\Mediable\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\FilesystemManager;
+use Illuminate\Database\Eloquent\Collection;
 use Plank\Mediable\Helpers\File;
 use Plank\Mediable\Media;
 use Plank\Mediable\MediaUploader;
@@ -102,7 +103,7 @@ class ImportMediaCommand extends Command
      * @param  bool $recursive
      * @return array
      */
-    protected function listFiles($disk, $directory = '', $recursive = true)
+    protected function listFiles(string $disk, string $directory = '', bool $recursive = true)
     {
         if ($recursive) {
             return $this->filesystem->disk($disk)->allFiles($directory);
@@ -117,7 +118,7 @@ class ImportMediaCommand extends Command
      * @param  \Illuminate\Database\Eloquent\Collection $existing_media
      * @return \Plank\Mediable\Media|null
      */
-    protected function getRecordForFile($path, $existing_media)
+    protected function getRecordForFile(string $path, Collection $existing_media)
     {
         $directory = File::cleanDirname($path);
         $filename = pathinfo($path, PATHINFO_FILENAME);
@@ -134,7 +135,7 @@ class ImportMediaCommand extends Command
      * @param  string $path
      * @return void
      */
-    protected function createRecordForFile($disk, $path)
+    protected function createRecordForFile(string $disk, string $path)
     {
         try {
             $this->uploader->importPath($disk, $path);
@@ -153,7 +154,7 @@ class ImportMediaCommand extends Command
      * @param  string $path
      * @return void
      */
-    protected function updateRecordForFile(Media $media, $path)
+    protected function updateRecordForFile(Media $media, string $path)
     {
         try {
             if ($this->uploader->update($media)) {
@@ -172,10 +173,9 @@ class ImportMediaCommand extends Command
 
     /**
      * Send the counter total to the console.
-     * @param  bool $force
      * @return void
      */
-    protected function outputCounters($force)
+    protected function outputCounters()
     {
         $this->info(sprintf('Imported %d file(s).', $this->counters['created']));
         if ($this->counters['updated'] > 0) {

@@ -45,7 +45,7 @@ class UrlGeneratorFactory
      * @param string $driver
      * @return void
      */
-    public function setGeneratorForFilesystemDriver($class, $driver)
+    public function setGeneratorForFilesystemDriver(string $class, string $driver)
     {
         $this->validateGeneratorClass($class);
         $this->driver_generators[$driver] = $class;
@@ -57,7 +57,7 @@ class UrlGeneratorFactory
      * @return void
      * @throws \Plank\Mediable\Exceptions\MediaUrlException If class does not exist or does not implement `UrlGenerator`
      */
-    protected function validateGeneratorClass($class)
+    protected function validateGeneratorClass(string $class)
     {
         if (! class_exists($class) || ! is_subclass_of($class, UrlGeneratorInterface::class)) {
             throw MediaUrlException::invalidGenerator($class);
@@ -69,7 +69,7 @@ class UrlGeneratorFactory
      * @param  string $disk
      * @return string
      */
-    protected function getDriverForDisk($disk)
+    protected function getDriverForDisk(string $disk)
     {
         return config("filesystems.disks.{$disk}.driver");
     }

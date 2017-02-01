@@ -28,7 +28,7 @@ class SourceAdapterFactory
 
     /**
      * Create a Source Adapter for the provided source.
-     * @param  object|string $source
+     * @param  object|string|resource $source
      * @return \Plank\Mediable\SourceAdapters\SourceAdapterInterface
      * @throws \Plank\Mediable\Exceptions\MediaUpload\ConfigurationException If the provided source does not match any of the mapped classes or patterns
      */
@@ -59,7 +59,7 @@ class SourceAdapterFactory
      * @param string $source_class
      * @return void
      */
-    public function setAdapterForClass($adapter_class, $source_class)
+    public function setAdapterForClass(string $adapter_class, string $source_class)
     {
         $this->validateAdapterClass($adapter_class);
         $this->class_adapters[$source_class] = $adapter_class;
@@ -71,7 +71,7 @@ class SourceAdapterFactory
      * @param string $source_class
      * @return void
      */
-    public function setAdapterForPattern($adapter_class, $source_pattern)
+    public function setAdapterForPattern(string $adapter_class, string $source_pattern)
     {
         $this->validateAdapterClass($adapter_class);
         $this->pattern_adapters[$source_pattern] = $adapter_class;
@@ -96,7 +96,7 @@ class SourceAdapterFactory
      * @param  string $source
      * @return \Plank\Mediable\SourceAdapters\SourceAdapterInterface|null
      */
-    private function adaptString($source)
+    private function adaptString(string $source)
     {
         foreach ($this->pattern_adapters as $pattern => $adapter) {
             $pattern = '/'.str_replace('/', '\\/', $pattern).'/i';
@@ -112,7 +112,7 @@ class SourceAdapterFactory
      * @throws \Plank\Mediable\Exceptions\MediaUpload\ConfigurationException If class is not valid
      * @return void
      */
-    private function validateAdapterClass($class)
+    private function validateAdapterClass(string $class)
     {
         if (! class_implements($class, SourceAdapterInterface::class)) {
             throw ConfigurationException::cannotSetAdapter($class);

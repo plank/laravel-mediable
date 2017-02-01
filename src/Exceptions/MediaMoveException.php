@@ -9,7 +9,7 @@ use Exception;
  */
 class MediaMoveException extends Exception
 {
-    public static function destinationExists($path)
+    public static function destinationExists(string $path)
     {
         return new static("Another file already exists at `{$path}`");
     }

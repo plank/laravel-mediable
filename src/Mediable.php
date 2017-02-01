@@ -55,7 +55,7 @@ trait Mediable
      * @param  bool                                  $match_all
      * @return void
      */
-    public function scopeWhereHasMedia(Builder $q, $tags, $match_all = false)
+    public function scopeWhereHasMedia(Builder $q, $tags, bool $match_all = false)
     {
         if ($match_all && is_array($tags) && count($tags) > 1) {
             return $this->scopeWhereHasMediaMatchAll($q, $tags);
@@ -88,7 +88,7 @@ trait Mediable
      * @param  bool                                  $match_all Only load media matching all provided tags
      * @return void
      */
-    public function scopeWithMedia(Builder $q, $tags = [], $match_all = false)
+    public function scopeWithMedia(Builder $q, $tags = [], bool $match_all = false)
     {
         $tags = (array) $tags;
 
@@ -125,7 +125,7 @@ trait Mediable
      * @param  bool          $match_all Only load media matching all provided tags
      * @return $this
      */
-    public function loadMedia($tags = [], $match_all = false)
+    public function loadMedia($tags = [], bool $match_all = false)
     {
         $tags = (array) $tags;
 
@@ -237,7 +237,7 @@ trait Mediable
      * If true, will return true is the model has any media that are attached to all of provided tags simultaneously
      * @return bool
      */
-    public function hasMedia($tags, $match_all = false)
+    public function hasMedia($tags, bool $match_all = false)
     {
         return count($this->getMedia($tags, $match_all)) > 0;
     }
@@ -250,7 +250,7 @@ trait Mediable
      * If true, will return media attached to all of the provided tags simultaneously
      * @return bool
      */
-    public function getMedia($tags, $match_all = false)
+    public function getMedia($tags, bool $match_all = false)
     {
         if ($match_all) {
             return $this->getMediaMatchAll($tags);
@@ -302,7 +302,7 @@ trait Mediable
      * @see \Plank\Mediable\Mediable::getMedia()
      * @return bool
      */
-    public function firstMedia($tags, $match_all = false)
+    public function firstMedia($tags, bool $match_all = false)
     {
         return $this->getMedia($tags, $match_all)->first();
     }

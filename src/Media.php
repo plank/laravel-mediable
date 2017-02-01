@@ -48,7 +48,7 @@ class Media extends Model
      * @param  string $class FQCN
      * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
-    public function models($class)
+    public function models(string $class)
     {
         return $this->morphedByMany($class, 'mediable')->withPivot('tag', 'order');
     }
@@ -70,7 +70,7 @@ class Media extends Model
      * @param  bool                                   $recursive (_optional_) If true, will find media in or under the specified directory
      * @return void
      */
-    public function scopeInDirectory(Builder $q, $disk, $directory, $recursive = false)
+    public function scopeInDirectory(Builder $q, string $disk, string $directory, bool $recursive = false)
     {
         $q->where('disk', $disk);
         if ($recursive) {
@@ -88,7 +88,7 @@ class Media extends Model
      * @param  string                                 $directory Path relative to disk
      * @return void
      */
-    public function scopeInOrUnderDirectory(Builder $q, $disk, $directory)
+    public function scopeInOrUnderDirectory(Builder $q, string $disk, string $directory)
     {
         $q->inDirectory($disk, $directory, true);
     }
@@ -99,7 +99,7 @@ class Media extends Model
      * @param  string                                $basename filename and extension
      * @return void
      */
-    public function scopeWhereBasename(Builder $q, $basename)
+    public function scopeWhereBasename(Builder $q, string $basename)
     {
         $q->where('filename', pathinfo($basename, PATHINFO_FILENAME))
             ->where('extension', pathinfo($basename, PATHINFO_EXTENSION));
@@ -112,7 +112,7 @@ class Media extends Model
      * @param  string                                $path directory, filename and extension
      * @return void
      */
-    public function scopeForPathOnDisk(Builder $q, $disk, $path)
+    public function scopeForPathOnDisk(Builder $q, string $disk, string $path)
     {
         $q->where('disk', $disk)
             ->where('directory', File::cleanDirname($path))
@@ -138,7 +138,7 @@ class Media extends Model
      * @param  int $precision (_optional_) Number of decimal places to include.
      * @return string
      */
-    public function readableSize($precision = 1)
+    public function readableSize(int $precision = 1)
     {
         return File::readableSize($this->size, $precision);
     }
@@ -206,7 +206,7 @@ class Media extends Model
      * @param  string $filename    filename. Do not include extension
      * @return void
      */
-    public function move($destination, $filename = null)
+    public function move(string $destination, string $filename = null)
     {
         app('mediable.mover')->move($this, $destination, $filename);
     }
@@ -217,7 +217,7 @@ class Media extends Model
      * @return void
      * @see \Plank\Mediable\Media::move()
      */
-    public function rename($filename)
+    public function rename(string $filename)
     {
         $this->move($this->directory, $filename);
     }

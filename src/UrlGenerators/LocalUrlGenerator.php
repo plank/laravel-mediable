@@ -45,7 +45,7 @@ class LocalUrlGenerator extends BaseUrlGenerator
     public function getPublicPath()
     {
         if (! $this->isPubliclyAccessible()) {
-            throw MediaUrlException::mediaNotPubliclyAccessible($this->getAbsolutePath(), public_path());
+            throw MediaUrlException::mediaNotPubliclyAccessible($this->getAbsolutePath());
         }
         if ($this->isInWebroot()) {
             $path = str_replace(public_path(), '', $this->getAbsolutePath());
@@ -90,7 +90,7 @@ class LocalUrlGenerator extends BaseUrlGenerator
      * @param  string $path
      * @return string
      */
-    protected function cleanDirectorySeparators($path)
+    protected function cleanDirectorySeparators(string $path)
     {
         if (DIRECTORY_SEPARATOR != '/') {
             $path = str_replace(DIRECTORY_SEPARATOR, '/', $path);

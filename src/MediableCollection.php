@@ -2,7 +2,9 @@
 
 namespace Plank\Mediable;
 
+use Illuminate\Database\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Closure;
 
@@ -20,7 +22,7 @@ class MediableCollection extends Collection
      * @param bool $match_all If true, only load media attached to all tags simultaneously
      * @return $this
      */
-    public function loadMedia($tags = [], $match_all = false)
+    public function loadMedia($tags = [], bool $match_all = false)
     {
         $tags = (array) $tags;
 
@@ -53,4 +55,36 @@ class MediableCollection extends Collection
 
         return $this->load(['media' => $closure]);
     }
+
+    public function delete()
+    {
+        if(count($this) == 0){
+            return;
+        }
+
+        $relation = $this->first()->media();
+        $query = $relation->newPivotStatement();
+        $classes = collect();
+
+        $this->each(function(Model $item) use($query, $relation, $classes){
+            // collect list of ids of each class in case not all
+            // items belong to the same class
+            $classes[get_class($item)][] = $item->getKey();
+
+            // select pivots matching each item for deletion
+            $query->orWhere(function(Builder $q) use($item, $relation) {
+                $q->where($relation->getMorphType(), get_class($item));
+                $q->where($relation->getForeignKey(), $item->getKey());
+            });
+        });
+
+        // delete pivots
+        $query->delete();
+
+        // delete each item by class
+        $classes->each(function(array $ids, string $class) {
+            $class::whereIn((new $class)->getKeyName(), $ids)->delete();
+        });
+    }
+
 }

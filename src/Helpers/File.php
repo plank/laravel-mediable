@@ -16,7 +16,7 @@ class File
      * @param  string $path
      * @return string
      */
-    public static function cleanDirname($path)
+    public static function cleanDirname(string $path)
     {
         $dirname = pathinfo($path, PATHINFO_DIRNAME);
         if ($dirname == '.') {
@@ -28,11 +28,11 @@ class File
 
     /**
      * Generate a human readable bytecount string.
-     * @param  int  $bytes
+     * @param  int $bytes
      * @param  int $precision
      * @return string
      */
-    public static function readableSize($bytes, $precision = 1)
+    public static function readableSize(int $bytes, int $precision = 1)
     {
         static $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
         if ($bytes === 0) {
@@ -54,7 +54,7 @@ class File
      *
      * @see Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser
      */
-    public static function guessExtension($mimeType)
+    public static function guessExtension(string $mimeType)
     {
         $guesser = ExtensionGuesser::getInstance();
 
