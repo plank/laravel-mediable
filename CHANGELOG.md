@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.4.2 - 2016-02-12
+- Fixed issues cause by Laravel 5.4 backwards-compatibility breaks
+- Increased laravel minumum version to 5.3, which is the minimum that works with the current implementation. Will attempt to restore support for older versions in an upcoming release.
+
+
 ## 2.4.1 - 2016-12-30
 - The `onDuplicateDelete` action of the `MediaUploader` now manually deletes the `Media` record and the file on disk, instead of depending on the record existing to clean its own file.
 
