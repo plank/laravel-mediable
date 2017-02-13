@@ -12,18 +12,6 @@ class MediableTest extends TestCase
         $this->useDatabase();
     }
 
-    public function test_it_can_be_related_to_media()
-    {
-        $mediable = factory(SampleMediable::class)->make();
-        $relationship = $mediable->media();
-
-        $this->assertInstanceOf(MorphToMany::class, $relationship);
-        $this->assertEquals('mediable_type', $relationship->getMorphType());
-        $this->assertEquals('mediables', $relationship->getTable());
-        $this->assertEquals('mediables.mediable_id', $relationship->getForeignKey());
-        $this->assertEquals('sample_mediables.id', $relationship->getQualifiedParentKeyName());
-    }
-
     public function test_it_can_attach_and_retrieve_media_by_a_tag()
     {
         $mediable = factory(SampleMediable::class)->create();

@@ -7,19 +7,6 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class MediaTest extends TestCase
 {
-    public function test_it_can_be_related_to_other_models()
-    {
-        $media = factory(Media::class)->make();
-        $other = $this->getMockForAbstractClass(Model::class);
-        $relationship = $media->models(get_class($other));
-
-        $this->assertInstanceOf(MorphToMany::class, $relationship);
-        $this->assertEquals('mediable_type', $relationship->getMorphType());
-        $this->assertEquals('mediables', $relationship->getTable());
-        $this->assertEquals('mediables.media_id', $relationship->getForeignKey());
-        $this->assertEquals('media.id', $relationship->getQualifiedParentKeyName());
-    }
-
     public function test_it_has_path_accessors()
     {
         $media = factory(Media::class)->make([

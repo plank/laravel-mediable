@@ -110,9 +110,8 @@ class MediaUploaderTest extends TestCase
     {
         $uploader = $this->mockUploader();
         $method = $this->getPrivateMethod($uploader, 'makeModel');
-        $class = $this->getMockClass(Media::class, null, [], '', true);
-        $uploader->setModelClass($class);
-        $this->assertInstanceOf($class, $method->invoke($uploader));
+        $uploader->setModelClass(MediaSubclass::class);
+        $this->assertInstanceOf(MediaSubclass::class, $method->invoke($uploader));
     }
 
     public function test_it_throw_exception_for_invalid_model()
