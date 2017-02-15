@@ -11,8 +11,6 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
  * Media Model.
  *
  * @author Sean Fraser <sean@plankdesign.com>
- *
- * @var string
  */
 class Media extends Model
 {

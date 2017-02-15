@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Collection;
  * Provides functionality for attaching media to an eloquent model.
  *
  * @author Sean Fraser <sean@plankdesign.com>
- * @var bool
+ *
  * Whether the model should automatically reload its media relationship after modification.
  */
 trait Mediable
