@@ -47,6 +47,7 @@ class S3UrlGenerator extends BaseUrlGenerator
             throw MediaUrlException::cloudMediaNotPubliclyAccessible($this->media->disk);
         }
 
-        return $this->filesystem->disk($this->media->disk)->url($this->media->getDiskPath());
+        $adapter = $this->filesystem->disk($this->media->disk)->getDriver()->getAdapter();
+        return $adapter->getClient()->getObjectUrl($adapter->getBucket(), $this->media->getDiskPath());
     }
 }

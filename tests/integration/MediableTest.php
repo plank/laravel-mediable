@@ -237,6 +237,7 @@ class MediableTest extends TestCase
         $mediable->attachMedia($media2, 'bar');
 
         $result = SampleMediable::withMedia(['bar'])->first();
+
         $this->assertTrue($result->relationLoaded('media'));
         $this->assertEquals([2], $result->media->pluck('id')->toArray());
     }

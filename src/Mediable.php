@@ -101,7 +101,7 @@ trait Mediable
         }
 
         $q->with(['media' => function (MorphToMany $q) use ($tags) {
-            $q->wherePivotIn('tag', $tags);
+            $this->wherePivotTagIn($q, $tags);
         }]);
     }
 
@@ -138,7 +138,7 @@ trait Mediable
         }
 
         $this->load(['media' => function (MorphToMany $q) use ($tags) {
-            $q->wherePivotIn('tag', $tags);
+            $this->wherePivotTagIn($q, $tags);
         }]);
 
         return $this;
@@ -417,8 +417,8 @@ trait Mediable
         $tags = (array) $tags;
         $grammar = $q->getBaseQuery()->getGrammar();
         $subquery = $this->newMatchAllQuery($tags)->select($this->mediaQualifiedRelatedKey());
-        $q->wherePivotIn('tag', $tags)
-            ->whereRaw($grammar->wrap($this->mediaQualifiedRelatedKey()).' IN ('.$subquery->toSql().')', $subquery->getBindings());
+        $q->whereRaw($grammar->wrap($this->mediaQualifiedRelatedKey()).' IN ('.$subquery->toSql().')', $subquery->getBindings());
+        $this->wherePivotTagIn($q, $tags);
     }
 
     /**
@@ -528,5 +528,18 @@ trait Mediable
     {
         $relation = $this->media();
         return method_exists($relation, 'getQualifiedRelatedKeyName') ? $relation->getQualifiedRelatedKeyName() : $relation->getOtherKey();
+    }
+
+    /**
+     * perform a WHERE IN on the pivot table's tags column
+     *
+     * Adds support for Laravel <= 5.2, which does not provide a `wherePivotIn()` method
+     * @param  MorphToMany $q
+     * @param  array       $tags
+     * @return void
+     */
+    private function wherePivotTagIn(MorphToMany $q, $tags = [])
+    {
+        method_exists($q, 'wherePivotIn') ? $q->wherePivotIn('tag', $tags) : $q->whereIn($this->media()->getTable().'.tag', $tags);
     }
 }
