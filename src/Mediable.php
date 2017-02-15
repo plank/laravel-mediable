@@ -73,10 +73,10 @@ trait Mediable
      */
     public function scopeWhereHasMediaMatchAll(Builder $q, array $tags)
     {
-        $grammar = $q->getConnection()->getQueryGrammar();
+        $grammar = $q->getQuery()->getGrammar();
         $subquery = $this->newMatchAllQuery($tags)
             ->selectRaw('count(*)')
-            ->whereRaw($grammar->wrap($this->media()->getForeignKey()).' = '.$grammar->wrap($this->getQualifiedKeyName()));
+            ->whereRaw($grammar->wrap($this->mediaQualifiedForeignKey()).' = '.$grammar->wrap($this->getQualifiedKeyName()));
         $q->whereRaw('('.$subquery->toSql().') >= 1', $subquery->getBindings());
     }
 
@@ -224,7 +224,7 @@ trait Mediable
     {
         $this->media()->newPivotStatement()
             ->where($this->media()->getMorphType(), $this->media()->getMorphClass())
-            ->where($this->media()->getForeignKey(), $this->getKey())
+            ->where($this->mediaQualifiedForeignKey(), $this->getKey())
             ->whereIn('tag', (array) $tags)->delete();
         $this->markMediaDirty($tags);
     }
@@ -398,13 +398,12 @@ trait Mediable
     protected function newMatchAllQuery($tags = [])
     {
         $tags = (array) $tags;
-        $grammar = $this->media()->getConnection()->getQueryGrammar();
-
+        $grammar = $this->media()->getBaseQuery()->getGrammar();
         return $this->media()->newPivotStatement()
             ->where($this->media()->getMorphType(), $this->media()->getMorphClass())
             ->whereIn('tag', $tags)
-            ->groupBy($this->media()->getOtherKey())
-            ->havingRaw('count('.$grammar->wrap($this->media()->getOtherKey()).') = '.count($tags));
+            ->groupBy($this->mediaQualifiedRelatedKey())
+            ->havingRaw('count('.$grammar->wrap($this->mediaQualifiedRelatedKey()).') = '.count($tags));
     }
 
     /**
@@ -416,10 +415,10 @@ trait Mediable
     protected function addMatchAllToEagerLoadQuery(MorphToMany $q, $tags = [])
     {
         $tags = (array) $tags;
-        $grammar = $q->getConnection()->getQueryGrammar();
-        $subquery = $this->newMatchAllQuery($tags)->select($q->getOtherKey());
+        $grammar = $q->getBaseQuery()->getGrammar();
+        $subquery = $this->newMatchAllQuery($tags)->select($this->mediaQualifiedRelatedKey());
         $q->wherePivotIn('tag', $tags)
-            ->whereRaw($grammar->wrap($q->getOtherKey()).' IN ('.$subquery->toSql().')', $subquery->getBindings());
+            ->whereRaw($grammar->wrap($this->mediaQualifiedRelatedKey()).' IN ('.$subquery->toSql().')', $subquery->getBindings());
     }
 
     /**
@@ -448,7 +447,7 @@ trait Mediable
     {
         $q = $this->media()->newPivotStatement();
         $tags = (array) $tags;
-        $grammar = $q->getConnection()->getQueryGrammar();
+        $grammar = $q->getGrammar();
 
         $result = $q->selectRaw($grammar->wrap('tag').', max('.$grammar->wrap('order').') as aggregate')
             ->where('mediable_type', $this->getMorphClass())
@@ -503,5 +502,31 @@ trait Mediable
     public function newCollection(array $models = [])
     {
         return new MediableCollection($models);
+    }
+
+    /**
+     * Key the name of the foreign key field of the media relation
+     *
+     * Accounts for the change of method name in Laravel 5.4
+     *
+     * @return string
+     */
+    private function mediaQualifiedForeignKey()
+    {
+        $relation = $this->media();
+        return method_exists($relation, 'getQualifiedForeignKeyName') ? $relation->getQualifiedForeignKeyName() : $relation->getForeignKey();
+    }
+
+    /**
+     * Key the name of the related key field of the media relation
+     *
+     * Accounts for the change of method name in Laravel 5.4
+     *
+     * @return string
+     */
+    private function mediaQualifiedRelatedKey()
+    {
+        $relation = $this->media();
+        return method_exists($relation, 'getQualifiedRelatedKeyName') ? $relation->getQualifiedRelatedKeyName() : $relation->getOtherKey();
     }
 }
