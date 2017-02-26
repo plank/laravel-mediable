@@ -1,11 +1,11 @@
 # Changelog
 
-## 2.4.3 - 2016-02-15
+## 2.4.3 - 2017-02-15
 - Restored Laravel 5.2 compatibility
 - `S3UrlGenerator` now generates the url directly with S3 client, instead of with the `FilesystemAdapter::url()` method, which was only added in Laravel 5.2.15
 - Added fallback for `wherePivotIn()` used in eager loading, which was only added in Laravel 5.3
 
-## 2.4.2 - 2016-02-12
+## 2.4.2 - 2017-02-12
 - Fixed issues cause by Laravel 5.4 backwards-compatibility breaks
 - Increased laravel minumum version to 5.3, which is the minimum that works with the current implementation. Will attempt to restore support for older versions in an upcoming release.
 
