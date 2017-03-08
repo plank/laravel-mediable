@@ -309,7 +309,7 @@ class MediaUploader
      */
     public function setAllowedMimeTypes($allowed_mimes)
     {
-        $this->config['allowed_mime_types'] = $allowed_mimes;
+        $this->config['allowed_mime_types'] = array_map('strtolower', (array)$allowed_mimes);
 
         return $this;
     }
@@ -321,7 +321,7 @@ class MediaUploader
      */
     public function setAllowedExtensions($allowed_extensions)
     {
-        $this->config['allowed_extensions'] = $allowed_extensions;
+        $this->config['allowed_extensions'] = array_map('strtolower', (array)$allowed_extensions);
 
         return $this;
     }
@@ -568,8 +568,8 @@ class MediaUploader
     private function verifyMimeType($mime_type)
     {
         $allowed = $this->config['allowed_mime_types'];
-        if (! empty($allowed) && ! in_array($mime_type, $allowed)) {
-            throw FileNotSupportedException::mimeRestricted($mime_type, $allowed);
+        if (! empty($allowed) && ! in_array(strtolower($mime_type), $allowed)) {
+            throw FileNotSupportedException::mimeRestricted(strtolower($mime_type), $allowed);
         }
 
         return $mime_type;
@@ -584,8 +584,8 @@ class MediaUploader
     private function verifyExtension($extension)
     {
         $allowed = $this->config['allowed_extensions'];
-        if (! empty($allowed) && ! in_array($extension, $allowed)) {
-            throw FileNotSupportedException::extensionRestricted($extension, $allowed);
+        if (! empty($allowed) && ! in_array(strtolower($extension), $allowed)) {
+            throw FileNotSupportedException::extensionRestricted(strtolower($extension), $allowed);
         }
 
         return $extension;

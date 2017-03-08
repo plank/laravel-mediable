@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.4.4 - 2017-03-08
+- Fixed allowed extension checking failing due to case mismatch
+
 ## 2.4.3 - 2017-02-15
 - Restored Laravel 5.2 compatibility
 - `S3UrlGenerator` now generates the url directly with S3 client, instead of with the `FilesystemAdapter::url()` method, which was only added in Laravel 5.2.15
