@@ -25,6 +25,7 @@ class MediaUploader
     const ON_DUPLICATE_REPLACE = 'replace';
     const ON_DUPLICATE_INCREMENT = 'increment';
     const ON_DUPLICATE_ERROR = 'error';
+    const ON_DUPLICATE_DELETE = 'delete';
 
     /**
      * @var FileSystemManager
@@ -88,7 +89,7 @@ class MediaUploader
     /**
      * Set the source for the file.
      * @param  mixed $source
-     * @return static
+     * @return $this
      */
     public function fromSource($source)
     {
@@ -100,7 +101,7 @@ class MediaUploader
     /**
      * Set the source for the string data.
      * @param  string $source
-     * @return static
+     * @return $this
      */
     public function fromString($source)
     {
@@ -113,7 +114,7 @@ class MediaUploader
      * Set the filesystem disk and relative directory where the file will be saved.
      * @param  string $disk
      * @param  string $directory
-     * @return static
+     * @return $this
      */
     public function toDestination($disk, $directory)
     {
@@ -123,7 +124,7 @@ class MediaUploader
     /**
      * Set the filesystem disk on which the file will be saved.
      * @param string $disk
-     * @return static
+     * @return $this
      */
     public function toDisk($disk)
     {
@@ -135,7 +136,7 @@ class MediaUploader
     /**
      * Set the directory relative to the filesystem disk at which the file will be saved.
      * @param string $directory
-     * @return static
+     * @return $this
      */
     public function toDirectory($directory)
     {
@@ -147,7 +148,7 @@ class MediaUploader
     /**
      * Specify the filename to copy to the file to.
      * @param string $filename
-     * @return static
+     * @return $this
      */
     public function useFilename($filename)
     {
@@ -159,7 +160,7 @@ class MediaUploader
 
     /**
      * Indicates to the uploader to generate a filename using the file's MD5 hash.
-     * @return static
+     * @return $this
      */
     public function useHashForFilename()
     {
@@ -171,7 +172,7 @@ class MediaUploader
 
     /**
      * Restore the default behaviour of using the source file's filename.
-     * @return static
+     * @return $this
      */
     public function useOriginalFilename()
     {
@@ -184,7 +185,7 @@ class MediaUploader
     /**
      * Change the class to use for generated Media.
      * @param string $class
-     * @return static
+     * @return $this
      * @throws \Plank\Mediable\Exceptions\MediaUpload\ConfigurationException if $class does not extend Plank\Mediable\Media
      */
     public function setModelClass($class)
@@ -200,7 +201,7 @@ class MediaUploader
     /**
      * Change the maximum allowed filesize.
      * @param int $size
-     * @return static
+     * @return $this
      */
     public function setMaximumSize($size)
     {
@@ -212,7 +213,7 @@ class MediaUploader
     /**
      * Change the behaviour for when a file already exists at the destination.
      * @param string $behavior
-     * @return static
+     * @return $this
      */
     public function setOnDuplicateBehavior($behavior)
     {
@@ -234,7 +235,7 @@ class MediaUploader
     /**
      * Throw an exception when file already exists at the destination.
      *
-     * @return static
+     * @return $this
      */
     public function onDuplicateError()
     {
@@ -244,7 +245,7 @@ class MediaUploader
     /**
      * Append incremented counter to file name when file already exists at destination.
      *
-     * @return static
+     * @return $this
      */
     public function onDuplicateIncrement()
     {
@@ -252,9 +253,8 @@ class MediaUploader
     }
 
     /**
-     * Overwrite existing file when file already exists at destination.
-     *
-     * @return static
+     * Overwrite the existing file, updating the original media record
+     * @return $this
      */
     public function onDuplicateReplace()
     {
@@ -262,9 +262,21 @@ class MediaUploader
     }
 
     /**
+     * Overwrite existing files and create a new media record.
+     *
+     * This will delete the old media record and create a new one, detaching any existing associations.
+     *
+     * @return $this
+     */
+    public function onDuplicateDelete()
+    {
+        return $this->setOnDuplicateBehavior(self::ON_DUPLICATE_DELETE);
+    }
+
+    /**
      * Change whether both the MIME type and extensions must match the same aggregate type.
      * @param bool $strict
-     * @return static
+     * @return $this
      */
     public function setStrictTypeChecking($strict)
     {
@@ -276,7 +288,7 @@ class MediaUploader
     /**
      * Change whether files not matching any aggregate types are allowed.
      * @param bool $allow
-     * @return static
+     * @return $this
      */
     public function setAllowUnrecognizedTypes($allow)
     {
@@ -290,7 +302,7 @@ class MediaUploader
      * @param string $type       the name of the type
      * @param array  $mime_types list of MIME types recognized
      * @param array  $extensions list of file extensions recognized
-     * @return static
+     * @return $this
      */
     public function setTypeDefinition($type, $mime_types, $extensions)
     {
@@ -305,7 +317,7 @@ class MediaUploader
     /**
      * Set a list of MIME types that the source file must be restricted to.
      * @param array $allowed_mimes
-     * @return static
+     * @return $this
      */
     public function setAllowedMimeTypes($allowed_mimes)
     {
@@ -317,7 +329,7 @@ class MediaUploader
     /**
      * Set a list of file extensions that the source file must be restricted to.
      * @param array $allowed_extensions
-     * @return static
+     * @return $this
      */
     public function setAllowedExtensions($allowed_extensions)
     {
@@ -329,7 +341,7 @@ class MediaUploader
     /**
      * Set a list of aggregate types that the source file must be restricted to.
      * @param array $allowed_types
-     * @return static
+     * @return $this
      */
     public function setAllowedAggregateTypes($allowed_types)
     {
@@ -423,9 +435,35 @@ class MediaUploader
      */
     public function upload()
     {
-        $this->verifySource();
+        return $this->uploadToModel($this->makeModel());
+    }
 
-        $model = $this->makeModel();
+    /**
+     * Process the file upload, overwriting an existing media's file
+     *
+     * Uploader will automatically place the file on the same disk as the original media.
+     * Will automatically
+     * @param  Media  $media
+     * @return [type]        [description]
+     */
+    public function replace(Media $media)
+    {
+        $this->disk = $media->disk;
+
+        if (!$this->directory) {
+            $this->toDirectory($media->directory);
+        }
+
+        if(!$this->filename) {
+            $this->useFilename($media->filename);
+        }
+
+        return $this->uploadToModel($media);
+    }
+
+    private function uploadToModel(Media $model)
+    {
+        $this->verifySource();
 
         $model->size = $this->verifyFileSize($this->source->size());
         $model->mime_type = $this->verifyMimeType($this->source->mimeType());
@@ -440,7 +478,6 @@ class MediaUploader
 
         $this->filesystem->disk($model->disk)->put($model->getDiskPath(), $this->source->contents());
         $model->save();
-
         return $model;
     }
 
@@ -624,7 +661,6 @@ class MediaUploader
     /**
      * Decide what to do about duplicated files.
      * @param  \Plank\Mediable\Media  $model
-     * @return void
      * @throws \Plank\Mediable\Exceptions\MediaUpload\FileExistsException If directory is not writable or file already exists at the destination and on_duplicate is set to 'error'
      */
     private function handleDuplicate(Media $model)
@@ -633,8 +669,18 @@ class MediaUploader
             case static::ON_DUPLICATE_ERROR:
                 throw FileExistsException::fileExists($model->getDiskPath());
                 break;
-            case static::ON_DUPLICATE_REPLACE:
+            case static::ON_DUPLICATE_DELETE:
                 $this->deleteExistingMedia($model);
+                break;
+            case static::ON_DUPLICATE_REPLACE:
+                $model->{$model->getKeyName()} = Media::where('disk', $model->disk)
+                    ->where('directory', $model->directory)
+                    ->where('filename', $model->filename)
+                    ->where('extension', $model->extension)
+                    ->pluck($model->getKeyName())
+                    ->first();
+
+                $model->exists = true;
                 break;
             case static::ON_DUPLICATE_INCREMENT:
             default:

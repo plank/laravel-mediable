@@ -31,9 +31,10 @@ class MediableCollectionTest extends TestCase
         $mediable->attachMedia($media1, 'foo');
         $mediable->attachMedia($media2, 'bar');
 
-        $result = SampleMediable::first();
-        $collection = new MediableCollection([$result]);
-        $this->assertSame($collection, $collection->loadMedia(['bar']));
+        $collection = new MediableCollection([SampleMediable::first()]);
+        $return = $collection->loadMedia(['bar']);
+
+        $this->assertSame($collection, $return);
         $this->assertTrue($collection[0]->relationLoaded('media'));
         $this->assertEquals([2], $collection[0]->media->pluck('id')->toArray());
     }

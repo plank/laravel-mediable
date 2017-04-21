@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Filesystem\Filesystem;
 use Plank\Mediable\Media;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
@@ -102,14 +104,10 @@ class TestCase extends BaseTestCase
 
     protected function useDatabase()
     {
-        $artisan = $this->app->make('Illuminate\Contracts\Console\Kernel');
-        $database = $this->app['config']->get('database.default');
-
+        $artisan = $this->app->make(Kernel::class);
+        $this->app->useDatabasePath(dirname(__DIR__));
         //Remigrate all database tables
-        $artisan->call('migrate:refresh', [
-            '--database' => $database,
-            '--realpath' => realpath(__DIR__.'/../migrations'),
-        ]);
+        $artisan->call('migrate:refresh');
     }
 
     protected function useFilesystem($disk)
@@ -118,7 +116,7 @@ class TestCase extends BaseTestCase
             return;
         }
         $root = $this->app['config']->get('filesystems.disks.' . $disk . '.root');
-        $filesystem =  $this->app->make(Illuminate\Filesystem\Filesystem::class);
+        $filesystem =  $this->app->make(Filesystem::class);
         $filesystem->cleanDirectory($root);
     }
 

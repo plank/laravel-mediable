@@ -34,9 +34,12 @@ class MediableCollection extends Collection
             return $this->loadMediaMatchAll($tags);
         }
 
-        return $this->load(['media' => function (MorphToMany $q) use ($tags) {
-            $q->wherePivotIn('tag', $tags);
-        }]);
+        $closure = function (MorphToMany $q) use ($tags) {
+            $this->wherePivotTagIn($q, $tags);
+        };
+        $closure = Closure::bind($closure, $this->first(), $this->first());
+
+        return $this->load(['media' => $closure]);
     }
 
     /**

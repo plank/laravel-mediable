@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Collection;
  * Provides functionality for attaching media to an eloquent model.
  *
  * @author Sean Fraser <sean@plankdesign.com>
- * @var bool
+ *
  * Whether the model should automatically reload its media relationship after modification.
  */
 trait Mediable
@@ -73,10 +73,10 @@ trait Mediable
      */
     public function scopeWhereHasMediaMatchAll(Builder $q, array $tags)
     {
-        $grammar = $q->getConnection()->getQueryGrammar();
+        $grammar = $q->getQuery()->getGrammar();
         $subquery = $this->newMatchAllQuery($tags)
             ->selectRaw('count(*)')
-            ->whereRaw($grammar->wrap($this->media()->getForeignKey()).' = '.$grammar->wrap($this->getQualifiedKeyName()));
+            ->whereRaw($grammar->wrap($this->mediaQualifiedForeignKey()).' = '.$grammar->wrap($this->getQualifiedKeyName()));
         $q->whereRaw('('.$subquery->toSql().') >= 1', $subquery->getBindings());
     }
 
@@ -101,7 +101,7 @@ trait Mediable
         }
 
         $q->with(['media' => function (MorphToMany $q) use ($tags) {
-            $q->wherePivotIn('tag', $tags);
+            $this->wherePivotTagIn($q, $tags);
         }]);
     }
 
@@ -138,7 +138,7 @@ trait Mediable
         }
 
         $this->load(['media' => function (MorphToMany $q) use ($tags) {
-            $q->wherePivotIn('tag', $tags);
+            $this->wherePivotTagIn($q, $tags);
         }]);
 
         return $this;
@@ -224,7 +224,7 @@ trait Mediable
     {
         $this->media()->newPivotStatement()
             ->where($this->media()->getMorphType(), $this->media()->getMorphClass())
-            ->where($this->media()->getForeignKey(), $this->getKey())
+            ->where($this->mediaQualifiedForeignKey(), $this->getKey())
             ->whereIn('tag', (array) $tags)->delete();
         $this->markMediaDirty($tags);
     }
@@ -398,13 +398,12 @@ trait Mediable
     protected function newMatchAllQuery($tags = [])
     {
         $tags = (array) $tags;
-        $grammar = $this->media()->getConnection()->getQueryGrammar();
-
+        $grammar = $this->media()->getBaseQuery()->getGrammar();
         return $this->media()->newPivotStatement()
             ->where($this->media()->getMorphType(), $this->media()->getMorphClass())
             ->whereIn('tag', $tags)
-            ->groupBy($this->media()->getOtherKey())
-            ->havingRaw('count('.$grammar->wrap($this->media()->getOtherKey()).') = '.count($tags));
+            ->groupBy($this->mediaQualifiedRelatedKey())
+            ->havingRaw('count('.$grammar->wrap($this->mediaQualifiedRelatedKey()).') = '.count($tags));
     }
 
     /**
@@ -416,10 +415,10 @@ trait Mediable
     protected function addMatchAllToEagerLoadQuery(MorphToMany $q, $tags = [])
     {
         $tags = (array) $tags;
-        $grammar = $q->getConnection()->getQueryGrammar();
-        $subquery = $this->newMatchAllQuery($tags)->select($q->getOtherKey());
-        $q->wherePivotIn('tag', $tags)
-            ->whereRaw($grammar->wrap($q->getOtherKey()).' IN ('.$subquery->toSql().')', $subquery->getBindings());
+        $grammar = $q->getBaseQuery()->getGrammar();
+        $subquery = $this->newMatchAllQuery($tags)->select($this->mediaQualifiedRelatedKey());
+        $q->whereRaw($grammar->wrap($this->mediaQualifiedRelatedKey()).' IN ('.$subquery->toSql().')', $subquery->getBindings());
+        $this->wherePivotTagIn($q, $tags);
     }
 
     /**
@@ -448,7 +447,7 @@ trait Mediable
     {
         $q = $this->media()->newPivotStatement();
         $tags = (array) $tags;
-        $grammar = $q->getConnection()->getQueryGrammar();
+        $grammar = $q->getGrammar();
 
         $result = $q->selectRaw($grammar->wrap('tag').', max('.$grammar->wrap('order').') as aggregate')
             ->where('mediable_type', $this->getMorphClass())
@@ -503,5 +502,44 @@ trait Mediable
     public function newCollection(array $models = [])
     {
         return new MediableCollection($models);
+    }
+
+    /**
+     * Key the name of the foreign key field of the media relation
+     *
+     * Accounts for the change of method name in Laravel 5.4
+     *
+     * @return string
+     */
+    private function mediaQualifiedForeignKey()
+    {
+        $relation = $this->media();
+        return method_exists($relation, 'getQualifiedForeignKeyName') ? $relation->getQualifiedForeignKeyName() : $relation->getForeignKey();
+    }
+
+    /**
+     * Key the name of the related key field of the media relation
+     *
+     * Accounts for the change of method name in Laravel 5.4
+     *
+     * @return string
+     */
+    private function mediaQualifiedRelatedKey()
+    {
+        $relation = $this->media();
+        return method_exists($relation, 'getQualifiedRelatedKeyName') ? $relation->getQualifiedRelatedKeyName() : $relation->getOtherKey();
+    }
+
+    /**
+     * perform a WHERE IN on the pivot table's tags column
+     *
+     * Adds support for Laravel <= 5.2, which does not provide a `wherePivotIn()` method
+     * @param  MorphToMany $q
+     * @param  array       $tags
+     * @return void
+     */
+    private function wherePivotTagIn(MorphToMany $q, $tags = [])
+    {
+        method_exists($q, 'wherePivotIn') ? $q->wherePivotIn('tag', $tags) : $q->whereIn($this->media()->getTable().'.tag', $tags);
     }
 }

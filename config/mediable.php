@@ -200,7 +200,8 @@ return [
         ],
         'pattern' => [
             '^https?://' => Plank\Mediable\SourceAdapters\RemoteUrlAdapter::class,
-            '^/' => Plank\Mediable\SourceAdapters\LocalPathAdapter::class
+            '^/' => Plank\Mediable\SourceAdapters\LocalPathAdapter::class,
+            '^[a-zA-Z]:\\' => Plank\Mediable\SourceAdapters\LocalPathAdapter::class
         ],
     ],
 

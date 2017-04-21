@@ -46,7 +46,7 @@ class SourceAdapterTest extends TestCase
 
         $data = [
             [FileAdapter::class, new File($file), $file, 'plank'],
-            [UploadedFileAdapter::class, new UploadedFile($file, 'plank.png', 'image/png', 8444, UPLOAD_ERR_OK, true), $file, 'plank'],
+            [UploadedFileAdapter::class, new UploadedFile($file, 'plank.png', 'image/png', 7173, UPLOAD_ERR_OK, true), $file, 'plank'],
             [LocalPathAdapter::class, $file, $file, 'plank'],
             [RemoteUrlAdapter::class, $url, $url, 'plank'],
             [RawContentAdapter::class, $string, null, null],
@@ -135,7 +135,7 @@ class SourceAdapterTest extends TestCase
     public function test_it_adapts_file_size($adapter, $source)
     {
         $adapter = new $adapter($source);
-        $this->assertEquals(8444, $adapter->size());
+        $this->assertEquals(7173, $adapter->size());
     }
 
     /**
