@@ -469,6 +469,21 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('3ef5e70366086147c2695325d79a25cc', $media->filename);
     }
 
+    public function test_it_can_revert_to_original_filename()
+    {
+        $this->useFilesystem('tmp');
+        $this->useDatabase();
+
+        $media = Facade::fromSource(__DIR__ . '/../_data/plank.png')
+            ->toDestination('tmp', 'foo')
+            ->useHashForFilename()
+            ->useOriginalFilename()
+            ->upload();
+
+        $this->assertEquals('plank', $media->filename);
+
+    }
+
     protected function mockUploader($filesystem = null, $factory = null)
     {
         return new MediaUploader(
