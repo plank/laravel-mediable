@@ -127,4 +127,19 @@ class TestCase extends BaseTestCase
             $this->useFilesystem($disk);
         }
     }
+
+    protected function sampleFilePath()
+    {
+        return realpath(__DIR__ . '/_data/plank.png');
+    }
+
+    protected function alternateFilePath()
+    {
+        return realpath(__DIR__ . '/_data/plank2.png');
+    }
+
+    protected function sampleFile()
+    {
+        return fopen($this->sampleFilePath(), 'r');
+    }
 }

@@ -22,12 +22,12 @@ class SourceAdapterTest extends TestCase
     protected function getEnvironmentSetUp($app)
     {
         parent::getEnvironmentSetUp($app);
-        $app['filesystem']->disk('uploads')->put('plank.png', fopen(__DIR__.'/../../_data/plank.png', 'r'));
+        $app['filesystem']->disk('uploads')->put('plank.png', $this->sampleFile());
     }
 
     public function adapterProvider()
     {
-        $file = realpath(__DIR__.'/../../_data/plank.png');
+        $file = $this->sampleFilePath();
         $string = file_get_contents($file);
         $url = 'https://www.plankdesign.com/externaluse/plank.png';
 
@@ -69,7 +69,7 @@ class SourceAdapterTest extends TestCase
             [new FileAdapter(new File($file, false))],
             [new LocalPathAdapter($file)],
             [new UploadedFileAdapter(new UploadedFile($file, 'invalid.png', 'image/png', 8444, UPLOAD_ERR_CANT_WRITE, false))],
-            [new StreamResourceAdapter(fopen(realpath(__DIR__.'/../../_data/plank.png'), 'a'))],
+            [new StreamResourceAdapter(fopen($this->sampleFilePath(), 'a'))],
             [new StreamResourceAdapter(fopen('php://stdin', 'w'))],
         ];
     }
