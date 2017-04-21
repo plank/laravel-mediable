@@ -74,6 +74,12 @@ class MediaUploader
     private $hash_filename = false;
 
     /**
+     * Media record to replace
+     * @var Media
+     */
+    private $replace_media;
+
+    /**
      * Constructor.
      * @param \Illuminate\Filesystem\FilesystemManager            $filesystem
      * @param \Plank\Mediable\SourceAdapters\SourceAdapterFactory $factory
@@ -435,7 +441,15 @@ class MediaUploader
      */
     public function upload()
     {
-        return $this->uploadToModel($this->makeModel());
+        $model = $this->populateModel($this->makeModel());
+        $this->verifyDestination($model);
+        $this->filesystem->disk($model->disk)
+            ->put($model->getDiskPath(), $this->source->contents());
+
+        $model->save();
+
+        return $model;
+
     }
 
     /**
@@ -444,11 +458,14 @@ class MediaUploader
      * Uploader will automatically place the file on the same disk as the original media.
      * Will automatically
      * @param  Media  $media
-     * @return [type]        [description]
+     * @return Media
      */
     public function replace(Media $media)
     {
-        $this->disk = $media->disk;
+
+        if (!$this->disk) {
+            $this->toDisk($media->disk);
+        }
 
         if (!$this->directory) {
             $this->toDirectory($media->directory);
@@ -458,10 +475,33 @@ class MediaUploader
             $this->useFilename($media->filename);
         }
 
-        return $this->uploadToModel($media);
+        // Remember original file location.
+        // We will only delete it if validation passes
+        $disk = $media->disk;
+        $path = $media->getDiskPath();
+
+        $model = $this->populateModel($media);
+
+        $this->verifyDestination($model);
+
+        // Delete original file, if necessary
+        $this->filesystem->disk($disk)->delete($path);
+
+        // Move the new file into place
+        $this->filesystem->disk($model->disk)
+            ->put($model->getDiskPath(), $this->source->contents());
+
+        $model->save();
+
+        return $model;
     }
 
-    private function uploadToModel(Media $model)
+    /**
+     * Validate input and convert to Media attributes
+     * @param  Media  $model
+     * @return Media
+     */
+    private function populateModel(Media $model)
     {
         $this->verifySource();
 
@@ -474,12 +514,9 @@ class MediaUploader
         $model->directory = $this->directory;
         $model->filename = $this->generateFilename();
 
-        $this->verifyDestination($model);
-
-        $this->filesystem->disk($model->disk)->put($model->getDiskPath(), $this->source->contents());
-        $model->save();
         return $model;
     }
+
 
     /**
      * Create a `Media` record for a file already on a disk.
