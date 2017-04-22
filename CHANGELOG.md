@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.0 -
+- Updated minimum support requirements to PHP 7.0 and Laravel 5.3.
+- Changed the behaviour of `MediaUploader::onDuplicateReplace()` to preserve the original `Media` record. The old behaviour has been renamed `MediaUploader::onDuplicateDelete()`.
+- Added `delete()` method to `MediableCollection` for mass deleting media records and files.
+- Cleaned up test suite.
+
 ## 2.4.3 - 2016-02-15
 - Restored Laravel 5.2 compatibility
 - `S3UrlGenerator` now generates the url directly with S3 client, instead of with the `FilesystemAdapter::url()` method, which was only added in Laravel 5.2.15

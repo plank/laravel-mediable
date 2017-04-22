@@ -1,5 +1,12 @@
 # Upgrading
 
+## 2.x to 3.x
+
+Minimum PHP version moved to 7.0
+Minimum Laravel version moved to 5.3
+
+The behaviour of `MediaUploader::onDuplicateReplace()` method has been changed to preserve the original `Media` record and any attachments. The old behaviour has been renamed to `MediaUploader::onDuplicateDelete()`.
+
 ## 1.x to 2.x
 
 You need to add an order column to the mediables table.
