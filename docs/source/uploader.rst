@@ -127,6 +127,19 @@ You can override the most validation configuration values set in ``config/mediab
 
         ->upload();
 
+Visibility
+--------------------
+
+In addition to setting visibility on :ref:`Disks as a whole <disk_visibility>`, you can also specify whether a file should be publicly viewable on a file by file basic
+
+::
+
+    <?php
+    MediaUploader::fromSource($request->file('image'))
+        ->makePrivate() // Disable public access
+        ->makePublic() // Default behaviour
+        ->upload()
+
 Handling Exceptions
 --------------------
 

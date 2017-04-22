@@ -47,7 +47,7 @@ abstract class BaseUrlGenerator implements UrlGeneratorInterface
      */
     public function isPubliclyAccessible()
     {
-        return $this->getDiskConfig('visibility', 'private') == 'public';
+        return $this->getDiskConfig('visibility', 'private') == 'public' && $this->media->isVisible();
     }
 
     /**

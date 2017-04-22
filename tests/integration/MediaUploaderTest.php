@@ -214,6 +214,29 @@ class MediaUploaderTest extends TestCase
         $method->invoke($uploader, new Media);
     }
 
+    public function test_it_sets_file_visibility()
+    {
+        $this->useDatabase();
+        $this->useFilesystem('tmp');
+
+        $media1 = $this->getUploader()->fromSource($this->sampleFilePath())
+            ->toDestination('tmp', 'a')
+            ->makePrivate()
+            ->upload();
+
+        $media2 = $this->getUploader()->fromSource($this->sampleFilePath())
+            ->toDestination('tmp', 'b')
+            ->makePrivate()
+            ->makePublic()
+            ->upload();
+
+        $this->assertFalse($media1->isVisible());
+
+        $this->assertTrue($media2->isVisible());
+
+
+    }
+
     public function test_it_can_delete_duplicate_files()
     {
         $this->useDatabase();

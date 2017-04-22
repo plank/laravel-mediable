@@ -4,6 +4,7 @@
 - Updated minimum support requirements to PHP 7.0 and Laravel 5.3.
 - Changed the behaviour of `MediaUploader::onDuplicateReplace()` to preserve the original `Media` record. The old behaviour has been renamed `MediaUploader::onDuplicateDelete()`.
 - Added `delete()` method to `MediableCollection` for mass deleting media records and files.
+- Added support for file visibility on a file-by-file basis.
 - Cleaned up test suite.
 
 ## 2.4.3 - 2016-02-15

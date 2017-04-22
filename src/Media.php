@@ -188,6 +188,25 @@ class Media extends Model
     }
 
     /**
+     * [isVisible description]
+     * @return boolean [description]
+     */
+    public function isVisible()
+    {
+        return $this->storage()->getVisibility($this->getDiskPath()) === 'public';
+    }
+
+    public function makePrivate()
+    {
+        $this->storage()->setVisibility($this->getDiskPath(), 'private');
+    }
+
+    public function makePublic()
+    {
+        $this->storage()->setVisibility($this->getDiskPath(), 'public');
+    }
+
+    /**
      * Retrieve the contents of the file.
      * @return string
      */

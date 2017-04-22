@@ -34,7 +34,7 @@ class LocalUrlGenerator extends BaseUrlGenerator
      */
     public function isPubliclyAccessible()
     {
-        return  parent::isPubliclyAccessible() || $this->isInWebroot();
+        return  (parent::isPubliclyAccessible() || $this->isInWebroot()) && $this->media->isVisible();
     }
 
     /**

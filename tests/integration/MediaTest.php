@@ -105,22 +105,51 @@ class MediaTest extends TestCase
 
     public function test_it_can_be_checked_for_public_visibility()
     {
+        $this->useFilesystem('tmp');
+        $this->useFilesystem('uploads');
+
         $media = factory(Media::class)->make(['disk' => 'tmp']);
+        $this->seedFileForMedia($media);
         $this->assertFalse($media->isPubliclyAccessible());
 
         $media = factory(Media::class)->make(['disk' => 'uploads']);
+        $this->seedFileForMedia($media);
         $this->assertTrue($media->isPubliclyAccessible());
 
+        $media->makePrivate();
+        $this->assertFalse($media->isPubliclyAccessible());
+
+        $media->makePublic();
+        $this->assertTrue($media->isPubliclyAccessible());
+    }
+
+    public function test_it_can_be_checked_for_public_visibility_s3()
+    {
+        if (!$this->s3ConfigLoaded()) {
+            $this->markTestSkipped('S3 Credentials not available.');
+        }
+
+        $this->useFilesystem('s3');
+
         $media = factory(Media::class)->make(['disk' => 's3']);
+        $this->seedFileForMedia($media);
+        $this->assertTrue($media->isPubliclyAccessible());
+
+        $media->makePrivate();
+        $this->assertFalse($media->isPubliclyAccessible());
+
+        $media->makePublic();
         $this->assertTrue($media->isPubliclyAccessible());
 
         config()->set('filesystems.disks.s3.visibility', 'hidden');
         $this->assertFalse($media->isPubliclyAccessible());
+
     }
 
     public function test_it_can_generate_a_url_to_the_local_file()
     {
         $media = factory(Media::class)->make(['disk' => 'uploads', 'directory' => 'foo/bar', 'filename' => 'baz', 'extension' => 'jpg']);
+        $this->seedFileForMedia($media);
         $this->assertEquals('http://localhost/uploads/foo/bar/baz.jpg', $media->getUrl());
     }
 
@@ -128,6 +157,7 @@ class MediaTest extends TestCase
     {
         $this->app['config']->set('filesystems.disks.uploads.url', 'http://example.com');
         $media = factory(Media::class)->make(['disk' => 'uploads', 'directory' => 'foo/bar', 'filename' => 'baz', 'extension' => 'jpg']);
+        $this->seedFileForMedia($media);
         $this->assertEquals('http://example.com/foo/bar/baz.jpg', $media->getUrl());
     }
 

@@ -79,6 +79,13 @@ class MediaUploader
      */
     private $replace_media;
 
+
+    /**
+     * Visibility for the new file
+     * @var string
+     */
+    private $visibility = 'public';
+
     /**
      * Constructor.
      * @param \Illuminate\Filesystem\FilesystemManager            $filesystem
@@ -357,6 +364,26 @@ class MediaUploader
     }
 
     /**
+     * Make the resulting file public (default behaviour)
+     * @return $this
+     */
+    public function makePublic()
+    {
+        $this->visibility = 'public';
+        return $this;
+    }
+
+    /**
+     * Make the resulting file private
+     * @return $this
+     */
+    public function makePrivate()
+    {
+        $this->visibility = 'private';
+        return $this;
+    }
+
+    /**
      * Determine the aggregate type of the file based on the MIME type and the extension.
      * @param  string $mime_type
      * @param  string $extension
@@ -444,7 +471,7 @@ class MediaUploader
         $model = $this->populateModel($this->makeModel());
         $this->verifyDestination($model);
         $this->filesystem->disk($model->disk)
-            ->put($model->getDiskPath(), $this->source->contents());
+            ->put($model->getDiskPath(), $this->source->contents(), $this->visibility);
 
         $model->save();
 
@@ -489,7 +516,7 @@ class MediaUploader
 
         // Move the new file into place
         $this->filesystem->disk($model->disk)
-            ->put($model->getDiskPath(), $this->source->contents());
+            ->put($model->getDiskPath(), $this->source->contents(), $this->visibility);
 
         $model->save();
 
@@ -560,6 +587,8 @@ class MediaUploader
         $model->mime_type = $this->verifyMimeType($storage->mimeType($model->getDiskPath()));
         $model->aggregate_type = $this->inferAggregateType($model->mime_type, $model->extension);
         $model->size = $this->verifyFileSize($storage->size($model->getDiskPath()));
+
+        $storage->setVisibility($model->getDiskPath(), $this->visibility);
 
         $model->save();
 
