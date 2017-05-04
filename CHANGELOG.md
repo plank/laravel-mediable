@@ -1,6 +1,9 @@
 # Changelog
 
-## 2.4.5 - 2017-03-08
+## 2.4.6 - 2017-05-04
+- Fixed composer notation use.
+
+## 2.4.5 - 2017-05-04
 - Added fallback extension guesser to various SourceAdapters for cases where file path does not include extension (e.g. tmp files).
 
 ## 2.4.4 - 2017-03-08
