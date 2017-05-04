@@ -2,6 +2,8 @@
 
 namespace Plank\Mediable\SourceAdapters;
 
+use Plank\Mediable\Helpers\File;
+
 /**
  * URL Adapter.
  *
