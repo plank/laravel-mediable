@@ -270,27 +270,7 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('tmp', $media->disk);
         $this->assertEquals('foo/bar.png', $media->getDiskPath());
         $this->assertEquals('image/png', $media->mime_type);
-        $this->assertEquals(8444, $media->size);
-        $this->assertEquals('image', $media->aggregate_type);
-    }
-
-    public function test_it_uploads_files_with_extension_case()
-    {
-        $this->useDatabase();
-        $this->useFilesystem('tmp');
-
-        $media = Facade::fromSource(__DIR__ . '/../_data/plankUC.PNG')
-            ->setAllowedExtensions(['png'])
-            ->toDestination('tmp', 'foo')
-            ->useFilename('bar')
-            ->upload();
-
-        $this->assertInstanceOf(Media::class, $media);
-        $this->assertTrue($media->fileExists());
-        $this->assertEquals('tmp', $media->disk);
-        $this->assertEquals('foo/bar.PNG', $media->getDiskPath());
-        $this->assertEquals('image/png', $media->mime_type);
-        $this->assertEquals(8444, $media->size);
+        $this->assertEquals(7173, $media->size);
         $this->assertEquals('image', $media->aggregate_type);
     }
 
@@ -311,7 +291,7 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('tmp', $media->disk);
         $this->assertEquals('foo/bar.png', $media->getDiskPath());
         $this->assertEquals('image/png', $media->mime_type);
-        $this->assertEquals(8444, $media->size);
+        $this->assertEquals(7173, $media->size);
         $this->assertEquals('image', $media->aggregate_type);
     }
 
@@ -332,7 +312,7 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('tmp', $media->disk);
         $this->assertEquals('foo/bar.png', $media->getDiskPath());
         $this->assertEquals('image/png', $media->mime_type);
-        $this->assertEquals(8444, $media->size);
+        $this->assertEquals(7173, $media->size);
         $this->assertEquals('image', $media->aggregate_type);
     }
 
@@ -353,7 +333,7 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('tmp', $media->disk);
         $this->assertEquals('foo/bar.png', $media->getDiskPath());
         $this->assertEquals('image/png', $media->mime_type);
-        $this->assertEquals(8444, $media->size);
+        $this->assertEquals(7173, $media->size);
         $this->assertEquals('image', $media->aggregate_type);
     }
 
@@ -374,7 +354,7 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('tmp', $media->disk);
         $this->assertEquals('foo/bar.png', $media->getDiskPath());
         $this->assertEquals('image/png', $media->mime_type);
-        $this->assertEquals(8444, $media->size);
+        $this->assertEquals(7173, $media->size);
         $this->assertEquals('image', $media->aggregate_type);
     }
 
@@ -397,7 +377,7 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('tmp', $media->disk);
         $this->assertEquals('foo/bar.png', $media->getDiskPath());
         $this->assertEquals('image/png', $media->mime_type);
-        $this->assertEquals(8444, $media->size);
+        $this->assertEquals(7173, $media->size);
         $this->assertEquals('image', $media->aggregate_type);
     }
 
@@ -420,7 +400,7 @@ class MediaUploaderTest extends TestCase
         $this->assertTrue($result);
         $this->assertEquals('image/png', $media->mime_type);
         $this->assertEquals('image', $media->aggregate_type);
-        $this->assertEquals(8444, $media->size);
+        $this->assertEquals(7173, $media->size);
     }
 
     public function test_it_throws_exception_when_importing_missing_file()
@@ -439,7 +419,7 @@ class MediaUploaderTest extends TestCase
             ->useHashForFilename()
             ->upload();
 
-        $this->assertEquals('8177ed8b17b9cd56510ce51dd95ede36', $media->filename);
+        $this->assertEquals('3ef5e70366086147c2695325d79a25cc', $media->filename);
     }
 
     protected function mockUploader($filesystem = null, $factory = null)

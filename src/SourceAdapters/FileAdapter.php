@@ -57,7 +57,13 @@ class FileAdapter implements SourceAdapterInterface
      */
     public function extension()
     {
-        return pathinfo($this->source->getFilename(), PATHINFO_EXTENSION);
+        $extension = pathinfo($this->path(), PATHINFO_EXTENSION);
+
+        if ($extension) {
+            return $extension;
+        }
+
+        return File::guessExtension($this->mimeType());
     }
 
     /**

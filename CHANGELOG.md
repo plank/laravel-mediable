@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.4.5 - 2017-03-08
+- Added fallback extension guesser to various SourceAdapters for cases where file path does not include extension (e.g. tmp files).
+
 ## 2.4.4 - 2017-03-08
 - Fixed allowed extension checking failing due to case mismatch
 

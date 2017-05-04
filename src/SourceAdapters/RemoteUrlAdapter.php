@@ -58,7 +58,13 @@ class RemoteUrlAdapter implements SourceAdapterInterface
      */
     public function extension()
     {
-        return pathinfo($this->source, PATHINFO_EXTENSION);
+        $extension = pathinfo($this->source, PATHINFO_EXTENSION);
+
+        if ($extension) {
+            return $extension;
+        }
+
+        return File::guessExtension($this->mimeType());
     }
 
     /**
