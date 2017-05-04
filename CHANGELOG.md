@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.4.7 - 2017-05-04
+- Added missing use statements.
+
 ## 2.4.6 - 2017-05-04
 - Fixed composer notation use.
 
