@@ -115,7 +115,7 @@ class MediaUploader
      * @param  string $directory
      * @return static
      */
-    public function toDestination($disk, $directory)
+    public function toDestination($disk, $directory = '')
     {
         return $this->toDisk($disk)->toDirectory($directory);
     }
