@@ -2,6 +2,7 @@
 
 namespace Plank\Mediable;
 
+use Illuminate\Database\Eloquent\Model;
 use Plank\Mediable\Exceptions\MediaUpload\FileSizeException;
 use Plank\Mediable\Exceptions\MediaUpload\FileExistsException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException;
@@ -71,6 +72,11 @@ class MediaUploader
      * @var bool
      */
     private $hash_filename = false;
+
+    /**
+     * @var \Plank\Mediable\Media
+     */
+    private $model;
 
     /**
      * Constructor.
@@ -165,6 +171,18 @@ class MediaUploader
     {
         $this->hash_filename = true;
         $this->filename = null;
+
+        return $this;
+    }
+
+    /**
+     * Use an already instantiated model for import/upload.
+     * @param Model|null $model
+     * @return static
+     */
+    public function useModel(Model $model = null)
+    {
+        $this->model = $model;
 
         return $this;
     }
@@ -425,7 +443,7 @@ class MediaUploader
     {
         $this->verifySource();
 
-        $model = $this->makeModel();
+        $model = $this->model ?: $this->makeModel();
 
         $model->size = $this->verifyFileSize($this->source->size());
         $model->mime_type = $this->verifyMimeType($this->source->mimeType());
@@ -473,7 +491,7 @@ class MediaUploader
         $disk = $this->verifyDisk($disk);
         $storage = $this->filesystem->disk($disk);
 
-        $model = $this->makeModel();
+        $model = $this->model ?: $this->makeModel();
         $model->disk = $disk;
         $model->directory = $directory;
         $model->filename = $filename;
