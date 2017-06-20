@@ -18,13 +18,13 @@ class SourceAdapterFactory
      * Map of which adapters to use for a given source class.
      * @var array
      */
-    private $class_adapters = [];
+    protected $class_adapters = [];
 
     /**
      * Map of which adapters to use for a given string pattern.
      * @var array
      */
-    private $pattern_adapters = [];
+    protected $pattern_adapters = [];
 
     /**
      * Create a Source Adapter for the provided source.
@@ -82,7 +82,7 @@ class SourceAdapterFactory
      * @param  object $source
      * @return \Plank\Mediable\SourceAdapters\SourceAdapterInterface|null
      */
-    private function adaptClass($source)
+    protected function adaptClass($source)
     {
         foreach ($this->class_adapters as $class => $adapter) {
             if ($source instanceof $class) {
@@ -96,7 +96,7 @@ class SourceAdapterFactory
      * @param  string $source
      * @return \Plank\Mediable\SourceAdapters\SourceAdapterInterface|null
      */
-    private function adaptString($source)
+    protected function adaptString($source)
     {
         foreach ($this->pattern_adapters as $pattern => $adapter) {
             $pattern = '/'.str_replace('/', '\\/', $pattern).'/i';
@@ -112,7 +112,7 @@ class SourceAdapterFactory
      * @throws \Plank\Mediable\Exceptions\MediaUpload\ConfigurationException If class is not valid
      * @return void
      */
-    private function validateAdapterClass($class)
+    protected function validateAdapterClass($class)
     {
         if (! class_implements($class, SourceAdapterInterface::class)) {
             throw ConfigurationException::cannotSetAdapter($class);

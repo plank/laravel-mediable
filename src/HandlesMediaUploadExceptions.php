@@ -19,7 +19,7 @@ trait HandlesMediaUploadExceptions
      *
      * @var array
      */
-    private $status_codes = [
+    protected $status_codes = [
         // 403
         Response::HTTP_FORBIDDEN => [
             ForbiddenException::class,
@@ -68,7 +68,7 @@ trait HandlesMediaUploadExceptions
      * @param  \Plank\Mediable\Exceptions\MediaUploadException $e
      * @return integer
      */
-    private function getStatusCodeForMediaUploadException(MediaUploadException $e)
+    protected function getStatusCodeForMediaUploadException(MediaUploadException $e)
     {
         foreach ($this->status_codes as $status_code => $exceptions) {
             if (in_array(get_class($e), $exceptions)) {

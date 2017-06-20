@@ -23,7 +23,7 @@ trait Mediable
      * List of media tags that have been modified since last load.
      * @var array
      */
-    private $media_dirty_tags = [];
+    protected $media_dirty_tags = [];
 
     /**
      * Boot the Mediable trait.
@@ -443,7 +443,7 @@ trait Mediable
      * @param  string|array $tags
      * @return int
      */
-    private function getOrderValueForTags($tags)
+    protected function getOrderValueForTags($tags)
     {
         $q = $this->media()->newPivotStatement();
         $tags = (array) $tags;
@@ -466,7 +466,7 @@ trait Mediable
      * @param  mixed $input
      * @return array
      */
-    private function extractIds($input)
+    protected function extractIds($input)
     {
         if ($input instanceof Collection) {
             return $input->modelKeys();
@@ -511,7 +511,7 @@ trait Mediable
      *
      * @return string
      */
-    private function mediaQualifiedForeignKey()
+    protected function mediaQualifiedForeignKey()
     {
         $relation = $this->media();
         return method_exists($relation, 'getQualifiedForeignKeyName') ? $relation->getQualifiedForeignKeyName() : $relation->getForeignKey();
@@ -524,7 +524,7 @@ trait Mediable
      *
      * @return string
      */
-    private function mediaQualifiedRelatedKey()
+    protected function mediaQualifiedRelatedKey()
     {
         $relation = $this->media();
         return method_exists($relation, 'getQualifiedRelatedKeyName') ? $relation->getQualifiedRelatedKeyName() : $relation->getOtherKey();
@@ -538,7 +538,7 @@ trait Mediable
      * @param  array       $tags
      * @return void
      */
-    private function wherePivotTagIn(MorphToMany $q, $tags = [])
+    protected function wherePivotTagIn(MorphToMany $q, $tags = [])
     {
         method_exists($q, 'wherePivotIn') ? $q->wherePivotIn('tag', $tags) : $q->whereIn($this->media()->getTable().'.tag', $tags);
     }
