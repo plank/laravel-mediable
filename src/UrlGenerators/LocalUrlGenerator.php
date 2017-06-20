@@ -99,7 +99,7 @@ class LocalUrlGenerator extends BaseUrlGenerator
         return $path;
     }
 
-    private function isInWebroot()
+    protected function isInWebroot()
     {
         return strpos($this->getAbsolutePath(), public_path()) === 0;
     }

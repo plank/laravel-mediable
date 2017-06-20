@@ -17,7 +17,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
      * Cache of headers loaded from the remote server.
      * @var array
      */
-    private $headers;
+    protected $headers;
 
     /**
      * The source string.
@@ -106,7 +106,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
      * @param  string $key Header name
      * @return mixed
      */
-    private function getHeader($key)
+    protected function getHeader($key)
     {
         if (! $this->headers) {
             $this->headers = get_headers($this->source, 1);

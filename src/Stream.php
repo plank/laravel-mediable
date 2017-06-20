@@ -12,15 +12,15 @@ use Psr\Http\Message\StreamInterface;
  */
 class Stream implements StreamInterface
 {
-    private $resource;
-    private $size;
-    private $seekable;
-    private $readable;
-    private $writable;
-    private $uri;
+    protected $resource;
+    protected $size;
+    protected $seekable;
+    protected $readable;
+    protected $writable;
+    protected $uri;
 
     /** @var array Hash of readable and writable stream types */
-    private static $readWriteHash = [
+    protected static $readWriteHash = [
         'read' => [
             'r' => true, 'w+' => true, 'r+' => true, 'x+' => true, 'c+' => true,
             'rb' => true, 'w+b' => true, 'r+b' => true, 'x+b' => true,

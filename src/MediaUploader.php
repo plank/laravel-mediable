@@ -29,48 +29,48 @@ class MediaUploader
     /**
      * @var FileSystemManager
      */
-    private $filesystem;
+    protected $filesystem;
 
     /**
      * @var SourceAdapterFactory
      */
-    private $factory;
+    protected $factory;
 
     /**
      * Mediable configurations.
      * @var array
      */
-    private $config;
+    protected $config;
 
     /**
      * Source adapter.
      * @var
      */
-    private $source;
+    protected $source;
 
     /**
      * Name of the filesystem disk.
      * @var string
      */
-    private $disk;
+    protected $disk;
 
     /**
      * Path relative to the filesystem disk root.
      * @var string
      */
-    private $directory = '';
+    protected $directory = '';
 
     /**
      * Name of the new file.
      * @var string
      */
-    private $filename = null;
+    protected $filename = null;
 
     /**
      * If true the contents hash of the source will be used as the filename.
      * @var bool
      */
-    private $hash_filename = false;
+    protected $hash_filename = false;
 
     /**
      * Constructor.
@@ -516,7 +516,7 @@ class MediaUploader
      * Generate an instance of the `Media` class.
      * @return \Plank\Mediable\Media
      */
-    private function makeModel()
+    protected function makeModel()
     {
         $class = $this->config['model'];
 
@@ -530,7 +530,7 @@ class MediaUploader
      * @throws \Plank\Mediable\Exceptions\MediaUpload\ConfigurationException If the disk does not exist
      * @throws \Plank\Mediable\Exceptions\MediaUpload\ForbiddenException If the disk is not included in the `allowed_disks` config.
      */
-    private function verifyDisk($disk)
+    protected function verifyDisk($disk)
     {
         if (! array_key_exists($disk, config('filesystems.disks'))) {
             throw ConfigurationException::diskNotFound($disk);
@@ -549,7 +549,7 @@ class MediaUploader
      * @throws \Plank\Mediable\Exceptions\MediaUpload\ConfigurationException If no source is provided
      * @throws \Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException If the source is invalid
      */
-    private function verifySource()
+    protected function verifySource()
     {
         if (empty($this->source)) {
             throw ConfigurationException::noSourceProvided();
@@ -565,7 +565,7 @@ class MediaUploader
      * @return string
      * @throws \Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException If the mime type is not allowed
      */
-    private function verifyMimeType($mime_type)
+    protected function verifyMimeType($mime_type)
     {
         $allowed = $this->config['allowed_mime_types'];
         if (! empty($allowed) && ! in_array(strtolower($mime_type), $allowed)) {
@@ -581,7 +581,7 @@ class MediaUploader
      * @return string
      * @throws \Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException If the file extension is not allowed
      */
-    private function verifyExtension($extension)
+    protected function verifyExtension($extension)
     {
         $allowed = $this->config['allowed_extensions'];
         if (! empty($allowed) && ! in_array(strtolower($extension), $allowed)) {
@@ -597,7 +597,7 @@ class MediaUploader
      * @return int
      * @throws \Plank\Mediable\Exceptions\MediaUpload\FileSizeException If the file is too large
      */
-    private function verifyFileSize($size)
+    protected function verifyFileSize($size)
     {
         $max = $this->config['max_size'];
         if ($max > 0 && $size > $max) {
@@ -612,7 +612,7 @@ class MediaUploader
      * @param  \Plank\Mediable\Media  $model
      * @return void
      */
-    private function verifyDestination(Media $model)
+    protected function verifyDestination(Media $model)
     {
         $storage = $this->filesystem->disk($model->disk);
 
@@ -627,7 +627,7 @@ class MediaUploader
      * @return void
      * @throws \Plank\Mediable\Exceptions\MediaUpload\FileExistsException If directory is not writable or file already exists at the destination and on_duplicate is set to 'error'
      */
-    private function handleDuplicate(Media $model)
+    protected function handleDuplicate(Media $model)
     {
         switch ($this->config['on_duplicate']) {
             case static::ON_DUPLICATE_ERROR:
@@ -647,7 +647,7 @@ class MediaUploader
      * @param  \Plank\Mediable\Media  $model
      * @return void
      */
-    private function deleteExistingMedia(Media $model)
+    protected function deleteExistingMedia(Media $model)
     {
         Media::where('disk', $model->disk)
             ->where('directory', $model->directory)
@@ -663,7 +663,7 @@ class MediaUploader
      * @param  \Plank\Mediable\Media $model
      * @return void
      */
-    private function generateUniqueFilename(Media $model)
+    protected function generateUniqueFilename(Media $model)
     {
         $storage = $this->filesystem->disk($model->disk);
         $counter = 0;
@@ -680,7 +680,7 @@ class MediaUploader
      * Generate the model's filename.
      * @return string
      */
-    private function generateFilename()
+    protected function generateFilename()
     {
         if ($this->filename) {
             return $this->filename;
@@ -697,7 +697,7 @@ class MediaUploader
      * Calculate hash of source contents.
      * @return string
      */
-    private function generateHash()
+    protected function generateHash()
     {
         $ctx = hash_init('md5');
 
@@ -716,7 +716,7 @@ class MediaUploader
      * @param  string $path
      * @return string
      */
-    private function sanitizePath($path)
+    protected function sanitizePath($path)
     {
         return str_replace(['#', '?', '\\'], '-', $path);
     }
@@ -726,7 +726,7 @@ class MediaUploader
      * @param  string $file
      * @return string
      */
-    private function sanitizeFileName($file)
+    protected function sanitizeFileName($file)
     {
         return str_replace(['#', '?', '\\', '/'], '-', $file);
     }
