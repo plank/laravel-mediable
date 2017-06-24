@@ -7,12 +7,18 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
+if (class_exists('\\Jenssegers\\Mongodb\\Eloquent\\Model')) {
+    class MiddleManClass extends \Jenssegers\Mongodb\Eloquent\Model { }
+} else {
+    class MiddleManClass extends Model { }
+}
+
 /**
  * Media Model.
  *
  * @author Sean Fraser <sean@plankdesign.com>
  */
-class Media extends Model
+class Media extends MiddleManClass
 {
     const TYPE_IMAGE = 'image';
     const TYPE_IMAGE_VECTOR = 'vector';
