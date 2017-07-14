@@ -46,7 +46,7 @@ Add the package to your Laravel app using composer
 composer require plank/laravel-mediable
 ```
 
-Register the package's servive provider in `config/app.php`
+Register the package's service provider in `config/app.php`. In Laravel versions 5.5 and beyond, this step can be skipped if package auto-discovery is enabled.
 
 ```php
 'providers' => [
@@ -56,7 +56,7 @@ Register the package's servive provider in `config/app.php`
 ];
 ```
 
-The package comes with a Facade for the image uploader, which you can optionally register as well.
+The package comes with a Facade for the image uploader, which you can optionally register as well. In Laravel versions 5.5 and beyond, this step can be skipped if package auto-discovery is enabled.
 
 ```php
 'aliases' => [
