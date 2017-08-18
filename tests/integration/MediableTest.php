@@ -137,8 +137,14 @@ class MediableTest extends TestCase
     public function test_it_can_detach_media_of_multiple_tags()
     {
         $mediable = factory(SampleMediable::class)->create();
-        $media1 = factory(Media::class)->create(['id'=>1]);
-        $media2 = factory(Media::class)->create(['id'=>2]);
+        $media = factory(Media::class)->create(['id'=>1]);
+        $mediable->attachMedia($media, 'foo');
+        $mediable->attachMedia($media, 'bar');
+
+        $mediable->detachMedia($media, ['foo', 'bar']);
+
+        $this->assertEquals(0, $mediable->getMedia('foo')->count());
+        $this->assertEquals(0, $mediable->getMedia('bar')->count());
     }
 
     public function test_it_can_sync_media_by_tag()
