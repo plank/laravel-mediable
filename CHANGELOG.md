@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.4.8 - 2017-08-18
+- Added Laravel 5.5 package autodiscovery
+- Fixed bugs due to method renamed in Laravel 5.5
+
 ## 2.4.7 - 2017-05-04
 - Added missing use statements.
 
