@@ -514,20 +514,33 @@ trait Mediable
     private function mediaQualifiedForeignKey()
     {
         $relation = $this->media();
-        return method_exists($relation, 'getQualifiedForeignKeyName') ? $relation->getQualifiedForeignKeyName() : $relation->getForeignKey();
+        if (method_exists($relation, 'getQualifiedForeignPivotKeyName')) {
+            return $relation->getQualifiedForeignPivotKeyName();
+        } elseif (method_exists($relation, 'getQualifiedForeignKeyName')) {
+            return $relation->getQualifiedForeignKeyName();
+        }
+        return $relation->getForeignKey();
     }
 
     /**
      * Key the name of the related key field of the media relation
      *
-     * Accounts for the change of method name in Laravel 5.4
+     * Accounts for the change of method name in Laravel 5.4 and again in Laravel 5.5
      *
      * @return string
      */
     private function mediaQualifiedRelatedKey()
     {
         $relation = $this->media();
-        return method_exists($relation, 'getQualifiedRelatedKeyName') ? $relation->getQualifiedRelatedKeyName() : $relation->getOtherKey();
+        // Laravel 5.5
+        if (method_exists($relation, 'getQualifiedRelatedPivotKeyName')) {
+            return $relation->getQualifiedRelatedPivotKeyName();
+        // Laravel 5.4
+        } elseif (method_exists($relation, 'getQualifiedRelatedKeyName')) {
+            return $relation->getQualifiedRelatedKeyName();
+        }
+        // Laravel <= 5.3
+        return $relation->getOtherKey();
     }
 
     /**
