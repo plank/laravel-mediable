@@ -61,6 +61,18 @@ class MediableTest extends TestCase
         $this->assertEquals(1, $mediable->firstMedia('foo')->id);
     }
 
+    public function test_it_can_find_the_last_media()
+    {
+        $mediable = factory(SampleMediable::class)->create();
+        $media1 = factory(Media::class)->create(['id' => 1]);
+        $media2 = factory(Media::class)->create(['id' => 2]);
+
+        $mediable->attachMedia($media1, 'foo');
+        $mediable->attachMedia($media2, 'foo');
+
+        $this->assertEquals(2, $mediable->lastMedia('foo')->id);
+    }
+
     public function test_it_can_find_media_matching_any_tags()
     {
         $mediable = factory(SampleMediable::class)->create();

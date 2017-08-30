@@ -72,7 +72,7 @@ You can retrieve media attached to a file by referring to the tag to which it wa
     <?php
     $media = $post->getMedia('thumbnail');
 
-This returns a collection of all media assigned to that tag. In cases where you only need one ``Media`` entity, you can instead use ``firstMedia()``.
+This returns a collection of all media assigned to that tag. In cases where you only need one ``Media`` entity, you can instead use ``firstMedia()`` or ``lastMedia()``.
 
 ::
 
@@ -247,7 +247,7 @@ Automatic Rehydration
 
 By default, ``Mediable`` models will automatically reload their media relationship the next time the media at a given tag is accessed after that tag is modified.
 
-The ``attachMedia()``, ``syncMedia()``, ``detachMedia()``, and ``detachMediaTags()`` methods will mark any tags passed as being dirty, while the ``hasMedia()`` ``getMedia()``, ``firstMedia()``, ``getAllMediaByTag()``, and ``getTagsForMedia()`` methods will execute ``loadMedia()`` to reload all media if they attempt to read a dirty tag.
+The ``attachMedia()``, ``syncMedia()``, ``detachMedia()``, and ``detachMediaTags()`` methods will mark any tags passed as being dirty, while the ``hasMedia()`` ``getMedia()``, ``firstMedia()``, ``lastMedia()``, ``getAllMediaByTag()``, and ``getTagsForMedia()`` methods will execute ``loadMedia()`` to reload all media if they attempt to read a dirty tag.
 
 For example:
 
