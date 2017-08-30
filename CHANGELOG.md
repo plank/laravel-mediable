@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.5.0 - 2017-08-30
+- Added `Mediable::lastMedia()` convenience method (Thanks @pet1330!)
+
 ## 2.4.8 - 2017-08-18
 - Added Laravel 5.5 package autodiscovery
 - Fixed bugs due to method renamed in Laravel 5.5
