@@ -25,6 +25,7 @@ class MediaUploader
     const ON_DUPLICATE_REPLACE = 'replace';
     const ON_DUPLICATE_INCREMENT = 'increment';
     const ON_DUPLICATE_ERROR = 'error';
+    const ON_DUPLICATE_UPDATE = 'update';
 
     /**
      * @var FileSystemManager
@@ -242,6 +243,16 @@ class MediaUploader
     }
 
     /**
+     * Overwrite existing file when file already exists at destination.
+     *
+     * @return static
+     */
+    public function onDuplicateUpdate()
+    {
+        return $this->setOnDuplicateBehavior(self::ON_DUPLICATE_UPDATE);
+    }
+
+    /**
      * Append incremented counter to file name when file already exists at destination.
      *
      * @return static
@@ -252,7 +263,7 @@ class MediaUploader
     }
 
     /**
-     * Overwrite existing file when file already exists at destination.
+     * Overwrite existing Media when file already exists at destination.
      *
      * @return static
      */
@@ -436,7 +447,7 @@ class MediaUploader
         $model->directory = $this->directory;
         $model->filename = $this->generateFilename();
 
-        $this->verifyDestination($model);
+        $model = $this->handleDuplicate($model);
 
         $this->filesystem->disk($model->disk)->put($model->getDiskPath(), $this->source->contents());
         $model->save();
@@ -608,20 +619,6 @@ class MediaUploader
     }
 
     /**
-     * Verify that the intended destination is available and handle any duplications.
-     * @param  \Plank\Mediable\Media  $model
-     * @return void
-     */
-    private function verifyDestination(Media $model)
-    {
-        $storage = $this->filesystem->disk($model->disk);
-
-        if ($storage->has($model->getDiskPath())) {
-            $this->handleDuplicate($model);
-        }
-    }
-
-    /**
      * Decide what to do about duplicated files.
      * @param  \Plank\Mediable\Media  $model
      * @return void
@@ -629,17 +626,26 @@ class MediaUploader
      */
     private function handleDuplicate(Media $model)
     {
-        switch ($this->config['on_duplicate']) {
-            case static::ON_DUPLICATE_ERROR:
-                throw FileExistsException::fileExists($model->getDiskPath());
-                break;
-            case static::ON_DUPLICATE_REPLACE:
-                $this->deleteExistingMedia($model);
-                break;
-            case static::ON_DUPLICATE_INCREMENT:
-            default:
-                $model->filename = $this->generateUniqueFilename($model);
+        if($this->filesystem->disk($model->disk)->has($model->getDiskPath())) {
+
+            switch ($this->config['on_duplicate']) {
+                case static::ON_DUPLICATE_ERROR:
+                    throw FileExistsException::fileExists($model->getDiskPath());
+                    break;
+                case static::ON_DUPLICATE_REPLACE:
+                    $this->deleteExistingMedia($model);
+                    break;
+                case static::ON_DUPLICATE_UPDATE:
+                    $this->deleteExistingFile($model);
+                    $model = $this->findExistingMediaRecord($model);
+                    $model->touch();
+                    break;
+                case static::ON_DUPLICATE_INCREMENT:
+                default:
+                    $model->filename = $this->generateUniqueFilename($model);
+            }
         }
+        return $model;
     }
 
     /**
@@ -655,6 +661,32 @@ class MediaUploader
             ->where('extension', $model->extension)
             ->delete();
 
+        $this->deleteExistingFile($model);
+    }
+
+    /**
+     * Find the media that previously existed at a destination.
+     * @param  \Plank\Mediable\Media  $model
+     * @return \Plank\Mediable\Media  $model
+     */
+    private function findExistingMediaRecord(Media $model)
+    {
+        if($model->exists)
+            return $model;
+        return Media::where('disk', $model->disk)
+            ->where('directory', $model->directory)
+            ->where('filename', $model->filename)
+            ->where('extension', $model->extension)
+            ->first();
+    }
+
+    /**
+     * Delete the file on disk.
+     * @param  \Plank\Mediable\Media  $model
+     * @return void
+     */
+    private function deleteExistingFile(Media $model)
+    {
         $this->filesystem->disk($model->disk)->delete($model->getDiskPath());
     }
 

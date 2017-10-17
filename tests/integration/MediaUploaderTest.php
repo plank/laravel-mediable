@@ -37,6 +37,9 @@ class MediaUploaderTest extends TestCase
 
         $uploader = Facade::onDuplicateReplace();
         $this->assertEquals(MediaUploader::ON_DUPLICATE_REPLACE, $uploader->getOnDuplicateBehavior());
+
+        $uploader = Facade::onDuplicateUpdate();
+        $this->assertEquals(MediaUploader::ON_DUPLICATE_UPDATE, $uploader->getOnDuplicateBehavior());
     }
 
     public function test_it_can_determine_media_type_by_extension_and_mime()
@@ -208,7 +211,7 @@ class MediaUploaderTest extends TestCase
     {
         $uploader = $this->mockDuplicateUploader();
         $uploader->setOnDuplicateBehavior(MediaUploader::ON_DUPLICATE_ERROR);
-        $method = $this->getPrivateMethod($uploader, 'verifyDestination');
+        $method = $this->getPrivateMethod($uploader, 'handleDuplicate');
         $this->expectException(FileExistsException::class);
         $method->invoke($uploader, $this->createMock(Media::class));
     }
@@ -220,7 +223,7 @@ class MediaUploaderTest extends TestCase
 
         $uploader = $this->mockDuplicateUploader();
         $uploader->setOnDuplicateBehavior(MediaUploader::ON_DUPLICATE_REPLACE);
-        $method = $this->getPrivateMethod($uploader, 'verifyDestination');
+        $method = $this->getPrivateMethod($uploader, 'handleDuplicate');
 
         $media = factory(Media::class)->create([
             'disk' => 'tmp',
@@ -234,6 +237,38 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals(0, Media::all()->count());
     }
 
+    public function test_it_can_update_duplicate_files()
+    {
+        $this->useDatabase();
+        $this->useFilesystem('tmp');
+
+        $uploader = $this->mockDuplicateUploader();
+        $uploader->setOnDuplicateBehavior(MediaUploader::ON_DUPLICATE_UPDATE);
+        $method = $this->getPrivateMethod($uploader, 'handleDuplicate');
+
+        $m1 = factory(Media::class)->create([
+            'disk' => 'tmp',
+            'directory'=> '',
+            'filename' => 'plank',
+            'extension' => 'png'
+        ]);
+
+        $m2 = factory(Media::class)->make([
+            'disk' => 'tmp',
+            'directory'=> '',
+            'filename' => 'plank',
+            'extension' => 'png'
+        ]);
+
+        $this->assertFalse($m2->exists);
+        $this->assertTrue($m1->exists);
+        $m2 = $method->invoke($uploader, $m2);
+        $this->assertTrue($m2->exists);
+        $this->assertEquals($m1->created_at, $m2->created_at);
+        $this->assertEquals($m1->id, $m2->id);
+        $this->assertTrue($m2->save()); // check it does not throw an exception
+    }
+
     public function test_it_can_increment_filename_on_duplicate_files()
     {
         $this->useDatabase();
@@ -241,7 +276,7 @@ class MediaUploaderTest extends TestCase
 
         $uploader = $this->mockDuplicateUploader();
         $uploader->setOnDuplicateBehavior(MediaUploader::ON_DUPLICATE_INCREMENT);
-        $method = $this->getPrivateMethod($uploader, 'verifyDestination');
+        $method = $this->getPrivateMethod($uploader, 'handleDuplicate');
 
         $media = factory(Media::class)->create([
             'disk' => 'tmp',
