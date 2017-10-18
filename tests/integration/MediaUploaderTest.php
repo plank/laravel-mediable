@@ -233,8 +233,6 @@ class MediaUploaderTest extends TestCase
         $this->assertFalse($media1->isVisible());
 
         $this->assertTrue($media2->isVisible());
-
-
     }
 
     public function test_it_can_delete_duplicate_files()
@@ -498,12 +496,10 @@ class MediaUploaderTest extends TestCase
             ->upload();
 
         $this->assertEquals('plank', $media->filename);
-
     }
 
     protected function getUploader()
     {
         return app('mediable.uploader');
     }
-
 }
