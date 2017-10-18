@@ -3,6 +3,7 @@
 namespace Plank\Mediable\SourceAdapters;
 
 use Symfony\Component\HttpFoundation\File\File;
+use Plank\Mediable\Helpers\File as FileHelper;
 
 /**
  * File Adapter.
@@ -57,7 +58,13 @@ class FileAdapter implements SourceAdapterInterface
      */
     public function extension()
     {
-        return pathinfo($this->source->getFilename(), PATHINFO_EXTENSION);
+        $extension = pathinfo($this->path(), PATHINFO_EXTENSION);
+
+        if ($extension) {
+            return $extension;
+        }
+
+        return FileHelper::guessExtension($this->mimeType());
     }
 
     /**

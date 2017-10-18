@@ -54,7 +54,13 @@ class UploadedFileAdapter implements SourceAdapterInterface
      */
     public function extension()
     {
-        return $this->source->getClientOriginalExtension();
+        $extension = $this->source->getClientOriginalExtension();
+
+        if ($extension) {
+            return $extension;
+        }
+
+        return $this->source->guessExtension();
     }
 
     /**

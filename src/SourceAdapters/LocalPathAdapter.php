@@ -2,6 +2,8 @@
 
 namespace Plank\Mediable\SourceAdapters;
 
+use Plank\Mediable\Helpers\File;
+
 /**
  * Local Path Adapter.
  *
@@ -52,7 +54,13 @@ class LocalPathAdapter implements SourceAdapterInterface
      */
     public function extension()
     {
-        return pathinfo($this->source, PATHINFO_EXTENSION);
+        $extension = pathinfo($this->source, PATHINFO_EXTENSION);
+
+        if ($extension) {
+            return $extension;
+        }
+
+        return File::guessExtension($this->mimeType());
     }
 
     /**
