@@ -627,7 +627,6 @@ class MediaUploader
     private function handleDuplicate(Media $model)
     {
         if ($this->filesystem->disk($model->disk)->has($model->getDiskPath())) {
-
             switch ($this->config['on_duplicate']) {
                 case static::ON_DUPLICATE_ERROR:
                     throw FileExistsException::fileExists($model->getDiskPath());
