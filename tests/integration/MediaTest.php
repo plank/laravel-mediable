@@ -143,7 +143,6 @@ class MediaTest extends TestCase
 
         config()->set('filesystems.disks.s3.visibility', 'hidden');
         $this->assertFalse($media->isPubliclyAccessible());
-
     }
 
     public function test_it_can_generate_a_url_to_the_local_file()

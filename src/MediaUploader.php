@@ -476,7 +476,6 @@ class MediaUploader
         $model->save();
 
         return $model;
-
     }
 
     /**
@@ -489,7 +488,6 @@ class MediaUploader
      */
     public function replace(Media $media)
     {
-
         if (!$this->disk) {
             $this->toDisk($media->disk);
         }
@@ -498,7 +496,7 @@ class MediaUploader
             $this->toDirectory($media->directory);
         }
 
-        if(!$this->filename) {
+        if (!$this->filename) {
             $this->useFilename($media->filename);
         }
 
