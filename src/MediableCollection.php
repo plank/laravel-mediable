@@ -61,7 +61,7 @@ class MediableCollection extends Collection
 
     public function delete()
     {
-        if(count($this) == 0){
+        if (count($this) == 0) {
             return;
         }
 
@@ -69,13 +69,13 @@ class MediableCollection extends Collection
         $query = $relation->newPivotStatement();
         $classes = collect();
 
-        $this->each(function(Model $item) use($query, $relation, $classes){
+        $this->each(function (Model $item) use ($query, $relation, $classes) {
             // collect list of ids of each class in case not all
             // items belong to the same class
             $classes[get_class($item)][] = $item->getKey();
 
             // select pivots matching each item for deletion
-            $query->orWhere(function(Builder $q) use($item, $relation) {
+            $query->orWhere(function (Builder $q) use ($item, $relation) {
                 $q->where($relation->getMorphType(), get_class($item));
                 $q->where($relation->getForeignKey(), $item->getKey());
             });
@@ -85,9 +85,8 @@ class MediableCollection extends Collection
         $query->delete();
 
         // delete each item by class
-        $classes->each(function(array $ids, string $class) {
+        $classes->each(function (array $ids, string $class) {
             $class::whereIn((new $class)->getKeyName(), $ids)->delete();
         });
     }
-
 }
