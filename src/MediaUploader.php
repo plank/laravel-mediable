@@ -626,7 +626,7 @@ class MediaUploader
      */
     private function handleDuplicate(Media $model)
     {
-        if($this->filesystem->disk($model->disk)->has($model->getDiskPath())) {
+        if ($this->filesystem->disk($model->disk)->has($model->getDiskPath())) {
 
             switch ($this->config['on_duplicate']) {
                 case static::ON_DUPLICATE_ERROR:
@@ -671,8 +671,9 @@ class MediaUploader
      */
     private function findExistingMediaRecord(Media $model)
     {
-        if($model->exists)
+        if ($model->exists) {
             return $model;
+        }
         return Media::where('disk', $model->disk)
             ->where('directory', $model->directory)
             ->where('filename', $model->filename)
