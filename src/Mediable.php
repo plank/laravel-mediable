@@ -43,9 +43,16 @@ trait Mediable
      */
     public function media()
     {
-        return $this->morphToMany(config('mediable.model'), 'mediable')
-            ->withPivot('tag', 'order')
-            ->orderBy('order');
+        $media = $this->morphToMany(config('mediable.model'), 'mediable')
+                    ->withPivot('tag', 'order')
+                    ->orderBy('order');
+
+        // Skip deleted media if not detached
+        if (config('mediable.detach_on_soft_delete') == false) {
+            $media->whereNull('deleted_at');
+        }
+
+        return $media;
     }
 
     /**
