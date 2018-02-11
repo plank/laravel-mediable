@@ -210,6 +210,20 @@ class Media extends Model
     }
 
     /**
+     * Copy the file from one Media object to another one.
+     *
+     * Will invoke the `save()` method on the model after the associated file has been copied to prevent synchronization errors
+     * @param  \Plank\Mediable\Media $mediaFrom   the media the file is copied from
+     * @param  string                $destination directory relative to disk root
+     * @param  string                $filename    optional filename. Do not include extension
+     * @return void
+     */
+    public function copyFrom($mediaFrom, $destination, $filename = null)
+    {
+        app('mediable.mover')->copyFrom($this, $mediaFrom, $destination, $filename);
+    }
+
+    /**
      * Rename the file in place.
      * @param  string $name
      * @return void
