@@ -76,7 +76,9 @@ You can change the location of a media file on disk. You cannot move a media to 
 Copying Media
 ---------------------
 
-You can copy the associated media file to another one by using the ``copyFrom()`` method. This will also save the new model where this media file is associated.
+You can copy the associated media file to another one by using the ``copyTo()`` method. You can also specify a new filename when copying the file to another location.
+
+This method will also create a new model where the copied file is associated.
 
 ::
 
@@ -84,8 +86,8 @@ You can copy the associated media file to another one by using the ``copyFrom()`
     // we assume you already have a $media!
 
     // copy a media entry
-    $newMedia = $media->replicate();
-    $newMedia->copyFrom($media, 'new/destination', 'newFilename');
+    $newMedia = $media->copyTo('new/directory');
+    $newMedia = $media->copyTo('new/directory', 'new-filename');
 
 Deleting Media
 ---------------------
