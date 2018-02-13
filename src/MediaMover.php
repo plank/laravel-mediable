@@ -63,19 +63,19 @@ class MediaMover
     /**
      * Copy the file from one Media object to another one.
      *
-     * Will invoke the `save()` method on the model after the associated file has been copied to prevent synchronization errors
+     * This method creates a new Media object as well as duplicates the associated file on the disk.
      *
-     * @param  \Plank\Mediable\Media $media
-     * @param  \Plank\Mediable\Media $mediaFrom   the media the file is copied from
-     * @param  string                $destination directory relative to disk root
-     * @param  string                $filename    optional filename. Do not include extension
-     * @return void
-     * @throws \Plank\Mediable\Exceptions\MediaMoveException If attempting to change the file extension or a file with the same name already exists at the destination
+     * @param  \Plank\Mediable\Media $media     The media to copy from
+     * @param  string                $directory directory relative to disk root
+     * @param  string                $filename  optional filename. Do not include extension
+     *
+     * @return \Plank\Mediable\Media
+     * @throws \Plank\Mediable\Exceptions\MediaMoveException If a file with the same name already exists at the destination
+     *                                                       or it fails to copy the file
      */
-    public function copyFrom(Media $media, Media $mediaFrom, $destination, $filename = null)
+    public function copyTo(Media $media, $directory, $filename = null)
     {
-        $storageFrom = $this->filesystem->disk($mediaFrom->disk);
-        $storageTo = $this->filesystem->disk($media->disk);
+        $storage = $this->filesystem->disk($media->disk);
 
         if ($filename) {
             $filename = $this->removeExtensionFromFilename($filename, $media->extension);
@@ -83,19 +83,29 @@ class MediaMover
             $filename = $media->filename;
         }
 
-        $directory = trim($destination, '/');
+        $directory = trim($directory, '/');
         $target_path = $directory.'/'.$filename.'.'.$media->extension;
 
-        if ($storageTo->has($target_path)) {
+        if ($storage->has($target_path)) {
             throw MediaMoveException::destinationExists($target_path);
         }
 
-        $storageFrom->copy($mediaFrom->getDiskPath(), $target_path);
+        try {
+            $storage->copy($media->getDiskPath(), $target_path);
+        }
+        catch (\Exception $exception) {
+            throw MediaMoveException::failedToCopy($media->getDiskPath(), $target_path);
+        }
 
-        // copy the media and set the new values
-        $media->filename = $filename;
-        $media->directory = $directory;
-        $media->save();
+        // now we copy the Media object
+        /** @var Media $newMedia */
+        $newMedia = $media->replicate();
+        $newMedia->filename = $filename;
+        $newMedia->directory = $directory;
+
+        $newMedia->save();
+
+        return $newMedia;
     }
 
     /**
