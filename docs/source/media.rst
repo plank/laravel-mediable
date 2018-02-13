@@ -62,7 +62,7 @@ If you need to query the media table directly, rather than through associated mo
 Moving Media
 ---------------------
 
-You should taking caution if manually changing a media record's attributes, as you record and file could go out of sync.
+You should taking caution if manually changing a media record's attributes, as your record and file could go out of sync.
 
 You can change the location of a media file on disk. You cannot move a media to a different disk this way.
 
@@ -76,16 +76,11 @@ You can change the location of a media file on disk. You cannot move a media to 
 Copying Media
 ---------------------
 
-You can copy the associated media file to another one by using the ``copyTo()`` method. You can also specify a new filename when copying the file to another location.
-
-This method will also create a new model where the copied file is associated.
+You can duplicate a media file to a different location on disk with the ``copyTo()`` method. Doing so will create a new `Media` record for the new file. If a filename is not provided, the new file will copy the original filename. 
 
 ::
 
     <?php
-    // we assume you already have a $media!
-
-    // copy a media entry
     $newMedia = $media->copyTo('new/directory');
     $newMedia = $media->copyTo('new/directory', 'new-filename');
 
