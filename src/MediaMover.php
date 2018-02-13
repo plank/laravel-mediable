@@ -92,8 +92,7 @@ class MediaMover
 
         try {
             $storage->copy($media->getDiskPath(), $target_path);
-        }
-        catch (\Exception $exception) {
+        } catch (\Exception $exception) {
             throw MediaMoveException::failedToCopy($media->getDiskPath(), $target_path);
         }
 

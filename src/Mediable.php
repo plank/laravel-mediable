@@ -547,7 +547,7 @@ trait Mediable
         // Laravel 5.5
         if (method_exists($relation, 'getQualifiedRelatedPivotKeyName')) {
             return $relation->getQualifiedRelatedPivotKeyName();
-            // Laravel 5.4
+        // Laravel 5.4
         } elseif (method_exists($relation, 'getQualifiedRelatedKeyName')) {
             return $relation->getQualifiedRelatedKeyName();
         }
