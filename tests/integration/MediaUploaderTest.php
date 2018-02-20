@@ -252,7 +252,7 @@ class MediaUploaderTest extends TestCase
 
         $method->invoke($uploader, $media);
 
-        $this->assertEquals('plank (2)', $media->filename);
+        $this->assertEquals('plank-1', $media->filename);
     }
 
     public function test_it_uploads_files()
