@@ -426,7 +426,7 @@ class MediaUploader
     {
         $this->verifySource();
 
-        if($model === null) {
+        if ($model === null) {
             $model = $this->makeModel();
         }
         
