@@ -419,14 +419,17 @@ class MediaUploader
      * Process the file upload.
      *
      * Validates the source, then stores the file onto the disk and creates and stores a new Media instance.
+     * @param  ?\Plank\Mediable\Media $model
      * @return \Plank\Mediable\Media
      */
-    public function upload()
+    public function upload(?Media $model = null)
     {
         $this->verifySource();
 
-        $model = $this->makeModel();
-
+        if ($model === null) {
+            $model = $this->makeModel();
+        }
+        
         $model->size = $this->verifyFileSize($this->source->size());
         $model->mime_type = $this->verifyMimeType($this->source->mimeType());
         $model->extension = $this->verifyExtension($this->source->extension());
