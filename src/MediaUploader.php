@@ -778,9 +778,12 @@ class MediaUploader
         $storage = $this->filesystem->disk($model->disk);
         $counter = 0;
         do {
-            ++$counter;
-            $filename = "{$model->filename} ({$counter})";
+            $filename = "{$model->filename}";
+            if ($counter > 0) {
+                $filename .= '-' . $counter;
+            }
             $path = "{$model->directory}/{$filename}.{$model->extension}";
+            ++$counter;
         } while ($storage->has($path));
 
         return $filename;

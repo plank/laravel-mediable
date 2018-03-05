@@ -245,7 +245,7 @@ class MediaUploaderTest extends TestCase
 
         $media = factory(Media::class)->create([
             'disk' => 'tmp',
-            'directory'=> '',
+            'directory' => '',
             'filename' => 'plank',
             'extension' => 'png'
         ]);
@@ -264,14 +264,14 @@ class MediaUploaderTest extends TestCase
 
         $media = factory(Media::class)->create([
             'disk' => 'tmp',
-            'directory'=> '',
+            'directory' => '',
             'filename' => 'plank',
             'extension' => 'png',
             'aggregate_type' => 'bar'
         ]);
         $this->seedFileForMedia($media, $this->sampleFile());
 
-        $result = Facade::fromSource(__DIR__.'/../_data/plank.png')
+        $result = Facade::fromSource(__DIR__ . '/../_data/plank.png')
             ->setOnDuplicateBehavior(MediaUploader::ON_DUPLICATE_REPLACE)
             ->toDestination('tmp', '')
             ->upload();
@@ -288,14 +288,15 @@ class MediaUploaderTest extends TestCase
 
         $media = factory(Media::class)->make([
             'disk' => 'tmp',
-            'directory'=> '',
+            'directory' => '',
             'filename' => 'plank',
             'extension' => 'png'
         ]);
 
         $method->invoke($uploader, $media);
 
-        $this->assertEquals('plank (1)', $media->filename);
+
+        $this->assertEquals('plank-1', $media->filename);
     }
 
     public function test_it_uploads_files()
@@ -322,7 +323,7 @@ class MediaUploaderTest extends TestCase
         $this->useDatabase();
         $this->useFilesystem('tmp');
 
-        $string = file_get_contents(__DIR__.'/../_data/plank.png');
+        $string = file_get_contents(__DIR__ . '/../_data/plank.png');
 
         $media = Facade::fromString($string)
             ->toDestination('tmp', 'foo')
@@ -343,7 +344,7 @@ class MediaUploaderTest extends TestCase
         $this->useDatabase();
         $this->useFilesystem('tmp');
 
-        $resource = fopen(realpath(__DIR__.'/../_data/plank.png'), 'r');
+        $resource = fopen(realpath(__DIR__ . '/../_data/plank.png'), 'r');
 
         $media = Facade::fromSource($resource)
             ->toDestination('tmp', 'foo')

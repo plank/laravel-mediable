@@ -296,7 +296,7 @@ trait Mediable
     }
 
     /**
-     * Shorthand for retrieving a single attached media.
+     * Shorthand for retrieving the first attached media item.
      * @param  string|array  $tags
      * @param  bool         $match_all
      * @see \Plank\Mediable\Mediable::getMedia()
@@ -305,6 +305,18 @@ trait Mediable
     public function firstMedia($tags, bool $match_all = false)
     {
         return $this->getMedia($tags, $match_all)->first();
+    }
+
+    /**
+     * Shorthand for retrieving the last attached media item.
+     * @param  string|array  $tags
+     * @param  bool         $match_all
+     * @see \Plank\Mediable\Mediable::getMedia()
+     * @return bool
+     */
+    public function lastMedia($tags, $match_all = false)
+    {
+        return $this->getMedia($tags, $match_all)->last();
     }
 
     /**
@@ -535,7 +547,7 @@ trait Mediable
         // Laravel 5.5
         if (method_exists($relation, 'getQualifiedRelatedPivotKeyName')) {
             return $relation->getQualifiedRelatedPivotKeyName();
-            // Laravel 5.4
+        // Laravel 5.4
         } elseif (method_exists($relation, 'getQualifiedRelatedKeyName')) {
             return $relation->getQualifiedRelatedKeyName();
         }

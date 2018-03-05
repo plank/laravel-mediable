@@ -13,4 +13,9 @@ class MediaMoveException extends Exception
     {
         return new static("Another file already exists at `{$path}`");
     }
+
+    public static function failedToCopy($from, $to)
+    {
+        return new static("Failed to copy file from `{$from}` to `{$to}`.");
+    }
 }
