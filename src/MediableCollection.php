@@ -101,10 +101,13 @@ class MediableCollection extends Collection
     private function mediaQualifiedForeignKey(MorphToMany $relation)
     {
         if (method_exists($relation, 'getQualifiedForeignPivotKeyName')) {
+            // Laravel 5.5
             return $relation->getQualifiedForeignPivotKeyName();
         } elseif (method_exists($relation, 'getQualifiedForeignKeyName')) {
+            // Laravel 5.4
             return $relation->getQualifiedForeignKeyName();
         }
+        // Laravel 5.3
         return $relation->getForeignKey();
     }
 }

@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1d009a2c-368a-444f-85e1-860f117a9d9b" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/MediaUploader.php" afterPath="$PROJECT_DIR$/src/MediaUploader.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Mediable.php" afterPath="$PROJECT_DIR$/src/Mediable.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/MediableCollection.php" afterPath="$PROJECT_DIR$/src/MediableCollection.php" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -13,16 +14,6 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="FileNotFoundException.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Exceptions/MediaUpload/FileNotFoundException.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="FileNotSupportedException.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Exceptions/MediaUpload/FileNotSupportedException.php">
           <provider selected="true" editor-type-id="text-editor">
@@ -73,14 +64,34 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MediaUploader.php" pinned="false" current-in-tab="true">
+      <file leaf-file-name="MediaUploader.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/MediaUploader.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-5595">
-              <caret line="379" column="0" lean-forward="true" selection-start-line="379" selection-start-column="0" selection-end-line="379" selection-end-column="0" />
+            <state relative-caret-position="159">
+              <caret line="653" column="34" lean-forward="false" selection-start-line="653" selection-start-column="34" selection-end-line="653" selection-end-column="34" />
               <folding>
                 <element signature="e#34#81#0#PHP" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Mediable.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Mediable.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-1075">
+              <caret line="501" column="36" lean-forward="true" selection-start-line="501" selection-start-column="36" selection-end-line="501" selection-end-column="36" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MediableCollection.php" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/MediableCollection.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="571">
+              <caret line="109" column="22" lean-forward="false" selection-start-line="109" selection-start-column="22" selection-end-line="109" selection-end-column="22" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -90,16 +101,6 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="357">
               <caret line="17" column="4" lean-forward="false" selection-start-line="17" selection-start-column="4" selection-end-line="17" selection-end-column="46" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="FileSizeException.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Exceptions/MediaUpload/FileSizeException.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -124,6 +125,7 @@
       <find>_PUBLIC</find>
       <find>_PUBLI</find>
       <find>_</find>
+      <find>Laravel 5.4</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -158,13 +160,13 @@
         <option value="$PROJECT_DIR$/tests/TestCase.php" />
         <option value="$PROJECT_DIR$/src/MediaMover.php" />
         <option value="$PROJECT_DIR$/src/MediableServiceProvider.php" />
-        <option value="$PROJECT_DIR$/src/MediableCollection.php" />
-        <option value="$PROJECT_DIR$/src/Mediable.php" />
         <option value="$PROJECT_DIR$/src/Commands/ImportMediaCommand.php" />
         <option value="$PROJECT_DIR$/src/Commands/PruneMediaCommand.php" />
         <option value="$PROJECT_DIR$/migrations/2016_06_27_000000_create_mediable_tables.php" />
         <option value="$PROJECT_DIR$/src/Exceptions/MediaMoveException.php" />
         <option value="$PROJECT_DIR$/src/MediaUploader.php" />
+        <option value="$PROJECT_DIR$/src/Mediable.php" />
+        <option value="$PROJECT_DIR$/src/MediableCollection.php" />
       </list>
     </option>
   </component>
@@ -410,12 +412,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1520211611963</updated>
-      <workItem from="1520211614356" duration="7290000" />
+      <workItem from="1520211614356" duration="7530000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="7290000" />
+    <option name="totallyTimeSpent" value="7530000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="18" y="43" width="1400" height="837" extended-state="0" />
@@ -751,26 +753,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/MediableCollection.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-170">
-          <caret line="75" column="25" lean-forward="false" selection-start-line="75" selection-start-column="24" selection-end-line="75" selection-end-column="25" />
-          <folding>
-            <element signature="e#34#75#0#PHP" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Mediable.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3480">
-          <caret line="404" column="9" lean-forward="true" selection-start-line="404" selection-start-column="9" selection-end-line="404" selection-end-column="9" />
-          <folding>
-            <element signature="e#34#75#0#PHP" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Media.php">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="473">
@@ -895,11 +877,27 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/MediaUploader.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-5595">
-          <caret line="379" column="0" lean-forward="true" selection-start-line="379" selection-start-column="0" selection-end-line="379" selection-end-column="0" />
+        <state relative-caret-position="159">
+          <caret line="653" column="34" lean-forward="false" selection-start-line="653" selection-start-column="34" selection-end-line="653" selection-end-column="34" />
           <folding>
             <element signature="e#34#81#0#PHP" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Mediable.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1075">
+          <caret line="501" column="36" lean-forward="true" selection-start-line="501" selection-start-column="36" selection-end-line="501" selection-end-column="36" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MediableCollection.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="571">
+          <caret line="109" column="22" lean-forward="false" selection-start-line="109" selection-start-column="22" selection-end-line="109" selection-end-column="22" />
+          <folding />
         </state>
       </provider>
     </entry>

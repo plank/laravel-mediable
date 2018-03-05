@@ -534,10 +534,13 @@ trait Mediable
     {
         $relation = $this->media();
         if (method_exists($relation, 'getQualifiedForeignPivotKeyName')) {
+            // Laravel 5.5
             return $relation->getQualifiedForeignPivotKeyName();
         } elseif (method_exists($relation, 'getQualifiedForeignKeyName')) {
+            // Laravel 5.4
             return $relation->getQualifiedForeignKeyName();
         }
+        // Laravel <= 5.3
         return $relation->getForeignKey();
     }
 
@@ -551,11 +554,11 @@ trait Mediable
     private function mediaQualifiedRelatedKey()
     {
         $relation = $this->media();
-        // Laravel 5.5
         if (method_exists($relation, 'getQualifiedRelatedPivotKeyName')) {
+            // Laravel 5.5
             return $relation->getQualifiedRelatedPivotKeyName();
-            // Laravel 5.4
         } elseif (method_exists($relation, 'getQualifiedRelatedKeyName')) {
+            // Laravel 5.4
             return $relation->getQualifiedRelatedKeyName();
         }
         // Laravel <= 5.3
