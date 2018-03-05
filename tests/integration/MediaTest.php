@@ -230,13 +230,13 @@ class MediaTest extends TestCase
 
         $media1 = factory(Media::class)->make([
             'disk' => 'tmp',
-            'directory'=> '',
+            'directory' => '',
             'filename' => 'foo',
             'extension' => 'baz'
         ]);
         $media2 = factory(Media::class)->make([
             'disk' => 'tmp',
-            'directory'=> '',
+            'directory' => '',
             'filename' => 'bar',
             'extension' => 'baz'
         ]);

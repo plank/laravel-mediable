@@ -21,7 +21,7 @@ class LocalUrlGenerator extends BaseUrlGenerator
     /**
      * Constructor.
      * @param \Illuminate\Contracts\Config\Repository $config
-     * @param \Illuminate\Routing\UrlGenerator        $url
+     * @param \Illuminate\Routing\UrlGenerator $url
      */
     public function __construct(Config $config, Url $url)
     {
@@ -34,7 +34,7 @@ class LocalUrlGenerator extends BaseUrlGenerator
      */
     public function isPubliclyAccessible()
     {
-        return  (parent::isPubliclyAccessible() || $this->isInWebroot()) && $this->media->isVisible();
+        return (parent::isPubliclyAccessible() || $this->isInWebroot()) && $this->media->isVisible();
     }
 
     /**
@@ -44,13 +44,13 @@ class LocalUrlGenerator extends BaseUrlGenerator
      */
     public function getPublicPath()
     {
-        if (! $this->isPubliclyAccessible()) {
+        if (!$this->isPubliclyAccessible()) {
             throw MediaUrlException::mediaNotPubliclyAccessible($this->getAbsolutePath());
         }
         if ($this->isInWebroot()) {
             $path = str_replace(public_path(), '', $this->getAbsolutePath());
         } else {
-            $path = rtrim($this->getDiskConfig('prefix', 'storage'), '/').'/'.$this->media->getDiskPath();
+            $path = rtrim($this->getDiskConfig('prefix', 'storage'), '/') . '/' . $this->media->getDiskPath();
         }
 
         return $this->cleanDirectorySeparators($path);
@@ -71,7 +71,7 @@ class LocalUrlGenerator extends BaseUrlGenerator
                 $path = $this->media->getDiskPath();
             }
 
-            return rtrim($url, '/').'/'.trim($path, '/');
+            return rtrim($url, '/') . '/' . trim($path, '/');
         }
 
         return $this->url->asset($path);
@@ -82,7 +82,7 @@ class LocalUrlGenerator extends BaseUrlGenerator
      */
     public function getAbsolutePath()
     {
-        return $this->getDiskConfig('root').DIRECTORY_SEPARATOR.$this->media->getDiskPath();
+        return $this->getDiskConfig('root') . DIRECTORY_SEPARATOR . $this->media->getDiskPath();
     }
 
     /**

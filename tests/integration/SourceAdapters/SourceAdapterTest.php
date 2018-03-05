@@ -1,5 +1,6 @@
 <?php
 
+use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
 use Plank\Mediable\Stream;
 use Plank\Mediable\SourceAdapters\FileAdapter;
 use Plank\Mediable\SourceAdapters\RawContentAdapter;
@@ -10,7 +11,6 @@ use Plank\Mediable\SourceAdapters\LocalPathAdapter;
 use Plank\Mediable\SourceAdapters\RemoteUrlAdapter;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Psr\Http\Message\StreamInterface;
 
 class SourceAdapterTest extends TestCase
 {
@@ -68,7 +68,14 @@ class SourceAdapterTest extends TestCase
         return [
             [new FileAdapter(new File($file, false))],
             [new LocalPathAdapter($file)],
-            [new UploadedFileAdapter(new UploadedFile($file, 'invalid.png', 'image/png', 8444, UPLOAD_ERR_CANT_WRITE, false))],
+            [new UploadedFileAdapter(new UploadedFile(
+                $file,
+                'invalid.png',
+                'image/png',
+                8444,
+                UPLOAD_ERR_CANT_WRITE,
+                false
+            ))],
             [new StreamResourceAdapter(fopen($this->sampleFilePath(), 'a'))],
             [new StreamResourceAdapter(fopen('php://stdin', 'w'))],
         ];
@@ -77,80 +84,87 @@ class SourceAdapterTest extends TestCase
     /**
      * @dataProvider adapterProvider
      */
-    public function test_it_can_return_source($adapter, $source)
+    public function test_it_can_return_source($adapterClass, $source)
     {
-        $adapter = new $adapter($source);
+        /** @var SourceAdapterInterface $adapter */
+        $adapter = new $adapterClass($source);
         $this->assertEquals($source, $adapter->getSource());
     }
 
     /**
      * @dataProvider adapterProvider
      */
-    public function test_it_adapts_absolute_path($adapter, $source, $path)
+    public function test_it_adapts_absolute_path($adapterClass, $source, $path)
     {
-        $adapter = new $adapter($source);
+        /** @var SourceAdapterInterface $adapter */
+        $adapter = new $adapterClass($source);
         $this->assertEquals($path, $adapter->path());
     }
 
     /**
      * @dataProvider adapterProvider
      */
-    public function test_it_adapts_filename($adapter, $source, $path, $filename)
+    public function test_it_adapts_filename($adapterClass, $source, $path, $filename)
     {
-        $adapter = new $adapter($source);
+        /** @var SourceAdapterInterface $adapter */
+        $adapter = new $adapterClass($source);
         $this->assertEquals($filename, $adapter->filename());
     }
 
     /**
      * @dataProvider adapterProvider
      */
-    public function test_it_adapts_extension($adapter, $source)
+    public function test_it_adapts_extension($adapterClass, $source)
     {
-        $adapter = new $adapter($source);
+        /** @var SourceAdapterInterface $adapter */
+        $adapter = new $adapterClass($source);
         $this->assertEquals('png', $adapter->extension());
     }
 
     /**
      * @dataProvider adapterProvider
      */
-    public function test_it_adapts_mime_type($adapter, $source)
+    public function test_it_adapts_mime_type($adapterClass, $source)
     {
-        $adapter = new $adapter($source);
+        /** @var SourceAdapterInterface $adapter */
+        $adapter = new $adapterClass($source);
         $this->assertEquals('image/png', $adapter->mimeType());
     }
 
     /**
      * @dataProvider adapterProvider
      */
-    public function test_it_adapts_file_contents($adapter, $source)
+    public function test_it_adapts_file_contents($adapterClass, $source)
     {
-        $adapter = new $adapter($source);
-
+        /** @var SourceAdapterInterface $adapter */
+        $adapter = new $adapterClass($source);
         $this->assertInternalType('string', $adapter->contents());
     }
 
     /**
      * @dataProvider adapterProvider
      */
-    public function test_it_adapts_file_size($adapter, $source)
+    public function test_it_adapts_file_size($adapterClass, $source)
     {
-        $adapter = new $adapter($source);
+        /** @var SourceAdapterInterface $adapter */
+        $adapter = new $adapterClass($source);
         $this->assertEquals(7173, $adapter->size());
     }
 
     /**
      * @dataProvider adapterProvider
      */
-    public function test_it_verifies_file_validity($adapter, $source)
+    public function test_it_verifies_file_validity($adapterClass, $source)
     {
-        $adapter = new $adapter($source);
+        /** @var SourceAdapterInterface $adapter */
+        $adapter = new $adapterClass($source);
         $this->assertTrue($adapter->valid());
     }
 
     /**
      * @dataProvider invalidAdapterProvider
      */
-    public function test_it_verifies_file_validity_failure($adapter)
+    public function test_it_verifies_file_validity_failure(SourceAdapterInterface $adapter)
     {
         $this->assertFalse($adapter->valid());
     }

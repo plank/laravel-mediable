@@ -35,8 +35,8 @@ class SyncMediaCommand extends Command
     {
         $disk = $this->argument('disk');
         $directory = $this->option('directory') ?: '';
-        $non_recursive = (bool) $this->option('non-recursive');
-        $force = (bool) $this->option('force');
+        $non_recursive = (bool)$this->option('non-recursive');
+        $force = (bool)$this->option('force');
 
         $this->call('media:prune', [
             'disk' => $disk,

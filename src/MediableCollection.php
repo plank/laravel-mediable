@@ -2,7 +2,7 @@
 
 namespace Plank\Mediable;
 
-use Illuminate\Database\Builder;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
@@ -17,14 +17,14 @@ class MediableCollection extends Collection
 {
     /**
      * Lazy eager load media attached to items in the collection.
-     * @param  array  $tags
+     * @param  array $tags
      * If one or more tags are specified, only media attached to those tags will be loaded.
      * @param bool $match_all If true, only load media attached to all tags simultaneously
      * @return $this
      */
     public function loadMedia($tags = [], bool $match_all = false)
     {
-        $tags = (array) $tags;
+        $tags = (array)$tags;
 
         if (empty($tags)) {
             return $this->load('media');
@@ -44,13 +44,13 @@ class MediableCollection extends Collection
 
     /**
      * Lazy eager load media attached to items in the collection bound all of the provided tags simultaneously.
-     * @param  array  $tags
+     * @param  array $tags
      * If one or more tags are specified, only media attached to those tags will be loaded.
      * @return $this
      */
     public function loadMediaMatchAll($tags = [])
     {
-        $tags = (array) $tags;
+        $tags = (array)$tags;
         $closure = function (MorphToMany $q) use ($tags) {
             $this->addMatchAllToEagerLoadQuery($q, $tags);
         };
@@ -65,6 +65,7 @@ class MediableCollection extends Collection
             return;
         }
 
+        /** @var MorphToMany $relation */
         $relation = $this->first()->media();
         $query = $relation->newPivotStatement();
         $classes = collect();
@@ -77,7 +78,7 @@ class MediableCollection extends Collection
             // select pivots matching each item for deletion
             $query->orWhere(function (Builder $q) use ($item, $relation) {
                 $q->where($relation->getMorphType(), get_class($item));
-                $q->where($relation->getForeignKey(), $item->getKey());
+                $q->where($this->mediaQualifiedForeignKey($relation), $item->getKey());
             });
         });
 
@@ -88,5 +89,22 @@ class MediableCollection extends Collection
         $classes->each(function (array $ids, string $class) {
             $class::whereIn((new $class)->getKeyName(), $ids)->delete();
         });
+    }
+
+    /**
+     * Key the name of the foreign key field of the media relation
+     *
+     * Accounts for the change of method name in Laravel 5.4
+     *
+     * @return string
+     */
+    private function mediaQualifiedForeignKey(MorphToMany $relation)
+    {
+        if (method_exists($relation, 'getQualifiedForeignPivotKeyName')) {
+            return $relation->getQualifiedForeignPivotKeyName();
+        } elseif (method_exists($relation, 'getQualifiedForeignKeyName')) {
+            return $relation->getQualifiedForeignKeyName();
+        }
+        return $relation->getForeignKey();
     }
 }

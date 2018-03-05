@@ -48,7 +48,7 @@ interface SourceAdapterInterface
     public function contents();
 
     /**
-     * Check if the file can be transfered.
+     * Check if the file can be transferred.
      * @return bool
      */
     public function valid();

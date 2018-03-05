@@ -21,15 +21,15 @@ class StreamResourceAdapter extends StreamAdapter
     /**
      * Constructor.
      * @param resource $source
+     * @throws ConfigurationException
      */
     public function __construct($source)
     {
-        if (! is_resource($source) || get_resource_type($source) !== 'stream') {
+        if (!is_resource($source) || get_resource_type($source) !== 'stream') {
             throw ConfigurationException::unrecognizedSource($source);
         }
 
-        $this->source = new Stream($source);
-
+        parent::__construct(new Stream($source));
         $this->resource = $source;
     }
 

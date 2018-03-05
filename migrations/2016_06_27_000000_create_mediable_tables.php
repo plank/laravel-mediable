@@ -40,7 +40,8 @@ class CreateMediableTables extends Migration
             $table->index(['mediable_id', 'mediable_type']);
             $table->index('tag');
             $table->index('order');
-            $table->foreign('media_id')->references('id')->on('media')
+            $table->foreign('media_id')
+                ->references('id')->on('media')
                 ->onDelete('cascade');
         });
     }

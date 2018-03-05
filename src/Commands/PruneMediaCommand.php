@@ -29,13 +29,13 @@ class PruneMediaCommand extends Command
 
     /**
      * Filesystem Manager instance.
-     * @var \Illuminate\Filesystem\FilesystemManager
+     * @var FilesystemManager
      */
     protected $filesystem;
 
     /**
      * Constructor.
-     * @param \Illuminate\Filesystem\FilesystemManager $filesystem
+     * @param FilesystemManager $filesystem
      */
     public function __construct(FileSystemManager $filesystem)
     {
@@ -52,13 +52,13 @@ class PruneMediaCommand extends Command
     {
         $disk = $this->argument('disk');
         $directory = $this->option('directory') ?: '';
-        $recursive = ! $this->option('non-recursive');
+        $recursive = !$this->option('non-recursive');
         $counter = 0;
 
         $records = Media::inDirectory($disk, $directory, $recursive)->get();
 
         foreach ($records as $media) {
-            if (! $media->fileExists()) {
+            if (!$media->fileExists()) {
                 $media->delete();
                 ++$counter;
                 $this->info("Pruned record for file {$media->getDiskPath()}", 'v');

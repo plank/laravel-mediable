@@ -42,7 +42,7 @@ class FileAdapter implements SourceAdapterInterface
      */
     public function path()
     {
-        return $this->source->getPath().'/'.$this->source->getFilename();
+        return $this->source->getPath() . '/' . $this->source->getFilename();
     }
 
     /**

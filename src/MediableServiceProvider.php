@@ -2,6 +2,9 @@
 
 namespace Plank\Mediable;
 
+use Plank\Mediable\Commands\ImportMediaCommand;
+use Plank\Mediable\Commands\PruneMediaCommand;
+use Plank\Mediable\Commands\SyncMediaCommand;
 use Plank\Mediable\SourceAdapters\SourceAdapterFactory;
 use Plank\Mediable\UrlGenerators\UrlGeneratorFactory;
 use Illuminate\Support\ServiceProvider;
@@ -25,12 +28,12 @@ class MediableServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->publishes([
-            __DIR__.'/../config/mediable.php' => config_path('mediable.php'),
+            __DIR__ . '/../config/mediable.php' => config_path('mediable.php'),
         ], 'config');
 
-        if (! class_exists(CreateMediableTables::class)) {
+        if (!class_exists(CreateMediableTables::class)) {
             $this->publishes([
-                __DIR__.'/../migrations/2016_06_27_000000_create_mediable_tables.php' => database_path('migrations/'.date('Y_m_d_His').'_create_mediable_tables.php'),
+                __DIR__ . '/../migrations/2016_06_27_000000_create_mediable_tables.php' => database_path('migrations/' . date('Y_m_d_His') . '_create_mediable_tables.php'),
             ], 'migrations');
         }
     }
@@ -43,7 +46,7 @@ class MediableServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(
-            __DIR__.'/../config/mediable.php', 'mediable'
+            __DIR__ . '/../config/mediable.php', 'mediable'
         );
 
         $this->registerSourceAdapterFactory();
@@ -85,7 +88,11 @@ class MediableServiceProvider extends ServiceProvider
     public function registerUploader()
     {
         $this->app->bind('mediable.uploader', function (Container $app) {
-            return new MediaUploader($this->app['filesystem'], $this->app['mediable.source.factory'], $this->app['config']->get('mediable'));
+            return new MediaUploader(
+                $app['filesystem'],
+                $app['mediable.source.factory'],
+                $app['config']->get('mediable')
+            );
         });
         $this->app->alias('mediable.uploader', MediaUploader::class);
     }
@@ -97,7 +104,7 @@ class MediableServiceProvider extends ServiceProvider
     public function registerMover()
     {
         $this->app->bind('mediable.mover', function (Container $app) {
-            return new MediaMover($this->app['filesystem']);
+            return new MediaMover($app['filesystem']);
         });
         $this->app->alias('mediable.mover', MediaMover::class);
     }
@@ -128,9 +135,9 @@ class MediableServiceProvider extends ServiceProvider
     public function registerConsoleCommands()
     {
         $this->commands([
-            \Plank\Mediable\Commands\ImportMediaCommand::class,
-            \Plank\Mediable\Commands\PruneMediaCommand::class,
-            \Plank\Mediable\Commands\SyncMediaCommand::class,
+            ImportMediaCommand::class,
+            PruneMediaCommand::class,
+            SyncMediaCommand::class,
         ]);
     }
 }

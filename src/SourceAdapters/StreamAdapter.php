@@ -14,7 +14,7 @@ class StreamAdapter implements SourceAdapterInterface
 {
     /**
      * The source object.
-     * @var \Psr\Http\Message\StreamInterface
+     * @var StreamInterface
      */
     protected $source;
 
@@ -26,7 +26,7 @@ class StreamAdapter implements SourceAdapterInterface
 
     /**
      * Constructor.
-     * @param \Psr\Http\Message\StreamInterface $source
+     * @param StreamInterface $source
      */
     public function __construct(StreamInterface $source)
     {
@@ -76,9 +76,9 @@ class StreamAdapter implements SourceAdapterInterface
      */
     public function mimeType()
     {
-        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $fileInfo = new \finfo(FILEINFO_MIME_TYPE);
 
-        return $finfo->buffer($this->contents());
+        return $fileInfo->buffer($this->contents());
     }
 
     /**
@@ -88,9 +88,9 @@ class StreamAdapter implements SourceAdapterInterface
     {
         if (is_null($this->contents)) {
             if ($this->source->isSeekable()) {
-                $this->contents = (string) $this->source;
+                $this->contents = (string)$this->source;
             } else {
-                $this->contents = (string) $this->source->getContents();
+                $this->contents = (string)$this->source->getContents();
             }
         }
 
@@ -112,7 +112,7 @@ class StreamAdapter implements SourceAdapterInterface
     {
         $size = $this->source->getSize();
 
-        if (! is_null($size)) {
+        if (!is_null($size)) {
             return $size;
         }
 

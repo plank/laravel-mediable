@@ -2,6 +2,9 @@
 
 namespace Plank\Mediable;
 
+use Carbon\Carbon;
+use Illuminate\Contracts\Filesystem\Filesystem;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Plank\Mediable\Helpers\File;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -11,6 +14,23 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
  * Media Model.
  *
  * @author Sean Fraser <sean@plankdesign.com>
+ * @property int|string $id
+ * @property string $disk
+ * @property string $directory
+ * @property string $filename
+ * @property string $extension
+ * @property string $basename
+ * @property string $mime_type
+ * @property string $aggregate_type
+ * @property int $size
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ * @property Pivot $pivot
+ * @method static Builder inDirectory(string $disk, string $directory, bool $recursive = false)
+ * @method static Builder inOrUnderDirectory(string $disk, string $directory)
+ * @method static Builder whereBasename(string $basename)
+ * @method static Builder forPathOnDisk(string $disk, string $path)
+ * @method static Builder unordered()
  */
 class Media extends Model
 {
@@ -57,15 +77,15 @@ class Media extends Model
      */
     public function getBasenameAttribute()
     {
-        return $this->filename.'.'.$this->extension;
+        return $this->filename . '.' . $this->extension;
     }
 
     /**
      * Query scope for to find media in a particular directory.
-     * @param  \Illuminate\Database\Eloquent\Builder  $q
-     * @param  string                                 $disk      Filesystem disk to search in
-     * @param  string                                 $directory Path relative to disk
-     * @param  bool                                   $recursive (_optional_) If true, will find media in or under the specified directory
+     * @param  \Illuminate\Database\Eloquent\Builder $q
+     * @param  string $disk Filesystem disk to search in
+     * @param  string $directory Path relative to disk
+     * @param  bool $recursive (_optional_) If true, will find media in or under the specified directory
      * @return void
      */
     public function scopeInDirectory(Builder $q, string $disk, string $directory, bool $recursive = false)
@@ -73,7 +93,7 @@ class Media extends Model
         $q->where('disk', $disk);
         if ($recursive) {
             $directory = str_replace(['%', '_'], ['\%', '\_'], $directory);
-            $q->where('directory', 'like', $directory.'%');
+            $q->where('directory', 'like', $directory . '%');
         } else {
             $q->where('directory', '=', $directory);
         }
@@ -81,9 +101,9 @@ class Media extends Model
 
     /**
      * Query scope for finding media in a particular directory or one of its subdirectories.
-     * @param  \Illuminate\Database\Eloquent\Builder  $q
-     * @param  string                                 $disk      Filesystem disk to search in
-     * @param  string                                 $directory Path relative to disk
+     * @param  \Illuminate\Database\Eloquent\Builder $q
+     * @param  string $disk Filesystem disk to search in
+     * @param  string $directory Path relative to disk
      * @return void
      */
     public function scopeInOrUnderDirectory(Builder $q, string $disk, string $directory)
@@ -94,7 +114,7 @@ class Media extends Model
     /**
      * Query scope for finding media by basename.
      * @param  \Illuminate\Database\Eloquent\Builder $q
-     * @param  string                                $basename filename and extension
+     * @param  string $basename filename and extension
      * @return void
      */
     public function scopeWhereBasename(Builder $q, string $basename)
@@ -106,8 +126,8 @@ class Media extends Model
     /**
      * Query scope finding media at a path relative to a disk.
      * @param  \Illuminate\Database\Eloquent\Builder $q
-     * @param  string                                $disk
-     * @param  string                                $path directory, filename and extension
+     * @param  string $disk
+     * @param  string $path directory, filename and extension
      * @return void
      */
     public function scopeForPathOnDisk(Builder $q, string $disk, string $path)
@@ -147,7 +167,7 @@ class Media extends Model
      */
     public function getDiskPath()
     {
-        return ltrim(rtrim($this->directory, '/').'/'.ltrim($this->basename, '/'), '/');
+        return ltrim(rtrim($this->directory, '/') . '/' . ltrim($this->basename, '/'), '/');
     }
 
     /**
@@ -220,7 +240,7 @@ class Media extends Model
      *
      * Will invoke the `save()` method on the model after the associated file has been moved to prevent synchronization errors
      * @param  string $destination directory relative to disk root
-     * @param  string $filename    filename. Do not include extension
+     * @param  string $filename filename. Do not include extension
      * @return void
      */
     public function move(string $destination, string $filename = null)
@@ -233,7 +253,7 @@ class Media extends Model
      *
      * Will invoke the `save()` method on the model after the associated file has been copied to prevent synchronization errors
      * @param  string $destination directory relative to disk root
-     * @param  string $filename    optional filename. Do not include extension
+     * @param  string $filename optional filename. Do not include extension
      * @return \Plank\Mediable\Media
      */
     public function copyTo($destination, $filename = null)
@@ -243,7 +263,7 @@ class Media extends Model
 
     /**
      * Rename the file in place.
-     * @param  string $name
+     * @param  string $filename
      * @return void
      * @see \Plank\Mediable\Media::move()
      */
@@ -255,7 +275,7 @@ class Media extends Model
     protected function handleMediaDeletion()
     {
         // optionally detach mediable relationships on soft delete
-        if (static::hasGlobalScope(SoftDeletingScope::class) && ! $this->forceDeleting) {
+        if (static::hasGlobalScope(SoftDeletingScope::class) && !$this->forceDeleting) {
             if (config('mediable.detach_on_soft_delete')) {
                 $this->newBaseQueryBuilder()
                     ->from('mediables')
@@ -270,7 +290,7 @@ class Media extends Model
 
     /**
      * Get the filesystem object for this media.
-     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     * @return Filesystem
      */
     protected function storage()
     {
@@ -279,7 +299,7 @@ class Media extends Model
 
     /**
      * Get a UrlGenerator instance for the media.
-     * @return \Plank\Mediable\UrlGenerators\UrlGenerator
+     * @return \Plank\Mediable\UrlGenerators\BaseUrlGenerator
      */
     protected function getUrlGenerator()
     {

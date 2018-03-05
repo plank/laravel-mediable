@@ -49,8 +49,8 @@ trait HandlesMediaUploadExceptions
     /**
      * Transform a MediaUploadException into an HttpException.
      *
-     * @param  \Exception  $e
-     * @return \Symfony\Component\HttpKernel\Exception\HttpException
+     * @param  \Exception $e
+     * @return \Exception
      */
     protected function transformMediaUploadException(Exception $e)
     {

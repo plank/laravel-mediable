@@ -15,13 +15,13 @@ class UploadedFileAdapter implements SourceAdapterInterface
 {
     /**
      * The source object.
-     * @var \Symfony\Component\HttpFoundation\File\UploadedFile
+     * @var UploadedFile
      */
     protected $source;
 
     /**
      * Constructor.
-     * @param \Symfony\Component\HttpFoundation\File\UploadedFile $source
+     * @param UploadedFile $source
      */
     public function __construct(UploadedFile $source)
     {
@@ -38,7 +38,7 @@ class UploadedFileAdapter implements SourceAdapterInterface
      */
     public function path()
     {
-        return $this->source->getPath().'/'.$this->source->getFilename();
+        return $this->source->getPath() . '/' . $this->source->getFilename();
     }
 
     /**

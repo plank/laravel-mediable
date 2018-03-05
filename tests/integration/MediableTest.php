@@ -1,8 +1,8 @@
 <?php
 
+use Illuminate\Database\Eloquent\Collection;
 use Plank\Mediable\Media;
 use Plank\Mediable\MediableCollection;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class MediableTest extends TestCase
 {
@@ -20,7 +20,7 @@ class MediableTest extends TestCase
         $mediable->attachMedia($media1, 'foo');
         $result = $mediable->getMedia('foo');
 
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $result);
+        $this->assertInstanceOf(Collection::class, $result);
         $this->assertEquals([2], $result->pluck('id')->toArray());
     }
 
@@ -149,7 +149,7 @@ class MediableTest extends TestCase
     public function test_it_can_detach_media_of_multiple_tags()
     {
         $mediable = factory(SampleMediable::class)->create();
-        $media = factory(Media::class)->create(['id'=>1]);
+        $media = factory(Media::class)->create(['id' => 1]);
         $mediable->attachMedia($media, 'foo');
         $mediable->attachMedia($media, 'bar');
 

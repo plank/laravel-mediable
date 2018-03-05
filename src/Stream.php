@@ -36,13 +36,13 @@ class Stream implements StreamInterface
     ];
 
     /**
-     * @param resource $resource  Stream resource to wrap.
+     * @param resource $resource Stream resource to wrap.
      *
      * @throws \InvalidArgumentException if the stream is not a stream resource
      */
     public function __construct($resource)
     {
-        if (! is_resource($resource)) {
+        if (!is_resource($resource)) {
             throw new \InvalidArgumentException('Stream must be a resource');
         }
 
@@ -69,7 +69,7 @@ class Stream implements StreamInterface
     {
         try {
             $this->seek(0);
-            return (string) stream_get_contents($this->resource);
+            return (string)stream_get_contents($this->resource);
         } catch (\Exception $e) {
             return '';
         }
@@ -94,7 +94,7 @@ class Stream implements StreamInterface
      */
     public function close()
     {
-        if (! $this->resource) {
+        if (!$this->resource) {
             return;
         }
 
@@ -108,7 +108,7 @@ class Stream implements StreamInterface
      */
     public function detach()
     {
-        if (! $this->resource) {
+        if (!$this->resource) {
             return null;
         }
 
@@ -129,7 +129,7 @@ class Stream implements StreamInterface
             return $this->size;
         }
 
-        if (! $this->resource) {
+        if (!$this->resource) {
             return null;
         }
 
@@ -185,7 +185,7 @@ class Stream implements StreamInterface
      */
     public function tell()
     {
-        if (! $this->resource) {
+        if (!$this->resource) {
             throw new \RuntimeException('No resource available; cannot tell position');
         }
 
@@ -211,11 +211,11 @@ class Stream implements StreamInterface
      */
     public function seek($offset, $whence = SEEK_SET)
     {
-        if (! $this->resource) {
+        if (!$this->resource) {
             throw new \RuntimeException('No resource available; cannot seek position');
         }
 
-        if (! $this->isSeekable()) {
+        if (!$this->isSeekable()) {
             throw new \RuntimeException('Stream is not seekable');
         }
 
@@ -234,11 +234,11 @@ class Stream implements StreamInterface
      */
     public function read($length)
     {
-        if (! $this->resource) {
+        if (!$this->resource) {
             throw new \RuntimeException('No resource available; cannot read');
         }
 
-        if (! $this->isReadable()) {
+        if (!$this->isReadable()) {
             throw new \RuntimeException('Cannot read from non-readable stream');
         }
 
@@ -256,11 +256,11 @@ class Stream implements StreamInterface
      */
     public function write($string)
     {
-        if (! $this->resource) {
+        if (!$this->resource) {
             throw new \RuntimeException('No resource available; cannot write');
         }
 
-        if (! $this->isWritable()) {
+        if (!$this->isWritable()) {
             throw new \RuntimeException('Cannot write to a non-writable stream');
         }
 

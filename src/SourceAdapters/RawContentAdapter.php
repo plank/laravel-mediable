@@ -63,9 +63,9 @@ class RawContentAdapter implements SourceAdapterInterface
      */
     public function mimeType()
     {
-        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $fileInfo = new \finfo(FILEINFO_MIME_TYPE);
 
-        return $finfo->buffer($this->source) ?: null;
+        return $fileInfo->buffer($this->source) ?: null;
     }
 
     /**
@@ -75,6 +75,7 @@ class RawContentAdapter implements SourceAdapterInterface
     {
         return $this->source;
     }
+
     /**
      * {@inheritdoc}
      */

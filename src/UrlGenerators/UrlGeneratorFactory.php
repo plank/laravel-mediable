@@ -20,9 +20,9 @@ class UrlGeneratorFactory
 
     /**
      * Get a UrlGenerator instance for a media.
-     * @param  \Plank\Mediable\Media  $media
-     * @return UrlGenerator
-     * @throws \Plank\Mediable\Exceptions\MediaUrlException If no generator class has been assigned for the media's disk's driver
+     * @param  Media $media
+     * @return UrlGeneratorInterface
+     * @throws MediaUrlException If no generator class has been assigned for the media's disk's driver
      */
     public function create(Media $media)
     {
@@ -41,7 +41,7 @@ class UrlGeneratorFactory
 
     /**
      * Set a generator subclass to use for media on a disk with a particular driver.
-     * @param string $generator
+     * @param string $class
      * @param string $driver
      * @return void
      */
@@ -59,7 +59,7 @@ class UrlGeneratorFactory
      */
     protected function validateGeneratorClass(string $class)
     {
-        if (! class_exists($class) || ! is_subclass_of($class, UrlGeneratorInterface::class)) {
+        if (!class_exists($class) || !is_subclass_of($class, UrlGeneratorInterface::class)) {
             throw MediaUrlException::invalidGenerator($class);
         }
     }

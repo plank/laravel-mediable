@@ -34,13 +34,13 @@ class ImportMediaCommand extends Command
 
     /**
      * Filesystem Manager instance.
-     * @var \Illuminate\Filesystem\FilesystemManager
+     * @var FilesystemManager
      */
     protected $filesystem;
 
     /**
      * Uploader instance.
-     * @var \Plank\Mediable\MediaUploader
+     * @var MediaUploader
      */
     protected $uploader;
 
@@ -56,8 +56,8 @@ class ImportMediaCommand extends Command
 
     /**
      * Constructor.
-     * @param \Illuminate\Filesystem\FilesystemManager $filesystem
-     * @param \Plank\Mediable\MediaUploader            $uploader
+     * @param FilesystemManager $filesystem
+     * @param MediaUploader $uploader
      */
     public function __construct(FileSystemManager $filesystem, MediaUploader $uploader)
     {
@@ -77,8 +77,8 @@ class ImportMediaCommand extends Command
 
         $disk = $this->argument('disk');
         $directory = $this->option('directory') ?: '';
-        $recursive = ! $this->option('non-recursive');
-        $force = (bool) $this->option('force');
+        $recursive = !$this->option('non-recursive');
+        $force = (bool)$this->option('force');
 
         $files = $this->listFiles($disk, $directory, $recursive);
         $existing_media = Media::inDirectory($disk, $directory, $recursive)->get();
@@ -93,13 +93,13 @@ class ImportMediaCommand extends Command
             }
         }
 
-        $this->outputCounters($force);
+        $this->outputCounters();
     }
 
     /**
      * Generate a list of all files in the specified directory.
-     * @param  atring  $disk
-     * @param  string  $directory
+     * @param  string $disk
+     * @param  string $directory
      * @param  bool $recursive
      * @return array
      */
@@ -115,16 +115,16 @@ class ImportMediaCommand extends Command
     /**
      * Search through the record list for one matching the provided path.
      * @param  string $path
-     * @param  \Illuminate\Database\Eloquent\Collection $existing_media
-     * @return \Plank\Mediable\Media|null
+     * @param  Collection $existingMedia
+     * @return Media|null
      */
-    protected function getRecordForFile(string $path, Collection $existing_media)
+    protected function getRecordForFile(string $path, Collection $existingMedia)
     {
         $directory = File::cleanDirname($path);
         $filename = pathinfo($path, PATHINFO_FILENAME);
         $extension = pathinfo($path, PATHINFO_EXTENSION);
 
-        return $existing_media->filter(function (Media $media) use ($directory, $filename, $extension) {
+        return $existingMedia->filter(function (Media $media) use ($directory, $filename, $extension) {
             return $media->directory == $directory && $media->filename == $filename && $media->extension == $extension;
         })->first();
     }

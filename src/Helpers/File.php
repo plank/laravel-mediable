@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
 class File
 {
     /**
-     * Get the directory name of path, trimming unecessary `.` and `/` characters.
+     * Get the directory name of path, trimming unnecessary `.` and `/` characters.
      * @param  string $path
      * @return string
      */
@@ -38,7 +38,7 @@ class File
         if ($bytes === 0) {
             return '0 '.$units[0];
         }
-        $exponent = floor(log($bytes, 1024));
+        $exponent = (int)floor(log($bytes, 1024));
         $value = $bytes / pow(1024, $exponent);
 
         return round($value, $precision).' '.$units[$exponent];
@@ -52,7 +52,7 @@ class File
      * @param  string $mimeType
      * @return string|null The guessed extension or null if it cannot be guessed
      *
-     * @see Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser
+     * @see ExtensionGuesser
      */
     public static function guessExtension(string $mimeType)
     {

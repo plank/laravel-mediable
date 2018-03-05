@@ -15,14 +15,14 @@ class S3UrlGenerator extends BaseUrlGenerator
 {
     /**
      * Filesystem Manager.
-     * @var \Illuminate\Filesystem\FilesystemManager
+     * @var FilesystemManager
      */
     protected $filesystem;
 
     /**
      * Constructor.
-     * @param Illuminate\Contracts\Config\Repository   $config
-     * @param \Illuminate\Filesystem\FilesystemManager $filesystem
+     * @param Config $config
+     * @param FilesystemManager $filesystem
      */
     public function __construct(Config $config, FilesystemManager $filesystem)
     {
@@ -43,7 +43,7 @@ class S3UrlGenerator extends BaseUrlGenerator
      */
     public function getUrl()
     {
-        if (! $this->isPubliclyAccessible()) {
+        if (!$this->isPubliclyAccessible()) {
             throw MediaUrlException::cloudMediaNotPubliclyAccessible($this->media->disk);
         }
 
