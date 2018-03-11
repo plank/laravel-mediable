@@ -27,11 +27,19 @@ class LocalUrlGeneratorTest extends TestCase
         $this->assertEquals('http://example.com/foo/bar.jpg', $generator->getUrl());
     }
 
+    public function test_it_generates_prefixed_url()
+    {
+        $this->app['config']->set('filesystems.disks.public_storage.url', null);
+        $this->app['config']->set('filesystems.disks.public_storage.prefix', 'uploads');
+        $generator = $this->setupGenerator('public_storage');
+        $this->assertEquals('http://localhost/uploads/foo/bar.jpg', $generator->getUrl());
+    }
+
     public function test_it_generates_prefixed_custom_url()
     {
-        $this->app['config']->set('filesystems.disks.public_storage.url', 'http://example.com');
+        $this->app['config']->set('filesystems.disks.public_storage.prefix', 'uploads');
         $generator = $this->setupGenerator('public_storage');
-        $this->assertEquals('http://example.com/prefix/foo/bar.jpg', $generator->getUrl());
+        $this->assertEquals('http://localhost/storage/uploads/foo/bar.jpg', $generator->getUrl());
     }
 
     public function test_it_throws_exception_for_non_public_disk()
@@ -41,10 +49,10 @@ class LocalUrlGeneratorTest extends TestCase
         $generator->getPublicPath();
     }
 
-    public function test_it_accepts_public_visiblity()
+    public function test_it_accepts_public_visibility()
     {
         $generator = $this->setupGenerator('public_storage');
-        $this->assertEquals('http://localhost/prefix/foo/bar.jpg', $generator->getUrl());
+        $this->assertEquals('http://localhost/storage/foo/bar.jpg', $generator->getUrl());
     }
 
     protected function setupGenerator($disk = 'uploads')
