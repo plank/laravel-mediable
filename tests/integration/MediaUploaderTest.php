@@ -14,7 +14,6 @@ use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Plank\Mediable\Exceptions\BadCallableReturnException;
 use Plank\Mediable\MediaUploaderFacade as Facade;
 use Illuminate\Filesystem\FilesystemManager;
-use Illuminate\Database\Eloquent\Model;
 use League\Flysystem\Filesystem;
 
 class MediaUploaderTest extends TestCase
