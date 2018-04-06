@@ -453,9 +453,14 @@ class MediaUploader
 
         $this->verifyDestination($model);
 
-        $source = $this->callBefore('before_upload', $model, SourceAdapterInterface::class);
+        if (is_callable($this->before_upload)) {
+            $source = $this->callWithReturnTypeCheck(
+                'before_upload',
+                $this->before_upload,
+                SourceAdapterInterface::class,
+                ['model' => $model, 'source' => $this->source]
+            );
 
-        if ($source !== null) {
             $model->size = $source->size();
             $model->mime_type = $source->mimeType();
             $model->extension = $source->extension();
@@ -464,10 +469,8 @@ class MediaUploader
             $source = $this->source;
         }
 
-        $alteredModel = $this->callBefore('before_save', $model, Model::class);
-
-        if ($alteredModel !== null) {
-            $model = $alteredModel;
+        if (is_callable($this->before_save)) {
+            call_user_func($this->before_save, $model, $source);
         }
 
         $this->filesystem->disk($model->disk)->put($model->getDiskPath(), $source->contents());
@@ -789,32 +792,30 @@ class MediaUploader
     }
 
     /**
-     * Call the before callback for given event
-     * @param string $event
-     * @param Model $model
-     * @param string $expected
+     * Call a callable and ensure return is the right type
+     * @param $event
+     * @param $callable
+     * @param $expected
+     * @param array $params
      * @return mixed
      * @throws BadCallableReturnException
      */
-    private function callBefore($event, $model, $expected)
+    private function callWithReturnTypeCheck($event, callable $callable, $expected, $params = [])
     {
-        $altered = null;
+        $return = call_user_func_array($callable, $params);
 
-        if (is_callable($this->$event)) {
-            $altered = ($this->$event)($model, $this->source);
-            if (!$altered instanceof $expected) {
-                $given = gettype($altered);
-                if ($given === 'object') {
-                    $given = get_class($altered);
-                }
-                throw BadCallableReturnException::shouldBe(
-                    $event,
-                    $expected,
-                    $given
-                );
+        if (!$return instanceof $expected) {
+            $given = gettype($return);
+            if ($given === 'object') {
+                $given = get_class($return);
             }
+            throw BadCallableReturnException::shouldBe(
+                $event,
+                $expected,
+                $given
+            );
         }
 
-        return $altered;
+        return $return;
     }
 }
