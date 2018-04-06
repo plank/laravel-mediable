@@ -453,9 +453,22 @@ class MediaUploader
 
         $this->verifyDestination($model);
 
-        $model = $this->callBefore('before_save', $model, Model::class) ?: $model;
-        $source = $this->callBefore('before_upload', $model, SourceAdapterInterface::class)
-            ?: $this->source;
+        $source = $this->callBefore('before_upload', $model, SourceAdapterInterface::class);
+
+        if ($source !== null) {
+            $model->size = $source->size();
+            $model->mime_type = $source->mimeType();
+            $model->extension = $source->extension();
+            $model->aggregate_type = $this->inferAggregateType($model->mime_type, $model->extension);
+        } else {
+            $source = $this->source;
+        }
+
+        $alteredModel = $this->callBefore('before_save', $model, Model::class);
+
+        if ($alteredModel !== null) {
+            $model = $alteredModel;
+        }
 
         $this->filesystem->disk($model->disk)->put($model->getDiskPath(), $source->contents());
         $model->save();
@@ -468,7 +481,7 @@ class MediaUploader
      * @param callable $callable
      * @return static
      */
-    public function beforeUpload(callable $callable)
+    public function beforeUpload($callable)
     {
         $this->before_upload = $callable;
         return $this;
@@ -479,32 +492,10 @@ class MediaUploader
      * @param callable $callable
      * @return static
      */
-    public function beforeSave(callable $callable)
+    public function beforeSave($callable)
     {
         $this->before_save = $callable;
         return $this;
-    }
-
-    private function callBefore(string $event, Model $model, string $expected)
-    {
-        $altered = null;
-
-        if (is_callable($this->$event)) {
-            $altered = ($this->$event)($model, $this->source);
-            if (!$altered instanceof $expected) {
-                $given = gettype($altered);
-                if ($given === 'object') {
-                    $given = get_class($altered);
-                }
-                throw BadCallableReturnException::shouldBe(
-                    $event,
-                    $expected,
-                    $given
-                );
-            }
-        }
-
-        return $altered;
     }
 
     /**
@@ -795,5 +786,35 @@ class MediaUploader
     private function sanitizeFileName($file)
     {
         return str_replace(['#', '?', '\\', '/'], '-', $file);
+    }
+
+    /**
+     * Call the before callback for given event
+     * @param string $event
+     * @param Model $model
+     * @param string $expected
+     * @return mixed
+     * @throws BadCallableReturnException
+     */
+    private function callBefore($event, $model, $expected)
+    {
+        $altered = null;
+
+        if (is_callable($this->$event)) {
+            $altered = ($this->$event)($model, $this->source);
+            if (!$altered instanceof $expected) {
+                $given = gettype($altered);
+                if ($given === 'object') {
+                    $given = get_class($altered);
+                }
+                throw BadCallableReturnException::shouldBe(
+                    $event,
+                    $expected,
+                    $given
+                );
+            }
+        }
+
+        return $altered;
     }
 }

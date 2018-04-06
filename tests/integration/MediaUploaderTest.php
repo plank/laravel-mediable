@@ -11,8 +11,10 @@ use Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException;
 use Plank\Mediable\Exceptions\MediaUpload\ForbiddenException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException;
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
+use Plank\Mediable\Exceptions\BadCallableReturnException;
 use Plank\Mediable\MediaUploaderFacade as Facade;
 use Illuminate\Filesystem\FilesystemManager;
+use Illuminate\Database\Eloquent\Model;
 use League\Flysystem\Filesystem;
 
 class MediaUploaderTest extends TestCase
@@ -420,6 +422,56 @@ class MediaUploaderTest extends TestCase
             ->upload();
 
         $this->assertEquals('3ef5e70366086147c2695325d79a25cc', $media->filename);
+    }
+
+    public function test_it_throws_exception_when_bad_before_save_return()
+    {
+        $this->useFilesystem('tmp');
+        $this->useDatabase();
+
+        $this->expectException(BadCallableReturnException::class);
+        Facade::fromSource(__DIR__ . '/../_data/plank.png')
+            ->toDestination('tmp', 'foo')
+            ->beforeSave(function () {
+                return true;
+            })
+            ->upload();
+    }
+
+    public function test_it_throws_exception_when_bad_before_upload_return()
+    {
+        $this->useFilesystem('tmp');
+        $this->useDatabase();
+
+        $this->expectException(BadCallableReturnException::class);
+        Facade::fromSource(__DIR__ . '/../_data/plank.png')
+            ->toDestination('tmp', 'foo')
+            ->beforeUpload(function () {
+                return true;
+            })
+            ->upload();
+    }
+
+    public function test_it_uploads_altered_files()
+    {
+        $this->useDatabase();
+        $this->useFilesystem('tmp');
+
+        $media = Facade::fromSource(__DIR__ . '/../_data/plank.png')
+            ->toDestination('tmp', 'foo')
+            ->useFilename('bar')
+            ->beforeUpload(function () {
+                return new \Plank\Mediable\SourceAdapters\RawContentAdapter('foo');
+            })
+            ->upload();
+
+        $this->assertInstanceOf(Media::class, $media);
+        $this->assertTrue($media->fileExists());
+        $this->assertEquals('tmp', $media->disk);
+        $this->assertEquals('foo/bar.txt', $media->getDiskPath());
+        $this->assertEquals('text/plain', $media->mime_type);
+        $this->assertEquals(3, $media->size);
+        $this->assertEquals('document', $media->aggregate_type);
     }
 
     protected function mockUploader($filesystem = null, $factory = null)
