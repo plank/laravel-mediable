@@ -11,7 +11,6 @@ use Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException;
 use Plank\Mediable\Exceptions\MediaUpload\ForbiddenException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException;
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
-use Plank\Mediable\Exceptions\BadCallableReturnException;
 use Plank\Mediable\MediaUploaderFacade as Facade;
 use Illuminate\Filesystem\FilesystemManager;
 use League\Flysystem\Filesystem;
@@ -423,31 +422,18 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('3ef5e70366086147c2695325d79a25cc', $media->filename);
     }
 
-    public function test_it_throws_exception_when_bad_before_upload_return()
-    {
-        $this->useFilesystem('tmp');
-        $this->useDatabase();
 
-        $this->expectException(BadCallableReturnException::class);
-        Facade::fromSource(__DIR__ . '/../_data/plank.png')
-            ->toDestination('tmp', 'foo')
-            ->beforeUpload(function () {
-                return true;
-            })
-            ->upload();
-    }
-
-    public function test_it_uploads_altered_files()
+    public function test_it_uploads_files_with_modified_source()
     {
         $this->useDatabase();
         $this->useFilesystem('tmp');
 
         $media = Facade::fromSource(__DIR__ . '/../_data/plank.png')
-            ->toDestination('tmp', 'foo')
-            ->useFilename('bar')
-            ->beforeUpload(function () {
+            ->modifySource(function () {
                 return new \Plank\Mediable\SourceAdapters\RawContentAdapter('foo');
             })
+            ->toDestination('tmp', 'foo')
+            ->useFilename('bar')
             ->upload();
 
         $this->assertInstanceOf(Media::class, $media);
@@ -457,6 +443,29 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('text/plain', $media->mime_type);
         $this->assertEquals(3, $media->size);
         $this->assertEquals('document', $media->aggregate_type);
+    }
+
+    public function test_it_uploads_files_with_altered_model()
+    {
+        $this->useDatabase();
+        $this->useFilesystem('tmp');
+
+        $media = Facade::fromSource(__DIR__ . '/../_data/plank.png')
+            ->toDestination('tmp', 'foo')
+            ->useFilename('bar')
+            ->beforeSave(function ($model) {
+                $model->id = 9876;
+            })
+            ->upload();
+
+        $this->assertInstanceOf(Media::class, $media);
+        $this->assertTrue($media->fileExists());
+        $this->assertEquals('tmp', $media->disk);
+        $this->assertEquals('foo/bar.png', $media->getDiskPath());
+        $this->assertEquals('image/png', $media->mime_type);
+        $this->assertEquals(7173, $media->size);
+        $this->assertEquals('image', $media->aggregate_type);
+        $this->assertEquals(9876, $media->id);
     }
 
     protected function mockUploader($filesystem = null, $factory = null)
