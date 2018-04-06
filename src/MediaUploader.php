@@ -73,6 +73,18 @@ class MediaUploader
     private $hash_filename = false;
 
     /**
+     * Callable allowing to alter the file before upload. Should return a SourceAdapter
+     * @var callable
+     */
+    private $before_upload;
+
+    /**
+     * Callable allowing to alter the model before save. Should return the model
+     * @var callable
+     */
+    private $before_save;
+
+    /**
      * Constructor.
      * @param \Illuminate\Filesystem\FilesystemManager            $filesystem
      * @param \Plank\Mediable\SourceAdapters\SourceAdapterFactory $factory
@@ -438,10 +450,58 @@ class MediaUploader
 
         $this->verifyDestination($model);
 
-        $this->filesystem->disk($model->disk)->put($model->getDiskPath(), $this->source->contents());
+        $model = $this->callBefore('before_save', $model, Model::class) ?: $model;
+        $source = $this->callBefore('before_upload', $model, SourceAdapterInterface::class)
+            ?: $this->source;
+
+        $this->filesystem->disk($model->disk)->put($model->getDiskPath(), $source->contents());
         $model->save();
 
         return $model;
+    }
+
+    /**
+     * Set the before upload callback
+     * @param callable $callable
+     * @return static
+     */
+    public function beforeUpload(callable $callable)
+    {
+        $this->before_upload = $callable;
+        return $this;
+    }
+
+    /**
+     * Set the before save callback
+     * @param callable $callable
+     * @return static
+     */
+    public function beforeSave(callable $callable)
+    {
+        $this->before_save = $callable;
+        return $this;
+    }
+
+    private function callBefore(string $event, Model $model, string $expected)
+    {
+        $altered = null;
+
+        if (is_callable($this->$event)) {
+            $altered = ($this->$event)($model, $this->source);
+            if (!$altered instanceof $expected) {
+                $given = gettype($altered);
+                if ($given === 'object') {
+                    $given = get_class($altered);
+                }
+                throw BadCallableReturnException::shouldBe(
+                    $event,
+                    $expected,
+                    $given
+                );
+            }
+        }
+
+        return $altered;
     }
 
     /**
