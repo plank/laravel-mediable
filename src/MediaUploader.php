@@ -2,8 +2,6 @@
 
 namespace Plank\Mediable;
 
-use Illuminate\Database\Eloquent\Model;
-use Plank\Mediable\Exceptions\BadCallableReturnException;
 use Plank\Mediable\Exceptions\MediaUpload\FileSizeException;
 use Plank\Mediable\Exceptions\MediaUpload\FileExistsException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException;
@@ -14,7 +12,6 @@ use Plank\Mediable\Helpers\File;
 use Plank\Mediable\SourceAdapters\RawContentAdapter;
 use Plank\Mediable\SourceAdapters\SourceAdapterFactory;
 use Illuminate\Filesystem\FilesystemManager;
-use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
 
 /**
  * Media Uploader.
