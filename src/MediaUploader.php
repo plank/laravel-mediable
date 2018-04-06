@@ -76,12 +76,6 @@ class MediaUploader
     private $hash_filename = false;
 
     /**
-     * Callable allowing to alter the file before upload. Should return a SourceAdapter
-     * @var callable
-     */
-    private $before_upload;
-
-    /**
      * Callable allowing to alter the model before save. Should return the model
      * @var callable
      */
@@ -442,9 +436,8 @@ class MediaUploader
 
         $model = $this->makeModel();
 
-        $model->size = $this->verifyFileSize($this->source->size());
-        $model->mime_type = $this->verifyMimeType($this->source->mimeType());
-        $model->extension = $this->verifyExtension($this->source->extension());
+        list($model->size, $model->mime_type, $model->extension) = $this->verifyFile();
+
         $model->aggregate_type = $this->inferAggregateType($model->mime_type, $model->extension);
 
         $model->disk = $this->disk ?: $this->config['default_disk'];
@@ -453,41 +446,21 @@ class MediaUploader
 
         $this->verifyDestination($model);
 
-        if (is_callable($this->before_upload)) {
-            $source = $this->callWithReturnTypeCheck(
-                'before_upload',
-                $this->before_upload,
-                SourceAdapterInterface::class,
-                ['model' => $model, 'source' => $this->source]
-            );
-
-            $model->size = $source->size();
-            $model->mime_type = $source->mimeType();
-            $model->extension = $source->extension();
-            $model->aggregate_type = $this->inferAggregateType($model->mime_type, $model->extension);
-        } else {
-            $source = $this->source;
-        }
-
         if (is_callable($this->before_save)) {
-            call_user_func($this->before_save, $model, $source);
+            call_user_func($this->before_save, $model, $this->source);
         }
 
-        $this->filesystem->disk($model->disk)->put($model->getDiskPath(), $source->contents());
+        $this->filesystem->disk($model->disk)->put($model->getDiskPath(), $this->source->contents());
         $model->save();
 
         return $model;
     }
 
-    /**
-     * Set the before upload callback
-     * @param callable $callable
-     * @return static
-     */
-    public function beforeUpload(callable $callable)
+    public function modifySource(callable $callable)
     {
-        $this->before_upload = $callable;
-        return $this;
+        $newSource = call_user_func($callable, $this->source);
+
+        return static::fromSource($newSource);
     }
 
     /**
@@ -567,6 +540,15 @@ class MediaUploader
         }
 
         return $dirty;
+    }
+
+    public function verifyFile()
+    {
+        return [
+            $this->verifyFileSize($this->source->size()),
+            $this->verifyMimeType($this->source->mimeType()),
+            $this->verifyExtension($this->source->extension()),
+        ];
     }
 
     /**
@@ -789,33 +771,5 @@ class MediaUploader
     private function sanitizeFileName($file)
     {
         return str_replace(['#', '?', '\\', '/'], '-', $file);
-    }
-
-    /**
-     * Call a callable and ensure return is the right type
-     * @param $event
-     * @param $callable
-     * @param $expected
-     * @param array $params
-     * @return mixed
-     * @throws BadCallableReturnException
-     */
-    private function callWithReturnTypeCheck($event, callable $callable, $expected, $params = [])
-    {
-        $return = call_user_func_array($callable, $params);
-
-        if (!$return instanceof $expected) {
-            $given = gettype($return);
-            if ($given === 'object') {
-                $given = get_class($return);
-            }
-            throw BadCallableReturnException::shouldBe(
-                $event,
-                $expected,
-                $given
-            );
-        }
-
-        return $return;
     }
 }
