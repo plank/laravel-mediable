@@ -423,20 +423,6 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('3ef5e70366086147c2695325d79a25cc', $media->filename);
     }
 
-    public function test_it_throws_exception_when_bad_before_save_return()
-    {
-        $this->useFilesystem('tmp');
-        $this->useDatabase();
-
-        $this->expectException(BadCallableReturnException::class);
-        Facade::fromSource(__DIR__ . '/../_data/plank.png')
-            ->toDestination('tmp', 'foo')
-            ->beforeSave(function () {
-                return true;
-            })
-            ->upload();
-    }
-
     public function test_it_throws_exception_when_bad_before_upload_return()
     {
         $this->useFilesystem('tmp');
