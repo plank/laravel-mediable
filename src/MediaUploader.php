@@ -481,7 +481,7 @@ class MediaUploader
      * @param callable $callable
      * @return static
      */
-    public function beforeUpload($callable)
+    public function beforeUpload(callable $callable)
     {
         $this->before_upload = $callable;
         return $this;
@@ -492,7 +492,7 @@ class MediaUploader
      * @param callable $callable
      * @return static
      */
-    public function beforeSave($callable)
+    public function beforeSave(callable $callable)
     {
         $this->before_save = $callable;
         return $this;
