@@ -422,29 +422,6 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('3ef5e70366086147c2695325d79a25cc', $media->filename);
     }
 
-
-    public function test_it_uploads_files_with_modified_source()
-    {
-        $this->useDatabase();
-        $this->useFilesystem('tmp');
-
-        $media = Facade::fromSource(__DIR__ . '/../_data/plank.png')
-            ->modifySource(function () {
-                return new \Plank\Mediable\SourceAdapters\RawContentAdapter('foo');
-            })
-            ->toDestination('tmp', 'foo')
-            ->useFilename('bar')
-            ->upload();
-
-        $this->assertInstanceOf(Media::class, $media);
-        $this->assertTrue($media->fileExists());
-        $this->assertEquals('tmp', $media->disk);
-        $this->assertEquals('foo/bar.txt', $media->getDiskPath());
-        $this->assertEquals('text/plain', $media->mime_type);
-        $this->assertEquals(3, $media->size);
-        $this->assertEquals('document', $media->aggregate_type);
-    }
-
     public function test_it_uploads_files_with_altered_model()
     {
         $this->useDatabase();

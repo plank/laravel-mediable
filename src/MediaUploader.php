@@ -453,13 +453,6 @@ class MediaUploader
         return $model;
     }
 
-    public function modifySource(callable $callable)
-    {
-        $newSource = call_user_func($callable, $this->source);
-
-        return static::fromSource($newSource);
-    }
-
     /**
      * Set the before save callback
      * @param callable $callable
@@ -539,6 +532,10 @@ class MediaUploader
         return $dirty;
     }
 
+    /**
+     * Verify if file is valid
+     * @return array
+     */
     public function verifyFile()
     {
         return [
