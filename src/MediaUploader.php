@@ -429,11 +429,13 @@ class MediaUploader
      */
     public function upload()
     {
-        $this->verifySource();
+        $this->verifyFile();
 
         $model = $this->makeModel();
 
-        list($model->size, $model->mime_type, $model->extension) = $this->verifyFile();
+        $model->size = $this->source->size();
+        $model->mime_type = $this->source->mimeType();
+        $model->extension = $this->source->extension();
 
         $model->aggregate_type = $this->inferAggregateType($model->mime_type, $model->extension);
 
@@ -534,15 +536,21 @@ class MediaUploader
 
     /**
      * Verify if file is valid
-     * @return array
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\ConfigurationException If no source is provided
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException If the source is invalid
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\FileSizeException If the file is too large
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException If the mime type is not allowed
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException If the file extension is not allowed
+     * @return bool
      */
     public function verifyFile()
     {
-        return [
-            $this->verifyFileSize($this->source->size()),
-            $this->verifyMimeType($this->source->mimeType()),
-            $this->verifyExtension($this->source->extension()),
-        ];
+        $this->verifySource();
+        $this->verifyFileSize($this->source->size());
+        $this->verifyMimeType($this->source->mimeType());
+        $this->verifyExtension($this->source->extension());
+
+        return true;
     }
 
     /**
