@@ -73,7 +73,7 @@ class MediaUploader
     private $hash_filename = false;
 
     /**
-     * Callable allowing to alter the model before save. Should return the model
+     * Callable allowing to alter the model before save.
      * @var callable
      */
     private $before_save;
