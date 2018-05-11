@@ -145,7 +145,8 @@ You can also validate the file without uploading it by calling the ``verifyFile`
 Alter Model before upload
 -------------------------
 
-You can manipulate the model before it's saved by passing a callable to the ``beforeSave`` method
+You can manipulate the model before it's saved by passing a callable to the ``beforeSave`` method.
+The callback takes two params, ``$model`` an instance of ``Plank\Mediable\Media`` the current model and ``$source`` an instance of ``Plank\Mediable\SourceAdapters\SourceAdapterInterface`` the current source.
 
 ::
 
@@ -156,7 +157,7 @@ You can manipulate the model before it's saved by passing a callable to the ``be
         ->setModelClass(CustomMediaClass::class)
 
         // pass the callable
-        ->beforeSave(function (Media $model, $source) {
+        ->beforeSave(function (Media $model, SourceAdapterInterface $source) {
             $model->setAttribute('customAttribute', 'value')
         })
 
