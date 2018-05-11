@@ -422,6 +422,29 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('3ef5e70366086147c2695325d79a25cc', $media->filename);
     }
 
+    public function test_it_uploads_files_with_altered_model()
+    {
+        $this->useDatabase();
+        $this->useFilesystem('tmp');
+
+        $media = Facade::fromSource(__DIR__ . '/../_data/plank.png')
+            ->toDestination('tmp', 'foo')
+            ->useFilename('bar')
+            ->beforeSave(function ($model) {
+                $model->id = 9876;
+            })
+            ->upload();
+
+        $this->assertInstanceOf(Media::class, $media);
+        $this->assertTrue($media->fileExists());
+        $this->assertEquals('tmp', $media->disk);
+        $this->assertEquals('foo/bar.png', $media->getDiskPath());
+        $this->assertEquals('image/png', $media->mime_type);
+        $this->assertEquals(7173, $media->size);
+        $this->assertEquals('image', $media->aggregate_type);
+        $this->assertEquals(9876, $media->id);
+    }
+
     protected function mockUploader($filesystem = null, $factory = null)
     {
         return new MediaUploader(
