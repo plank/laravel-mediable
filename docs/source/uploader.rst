@@ -123,6 +123,46 @@ You can override the most validation configuration values set in ``config/mediab
 
         ->upload();
 
+You can also validate the file without uploading it by calling the ``verifyFile`` method, it will always return true or throw a ``Plank\Mediable\MediaUploadException``
+
+::
+
+    <?php
+    $media = MediaUploader::fromSource($request->file('image'))
+
+        // model class to use
+        ->setModelClass(MediaSubclass::class)
+
+        // maximum filesize in bytes
+        ->setMaximumSize(99999)
+
+        // only allow files of specific MIME types
+        ->setAllowedMimeTypes(['image/jpeg'])
+
+        ->verifyFile()
+
+
+Alter Model before upload
+-------------------------
+
+You can manipulate the model before it's saved by passing a callable to the ``beforeSave`` method
+
+::
+
+    <?php
+    $media = MediaUploader::fromSource($request->file('image'))
+
+        // model class to use
+        ->setModelClass(CustomMediaClass::class)
+
+        // pass the callable
+        ->beforeSave(function (Media $model, $source) {
+            $model->setAttribute('customAttribute', 'value')
+        })
+
+        ->upload()
+
+
 Handling Exceptions
 --------------------
 
