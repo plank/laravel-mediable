@@ -123,7 +123,8 @@ You can override the most validation configuration values set in ``config/mediab
 
         ->upload();
 
-You can also validate the file without uploading it by calling the ``verifyFile`` method, it will always return true or throw a ``Plank\Mediable\MediaUploadException``
+You can also validate the file without uploading it by calling the ``verifyFile`` method.
+If the file does not pass validation, an instance of ``Plank\Mediable\MediaUploadException`` will be thrown
 
 ::
 
