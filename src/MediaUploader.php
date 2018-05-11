@@ -541,7 +541,7 @@ class MediaUploader
      * @throws \Plank\Mediable\Exceptions\MediaUpload\FileSizeException If the file is too large
      * @throws \Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException If the mime type is not allowed
      * @throws \Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException If the file extension is not allowed
-     * @return bool
+     * @return void
      */
     public function verifyFile()
     {
@@ -549,8 +549,6 @@ class MediaUploader
         $this->verifyFileSize($this->source->size());
         $this->verifyMimeType($this->source->mimeType());
         $this->verifyExtension($this->source->extension());
-
-        return true;
     }
 
     /**
