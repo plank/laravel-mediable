@@ -169,6 +169,7 @@ trait Mediable
     {
         $tags = (array) $tags;
         $increments = $this->getOrderValueForTags($tags);
+
         $ids = $this->extractIds($media);
 
         foreach ($tags as $tag) {
@@ -458,7 +459,7 @@ trait Mediable
     private function getOrderValueForTags($tags)
     {
         $q = $this->media()->newPivotStatement();
-        $tags = (array) $tags;
+        $tags = array_map('strval', (array) $tags);
         $grammar = $q->getGrammar();
 
         $result = $q->selectRaw($grammar->wrap('tag').', max('.$grammar->wrap('order').') as aggregate')
@@ -470,7 +471,8 @@ trait Mediable
 
         $empty = array_combine($tags, array_fill(0, count($tags), 0));
 
-        return array_merge($empty, collect($result)->toArray());
+        $merged = collect($result)->toArray() + $empty;
+        return $merged;
     }
 
     /**
