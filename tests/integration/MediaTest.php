@@ -168,6 +168,33 @@ class MediaTest extends TestCase
         $this->assertTrue($media->exists());
     }
 
+    public function test_it_can_be_copied_on_disk()
+    {
+        $this->useFilesystem('tmp');
+        $this->useDatabase();
+
+        $media = factory(Media::class)->make(['disk' => 'tmp', 'directory' => 'foo', 'filename' => 'bar', 'extension' => 'baz']);
+        $this->seedFileForMedia($media);
+
+        // copy the file and make some checks
+        $copiedMedia1 = $media->copyTo('alpha', 'test');
+        $this->assertEquals('alpha/test.baz', $copiedMedia1->getDiskPath());
+        $this->assertTrue($copiedMedia1->exists());
+
+        // check that the "old" media file still exists
+        $this->assertEquals('foo/bar.baz', $media->getDiskPath());
+        $this->assertTrue($media->exists());
+
+        // check, if it works without a filename (the filename of the original media object is used!)
+        $copiedMedia2 = $media->copyTo('beta');
+        $this->assertEquals('beta/bar.baz', $copiedMedia2->getDiskPath());
+        $this->assertTrue($copiedMedia2->exists());
+
+        // check if it throws an exception if the file already exists
+        $this->expectException(MediaMoveException::class);
+        $copiedMedia3 = $media->copyTo('alpha', 'test');
+    }
+
     public function test_it_throws_an_exception_if_moving_to_existing_file()
     {
         $this->useFilesystem('tmp');

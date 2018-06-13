@@ -74,6 +74,12 @@ class MediaUploader
     private $hash_filename = false;
 
     /**
+     * Callable allowing to alter the model before save.
+     * @var callable
+     */
+    private $before_save;
+
+    /**
      * Constructor.
      * @param \Illuminate\Filesystem\FilesystemManager            $filesystem
      * @param \Plank\Mediable\SourceAdapters\SourceAdapterFactory $factory
@@ -434,13 +440,14 @@ class MediaUploader
      */
     public function upload()
     {
-        $this->verifySource();
+        $this->verifyFile();
 
         $model = $this->makeModel();
 
-        $model->size = $this->verifyFileSize($this->source->size());
-        $model->mime_type = $this->verifyMimeType($this->source->mimeType());
-        $model->extension = $this->verifyExtension($this->source->extension());
+        $model->size = $this->source->size();
+        $model->mime_type = $this->source->mimeType();
+        $model->extension = $this->source->extension();
+
         $model->aggregate_type = $this->inferAggregateType($model->mime_type, $model->extension);
 
         $model->disk = $this->disk ?: $this->config['default_disk'];
@@ -449,10 +456,25 @@ class MediaUploader
 
         $model = $this->handleDuplicate($model);
 
+        if (is_callable($this->before_save)) {
+            call_user_func($this->before_save, $model, $this->source);
+        }
+
         $this->filesystem->disk($model->disk)->put($model->getDiskPath(), $this->source->contents());
         $model->save();
 
         return $model;
+    }
+
+    /**
+     * Set the before save callback
+     * @param callable $callable
+     * @return static
+     */
+    public function beforeSave(callable $callable)
+    {
+        $this->before_save = $callable;
+        return $this;
     }
 
     /**
@@ -521,6 +543,23 @@ class MediaUploader
         }
 
         return $dirty;
+    }
+
+    /**
+     * Verify if file is valid
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\ConfigurationException If no source is provided
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException If the source is invalid
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\FileSizeException If the file is too large
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException If the mime type is not allowed
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException If the file extension is not allowed
+     * @return void
+     */
+    public function verifyFile()
+    {
+        $this->verifySource();
+        $this->verifyFileSize($this->source->size());
+        $this->verifyMimeType($this->source->mimeType());
+        $this->verifyExtension($this->source->extension());
     }
 
     /**
@@ -700,9 +739,12 @@ class MediaUploader
         $storage = $this->filesystem->disk($model->disk);
         $counter = 0;
         do {
-            ++$counter;
-            $filename = "{$model->filename} ({$counter})";
+            $filename = "{$model->filename}";
+            if ($counter > 0) {
+                $filename .= '-' . $counter;
+            }
             $path = "{$model->directory}/{$filename}.{$model->extension}";
+            ++$counter;
         } while ($storage->has($path));
 
         return $filename;

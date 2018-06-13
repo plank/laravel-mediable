@@ -50,7 +50,7 @@ class LocalUrlGenerator extends BaseUrlGenerator
         if ($this->isInWebroot()) {
             $path = str_replace(public_path(), '', $this->getAbsolutePath());
         } else {
-            $path = rtrim($this->getDiskConfig('prefix', 'storage'), '/').'/'.$this->media->getDiskPath();
+            $path = rtrim($this->getPrefix(), '/').'/'.$this->media->getDiskPath();
         }
 
         return $this->cleanDirectorySeparators($path);
@@ -102,5 +102,27 @@ class LocalUrlGenerator extends BaseUrlGenerator
     private function isInWebroot()
     {
         return strpos($this->getAbsolutePath(), public_path()) === 0;
+    }
+
+    /**
+     * Get the prefix.
+     *
+     * If the prefix and the url are not set, we will assume the prefix
+     * is "storage", in order to point to the default symbolink link.
+     *
+     * Otherwise, we will trust the user has correctly set the prefix and/or the url.
+     *
+     * @return string
+     */
+    private function getPrefix()
+    {
+        $prefix = $this->getDiskConfig('prefix', '');
+        $url = $this->getDiskConfig('url');
+
+        if (! $prefix && ! $url) {
+            return 'storage';
+        }
+
+        return $prefix;
     }
 }

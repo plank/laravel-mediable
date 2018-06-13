@@ -24,6 +24,18 @@ class MediableTest extends TestCase
         $this->assertEquals([2], $result->pluck('id')->toArray());
     }
 
+    public function test_it_can_attach_to_numeric_tags()
+    {
+        $mediable = factory(SampleMediable::class)->create();
+        $media1 = factory(Media::class)->create(['id' => 2]);
+
+        $mediable->attachMedia($media1, (string)2018);
+        $result = $mediable->getMedia((string)2018);
+
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $result);
+        $this->assertEquals([2], $result->pluck('id')->toArray());
+    }
+
     public function test_it_can_attach_one_media_to_multiple_tags()
     {
         $mediable = factory(SampleMediable::class)->create();
