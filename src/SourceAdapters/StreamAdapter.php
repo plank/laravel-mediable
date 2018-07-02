@@ -20,7 +20,7 @@ class StreamAdapter implements SourceAdapterInterface
 
     /**
      * The contents of the stream.
-     * @var string
+     * @var string|null
      */
     protected $contents;
 
