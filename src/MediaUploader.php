@@ -676,6 +676,7 @@ class MediaUploader
                 case static::ON_DUPLICATE_UPDATE:
                     $this->deleteExistingFile($model);
                     $model = $this->findExistingMediaRecord($model);
+                    $model->exists = true;
                     $model->touch();
                     break;
                 case static::ON_DUPLICATE_INCREMENT:

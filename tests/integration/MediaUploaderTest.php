@@ -262,10 +262,12 @@ class MediaUploaderTest extends TestCase
 
         $this->assertFalse($m2->exists);
         $this->assertTrue($m1->exists);
+        sleep(1); // required to check the update time is different
         $m2 = $method->invoke($uploader, $m2);
         $this->assertTrue($m2->exists);
-        $this->assertEquals($m1->created_at, $m2->created_at);
         $this->assertEquals($m1->id, $m2->id);
+        $this->assertEquals($m1->created_at, $m2->created_at);
+        $this->assertNotEquals($m1->updated_at, $m2->updated_at);
         $this->assertTrue($m2->save()); // check it does not throw an exception
     }
 
