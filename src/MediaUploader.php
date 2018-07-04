@@ -27,7 +27,7 @@ class MediaUploader
     const ON_DUPLICATE_REPLACE = 'replace';
     const ON_DUPLICATE_INCREMENT = 'increment';
     const ON_DUPLICATE_ERROR = 'error';
-    const ON_DUPLICATE_DELETE = 'delete';
+    const ON_DUPLICATE_UPDATE = 'update';
 
     /**
      * @var FileSystemManager
@@ -264,9 +264,9 @@ class MediaUploader
      * Overwrite the existing file, updating the original media record
      * @return $this
      */
-    public function onDuplicateReplace()
+    public function onDuplicateUpdate()
     {
-        return $this->setOnDuplicateBehavior(self::ON_DUPLICATE_REPLACE);
+        return $this->setOnDuplicateBehavior(self::ON_DUPLICATE_UPDATE);
     }
 
     /**
@@ -276,9 +276,9 @@ class MediaUploader
      *
      * @return $this
      */
-    public function onDuplicateDelete()
+    public function onDuplicateReplace()
     {
-        return $this->setOnDuplicateBehavior(self::ON_DUPLICATE_DELETE);
+        return $this->setOnDuplicateBehavior(self::ON_DUPLICATE_REPLACE);
     }
 
     /**
@@ -728,10 +728,10 @@ class MediaUploader
             case static::ON_DUPLICATE_ERROR:
                 throw FileExistsException::fileExists($model->getDiskPath());
                 break;
-            case static::ON_DUPLICATE_DELETE:
+            case static::ON_DUPLICATE_REPLACE:
                 $this->deleteExistingMedia($model);
                 break;
-            case static::ON_DUPLICATE_REPLACE:
+            case static::ON_DUPLICATE_UPDATE:
                 $model->{$model->getKeyName()} = Media::where('disk', $model->disk)
                     ->where('directory', $model->directory)
                     ->where('filename', $model->filename)

@@ -35,8 +35,8 @@ class MediaUploaderTest extends TestCase
         $uploader = Facade::onDuplicateReplace();
         $this->assertEquals(MediaUploader::ON_DUPLICATE_REPLACE, $uploader->getOnDuplicateBehavior());
 
-        $uploader = Facade::onDuplicateDelete();
-        $this->assertEquals(MediaUploader::ON_DUPLICATE_DELETE, $uploader->getOnDuplicateBehavior());
+        $uploader = Facade::onDuplicateUpdate();
+        $this->assertEquals(MediaUploader::ON_DUPLICATE_UPDATE, $uploader->getOnDuplicateBehavior());
     }
 
     public function test_it_can_determine_media_type_by_extension_and_mime()
@@ -235,12 +235,12 @@ class MediaUploaderTest extends TestCase
         $this->assertTrue($media2->isVisible());
     }
 
-    public function test_it_can_delete_duplicate_files()
+    public function test_it_can_replace_duplicate_files()
     {
         $this->useDatabase();
         $this->useFilesystem('tmp');
 
-        $uploader = $this->getUploader()->onDuplicateDelete();
+        $uploader = $this->getUploader()->onDuplicateReplace();
         $method = $this->getPrivateMethod($uploader, 'handleDuplicate');
 
         $media = factory(Media::class)->create([
@@ -257,7 +257,7 @@ class MediaUploaderTest extends TestCase
         $this->assertFalse(file_exists($media->getAbsolutePath()));
     }
 
-    public function test_it_can_replace_duplicate_files()
+    public function test_it_can_update_duplicate_files()
     {
         $this->useDatabase();
         $this->useFilesystem('tmp');
@@ -271,11 +271,18 @@ class MediaUploaderTest extends TestCase
         ]);
         $this->seedFileForMedia($media, $this->sampleFile());
 
+        $ca = $media->created_at;
+        $ua = $media->updated_at;
+
+        sleep(1); // required to check the update time is different
+
         $result = Facade::fromSource(__DIR__ . '/../_data/plank.png')
-            ->setOnDuplicateBehavior(MediaUploader::ON_DUPLICATE_REPLACE)
+            ->setOnDuplicateBehavior(MediaUploader::ON_DUPLICATE_UPDATE)
             ->toDestination('tmp', '')
             ->upload();
         $media = $media->fresh();
+        $this->assertEquals($media->created_at, $ca);
+        $this->assertNotEquals($media->updated_at, $ua);
 
         $this->assertEquals($media->getKey(), $result->getKey());
         $this->assertEquals('image', $media->aggregate_type);

@@ -186,6 +186,7 @@ The `config/mediable.php` offers a number of options for configuring how media u
      *
      * * 'increment': the new file's name is given an incrementing suffix
      * * 'replace' : the old file and media model is deleted
+     * * 'update' : the old file is replaced, but the media model is updated
      * * 'error': an Exception is thrown
      *
      */

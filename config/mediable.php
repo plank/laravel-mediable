@@ -34,6 +34,7 @@ return [
      *
      * * `'increment'`: the new file's name is given an incrementing suffix
      * * `'replace'` : the old file and media model is deleted
+     * * `'update'` : the old file is replaced, but the media record is updated
      * * `'error'`: an Exception is thrown
      */
     'on_duplicate' => Plank\Mediable\MediaUploader::ON_DUPLICATE_INCREMENT,

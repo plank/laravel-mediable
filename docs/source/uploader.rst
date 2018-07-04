@@ -71,7 +71,7 @@ You can restore the default behaviour with ``useOriginalFilename()``.
 Handling Duplicates
 ----------------------
 
-Occasionally, a file with a matching name might already exist at the destination you would like to upload to. The uploader allows you to configure how it should respond to this scenario. There are three possible behaviours:
+Occasionally, a file with a matching name might already exist at the destination you would like to upload to. The uploader allows you to configure how it should respond to this scenario. There are four possible behaviours:
 
 ::
 
@@ -81,15 +81,13 @@ Occasionally, a file with a matching name might already exist at the destination
     $uploader->onDuplicateIncrement();
 
     // replace old file with new one, update existing Media record
-    $uploader->onDuplicateReplace();
+    $uploader->onDuplicateUpdate();
 
-    // replace old file with new one, delete existing Media record
-    $uploader->onDuplicateDelete();
+    // replace old file and media record with new ones
+    $uploader->onDuplicateReplace();
 
     // cancel upload, throw an exception
     $uploader->onDuplicateError();
-
-:note: In previous versions, ``onDuplicateReplace()`` behaved like ``onDuplicateDelete()``
 
 Validation
 --------------------
