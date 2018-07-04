@@ -60,7 +60,7 @@ class LocalPathAdapter implements SourceAdapterInterface
             return $extension;
         }
 
-        return File::guessExtension($this->mimeType());
+        return (string) File::guessExtension($this->mimeType());
     }
 
     /**
@@ -76,7 +76,7 @@ class LocalPathAdapter implements SourceAdapterInterface
      */
     public function contents()
     {
-        return file_get_contents($this->source);
+        return (string) file_get_contents($this->source);
     }
 
     /**
@@ -92,6 +92,6 @@ class LocalPathAdapter implements SourceAdapterInterface
      */
     public function size()
     {
-        return filesize($this->source);
+        return (int) filesize($this->source);
     }
 }

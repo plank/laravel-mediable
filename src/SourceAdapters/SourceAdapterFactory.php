@@ -80,7 +80,7 @@ class SourceAdapterFactory
     /**
      * Choose an adapter class for the class of the provided object.
      * @param  object $source
-     * @return \Plank\Mediable\SourceAdapters\SourceAdapterInterface|null
+     * @return string|null
      */
     private function adaptClass($source)
     {
@@ -94,7 +94,7 @@ class SourceAdapterFactory
     /**
      * Choose an adapter class for the provided string.
      * @param  string $source
-     * @return \Plank\Mediable\SourceAdapters\SourceAdapterInterface|null
+     * @return string|null
      */
     private function adaptString($source)
     {
@@ -114,7 +114,9 @@ class SourceAdapterFactory
      */
     private function validateAdapterClass($class)
     {
-        if (! class_implements($class, SourceAdapterInterface::class)) {
+        $implements = class_implements($class, true);
+
+        if (! in_array(SourceAdapterInterface::class, $implements)) {
             throw ConfigurationException::cannotSetAdapter($class);
         }
     }
