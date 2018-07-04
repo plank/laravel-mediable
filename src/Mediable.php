@@ -21,7 +21,7 @@ trait Mediable
 {
     /**
      * List of media tags that have been modified since last load.
-     * @var array
+     * @var string[]
      */
     private $media_dirty_tags = [];
 
@@ -51,7 +51,7 @@ trait Mediable
     /**
      * Query scope to detect the presence of one or more attached media for a given tag.
      * @param  \Illuminate\Database\Eloquent\Builder $q
-     * @param  string|array                          $tags
+     * @param  string|string[]                       $tags
      * @param  bool                                  $match_all
      * @return void
      */
@@ -68,7 +68,7 @@ trait Mediable
     /**
      * Query scope to detect the presence of one or more attached media that is bound to all of the specified tags simultaneously.
      * @param  \Illuminate\Database\Eloquent\Builder $q
-     * @param  array                                 $tags
+     * @param  string[]                              $tags
      * @return void
      */
     public function scopeWhereHasMediaMatchAll(Builder $q, array $tags)
@@ -84,7 +84,7 @@ trait Mediable
      * Query scope to eager load attached media.
      *
      * @param  \Illuminate\Database\Eloquent\Builder $q
-     * @param  string|array                          $tags      If one or more tags are specified, only media attached to those tags will be loaded.
+     * @param  string|string[]                       $tags      If one or more tags are specified, only media attached to those tags will be loaded.
      * @param  bool                                  $match_all Only load media matching all provided tags
      * @return void
      */
@@ -108,7 +108,7 @@ trait Mediable
     /**
      * Query scope to eager load attached media assigned to multiple tags.
      * @param  \Illuminate\Database\Eloquent\Builder $q
-     * @param  string|array                          $tags
+     * @param  string|string[]                       $tags
      * @return void
      */
     public function scopeWithMediaMatchAll(Builder $q, $tags = [])
@@ -121,8 +121,8 @@ trait Mediable
 
     /**
      * Lazy eager load attached media relationships.
-     * @param  string|array  $tags      If one or more tags are specified, only media attached to those tags will be loaded.
-     * @param  bool          $match_all Only load media matching all provided tags
+     * @param  string|string[] $tags      If one or more tags are specified, only media attached to those tags will be loaded.
+     * @param  bool            $match_all Only load media matching all provided tags
      * @return $this
      */
     public function loadMedia($tags = [], $match_all = false)
@@ -146,7 +146,7 @@ trait Mediable
 
     /**
      * Lazy eager load attached media relationships matching all provided tags.
-     * @param  string|array  $tags one or more tags
+     * @param  string|string[] $tags one or more tags
      * @return $this
      */
     public function loadMediaMatchAll($tags = [])
@@ -161,8 +161,8 @@ trait Mediable
 
     /**
      * Attach a media entity to the model with one or more tags.
-     * @param mixed        $media Either a string or numeric id, an array of ids, an instance of `Media` or an instance of `\Illuminate\Database\Eloquent\Collection`
-     * @param string|array $tags  One or more tags to define the relation
+     * @param mixed           $media Either a string or numeric id, an array of ids, an instance of `Media` or an instance of `\Illuminate\Database\Eloquent\Collection`
+     * @param string|string[] $tags  One or more tags to define the relation
      * @return void
      */
     public function attachMedia($media, $tags)
@@ -188,8 +188,8 @@ trait Mediable
 
     /**
      * Replace the existing media collection for the specified tag(s).
-     * @param mixed        $media
-     * @param string|array $tags
+     * @param mixed           $media
+     * @param string|string[] $tags
      * @return void
      */
     public function syncMedia($media, $tags)
@@ -200,8 +200,8 @@ trait Mediable
 
     /**
      * Detach a media item from the model.
-     * @param  mixed             $media
-     * @param  string|array|null $tags
+     * @param  mixed                $media
+     * @param  string|string[]|null $tags
      * If provided, will remove the media from the model for the provided tag(s) only
      * If omitted, will remove the media from the media for all tags
      * @return void
@@ -218,7 +218,7 @@ trait Mediable
 
     /**
      * Remove one or more tags from the model, detaching any media using those tags.
-     * @param  string|array $tags
+     * @param  string|string[] $tags
      * @return void
      */
     public function detachMediaTags($tags)
@@ -232,8 +232,8 @@ trait Mediable
 
     /**
      * Check if the model has any media attached to one or more tags.
-     * @param  string|array  $tags
-     * @param  bool          $match_all
+     * @param  string|string[] $tags
+     * @param  bool            $match_all
      * If false, will return true if the model has any attach media for any of the provided tags
      * If true, will return true is the model has any media that are attached to all of provided tags simultaneously
      * @return bool
@@ -245,11 +245,11 @@ trait Mediable
 
     /**
      * Retrieve media attached to the model.
-     * @param  string|array  $tags
-     * @param  bool          $match_all
+     * @param  string|string[] $tags
+     * @param  bool            $match_all
      * If false, will return media attached to any of the provided tags
      * If true, will return media attached to all of the provided tags simultaneously
-     * @return bool
+     * @return \Illuminate\Database\Eloquent\Collection|\Plank\Mediable\Media[]
      */
     public function getMedia($tags, $match_all = false)
     {
@@ -272,8 +272,8 @@ trait Mediable
 
     /**
      * Retrieve media attached to multiple tags simultaneously.
-     * @param array  $tags
-     * @return bool
+     * @param string[] $tags
+     * @return \Illuminate\Database\Eloquent\Collection|\Plank\Mediable\Media[]
      */
     public function getMediaMatchAll(array $tags)
     {
@@ -298,10 +298,10 @@ trait Mediable
 
     /**
      * Shorthand for retrieving the first attached media item.
-     * @param  string|array  $tags
-     * @param  bool         $match_all
+     * @param  string|string[] $tags
+     * @param  bool            $match_all
      * @see \Plank\Mediable\Mediable::getMedia()
-     * @return bool
+     * @return \Plank\Mediable\Media|null
      */
     public function firstMedia($tags, $match_all = false)
     {
@@ -310,10 +310,10 @@ trait Mediable
 
     /**
      * Shorthand for retrieving the last attached media item.
-     * @param  string|array  $tags
-     * @param  bool         $match_all
+     * @param  string|string[] $tags
+     * @param  bool            $match_all
      * @see \Plank\Mediable\Mediable::getMedia()
-     * @return bool
+     * @return \Plank\Mediable\Media|null
      */
     public function lastMedia($tags, $match_all = false)
     {
@@ -334,7 +334,7 @@ trait Mediable
     /**
      * Get a list of all tags that the media is attached to.
      * @param  \Plank\Mediable\Media  $media
-     * @return array
+     * @return string[]
      */
     public function getTagsForMedia(Media $media)
     {
@@ -351,7 +351,7 @@ trait Mediable
 
     /**
      * Indicate that the media attached to the provided tags has been modified.
-     * @param  string|array $tags
+     * @param  string|string[] $tags
      * @return void
      */
     protected function markMediaDirty($tags)
@@ -363,7 +363,7 @@ trait Mediable
 
     /**
      * Check if media attached to the specified tags has been modified.
-     * @param  null|string|array $tags
+     * @param  null|string|string[] $tags
      * If omitted, will return `true` if any tags have been modified
      * @return bool
      */
@@ -378,7 +378,7 @@ trait Mediable
 
     /**
      * Reloads media relationship if allowed and necessary.
-     * @param  null|string|array $tags
+     * @param  null|string|string[] $tags
      * @return void
      */
     protected function rehydrateMediaIfNecessary($tags = null)
@@ -405,8 +405,8 @@ trait Mediable
 
     /**
      * Generate a query builder for.
-     * @param  array|string  $tags [description]
-     * @return [type]              [description]
+     * @param  string|string[] $tags
+     * @return \Illuminate\Database\Query\Builder
      */
     protected function newMatchAllQuery($tags = [])
     {
@@ -422,7 +422,7 @@ trait Mediable
     /**
      * Modify an eager load query to only load media assigned to all provided tags simultaneously.
      * @param  \Illuminate\Database\Eloquent\Relations\MorphToMany $q
-     * @param  array|string                                        $tags
+     * @param  string|string[]                                     $tags
      * @return void
      */
     protected function addMatchAllToEagerLoadQuery(MorphToMany $q, $tags = [])
@@ -453,8 +453,8 @@ trait Mediable
 
     /**
      * Determine the highest order value assigned to each provided tag.
-     * @param  string|array $tags
-     * @return int
+     * @param  string|string[] $tags
+     * @return array
      */
     private function getOrderValueForTags($tags)
     {
@@ -561,8 +561,8 @@ trait Mediable
      * perform a WHERE IN on the pivot table's tags column
      *
      * Adds support for Laravel <= 5.2, which does not provide a `wherePivotIn()` method
-     * @param  MorphToMany $q
-     * @param  array       $tags
+     * @param  \Illuminate\Database\Eloquent\Relations\MorphToMany $q
+     * @param  string|string[]                                     $tags
      * @return void
      */
     private function wherePivotTagIn(MorphToMany $q, $tags = [])

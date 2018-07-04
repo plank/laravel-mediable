@@ -16,13 +16,13 @@ class SourceAdapterFactory
 {
     /**
      * Map of which adapters to use for a given source class.
-     * @var array
+     * @var string[]
      */
     private $class_adapters = [];
 
     /**
      * Map of which adapters to use for a given string pattern.
-     * @var array
+     * @var string[]
      */
     private $pattern_adapters = [];
 
@@ -68,7 +68,7 @@ class SourceAdapterFactory
     /**
      * Specify the FQCN of a SourceAdapter class to use when the source is a string matching the given pattern.
      * @param string $adapter_class
-     * @param string $source_class
+     * @param string $source_pattern
      * @return void
      */
     public function setAdapterForPattern($adapter_class, $source_pattern)

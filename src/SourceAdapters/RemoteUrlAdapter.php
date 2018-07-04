@@ -103,7 +103,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
 
     /**
      * Read the headers of the remote content.
-     * @param  string $key Header name
+     * @param  mixed $key Header name
      * @return mixed
      */
     private function getHeader($key)

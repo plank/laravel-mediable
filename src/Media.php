@@ -224,7 +224,7 @@ class Media extends Model
 
     /**
      * Rename the file in place.
-     * @param  string $name
+     * @param  string $filename
      * @return void
      * @see \Plank\Mediable\Media::move()
      */
@@ -260,7 +260,7 @@ class Media extends Model
 
     /**
      * Get a UrlGenerator instance for the media.
-     * @return \Plank\Mediable\UrlGenerators\UrlGenerator
+     * @return \Plank\Mediable\UrlGenerators\UrlGeneratorInterface
      */
     protected function getUrlGenerator()
     {
