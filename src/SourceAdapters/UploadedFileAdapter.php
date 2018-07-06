@@ -46,7 +46,7 @@ class UploadedFileAdapter implements SourceAdapterInterface
      */
     public function filename()
     {
-        return pathinfo($this->source->getClientOriginalName(), PATHINFO_FILENAME);
+        return pathinfo((string) $this->source->getClientOriginalName(), PATHINFO_FILENAME);
     }
 
     /**
@@ -60,7 +60,7 @@ class UploadedFileAdapter implements SourceAdapterInterface
             return $extension;
         }
 
-        return $this->source->guessExtension();
+        return (string) $this->source->guessExtension();
     }
 
     /**
@@ -68,7 +68,7 @@ class UploadedFileAdapter implements SourceAdapterInterface
      */
     public function mimeType()
     {
-        return $this->source->getClientMimeType();
+        return (string) $this->source->getClientMimeType();
     }
 
     /**
@@ -76,7 +76,7 @@ class UploadedFileAdapter implements SourceAdapterInterface
      */
     public function contents()
     {
-        return file_get_contents($this->path());
+        return (string) file_get_contents($this->path());
     }
 
     /**
@@ -92,6 +92,6 @@ class UploadedFileAdapter implements SourceAdapterInterface
      */
     public function size()
     {
-        return $this->source->getClientSize();
+        return (int) $this->source->getClientSize();
     }
 }

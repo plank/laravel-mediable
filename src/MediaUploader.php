@@ -315,7 +315,7 @@ class MediaUploader
      */
     public function setAllowedMimeTypes($allowed_mimes)
     {
-        $this->config['allowed_mime_types'] = array_map('strtolower', (array)$allowed_mimes);
+        $this->config['allowed_mime_types'] = array_map('strtolower', (array) $allowed_mimes);
 
         return $this;
     }
@@ -327,7 +327,7 @@ class MediaUploader
      */
     public function setAllowedExtensions($allowed_extensions)
     {
-        $this->config['allowed_extensions'] = array_map('strtolower', (array)$allowed_extensions);
+        $this->config['allowed_extensions'] = array_map('strtolower', (array) $allowed_extensions);
 
         return $this;
     }
@@ -488,7 +488,7 @@ class MediaUploader
      * @param  string $filename
      * @param  string $extension
      * @return \Plank\Mediable\Media
-     * @throws \Plank\Mediable\Exceptions\MediaUploadFileNotFoundException If the file does not exist
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException If the file does not exist
      */
     public function import($disk, $directory, $filename, $extension)
     {
