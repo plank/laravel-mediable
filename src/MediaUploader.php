@@ -675,7 +675,7 @@ class MediaUploader
                     break;
                 case static::ON_DUPLICATE_UPDATE:
                     $this->deleteExistingFile($model);
-                    $model = $this->findExistingMediaRecord($model);
+                    $model = Media::forPathOnDisk($model->disk, $model->getDiskPath())->first();
                     $model->exists = true;
                     $model->touch();
                     break;
@@ -701,23 +701,6 @@ class MediaUploader
             ->delete();
 
         $this->deleteExistingFile($model);
-    }
-
-    /**
-     * Find the media that previously existed at a destination.
-     * @param  \Plank\Mediable\Media  $model
-     * @return \Plank\Mediable\Media  $model
-     */
-    private function findExistingMediaRecord(Media $model)
-    {
-        if ($model->exists) {
-            return $model;
-        }
-        return Media::where('disk', $model->disk)
-            ->where('directory', $model->directory)
-            ->where('filename', $model->filename)
-            ->where('extension', $model->extension)
-            ->first();
     }
 
     /**
