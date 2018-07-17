@@ -242,33 +242,29 @@ class MediaUploaderTest extends TestCase
         $this->useDatabase();
         $this->useFilesystem('tmp');
 
-        $uploader = $this->mockDuplicateUploader();
-        $uploader->setOnDuplicateBehavior(MediaUploader::ON_DUPLICATE_UPDATE);
-        $method = $this->getPrivateMethod($uploader, 'handleDuplicate');
-
-        $m1 = factory(Media::class)->create([
+        $media = factory(Media::class)->create([
             'disk' => 'tmp',
-            'directory'=> '',
+            'directory' => '',
             'filename' => 'plank',
-            'extension' => 'png'
+            'extension' => 'png',
+            'aggregate_type' => 'bar'
         ]);
 
-        $m2 = factory(Media::class)->make([
-            'disk' => 'tmp',
-            'directory'=> '',
-            'filename' => 'plank',
-            'extension' => 'png'
-        ]);
+        $this->seedFileForMedia($media, fopen(__DIR__ . '/../_data/plank.png', 'r'));
 
-        $this->assertFalse($m2->exists);
-        $this->assertTrue($m1->exists);
+        $ca = $media->created_at;
+        $ua = $media->updated_at;
         sleep(1); // required to check the update time is different
-        $m2 = $method->invoke($uploader, $m2);
-        $this->assertTrue($m2->exists);
-        $this->assertEquals($m1->id, $m2->id);
-        $this->assertEquals($m1->created_at, $m2->created_at);
-        $this->assertNotEquals($m1->updated_at, $m2->updated_at);
-        $this->assertTrue($m2->save()); // check it does not throw an exception
+
+        $result = Facade::fromSource(__DIR__ . '/../_data/plank.png')
+            ->setOnDuplicateBehavior(MediaUploader::ON_DUPLICATE_UPDATE)
+            ->toDestination('tmp', '')->upload();
+
+        $media = $media->fresh();
+        $this->assertEquals($media->created_at, $ca);
+        $this->assertNotEquals($media->updated_at, $ua);
+        $this->assertEquals($media->getKey(), $result->getKey());
+        $this->assertEquals('image', $media->aggregate_type);
     }
 
     public function test_it_can_increment_filename_on_duplicate_files()
