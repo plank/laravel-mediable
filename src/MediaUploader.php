@@ -732,13 +732,8 @@ class MediaUploader
                 $this->deleteExistingMedia($model);
                 break;
             case static::ON_DUPLICATE_UPDATE:
-                $model->{$model->getKeyName()} = Media::where('disk', $model->disk)
-                    ->where('directory', $model->directory)
-                    ->where('filename', $model->filename)
-                    ->where('extension', $model->extension)
-                    ->pluck($model->getKeyName())
-                    ->first();
-
+                $model->{$model->getKeyName()} = Media::forPathOnDisk(
+                    $model->disk, $model->getDiskPath())->pluck($model->getKeyName())->first();
                 $model->exists = true;
                 break;
             case static::ON_DUPLICATE_INCREMENT:
