@@ -676,7 +676,7 @@ class MediaUploader
                 case static::ON_DUPLICATE_UPDATE:
                     $this->deleteExistingFile($model);
                     $model->{$model->getKeyName()} = Media::forPathOnDisk(
-                        $model->disk,$model->getDiskPath())
+                        $model->disk, $model->getDiskPath())
                         ->pluck($model->getKeyName())->first();
                     $model->exists = true;
                     break;
