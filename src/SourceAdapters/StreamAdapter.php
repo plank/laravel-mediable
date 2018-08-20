@@ -20,7 +20,7 @@ class StreamAdapter implements SourceAdapterInterface
 
     /**
      * The contents of the stream.
-     * @var string
+     * @var string|null
      */
     protected $contents;
 
@@ -68,7 +68,7 @@ class StreamAdapter implements SourceAdapterInterface
             return $extension;
         }
 
-        return File::guessExtension($this->mimeType());
+        return (string) File::guessExtension($this->mimeType());
     }
 
     /**
@@ -78,7 +78,7 @@ class StreamAdapter implements SourceAdapterInterface
     {
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
 
-        return $finfo->buffer($this->contents());
+        return (string) $finfo->buffer($this->contents());
     }
 
     /**
@@ -90,7 +90,7 @@ class StreamAdapter implements SourceAdapterInterface
             if ($this->source->isSeekable()) {
                 $this->contents = (string) $this->source;
             } else {
-                $this->contents = (string) $this->source->getContents();
+                $this->contents = $this->source->getContents();
             }
         }
 
@@ -116,6 +116,6 @@ class StreamAdapter implements SourceAdapterInterface
             return $size;
         }
 
-        return mb_strlen($this->contents(), '8bit');
+        return (int) mb_strlen($this->contents(), '8bit');
     }
 }

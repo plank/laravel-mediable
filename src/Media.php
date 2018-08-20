@@ -10,6 +10,20 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 /**
  * Media Model.
  *
+ * @property string $disk
+ * @property string $directory
+ * @property string $filename
+ * @property-read string $basename
+ * @property string $extension
+ * @property string $mime_type
+ * @property string $aggregate_type
+ * @property int $size
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder|\Plank\Mediable\Media forPathOnDisk(string $disk, string $path)
+ * @method static \Illuminate\Database\Eloquent\Builder|\Plank\Mediable\Media inDirectory(string $disk, string $directory, bool $recursive = false)
+ * @method static \Illuminate\Database\Eloquent\Builder|\Plank\Mediable\Media inOrUnderDirectory(string $disk, string $directory)
+ * @method static \Illuminate\Database\Eloquent\Builder|\Plank\Mediable\Media unordered()
+ * @method static \Illuminate\Database\Eloquent\Builder|\Plank\Mediable\Media whereBasename(string $basename)
  * @author Sean Fraser <sean@plankdesign.com>
  */
 class Media extends Model
@@ -224,7 +238,7 @@ class Media extends Model
 
     /**
      * Rename the file in place.
-     * @param  string $name
+     * @param  string $filename
      * @return void
      * @see \Plank\Mediable\Media::move()
      */
@@ -260,7 +274,7 @@ class Media extends Model
 
     /**
      * Get a UrlGenerator instance for the media.
-     * @return \Plank\Mediable\UrlGenerators\UrlGenerator
+     * @return \Plank\Mediable\UrlGenerators\UrlGeneratorInterface
      */
     protected function getUrlGenerator()
     {

@@ -97,9 +97,9 @@ class ImportMediaCommand extends Command
 
     /**
      * Generate a list of all files in the specified directory.
-     * @param  atring  $disk
+     * @param  string  $disk
      * @param  string  $directory
-     * @param  bool $recursive
+     * @param  bool    $recursive
      * @return array
      */
     protected function listFiles($disk, $directory = '', $recursive = true)

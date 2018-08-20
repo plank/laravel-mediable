@@ -16,13 +16,13 @@ class SourceAdapterFactory
 {
     /**
      * Map of which adapters to use for a given source class.
-     * @var array
+     * @var string[]
      */
     private $class_adapters = [];
 
     /**
      * Map of which adapters to use for a given string pattern.
-     * @var array
+     * @var string[]
      */
     private $pattern_adapters = [];
 
@@ -68,7 +68,7 @@ class SourceAdapterFactory
     /**
      * Specify the FQCN of a SourceAdapter class to use when the source is a string matching the given pattern.
      * @param string $adapter_class
-     * @param string $source_class
+     * @param string $source_pattern
      * @return void
      */
     public function setAdapterForPattern($adapter_class, $source_pattern)
@@ -80,7 +80,7 @@ class SourceAdapterFactory
     /**
      * Choose an adapter class for the class of the provided object.
      * @param  object $source
-     * @return \Plank\Mediable\SourceAdapters\SourceAdapterInterface|null
+     * @return string|null
      */
     private function adaptClass($source)
     {
@@ -94,7 +94,7 @@ class SourceAdapterFactory
     /**
      * Choose an adapter class for the provided string.
      * @param  string $source
-     * @return \Plank\Mediable\SourceAdapters\SourceAdapterInterface|null
+     * @return string|null
      */
     private function adaptString($source)
     {
@@ -114,7 +114,9 @@ class SourceAdapterFactory
      */
     private function validateAdapterClass($class)
     {
-        if (! class_implements($class, SourceAdapterInterface::class)) {
+        $implements = class_implements($class, true);
+
+        if (! in_array(SourceAdapterInterface::class, $implements)) {
             throw ConfigurationException::cannotSetAdapter($class);
         }
     }

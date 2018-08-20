@@ -28,7 +28,7 @@ class StreamResourceAdapter extends StreamAdapter
             throw ConfigurationException::unrecognizedSource($source);
         }
 
-        $this->source = new Stream($source);
+        parent::__construct(new Stream($source));
 
         $this->resource = $source;
     }

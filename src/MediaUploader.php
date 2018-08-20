@@ -45,7 +45,7 @@ class MediaUploader
 
     /**
      * Source adapter.
-     * @var
+     * @var \Plank\Mediable\SourceAdapters\SourceAdapterInterface
      */
     private $source;
 
@@ -63,7 +63,7 @@ class MediaUploader
 
     /**
      * Name of the new file.
-     * @var string
+     * @var string|null
      */
     private $filename = null;
 
@@ -304,9 +304,9 @@ class MediaUploader
 
     /**
      * Add or update the definition of a aggregate type.
-     * @param string $type       the name of the type
-     * @param array  $mime_types list of MIME types recognized
-     * @param array  $extensions list of file extensions recognized
+     * @param string           $type       the name of the type
+     * @param string|string[]  $mime_types list of MIME types recognized
+     * @param string|string[]  $extensions list of file extensions recognized
      * @return static
      */
     public function setTypeDefinition($type, $mime_types, $extensions)
@@ -321,24 +321,24 @@ class MediaUploader
 
     /**
      * Set a list of MIME types that the source file must be restricted to.
-     * @param array $allowed_mimes
+     * @param string|string[] $allowed_mimes
      * @return static
      */
     public function setAllowedMimeTypes($allowed_mimes)
     {
-        $this->config['allowed_mime_types'] = array_map('strtolower', (array)$allowed_mimes);
+        $this->config['allowed_mime_types'] = array_map('strtolower', (array) $allowed_mimes);
 
         return $this;
     }
 
     /**
      * Set a list of file extensions that the source file must be restricted to.
-     * @param array $allowed_extensions
+     * @param string|string[] $allowed_extensions
      * @return static
      */
     public function setAllowedExtensions($allowed_extensions)
     {
-        $this->config['allowed_extensions'] = array_map('strtolower', (array)$allowed_extensions);
+        $this->config['allowed_extensions'] = array_map('strtolower', (array) $allowed_extensions);
 
         return $this;
     }
@@ -401,7 +401,7 @@ class MediaUploader
     /**
      * Determine the aggregate type of the file based on the MIME type.
      * @param  string $mime
-     * @return string
+     * @return string[]
      */
     public function possibleAggregateTypesForMimeType($mime)
     {
@@ -418,7 +418,7 @@ class MediaUploader
     /**
      * Determine the aggregate type of the file based on the extension.
      * @param  string $extension
-     * @return string|null
+     * @return string[]
      */
     public function possibleAggregateTypesForExtension($extension)
     {
@@ -499,7 +499,7 @@ class MediaUploader
      * @param  string $filename
      * @param  string $extension
      * @return \Plank\Mediable\Media
-     * @throws \Plank\Mediable\Exceptions\MediaUploadFileNotFoundException If the file does not exist
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException If the file does not exist
      */
     public function import($disk, $directory, $filename, $extension)
     {
@@ -717,7 +717,7 @@ class MediaUploader
     /**
      * Increment model's filename until one is found that doesn't already exist.
      * @param  \Plank\Mediable\Media $model
-     * @return void
+     * @return string
      */
     private function generateUniqueFilename(Media $model)
     {
