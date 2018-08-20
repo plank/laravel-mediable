@@ -271,8 +271,8 @@ class MediaUploaderTest extends TestCase
         ]);
         $this->seedFileForMedia($media, $this->sampleFile());
 
-        $ca = $media->created_at;
-        $ua = $media->updated_at;
+        $createdAt = $media->created_at;
+        $updatedAt = $media->updated_at;
 
         sleep(1); // required to check the update time is different
 
@@ -281,8 +281,8 @@ class MediaUploaderTest extends TestCase
             ->toDestination('tmp', '')
             ->upload();
         $media = $media->fresh();
-        $this->assertEquals($media->created_at, $ca);
-        $this->assertNotEquals($media->updated_at, $ua);
+        $this->assertEquals($media->created_at, $createdAt);
+        $this->assertNotEquals($media->updated_at, $updatedAt);
 
         $this->assertEquals($media->getKey(), $result->getKey());
         $this->assertEquals('image', $media->aggregate_type);
