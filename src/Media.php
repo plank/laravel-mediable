@@ -62,7 +62,13 @@ class Media extends Model
      */
     public function models($class)
     {
-        return $this->morphedByMany($class, 'mediable')->withPivot('tag', 'order');
+        return $this
+            ->morphedByMany(
+                $class,
+                'mediable',
+                config('mediable.mediables_table', 'mediables')
+            )
+            ->withPivot('tag', 'order');
     }
 
     /**
@@ -253,7 +259,7 @@ class Media extends Model
         if (static::hasGlobalScope(SoftDeletingScope::class) && ! $this->forceDeleting) {
             if (config('mediable.detach_on_soft_delete')) {
                 $this->newBaseQueryBuilder()
-                    ->from('mediables')
+                    ->from(config('mediable.mediables_table', 'mediables'))
                     ->where('media_id', $this->getKey())
                     ->delete();
             }

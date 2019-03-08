@@ -9,6 +9,11 @@ return [
     'model' => Plank\Mediable\Media::class,
 
     /*
+     * Name to be used for mediables joining table
+     */
+    'mediables_table' => 'mediables',
+
+    /*
      * Filesystem disk to use if none is specified
      */
     'default_disk' => 'public',
