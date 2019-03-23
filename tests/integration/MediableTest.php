@@ -3,6 +3,7 @@
 use Plank\Mediable\Media;
 use Plank\Mediable\MediableCollection;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Support\Facades\DB;
 
 class MediableTest extends TestCase
 {
@@ -419,5 +420,17 @@ class MediableTest extends TestCase
         $query = $mediable->media()->unordered()->toSql();
 
         $this->assertNotRegExp('/order by `order`/i', $query);
+    }
+
+    public function test_it_can_create_mediables_on_custom_table()
+    {
+        config()->set('mediable.mediables_table', 'prefixed_mediables');
+
+        $media = factory(Media::class)->create();
+        $mediable = factory(SampleMediable::class)->create();
+        $mediable->attachMedia($media, 'foo');
+
+        $this->assertEmpty(DB::table('mediables')->get());
+        $this->assertCount(1, DB::table('prefixed_mediables')->get());
     }
 }

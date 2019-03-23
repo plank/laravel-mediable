@@ -308,3 +308,15 @@ Soft Deletes
 If your ``Mediable`` class uses Laravel's ``SoftDeletes`` trait, the model will only detach its media relationships if ``forceDelete()`` is used.
 
 You can change the ``detach_on_soft_delete`` setting to ``true`` in ``config/mediable.php`` to have relationships automatically detach when either the ``Media`` record or ``Mediable`` model are soft deleted.
+
+Custom Mediables Table
+----------------------
+
+By default the ``mediables`` table is used to for the media-to-mediables relationship. You can change this in ``config/mediable.php``:
+
+::
+
+    /*
+     * Name to be used for mediables joining table
+     */
+    'mediables_table' => 'prefixed_mediables',

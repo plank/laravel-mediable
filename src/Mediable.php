@@ -43,7 +43,12 @@ trait Mediable
      */
     public function media()
     {
-        return $this->morphToMany(config('mediable.model'), 'mediable')
+        return $this
+            ->morphToMany(
+                config('mediable.model'),
+                'mediable',
+                config('mediable.mediables_table', 'mediables')
+            )
             ->withPivot('tag', 'order')
             ->orderBy('order');
     }

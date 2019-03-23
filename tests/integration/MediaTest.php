@@ -4,6 +4,7 @@ use Plank\Mediable\Media;
 use Plank\Mediable\Exceptions\MediaMoveException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Support\Facades\DB;
 
 class MediaTest extends TestCase
 {
@@ -297,5 +298,35 @@ class MediaTest extends TestCase
 
         $media->forceDelete();
         $this->assertEquals(0, $mediable->getMedia('foo')->count());
+    }
+
+    public function test_it_retrieves_models_via_custom_mediables_table()
+    {
+        $this->useDatabase();
+
+        config()->set('mediable.mediables_table', 'prefixed_mediables');
+
+        $media = factory(Media::class)->create();
+        $mediable = factory(SampleMediable::class)->create();
+        $mediable->attachMedia($media, 'foo');
+
+        $this->assertEmpty(DB::table('mediables')->get());
+        $this->assertCount(1, $media->models(SampleMediable::class)->get());
+    }
+
+    public function test_it_cascades_relationships_on_soft_delete_with_config_via_custom_mediables_table()
+    {
+        $this->useDatabase();
+
+        config()->set('mediable.mediables_table', 'prefixed_mediables');
+        config()->set('mediable.detach_on_soft_delete', true);
+
+        $media = factory(MediaSoftDelete::class)->create();
+        $mediable = factory(SampleMediableSoftDelete::class)->create();
+        $mediable->attachMedia($media, 'foo');
+
+        $this->assertNotEmpty(DB::table('prefixed_mediables')->get());
+        $media->delete();
+        $this->assertEmpty(DB::table('prefixed_mediables')->get());
     }
 }
