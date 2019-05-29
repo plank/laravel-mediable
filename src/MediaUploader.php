@@ -80,6 +80,11 @@ class MediaUploader
     private $before_save;
 
     /**
+     * Visibility of the file (useful when working with S3)
+     */
+    private $visibility = null;
+
+    /**
      * Constructor.
      * @param \Illuminate\Filesystem\FilesystemManager            $filesystem
      * @param \Plank\Mediable\SourceAdapters\SourceAdapterFactory $factory
@@ -195,6 +200,18 @@ class MediaUploader
     {
         $this->filename = null;
         $this->hash_filename = false;
+
+        return $this;
+    }
+
+    /**
+     * Set visibility of the file.
+     * @param string $visibility Visibility (public|private)
+     * @return static
+     */
+    public function setVisibility($visibility)
+    {
+        $this->visibility = $visibility;
 
         return $this;
     }
@@ -477,7 +494,7 @@ class MediaUploader
             call_user_func($this->before_save, $model, $this->source);
         }
 
-        $this->filesystem->disk($model->disk)->put($model->getDiskPath(), $this->source->contents());
+        $this->filesystem->disk($model->disk)->put($model->getDiskPath(), $this->source->contents(), $this->visibility);
         $model->save();
 
         return $model;
