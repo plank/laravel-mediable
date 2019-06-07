@@ -227,7 +227,7 @@ class MediaUploaderTest extends TestCase
 
         $media = factory(Media::class)->create([
             'disk' => 'tmp',
-            'directory'=> '',
+            'directory' => '',
             'filename' => 'plank',
             'extension' => 'png'
         ]);
@@ -278,7 +278,7 @@ class MediaUploaderTest extends TestCase
 
         $media = factory(Media::class)->create([
             'disk' => 'tmp',
-            'directory'=> '',
+            'directory' => '',
             'filename' => 'plank',
             'extension' => 'png'
         ]);
@@ -333,7 +333,7 @@ class MediaUploaderTest extends TestCase
         $this->useDatabase();
         $this->useFilesystem('tmp');
 
-        $resource = fopen(realpath(__DIR__.'/../_data/plank.png'), 'r');
+        $resource = fopen(realpath(__DIR__ . '/../_data/plank.png'), 'r');
 
         $media = Facade::fromSource($resource)
             ->toDestination('tmp', 'foo')
@@ -476,6 +476,20 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals(7173, $media->size);
         $this->assertEquals('image', $media->aggregate_type);
         $this->assertEquals(9876, $media->id);
+    }
+
+    public function test_it_sets_visibility_on_upload()
+    {
+        $this->useDatabase();
+        $this->useFilesystem('tmp');
+
+        $media = Facade::fromSource(__DIR__ . '/../_data/plank.png')
+            ->toDestination('tmp', 'foo')
+            ->useFilename('bar')
+            ->setVisibility('private')
+            ->upload();
+
+        $this->assertEquals('private', Storage::disk('tmp')->getVisibility($media->getDiskPath()));
     }
 
     protected function mockUploader($filesystem = null, $factory = null)
