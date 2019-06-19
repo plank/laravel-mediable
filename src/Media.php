@@ -37,6 +37,7 @@ class Media extends Model
     const TYPE_DOCUMENT = 'document';
     const TYPE_SPREADSHEET = 'spreadsheet';
     const TYPE_PRESENTATION = 'presentation';
+    const TYPE_CERTIFICATE = 'certificate';
     const TYPE_OTHER = 'other';
     const TYPE_ALL = 'all';
 
