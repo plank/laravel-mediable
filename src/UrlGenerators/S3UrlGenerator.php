@@ -50,7 +50,7 @@ class S3UrlGenerator extends BaseUrlGenerator
         /** @var \League\Flysystem\AwsS3v3\AwsS3Adapter $adapter */
         $adapter = $this->filesystem->disk($this->media->disk)->getDriver()->getAdapter();
         
-        if($urlExpiry !== null) {
+        if ($urlExpiry !== null) {
             $command = $adapter->getClient()->getCommand('GetObject', array_merge([
                 'Bucket' => $adapter->getBucket(),
                 'Key' => $this->media->getDiskPath(),
