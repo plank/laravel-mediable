@@ -41,13 +41,24 @@ class S3UrlGenerator extends BaseUrlGenerator
     /**
      * {@inheritdoc}
      */
-    public function getUrl()
+    public function getUrl($urlExpiry = null)
     {
-        if (! $this->isPubliclyAccessible()) {
+        if (! $this->isPubliclyAccessible() && $urlExpiry === null) {
             throw MediaUrlException::cloudMediaNotPubliclyAccessible($this->media->disk);
         }
 
+        /** @var \League\Flysystem\AwsS3v3\AwsS3Adapter $adapter */
         $adapter = $this->filesystem->disk($this->media->disk)->getDriver()->getAdapter();
+        
+        if($urlExpiry !== null) {
+            $command = $adapter->getClient()->getCommand('GetObject', array_merge([
+                'Bucket' => $adapter->getBucket(),
+                'Key' => $this->media->getDiskPath(),
+            ], $options));
+
+            return (string) $adapter->getBucket()->createPresignedRequest($command, $urlExpiry)->getUri();
+        }
+        
         return $adapter->getClient()->getObjectUrl($adapter->getBucket(), $this->media->getDiskPath());
     }
 }
