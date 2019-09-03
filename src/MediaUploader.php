@@ -381,13 +381,13 @@ class MediaUploader
         $types_for_mime = $this->possibleAggregateTypesForMimeType($mime_type);
         $types_for_extension = $this->possibleAggregateTypesForExtension($extension);
 
-        if (count($allowed_types)) {
+        if (count($allowed_types) > 0) {
             $intersection = array_intersect($types_for_mime, $types_for_extension, $allowed_types);
         } else {
             $intersection = array_intersect($types_for_mime, $types_for_extension);
         }
 
-        if (count($intersection)) {
+        if (count($intersection) > 0) {
             $type = $intersection[0];
         } elseif (empty($types_for_mime) && empty($types_for_extension)) {
             if (! $this->config['allow_unrecognized_types']) {
@@ -761,7 +761,7 @@ class MediaUploader
         do {
             $filename = "{$model->filename}";
             if ($counter > 0) {
-                $filename .= '-' . $counter;
+                $filename .= "-{$counter}";
             }
             $path = "{$model->directory}/{$filename}.{$model->extension}";
             ++$counter;

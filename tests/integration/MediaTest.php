@@ -247,7 +247,7 @@ class MediaTest extends TestCase
 
         $this->assertFileExists($path);
         $media->delete();
-        $this->assertFalse(file_exists($path));
+        $this->assertFileNotExists($path);
     }
 
     public function test_it_cascades_relationship_on_delete()

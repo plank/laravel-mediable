@@ -476,8 +476,7 @@ trait Mediable
 
         $empty = array_combine($tags, array_fill(0, count($tags), 0));
 
-        $merged = collect($result)->toArray() + $empty;
-        return $merged;
+        return collect($result)->toArray() + $empty;
     }
 
     /**

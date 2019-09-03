@@ -106,7 +106,7 @@ class HandlesMediaExceptionsTest extends TestCase
             new Exception()
         );
 
-        $this->assertFalse($e instanceof HttpException);
+        $this->assertNotInstanceOf(HttpException::class, $e);
     }
 
     protected function assertHttpException($e, $code)

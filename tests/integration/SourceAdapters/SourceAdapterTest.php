@@ -14,7 +14,7 @@ use Psr\Http\Message\StreamInterface;
 
 class SourceAdapterTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
     }
@@ -128,7 +128,7 @@ class SourceAdapterTest extends TestCase
     {
         $adapter = new $adapter($source);
 
-        $this->assertInternalType('string', $adapter->contents());
+        $this->assertIsString($adapter->contents());
     }
 
     /**

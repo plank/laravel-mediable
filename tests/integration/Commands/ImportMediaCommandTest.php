@@ -6,7 +6,7 @@ use Illuminate\Contracts\Console\Kernel as Artisan;
 
 class ImportMediaCommandTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->useDatabase();

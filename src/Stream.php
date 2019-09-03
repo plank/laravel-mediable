@@ -221,8 +221,10 @@ class Stream implements StreamInterface
         $result = fseek($this->resource, $offset, $whence);
 
         if ($result === -1) {
-            throw new \RuntimeException('Unable to seek to stream position '
-                . $offset . ' with whence ' . var_export($whence, true));
+            throw new \RuntimeException(vsprintf('Unable to seek to stream position %d with whence %s', [
+                $offset,
+                var_export($whence, true),
+            ]));
         }
 
         return true;
@@ -285,6 +287,6 @@ class Stream implements StreamInterface
             return $metadata;
         }
 
-        return isset($metadata[$key]) ? $metadata[$key] : null;
+        return $metadata[$key] ?? null;
     }
 }

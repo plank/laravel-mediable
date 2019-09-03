@@ -39,9 +39,12 @@ class File
             return '0 '.$units[0];
         }
         $exponent = floor(log($bytes, 1024));
-        $value = $bytes / pow(1024, $exponent);
+        $value = $bytes / 1024 ** $exponent;
 
-        return round($value, $precision).' '.$units[$exponent];
+        return vsprintf('%s %s', [
+            round($value, $precision),
+            $units[$exponent],
+        ]);
     }
 
     /**

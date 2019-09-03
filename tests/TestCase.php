@@ -9,7 +9,7 @@ class TestCase extends BaseTestCase
 {
     protected $queriesCount;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->withFactories(__DIR__.'/_factories');

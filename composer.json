@@ -10,19 +10,19 @@
         }
     ],
     "require": {
-        "php": ">=5.4.0",
-        "illuminate/support": "^5.2.0",
-        "illuminate/filesystem": "^5.2.0",
-        "illuminate/database": "^5.2.0",
+        "php": "^7.2",
+        "illuminate/support": "^5.2.0|^6.0",
+        "illuminate/filesystem": "^5.2.0|^6.0",
+        "illuminate/database": "^5.2.0|^6.0",
         "league/flysystem": "^1.0.8",
         "psr/http-message": "^1.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^3.0",
-        "phpunit/phpunit": "^5.7",
-        "vlucas/phpdotenv": "^2.2",
+        "orchestra/testbench": "^3.2|^4.0",
+        "phpunit/phpunit": "^5.7|^8.0",
+        "vlucas/phpdotenv": "^2.2|^3.3",
         "league/flysystem-aws-s3-v3" : "^1.0.8",
-        "satooshi/php-coveralls": "^1.0.1"
+        "php-coveralls/php-coveralls": "^2.1"
     },
     "autoload": {
         "psr-4": {
