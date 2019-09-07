@@ -16,8 +16,6 @@ use Plank\Mediable\UrlGenerators\UrlGeneratorFactory;
  * Mediable Service Provider.
  *
  * Registers Laravel-Mediable package functionality
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 class MediableServiceProvider extends ServiceProvider
 {

@@ -7,11 +7,6 @@ use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Plank\Mediable\Exceptions\MediaUrlException;
 
-/**
- * Local Url Generator.
- *
- * @author Sean Fraser <sean@plankdesign.com>
- */
 class LocalUrlGenerator extends BaseUrlGenerator
 {
     /**

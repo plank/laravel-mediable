@@ -9,8 +9,6 @@ use Plank\Mediable\Helpers\File;
  * Local Path Adapter.
  *
  * Adapts a string representing an absolute path
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 class LocalPathAdapter implements SourceAdapterInterface
 {

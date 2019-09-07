@@ -8,8 +8,6 @@ use Plank\Mediable\Exceptions\MediaMoveException;
 
 /**
  * Media Mover Class.
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 class MediaMover
 {

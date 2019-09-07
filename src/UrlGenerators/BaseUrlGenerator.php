@@ -6,11 +6,6 @@ namespace Plank\Mediable\UrlGenerators;
 use Illuminate\Contracts\Config\Repository as Config;
 use Plank\Mediable\Media;
 
-/**
- * Abstract Url Generator.
- *
- * @author Sean Fraser <sean@plankdesign.com>
- */
 abstract class BaseUrlGenerator implements UrlGeneratorInterface
 {
     /**

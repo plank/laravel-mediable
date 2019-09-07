@@ -9,8 +9,6 @@ use Plank\Mediable\Media;
 
 /**
  * Prune Media Artisan Command.
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 class PruneMediaCommand extends Command
 {

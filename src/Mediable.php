@@ -13,9 +13,6 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
  * Mediable Trait.
  *
  * Provides functionality for attaching media to an eloquent model.
- *
- * @author Sean Fraser <sean@plankdesign.com>
- *
  * Whether the model should automatically reload its media relationship after modification.
  *
  * @property MediableCollection $media

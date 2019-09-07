@@ -11,8 +11,6 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 /**
  * Collection of Mediable Models.
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 class MediableCollection extends Collection
 {

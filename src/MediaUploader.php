@@ -19,8 +19,6 @@ use Plank\Mediable\SourceAdapters\SourceAdapterFactory;
  * Media Uploader.
  *
  * Validates files, uploads them to disk and generates Media
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 class MediaUploader
 {

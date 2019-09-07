@@ -7,8 +7,6 @@ namespace Plank\Mediable\SourceAdapters;
  * Source Adapter Interface.
  *
  * Defines methods needed by the MediaUploader
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 interface SourceAdapterInterface
 {

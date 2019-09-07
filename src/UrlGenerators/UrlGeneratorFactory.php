@@ -6,11 +6,6 @@ namespace Plank\Mediable\UrlGenerators;
 use Plank\Mediable\Exceptions\MediaUrlException;
 use Plank\Mediable\Media;
 
-/**
- * Url Generator Factory.
- *
- * @author Sean Fraser <sean@plankdesign.com>
- */
 class UrlGeneratorFactory
 {
     /**

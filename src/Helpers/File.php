@@ -5,11 +5,6 @@ namespace Plank\Mediable\Helpers;
 
 use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
 
-/**
- * File Helpers.
- *
- * @author Sean Fraser <sean@plankdesign.com>
- */
 class File
 {
     /**

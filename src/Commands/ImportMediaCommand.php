@@ -13,8 +13,6 @@ use Plank\Mediable\MediaUploader;
 
 /**
  * Import Media Artisan Command.
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 class ImportMediaCommand extends Command
 {

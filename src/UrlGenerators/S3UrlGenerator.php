@@ -7,11 +7,6 @@ use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Filesystem\FilesystemManager;
 use Plank\Mediable\Exceptions\MediaUrlException;
 
-/**
- * S3 Url Generator.
- *
- * @author Sean Fraser <sean@plankdesign.com>
- */
 class S3UrlGenerator extends BaseUrlGenerator
 {
     /**

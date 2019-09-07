@@ -9,8 +9,6 @@ use Plank\Mediable\Helpers\File;
  * URL Adapter.
  *
  * Adapts a string representing a URL
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 class RemoteUrlAdapter implements SourceAdapterInterface
 {

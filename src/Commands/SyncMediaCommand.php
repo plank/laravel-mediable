@@ -7,8 +7,6 @@ use Illuminate\Console\Command;
 
 /**
  * Synchronize Media Artisan Command.
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 class SyncMediaCommand extends Command
 {

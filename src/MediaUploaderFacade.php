@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Facade;
 
 /**
  * Facade for Media Uploader.
- * @author Sean Fraser <sean@plankdesign.com>
  *
  * @method $this fromSource(mixed $source)
  * @method $this fromString(string $source)
