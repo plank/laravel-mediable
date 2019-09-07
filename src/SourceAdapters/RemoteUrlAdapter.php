@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Plank\Mediable\SourceAdapters;
 
@@ -90,7 +91,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
      */
     public function valid(): bool
     {
-        return strpos($this->getHeader(0), '200') !== false;
+        return strpos((string)$this->getHeader(0), '200') !== false;
     }
 
     /**
@@ -98,16 +99,16 @@ class RemoteUrlAdapter implements SourceAdapterInterface
      */
     public function size(): int
     {
-        return $this->getHeader('Content-Length');
+        return (int)$this->getHeader('Content-Length');
     }
 
     /**
      * Read a header value by name from the remote content.
      *
-     * @param  string $key Header name
+     * @param  string|int $key Header name
      * @return string|null
      */
-    private function getHeader(string $key, $default = null): ?string
+    private function getHeader($key, $default = null): ?string
     {
         if (!$this->headers) {
             $this->headers = $this->getHeaders();

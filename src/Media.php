@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Plank\Mediable;
 
@@ -174,7 +175,7 @@ class Media extends Model
      */
     public function getDiskPath(): string
     {
-        return ltrim(rtrim($this->directory, '/') . '/' . ltrim($this->basename, '/'), '/');
+        return ltrim(rtrim((string)$this->directory, '/') . '/' . ltrim((string)$this->basename, '/'), '/');
     }
 
     /**
