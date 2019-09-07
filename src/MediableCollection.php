@@ -36,9 +36,8 @@ class MediableCollection extends Collection
         }
 
         $closure = function (MorphToMany $q) use ($tags) {
-            $this->wherePivotTagIn($q, $tags);
+            $q->wherePivotIn('tag', $tags);
         };
-        $closure = Closure::bind($closure, $this->first(), $this->first());
 
         return $this->load(['media' => $closure]);
     }
@@ -79,7 +78,7 @@ class MediableCollection extends Collection
             // select pivots matching each item for deletion
             $query->orWhere(function (Builder $q) use ($item, $relation) {
                 $q->where($relation->getMorphType(), get_class($item));
-                $q->where($this->mediaQualifiedForeignKey($relation), $item->getKey());
+                $q->where($relation->getQualifiedForeignPivotKeyName(), $item->getKey());
             });
         });
 
@@ -90,25 +89,5 @@ class MediableCollection extends Collection
         $classes->each(function (array $ids, string $class) {
             $class::whereIn((new $class)->getKeyName(), $ids)->delete();
         });
-    }
-
-    /**
-     * Key the name of the foreign key field of the media relation
-     *
-     * Accounts for the change of method name in Laravel 5.4
-     *
-     * @return string
-     */
-    private function mediaQualifiedForeignKey(MorphToMany $relation): string
-    {
-        if (method_exists($relation, 'getQualifiedForeignPivotKeyName')) {
-            // Laravel 5.5
-            return $relation->getQualifiedForeignPivotKeyName();
-        } elseif (method_exists($relation, 'getQualifiedForeignKeyName')) {
-            // Laravel 5.4
-            return $relation->getQualifiedForeignKeyName();
-        }
-        // Laravel 5.3
-        return $relation->getForeignKey();
     }
 }
