@@ -37,7 +37,7 @@ class RawContentAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function path()
+    public function path(): string
     {
         return '';
     }
@@ -45,7 +45,7 @@ class RawContentAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function filename()
+    public function filename(): string
     {
         return '';
     }
@@ -53,7 +53,7 @@ class RawContentAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function extension()
+    public function extension(): string
     {
         return (string)File::guessExtension($this->mimeType());
     }
@@ -61,7 +61,7 @@ class RawContentAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function mimeType()
+    public function mimeType(): string
     {
         $fileInfo = new \finfo(FILEINFO_MIME_TYPE);
 
@@ -71,7 +71,7 @@ class RawContentAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function contents()
+    public function contents(): string
     {
         return $this->source;
     }
@@ -79,7 +79,7 @@ class RawContentAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         return true;
     }
@@ -87,7 +87,7 @@ class RawContentAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function size()
+    public function size(): int
     {
         return (int)mb_strlen($this->source, '8bit');
     }

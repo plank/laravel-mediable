@@ -25,7 +25,7 @@ class MediableServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         $this->publishes([
             __DIR__ . '/../config/mediable.php' => config_path('mediable.php'),
@@ -43,7 +43,7 @@ class MediableServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->mergeConfigFrom(
             __DIR__ . '/../config/mediable.php', 'mediable'
@@ -62,7 +62,7 @@ class MediableServiceProvider extends ServiceProvider
      * Attaches the default adapter types
      * @return void
      */
-    public function registerSourceAdapterFactory()
+    public function registerSourceAdapterFactory(): void
     {
         $this->app->singleton('mediable.source.factory', function (Container $app) {
             $factory = new SourceAdapterFactory;
@@ -85,7 +85,7 @@ class MediableServiceProvider extends ServiceProvider
      * Bind the Media Uploader to the container.
      * @return void
      */
-    public function registerUploader()
+    public function registerUploader(): void
     {
         $this->app->bind('mediable.uploader', function (Container $app) {
             return new MediaUploader(
@@ -101,7 +101,7 @@ class MediableServiceProvider extends ServiceProvider
      * Bind the Media Uploader to the container.
      * @return void
      */
-    public function registerMover()
+    public function registerMover(): void
     {
         $this->app->bind('mediable.mover', function (Container $app) {
             return new MediaMover($app['filesystem']);
@@ -113,7 +113,7 @@ class MediableServiceProvider extends ServiceProvider
      * Bind the Media Uploader to the container.
      * @return void
      */
-    public function registerUrlGeneratorFactory()
+    public function registerUrlGeneratorFactory(): void
     {
         $this->app->singleton('mediable.url.factory', function (Container $app) {
             $factory = new UrlGeneratorFactory;
@@ -132,7 +132,7 @@ class MediableServiceProvider extends ServiceProvider
      * Add package commands to artisan console.
      * @return void
      */
-    public function registerConsoleCommands()
+    public function registerConsoleCommands(): void
     {
         $this->commands([
             ImportMediaCommand::class,

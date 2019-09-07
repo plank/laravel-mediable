@@ -16,7 +16,7 @@ class File
      * @param  string $path
      * @return string
      */
-    public static function cleanDirname(string $path)
+    public static function cleanDirname(string $path): string
     {
         $dirname = pathinfo($path, PATHINFO_DIRNAME);
         if ($dirname == '.') {
@@ -32,7 +32,7 @@ class File
      * @param  int $precision
      * @return string
      */
-    public static function readableSize(int $bytes, int $precision = 1)
+    public static function readableSize(int $bytes, int $precision = 1): string
     {
         static $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
         if ($bytes === 0) {
@@ -54,7 +54,7 @@ class File
      *
      * @see ExtensionGuesser
      */
-    public static function guessExtension(string $mimeType)
+    public static function guessExtension(string $mimeType): ?string
     {
         $guesser = ExtensionGuesser::getInstance();
 

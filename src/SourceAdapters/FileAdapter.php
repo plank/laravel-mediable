@@ -40,7 +40,7 @@ class FileAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function path()
+    public function path(): string
     {
         return $this->source->getPath() . '/' . $this->source->getFilename();
     }
@@ -48,7 +48,7 @@ class FileAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function filename()
+    public function filename(): string
     {
         return pathinfo($this->source->getFilename(), PATHINFO_FILENAME);
     }
@@ -56,7 +56,7 @@ class FileAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function extension()
+    public function extension(): string
     {
         $extension = pathinfo($this->path(), PATHINFO_EXTENSION);
 
@@ -70,7 +70,7 @@ class FileAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function mimeType()
+    public function mimeType(): string
     {
         return (string)$this->source->getMimeType();
     }
@@ -78,7 +78,7 @@ class FileAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function contents()
+    public function contents(): string
     {
         return (string)file_get_contents($this->path());
     }
@@ -86,7 +86,7 @@ class FileAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         return file_exists($this->path());
     }
@@ -94,7 +94,7 @@ class FileAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function size()
+    public function size(): int
     {
         return (int)filesize($this->path());
     }

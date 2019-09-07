@@ -36,7 +36,7 @@ class UploadedFileAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function path()
+    public function path(): string
     {
         return $this->source->getPath() . '/' . $this->source->getFilename();
     }
@@ -44,7 +44,7 @@ class UploadedFileAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function filename()
+    public function filename(): string
     {
         return pathinfo((string)$this->source->getClientOriginalName(), PATHINFO_FILENAME);
     }
@@ -52,7 +52,7 @@ class UploadedFileAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function extension()
+    public function extension(): string
     {
         $extension = $this->source->getClientOriginalExtension();
 
@@ -66,7 +66,7 @@ class UploadedFileAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function mimeType()
+    public function mimeType(): string
     {
         return (string)$this->source->getClientMimeType();
     }
@@ -74,7 +74,7 @@ class UploadedFileAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function contents()
+    public function contents(): string
     {
         return (string)file_get_contents($this->path());
     }
@@ -82,7 +82,7 @@ class UploadedFileAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         return $this->source->isValid();
     }
@@ -90,7 +90,7 @@ class UploadedFileAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function size()
+    public function size(): int
     {
         return (int)$this->source->getClientSize();
     }

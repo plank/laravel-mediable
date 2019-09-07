@@ -37,7 +37,7 @@ abstract class BaseUrlGenerator implements UrlGeneratorInterface
      * Set the media being operated on.
      * @param \Plank\Mediable\Media $media
      */
-    public function setMedia(Media $media)
+    public function setMedia(Media $media): void
     {
         $this->media = $media;
     }
@@ -45,7 +45,7 @@ abstract class BaseUrlGenerator implements UrlGeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function isPubliclyAccessible()
+    public function isPubliclyAccessible(): bool
     {
         return $this->getDiskConfig('visibility', 'private') == 'public' && $this->media->isVisible();
     }
@@ -56,7 +56,7 @@ abstract class BaseUrlGenerator implements UrlGeneratorInterface
      * @param  mixed $default
      * @return mixed
      */
-    protected function getDiskConfig($key, $default = null)
+    protected function getDiskConfig(string $key, $default = null)
     {
         return $this->config->get("filesystems.disks.{$this->media->disk}.{$key}", $default);
     }

@@ -42,7 +42,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function path()
+    public function path(): string
     {
         return $this->source;
     }
@@ -50,7 +50,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function filename()
+    public function filename(): string
     {
         return pathinfo($this->source, PATHINFO_FILENAME);
     }
@@ -58,7 +58,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function extension()
+    public function extension(): string
     {
         $extension = pathinfo($this->source, PATHINFO_EXTENSION);
 
@@ -72,7 +72,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function mimeType()
+    public function mimeType(): string
     {
         return $this->getHeader('Content-Type');
     }
@@ -80,7 +80,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function contents()
+    public function contents(): string
     {
         return (string)file_get_contents($this->source);
     }
@@ -88,7 +88,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         return strpos($this->getHeader(0), '200') !== false;
     }
@@ -96,7 +96,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function size()
+    public function size(): int
     {
         return $this->getHeader('Content-Length');
     }
@@ -104,10 +104,10 @@ class RemoteUrlAdapter implements SourceAdapterInterface
     /**
      * Read a header value by name from the remote content.
      *
-     * @param  mixed $key Header name
-     * @return mixed
+     * @param  string $key Header name
+     * @return string|null
      */
-    private function getHeader($key)
+    private function getHeader(string $key, $default = null): ?string
     {
         if (!$this->headers) {
             $this->headers = $this->getHeaders();
@@ -120,6 +120,8 @@ class RemoteUrlAdapter implements SourceAdapterInterface
                 return $this->headers[$key];
             }
         }
+
+        return null;
     }
 
     /**
@@ -127,7 +129,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
      *
      * @return array
      */
-    public function getHeaders()
+    public function getHeaders(): array
     {
         $headers = @get_headers($this->source, 1);
 

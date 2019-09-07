@@ -52,7 +52,7 @@ trait HandlesMediaUploadExceptions
      * @param  \Exception $e
      * @return \Exception
      */
-    protected function transformMediaUploadException(Exception $e)
+    protected function transformMediaUploadException(Exception $e): Exception
     {
         if ($e instanceof MediaUploadException) {
             $status_code = $this->getStatusCodeForMediaUploadException($e);
@@ -65,10 +65,10 @@ trait HandlesMediaUploadExceptions
     /**
      * Get the appropriate HTTP status code for the exception.
      *
-     * @param  \Plank\Mediable\Exceptions\MediaUploadException $e
+     * @param  MediaUploadException $e
      * @return integer
      */
-    private function getStatusCodeForMediaUploadException(MediaUploadException $e)
+    private function getStatusCodeForMediaUploadException(MediaUploadException $e): int
     {
         foreach ($this->status_codes as $status_code => $exceptions) {
             if (in_array(get_class($e), $exceptions)) {

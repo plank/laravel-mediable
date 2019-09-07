@@ -36,7 +36,7 @@ class LocalPathAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function path()
+    public function path(): string
     {
         return $this->source;
     }
@@ -44,7 +44,7 @@ class LocalPathAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function filename()
+    public function filename(): string
     {
         return pathinfo($this->source, PATHINFO_FILENAME);
     }
@@ -52,7 +52,7 @@ class LocalPathAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function extension()
+    public function extension(): string
     {
         $extension = pathinfo($this->source, PATHINFO_EXTENSION);
 
@@ -66,7 +66,7 @@ class LocalPathAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function mimeType()
+    public function mimeType(): string
     {
         return mime_content_type($this->source);
     }
@@ -74,7 +74,7 @@ class LocalPathAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function contents()
+    public function contents(): string
     {
         return (string)file_get_contents($this->source);
     }
@@ -82,7 +82,7 @@ class LocalPathAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         return is_readable($this->source);
     }
@@ -90,7 +90,7 @@ class LocalPathAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function size()
+    public function size(): int
     {
         return (int)filesize($this->source);
     }

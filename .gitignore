@@ -3,3 +3,4 @@ composer.lock
 coverage/
 .env
 .idea/
+.phpunit.result.cache

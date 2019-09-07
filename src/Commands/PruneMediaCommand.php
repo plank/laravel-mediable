@@ -48,7 +48,7 @@ class PruneMediaCommand extends Command
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         $disk = $this->argument('disk');
         $directory = $this->option('directory') ?: '';

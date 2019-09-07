@@ -71,7 +71,7 @@ class ImportMediaCommand extends Command
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         $this->resetCounters();
 
@@ -103,7 +103,7 @@ class ImportMediaCommand extends Command
      * @param  bool $recursive
      * @return array
      */
-    protected function listFiles(string $disk, string $directory = '', bool $recursive = true)
+    protected function listFiles(string $disk, string $directory = '', bool $recursive = true): array
     {
         if ($recursive) {
             return $this->filesystem->disk($disk)->allFiles($directory);
@@ -118,7 +118,7 @@ class ImportMediaCommand extends Command
      * @param  Collection $existingMedia
      * @return Media|null
      */
-    protected function getRecordForFile(string $path, Collection $existingMedia)
+    protected function getRecordForFile(string $path, Collection $existingMedia): ?Media
     {
         $directory = File::cleanDirname($path);
         $filename = pathinfo($path, PATHINFO_FILENAME);
@@ -135,7 +135,7 @@ class ImportMediaCommand extends Command
      * @param  string $path
      * @return void
      */
-    protected function createRecordForFile(string $disk, string $path)
+    protected function createRecordForFile(string $disk, string $path): void
     {
         try {
             $this->uploader->importPath($disk, $path);
@@ -154,7 +154,7 @@ class ImportMediaCommand extends Command
      * @param  string $path
      * @return void
      */
-    protected function updateRecordForFile(Media $media, string $path)
+    protected function updateRecordForFile(Media $media, string $path): void
     {
         try {
             if ($this->uploader->update($media)) {
@@ -175,7 +175,7 @@ class ImportMediaCommand extends Command
      * Send the counter total to the console.
      * @return void
      */
-    protected function outputCounters()
+    protected function outputCounters(): void
     {
         $this->info(sprintf('Imported %d file(s).', $this->counters['created']));
         if ($this->counters['updated'] > 0) {
@@ -190,7 +190,7 @@ class ImportMediaCommand extends Command
      * Reset the counters of processed files.
      * @return void
      */
-    protected function resetCounters()
+    protected function resetCounters(): void
     {
         $this->counters = [
             'created' => 0,

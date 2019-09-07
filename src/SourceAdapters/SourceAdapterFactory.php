@@ -31,7 +31,7 @@ class SourceAdapterFactory
      * @return SourceAdapterInterface
      * @throws ConfigurationException If the provided source does not match any of the mapped classes or patterns
      */
-    public function create($source)
+    public function create($source): SourceAdapterInterface
     {
         $adapter = null;
 
@@ -57,8 +57,10 @@ class SourceAdapterFactory
      * @param string $adapterClass
      * @param string $sourceClass
      * @return void
+     *
+     * @throws ConfigurationException
      */
-    public function setAdapterForClass(string $adapterClass, string $sourceClass)
+    public function setAdapterForClass(string $adapterClass, string $sourceClass): void
     {
         $this->validateAdapterClass($adapterClass);
         $this->classAdapters[$sourceClass] = $adapterClass;
@@ -69,8 +71,10 @@ class SourceAdapterFactory
      * @param string $adapterClass
      * @param string $sourcePattern
      * @return void
+     *
+     * @throws ConfigurationException
      */
-    public function setAdapterForPattern(string $adapterClass, string $sourcePattern)
+    public function setAdapterForPattern(string $adapterClass, string $sourcePattern): void
     {
         $this->validateAdapterClass($adapterClass);
         $this->patternAdapters[$sourcePattern] = $adapterClass;
@@ -81,7 +85,7 @@ class SourceAdapterFactory
      * @param  object $source
      * @return string|null
      */
-    private function adaptClass($source)
+    private function adaptClass(object $source): ?string
     {
         foreach ($this->classAdapters as $class => $adapter) {
             if ($source instanceof $class) {
@@ -97,7 +101,7 @@ class SourceAdapterFactory
      * @param  string $source
      * @return string|null
      */
-    private function adaptString(string $source)
+    private function adaptString(string $source): ?string
     {
         foreach ($this->patternAdapters as $pattern => $adapter) {
             $pattern = '/' . str_replace('/', '\\/', $pattern) . '/i';
@@ -115,7 +119,7 @@ class SourceAdapterFactory
      * @throws ConfigurationException If class is not valid
      * @return void
      */
-    private function validateAdapterClass(string $class)
+    private function validateAdapterClass(string $class): void
     {
         $implements = class_implements($class, true);
 

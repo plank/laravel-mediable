@@ -22,7 +22,7 @@ class MediableCollection extends Collection
      * @param bool $match_all If true, only load media attached to all tags simultaneously
      * @return $this
      */
-    public function loadMedia($tags = [], bool $match_all = false)
+    public function loadMedia($tags = [], bool $match_all = false): self
     {
         $tags = (array)$tags;
 
@@ -48,7 +48,7 @@ class MediableCollection extends Collection
      * If one or more tags are specified, only media attached to those tags will be loaded.
      * @return $this
      */
-    public function loadMediaMatchAll($tags = [])
+    public function loadMediaMatchAll($tags = []): self
     {
         $tags = (array)$tags;
         $closure = function (MorphToMany $q) use ($tags) {
@@ -59,7 +59,7 @@ class MediableCollection extends Collection
         return $this->load(['media' => $closure]);
     }
 
-    public function delete()
+    public function delete(): void
     {
         if (count($this) == 0) {
             return;
@@ -98,7 +98,7 @@ class MediableCollection extends Collection
      *
      * @return string
      */
-    private function mediaQualifiedForeignKey(MorphToMany $relation)
+    private function mediaQualifiedForeignKey(MorphToMany $relation): string
     {
         if (method_exists($relation, 'getQualifiedForeignPivotKeyName')) {
             // Laravel 5.5

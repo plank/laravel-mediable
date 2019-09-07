@@ -44,7 +44,7 @@ class StreamAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function path()
+    public function path(): string
     {
         return $this->source->getMetadata('uri');
     }
@@ -52,7 +52,7 @@ class StreamAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function filename()
+    public function filename(): string
     {
         return pathinfo($this->path(), PATHINFO_FILENAME);
     }
@@ -60,7 +60,7 @@ class StreamAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function extension()
+    public function extension(): string
     {
         $extension = pathinfo($this->path(), PATHINFO_EXTENSION);
 
@@ -74,7 +74,7 @@ class StreamAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function mimeType()
+    public function mimeType(): string
     {
         $fileInfo = new \finfo(FILEINFO_MIME_TYPE);
 
@@ -84,7 +84,7 @@ class StreamAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function contents()
+    public function contents(): string
     {
         if (is_null($this->contents)) {
             if ($this->source->isSeekable()) {
@@ -100,7 +100,7 @@ class StreamAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         return $this->source->isReadable();
     }
@@ -108,7 +108,7 @@ class StreamAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function size()
+    public function size(): int
     {
         $size = $this->source->getSize();
 

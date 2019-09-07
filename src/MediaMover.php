@@ -36,7 +36,7 @@ class MediaMover
      * @return void
      * @throws MediaMoveException If attempting to change the file extension or a file with the same name already exists at the destination
      */
-    public function move(Media $media, $directory, $filename = null)
+    public function move(Media $media, string $directory, string $filename = null): void
     {
         $storage = $this->filesystem->disk($media->disk);
 
@@ -72,7 +72,7 @@ class MediaMover
      * @return Media
      * @throws MediaMoveException If a file with the same name already exists at the destination or it fails to copy the file
      */
-    public function copyTo(Media $media, $directory, $filename = null)
+    public function copyTo(Media $media, string $directory, string $filename = null): Media
     {
         $storage = $this->filesystem->disk($media->disk);
 
@@ -112,7 +112,7 @@ class MediaMover
      * @param  string $extension
      * @return string
      */
-    protected function removeExtensionFromFilename($filename, $extension)
+    protected function removeExtensionFromFilename(string $filename, string $extension): string
     {
         $extension = '.' . $extension;
         $extensionLength = mb_strlen($filename) - mb_strlen($extension);

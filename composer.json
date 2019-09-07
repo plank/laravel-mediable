@@ -11,7 +11,7 @@
     ],
     "require": {
         "php": ">=7.2.0",
-        "ext-finfo": "*",
+        "ext-fileinfo": "*",
         "illuminate/support": "^6.0",
         "illuminate/filesystem": "^6.0",
         "illuminate/database": "^6.0",

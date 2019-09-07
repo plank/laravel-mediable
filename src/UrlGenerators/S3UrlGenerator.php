@@ -33,7 +33,7 @@ class S3UrlGenerator extends BaseUrlGenerator
     /**
      * {@inheritdoc}
      */
-    public function getAbsolutePath()
+    public function getAbsolutePath(): string
     {
         return $this->getUrl();
     }
@@ -41,13 +41,15 @@ class S3UrlGenerator extends BaseUrlGenerator
     /**
      * {@inheritdoc}
      */
-    public function getUrl()
+    public function getUrl(): string
     {
         if (!$this->isPubliclyAccessible()) {
             throw MediaUrlException::cloudMediaNotPubliclyAccessible($this->media->disk);
         }
 
         $adapter = $this->filesystem->disk($this->media->disk)->getDriver()->getAdapter();
-        return $adapter->getClient()->getObjectUrl($adapter->getBucket(), $this->media->getDiskPath());
+        return $adapter->getClient()->getObjectUrl(
+            $adapter->getBucket(), $this->media->getDiskPath()
+        );
     }
 }
