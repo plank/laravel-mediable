@@ -3,11 +3,11 @@
 namespace Plank\Mediable;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Database\Eloquent\Collection;
 
 /**
  * Mediable Trait.
@@ -80,7 +80,7 @@ trait Mediable
     /**
      * Query scope to detect the presence of one or more attached media that is bound to all of the specified tags simultaneously.
      * @param  \Illuminate\Database\Eloquent\Builder $q
-     * @param  string|string[]                              $tags
+     * @param  string|string[] $tags
      * @return void
      */
     public function scopeWhereHasMediaMatchAll(Builder $q, array $tags)
@@ -114,9 +114,11 @@ trait Mediable
             return;
         }
 
-        $q->with(['media' => function (MorphToMany $q) use ($tags) {
-            $this->wherePivotTagIn($q, $tags);
-        }]);
+        $q->with([
+            'media' => function (MorphToMany $q) use ($tags) {
+                $this->wherePivotTagIn($q, $tags);
+            }
+        ]);
     }
 
     /**
@@ -128,9 +130,11 @@ trait Mediable
     public function scopeWithMediaMatchAll(Builder $q, $tags = [])
     {
         $tags = (array)$tags;
-        $q->with(['media' => function (MorphToMany $q) use ($tags) {
-            $this->addMatchAllToEagerLoadQuery($q, $tags);
-        }]);
+        $q->with([
+            'media' => function (MorphToMany $q) use ($tags) {
+                $this->addMatchAllToEagerLoadQuery($q, $tags);
+            }
+        ]);
     }
 
     /**
@@ -151,9 +155,11 @@ trait Mediable
             return $this->loadMediaMatchAll($tags);
         }
 
-        $this->load(['media' => function (MorphToMany $q) use ($tags) {
-            $this->wherePivotTagIn($q, $tags);
-        }]);
+        $this->load([
+            'media' => function (MorphToMany $q) use ($tags) {
+                $this->wherePivotTagIn($q, $tags);
+            }
+        ]);
 
         return $this;
     }
@@ -166,17 +172,19 @@ trait Mediable
     public function loadMediaMatchAll($tags = [])
     {
         $tags = (array)$tags;
-        $this->load(['media' => function (MorphToMany $q) use ($tags) {
-            $this->addMatchAllToEagerLoadQuery($q, $tags);
-        }]);
+        $this->load([
+            'media' => function (MorphToMany $q) use ($tags) {
+                $this->addMatchAllToEagerLoadQuery($q, $tags);
+            }
+        ]);
 
         return $this;
     }
 
     /**
      * Attach a media entity to the model with one or more tags.
-     * @param mixed           $media Either a string or numeric id, an array of ids, an instance of `Media` or an instance of `\Illuminate\Database\Eloquent\Collection`
-     * @param string|string[] $tags  One or more tags to define the relation
+     * @param mixed $media Either a string or numeric id, an array of ids, an instance of `Media` or an instance of `\Illuminate\Database\Eloquent\Collection`
+     * @param string|string[] $tags One or more tags to define the relation
      * @return void
      */
     public function attachMedia($media, $tags)
@@ -202,7 +210,7 @@ trait Mediable
 
     /**
      * Replace the existing media collection for the specified tag(s).
-     * @param mixed           $media
+     * @param mixed $media
      * @param string|string[] $tags
      * @return void
      */
@@ -214,7 +222,7 @@ trait Mediable
 
     /**
      * Detach a media item from the model.
-     * @param  mixed                $media
+     * @param  mixed $media
      * @param  string|string[]|null $tags
      * If provided, will remove the media from the model for the provided tag(s) only
      * If omitted, will remove the media from the media for all tags
@@ -247,7 +255,7 @@ trait Mediable
     /**
      * Check if the model has any media attached to one or more tags.
      * @param  string|string[] $tags
-     * @param  bool            $match_all
+     * @param  bool $match_all
      * If false, will return true if the model has any attach media for any of the provided tags
      * If true, will return true is the model has any media that are attached to all of provided tags simultaneously
      * @return bool
@@ -260,7 +268,7 @@ trait Mediable
     /**
      * Retrieve media attached to the model.
      * @param  string|string[] $tags
-     * @param  bool            $match_all
+     * @param  bool $match_all
      * If false, will return media attached to any of the provided tags
      * If true, will return media attached to all of the provided tags simultaneously
      * @return \Illuminate\Database\Eloquent\Collection|\Plank\Mediable\Media[]
@@ -309,7 +317,7 @@ trait Mediable
     /**
      * Shorthand for retrieving the first attached media item.
      * @param  string|string[] $tags
-     * @param  bool            $match_all
+     * @param  bool $match_all
      * @see \Plank\Mediable\Mediable::getMedia()
      * @return \Plank\Mediable\Media|null
      */
@@ -321,7 +329,7 @@ trait Mediable
     /**
      * Shorthand for retrieving the last attached media item.
      * @param  string|string[] $tags
-     * @param  bool            $match_all
+     * @param  bool $match_all
      * @see \Plank\Mediable\Mediable::getMedia()
      * @return \Plank\Mediable\Media|null
      */
@@ -343,7 +351,7 @@ trait Mediable
 
     /**
      * Get a list of all tags that the media is attached to.
-     * @param  \Plank\Mediable\Media  $media
+     * @param  \Plank\Mediable\Media $media
      * @return string[]
      */
     public function getTagsForMedia(Media $media)
@@ -432,7 +440,7 @@ trait Mediable
     /**
      * Modify an eager load query to only load media assigned to all provided tags simultaneously.
      * @param  \Illuminate\Database\Eloquent\Relations\MorphToMany $q
-     * @param  string|string[]                                     $tags
+     * @param  string|string[] $tags
      * @return void
      */
     protected function addMatchAllToEagerLoadQuery(MorphToMany $q, $tags = [])
@@ -440,7 +448,8 @@ trait Mediable
         $tags = (array)$tags;
         $grammar = $q->getBaseQuery()->getGrammar();
         $subquery = $this->newMatchAllQuery($tags)->select($this->mediaQualifiedRelatedKey());
-        $q->whereRaw($grammar->wrap($this->mediaQualifiedRelatedKey()) . ' IN (' . $subquery->toSql() . ')', $subquery->getBindings());
+        $q->whereRaw($grammar->wrap($this->mediaQualifiedRelatedKey()) . ' IN (' . $subquery->toSql() . ')',
+            $subquery->getBindings());
         $this->wherePivotTagIn($q, $tags);
     }
 
@@ -469,7 +478,7 @@ trait Mediable
     private function getOrderValueForTags($tags)
     {
         $q = $this->media()->newPivotStatement();
-        $tags = array_map('strval', (array) $tags);
+        $tags = array_map('strval', (array)$tags);
         $grammar = $q->getGrammar();
 
         $result = $q->selectRaw($grammar->wrap('tag') . ', max(' . $grammar->wrap('order') . ') as aggregate')
@@ -577,11 +586,12 @@ trait Mediable
      *
      * Adds support for Laravel <= 5.2, which does not provide a `wherePivotIn()` method
      * @param  \Illuminate\Database\Eloquent\Relations\MorphToMany $q
-     * @param  string|string[]                                     $tags
+     * @param  string|string[] $tags
      * @return void
      */
     private function wherePivotTagIn(MorphToMany $q, $tags = [])
     {
-        method_exists($q, 'wherePivotIn') ? $q->wherePivotIn('tag', $tags) : $q->whereIn($this->media()->getTable() . '.tag', $tags);
+        method_exists($q, 'wherePivotIn') ? $q->wherePivotIn('tag',
+            $tags) : $q->whereIn($this->media()->getTable() . '.tag', $tags);
     }
 }

@@ -119,7 +119,7 @@ class SourceAdapterFactory
     {
         $implements = class_implements($class, true);
 
-        if (! in_array(SourceAdapterInterface::class, $implements)) {
+        if (!in_array(SourceAdapterInterface::class, $implements)) {
             throw ConfigurationException::cannotSetAdapter($class);
         }
     }

@@ -2,14 +2,14 @@
 
 namespace Plank\Mediable;
 
+use CreateMediableTables;
+use Illuminate\Contracts\Container\Container;
+use Illuminate\Support\ServiceProvider;
 use Plank\Mediable\Commands\ImportMediaCommand;
 use Plank\Mediable\Commands\PruneMediaCommand;
 use Plank\Mediable\Commands\SyncMediaCommand;
 use Plank\Mediable\SourceAdapters\SourceAdapterFactory;
 use Plank\Mediable\UrlGenerators\UrlGeneratorFactory;
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Contracts\Container\Container;
-use CreateMediableTables;
 
 /**
  * Mediable Service Provider.

@@ -2,8 +2,8 @@
 
 namespace Plank\Mediable\UrlGenerators;
 
-use Plank\Mediable\Media;
 use Illuminate\Contracts\Config\Repository as Config;
+use Plank\Mediable\Media;
 
 /**
  * Abstract Url Generator.

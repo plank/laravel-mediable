@@ -1,10 +1,8 @@
 <?php
 
 use Plank\Mediable\Exceptions\MediaUrlException;
-use Plank\Mediable\UrlGenerators\S3UrlGenerator;
 use Plank\Mediable\Media;
-use Illuminate\Contracts\Config\Repository as Config;
-use Illuminate\Routing\UrlGenerator as Url;
+use Plank\Mediable\UrlGenerators\S3UrlGenerator;
 
 class S3UrlGeneratorTest extends TestCase
 {
@@ -19,7 +17,8 @@ class S3UrlGeneratorTest extends TestCase
     public function test_it_generates_absolute_path()
     {
         $generator = $this->setupGenerator();
-        $this->assertEquals('https://s3.amazonaws.com/' . env('S3_BUCKET') . '/foo/bar.jpg', $generator->getAbsolutePath());
+        $this->assertEquals('https://s3.amazonaws.com/' . env('S3_BUCKET') . '/foo/bar.jpg',
+            $generator->getAbsolutePath());
     }
 
     public function test_it_generates_url()

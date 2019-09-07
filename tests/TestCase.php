@@ -2,15 +2,15 @@
 
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Filesystem\Filesystem;
-use Plank\Mediable\Media;
 use Orchestra\Testbench\TestCase as BaseTestCase;
+use Plank\Mediable\Media;
 
 class TestCase extends BaseTestCase
 {
     public function setUp(): void
     {
         parent::setUp();
-        $this->withFactories(__DIR__.'/_factories');
+        $this->withFactories(__DIR__ . '/_factories');
     }
 
     protected function getPackageProviders($app)
@@ -61,7 +61,7 @@ class TestCase extends BaseTestCase
             ],
             's3' => [
                 'driver' => 's3',
-                'key'    => env('S3_KEY'),
+                'key' => env('S3_KEY'),
                 'secret' => env('S3_SECRET'),
                 'region' => env('S3_REGION'),
                 'bucket' => env('S3_BUCKET'),
@@ -116,7 +116,7 @@ class TestCase extends BaseTestCase
             return;
         }
         $root = $this->app['config']->get('filesystems.disks.' . $disk . '.root');
-        $filesystem =  $this->app->make(Filesystem::class);
+        $filesystem = $this->app->make(Filesystem::class);
         $filesystem->cleanDirectory($root);
     }
 

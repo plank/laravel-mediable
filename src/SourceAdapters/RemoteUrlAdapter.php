@@ -66,7 +66,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
             return $extension;
         }
 
-        return (string) File::guessExtension($this->mimeType());
+        return (string)File::guessExtension($this->mimeType());
     }
 
     /**
@@ -82,7 +82,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
      */
     public function contents()
     {
-        return (string) file_get_contents($this->source);
+        return (string)file_get_contents($this->source);
     }
 
     /**
@@ -109,7 +109,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
      */
     private function getHeader($key)
     {
-        if (! $this->headers) {
+        if (!$this->headers) {
             $this->headers = $this->getHeaders();
         }
         if (array_key_exists($key, $this->headers)) {

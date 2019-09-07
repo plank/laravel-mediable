@@ -1,16 +1,16 @@
 <?php
 
-use Plank\Mediable\Media;
-use Plank\Mediable\MediaUploader;
-use Plank\Mediable\Stream;
-use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
-use Plank\Mediable\Exceptions\MediaUpload\FileSizeException;
+use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Plank\Mediable\Exceptions\MediaUpload\FileExistsException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException;
-use Plank\Mediable\Exceptions\MediaUpload\ForbiddenException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException;
-use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
+use Plank\Mediable\Exceptions\MediaUpload\FileSizeException;
+use Plank\Mediable\Exceptions\MediaUpload\ForbiddenException;
+use Plank\Mediable\Media;
+use Plank\Mediable\MediaUploader;
 use Plank\Mediable\MediaUploaderFacade as Facade;
+use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
+use Plank\Mediable\Stream;
 
 class MediaUploaderTest extends TestCase
 {
@@ -50,9 +50,12 @@ class MediaUploaderTest extends TestCase
 
         $this->assertEquals('foo', $uploader->inferAggregateType('text/foo', 'foo', false), 'Double match, loose');
         $this->assertEquals('foo', $uploader->inferAggregateType('text/foo', 'foo', true), 'Double match, strict');
-        $this->assertEquals('bat', $uploader->inferAggregateType('text/bat', 'foo', false), 'Loose should match MIME type first');
-        $this->assertEquals(Media::TYPE_OTHER, $uploader->inferAggregateType('text/abc', 'abc', false), 'Loose match none');
-        $this->assertEquals(Media::TYPE_OTHER, $uploader->inferAggregateType('text/abc', 'abc', true), 'Strict match none');
+        $this->assertEquals('bat', $uploader->inferAggregateType('text/bat', 'foo', false),
+            'Loose should match MIME type first');
+        $this->assertEquals(Media::TYPE_OTHER, $uploader->inferAggregateType('text/abc', 'abc', false),
+            'Loose match none');
+        $this->assertEquals(Media::TYPE_OTHER, $uploader->inferAggregateType('text/abc', 'abc', true),
+            'Strict match none');
     }
 
     public function test_it_throws_exception_for_type_mismatch()

@@ -1,10 +1,8 @@
 <?php
 
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 use Plank\Mediable\Media;
 use Plank\Mediable\MediableCollection;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Support\Facades\DB;
 
 class MediableTest extends TestCase
 {
@@ -398,7 +396,8 @@ class MediableTest extends TestCase
         $mediable->attachMedia($media1, 'bar');
         $mediable->attachMedia($media1, 'foo');
 
-        $this->assertEquals([2 => 1, 3 => 2, 1 => 3], $mediable->getMedia('foo')->pluck('pivot.order', 'id')->toArray());
+        $this->assertEquals([2 => 1, 3 => 2, 1 => 3],
+            $mediable->getMedia('foo')->pluck('pivot.order', 'id')->toArray());
         $this->assertEquals([1 => 1], $mediable->getMedia('bar')->pluck('pivot.order', 'id')->toArray());
     }
 
@@ -411,7 +410,8 @@ class MediableTest extends TestCase
 
         $mediable->attachMedia([2, 3, 1], 'foo');
 
-        $this->assertEquals([2 => 1, 3 => 2, 1 => 3], $mediable->getMedia('foo')->pluck('pivot.order', 'id')->toArray());
+        $this->assertEquals([2 => 1, 3 => 2, 1 => 3],
+            $mediable->getMedia('foo')->pluck('pivot.order', 'id')->toArray());
     }
 
     public function test_it_can_unset_order()

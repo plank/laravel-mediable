@@ -1,14 +1,14 @@
 <?php
 
-use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
-use Plank\Mediable\Stream;
 use Plank\Mediable\SourceAdapters\FileAdapter;
+use Plank\Mediable\SourceAdapters\LocalPathAdapter;
 use Plank\Mediable\SourceAdapters\RawContentAdapter;
+use Plank\Mediable\SourceAdapters\RemoteUrlAdapter;
+use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
 use Plank\Mediable\SourceAdapters\StreamAdapter;
 use Plank\Mediable\SourceAdapters\StreamResourceAdapter;
 use Plank\Mediable\SourceAdapters\UploadedFileAdapter;
-use Plank\Mediable\SourceAdapters\LocalPathAdapter;
-use Plank\Mediable\SourceAdapters\RemoteUrlAdapter;
+use Plank\Mediable\Stream;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -46,7 +46,12 @@ class SourceAdapterTest extends TestCase
 
         $data = [
             [FileAdapter::class, new File($file), $file, 'plank'],
-            [UploadedFileAdapter::class, new UploadedFile($file, 'plank.png', 'image/png', 7173, UPLOAD_ERR_OK, true), $file, 'plank'],
+            [
+                UploadedFileAdapter::class,
+                new UploadedFile($file, 'plank.png', 'image/png', 7173, UPLOAD_ERR_OK, true),
+                $file,
+                'plank'
+            ],
             [LocalPathAdapter::class, $file, $file, 'plank'],
             [RemoteUrlAdapter::class, $url, $url, 'plank'],
             [RawContentAdapter::class, $string, null, null],
@@ -68,16 +73,18 @@ class SourceAdapterTest extends TestCase
         return [
             [new FileAdapter(new File($file, false))],
             [new LocalPathAdapter($file)],
-			[new RemoteUrlAdapter($url)],
-			[new RemoteUrlAdapter('http://example.invalid')],
-            [new UploadedFileAdapter(new UploadedFile(
-                $file,
-                'invalid.png',
-                'image/png',
-                8444,
-                UPLOAD_ERR_CANT_WRITE,
-                false
-            ))],
+            [new RemoteUrlAdapter($url)],
+            [new RemoteUrlAdapter('http://example.invalid')],
+            [
+                new UploadedFileAdapter(new UploadedFile(
+                    $file,
+                    'invalid.png',
+                    'image/png',
+                    8444,
+                    UPLOAD_ERR_CANT_WRITE,
+                    false
+                ))
+            ],
             [new StreamResourceAdapter(fopen($this->sampleFilePath(), 'a'))],
             [new StreamResourceAdapter(fopen('php://stdin', 'w'))],
         ];

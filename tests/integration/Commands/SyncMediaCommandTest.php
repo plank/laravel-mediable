@@ -1,8 +1,6 @@
 <?php
 
 use Plank\Mediable\Commands\SyncMediaCommand;
-use Plank\Mediable\Media;
-use Illuminate\Contracts\Console\Kernel as Artisan;
 
 class SyncMediaCommandTest extends TestCase
 {

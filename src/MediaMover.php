@@ -2,8 +2,8 @@
 
 namespace Plank\Mediable;
 
-use Plank\Mediable\Exceptions\MediaMoveException;
 use Illuminate\Filesystem\FilesystemManager;
+use Plank\Mediable\Exceptions\MediaMoveException;
 
 /**
  * Media Mover Class.

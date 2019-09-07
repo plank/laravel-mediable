@@ -2,11 +2,11 @@
 
 namespace Plank\Mediable;
 
+use Closure;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Closure;
 
 /**
  * Collection of Mediable Models.
@@ -17,7 +17,7 @@ class MediableCollection extends Collection
 {
     /**
      * Lazy eager load media attached to items in the collection.
-     * @param  string|string[]  $tags
+     * @param  string|string[] $tags
      * If one or more tags are specified, only media attached to those tags will be loaded.
      * @param bool $match_all If true, only load media attached to all tags simultaneously
      * @return $this
@@ -44,7 +44,7 @@ class MediableCollection extends Collection
 
     /**
      * Lazy eager load media attached to items in the collection bound all of the provided tags simultaneously.
-     * @param  string|string[]  $tags
+     * @param  string|string[] $tags
      * If one or more tags are specified, only media attached to those tags will be loaded.
      * @return $this
      */

@@ -4,11 +4,11 @@ namespace Plank\Mediable;
 
 use Carbon\Carbon;
 use Illuminate\Contracts\Filesystem\Filesystem;
-use Illuminate\Database\Eloquent\Relations\Pivot;
-use Plank\Mediable\Helpers\File;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Plank\Mediable\Helpers\File;
 
 /**
  * Media Model.

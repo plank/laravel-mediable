@@ -36,12 +36,12 @@ class File
     {
         static $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
         if ($bytes === 0) {
-            return '0 '.$units[0];
+            return '0 ' . $units[0];
         }
         $exponent = (int)floor(log($bytes, 1024));
         $value = $bytes / pow(1024, $exponent);
 
-        return round($value, $precision).' '.$units[$exponent];
+        return round($value, $precision) . ' ' . $units[$exponent];
     }
 
     /**

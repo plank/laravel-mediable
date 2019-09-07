@@ -1,9 +1,9 @@
 <?php
 
 use Plank\Mediable\Exceptions\MediaUrlException;
+use Plank\Mediable\Media;
 use Plank\Mediable\UrlGenerators\UrlGeneratorFactory;
 use Plank\Mediable\UrlGenerators\UrlGeneratorInterface;
-use Plank\Mediable\Media;
 
 class UrlGeneratorFactoryTest extends TestCase
 {

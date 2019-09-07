@@ -2,9 +2,9 @@
 
 namespace Plank\Mediable\UrlGenerators;
 
-use Plank\Mediable\Exceptions\MediaUrlException;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Routing\UrlGenerator as Url;
+use Plank\Mediable\Exceptions\MediaUrlException;
 
 /**
  * Local Url Generator.
@@ -119,7 +119,7 @@ class LocalUrlGenerator extends BaseUrlGenerator
         $prefix = $this->getDiskConfig('prefix', '');
         $url = $this->getDiskConfig('url');
 
-        if (! $prefix && ! $url) {
+        if (!$prefix && !$url) {
             return 'storage';
         }
 

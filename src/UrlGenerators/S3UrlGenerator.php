@@ -2,9 +2,9 @@
 
 namespace Plank\Mediable\UrlGenerators;
 
-use Plank\Mediable\Exceptions\MediaUrlException;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Filesystem\FilesystemManager;
+use Plank\Mediable\Exceptions\MediaUrlException;
 
 /**
  * S3 Url Generator.
@@ -21,7 +21,7 @@ class S3UrlGenerator extends BaseUrlGenerator
 
     /**
      * Constructor.
-     * @param \Illuminate\Contracts\Config\Repository  $config
+     * @param \Illuminate\Contracts\Config\Repository $config
      * @param \Illuminate\Filesystem\FilesystemManager $filesystem
      */
     public function __construct(Config $config, FilesystemManager $filesystem)

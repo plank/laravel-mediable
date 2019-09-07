@@ -1,10 +1,8 @@
 <?php
 
-use Plank\Mediable\Media;
-use Plank\Mediable\Exceptions\MediaMoveException;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Facades\DB;
+use Plank\Mediable\Exceptions\MediaMoveException;
+use Plank\Mediable\Media;
 
 class MediaTest extends TestCase
 {
@@ -148,7 +146,12 @@ class MediaTest extends TestCase
 
     public function test_it_can_generate_a_url_to_the_local_file()
     {
-        $media = factory(Media::class)->make(['disk' => 'uploads', 'directory' => 'foo/bar', 'filename' => 'baz', 'extension' => 'jpg']);
+        $media = factory(Media::class)->make([
+            'disk' => 'uploads',
+            'directory' => 'foo/bar',
+            'filename' => 'baz',
+            'extension' => 'jpg'
+        ]);
         $this->seedFileForMedia($media);
         $this->assertEquals('http://localhost/uploads/foo/bar/baz.jpg', $media->getUrl());
     }
@@ -156,7 +159,12 @@ class MediaTest extends TestCase
     public function test_it_can_generate_a_custom_url_to_the_local_file()
     {
         $this->app['config']->set('filesystems.disks.uploads.url', 'http://example.com');
-        $media = factory(Media::class)->make(['disk' => 'uploads', 'directory' => 'foo/bar', 'filename' => 'baz', 'extension' => 'jpg']);
+        $media = factory(Media::class)->make([
+            'disk' => 'uploads',
+            'directory' => 'foo/bar',
+            'filename' => 'baz',
+            'extension' => 'jpg'
+        ]);
         $this->seedFileForMedia($media);
         $this->assertEquals('http://example.com/foo/bar/baz.jpg', $media->getUrl());
     }
@@ -166,7 +174,12 @@ class MediaTest extends TestCase
         if (!$this->s3ConfigLoaded()) {
             $this->markTestSkipped('S3 Credentials not available.');
         }
-        $media = factory(Media::class)->make(['disk' => 's3', 'directory' => 'foo/bar', 'filename' => 'baz', 'extension' => 'jpg']);
+        $media = factory(Media::class)->make([
+            'disk' => 's3',
+            'directory' => 'foo/bar',
+            'filename' => 'baz',
+            'extension' => 'jpg'
+        ]);
         $this->assertEquals('https://s3.amazonaws.com/' . env('S3_BUCKET') . '/foo/bar/baz.jpg', $media->getUrl());
     }
 
@@ -185,7 +198,12 @@ class MediaTest extends TestCase
         $this->useFilesystem('tmp');
         $this->useDatabase();
 
-        $media = factory(Media::class)->make(['disk' => 'tmp', 'directory' => 'foo', 'filename' => 'bar', 'extension' => 'baz']);
+        $media = factory(Media::class)->make([
+            'disk' => 'tmp',
+            'directory' => 'foo',
+            'filename' => 'bar',
+            'extension' => 'baz'
+        ]);
         $this->seedFileForMedia($media);
 
         $media->move('alpha/beta');
@@ -203,7 +221,12 @@ class MediaTest extends TestCase
         $this->useFilesystem('tmp');
         $this->useDatabase();
 
-        $media = factory(Media::class)->make(['disk' => 'tmp', 'directory' => 'foo', 'filename' => 'bar', 'extension' => 'baz']);
+        $media = factory(Media::class)->make([
+            'disk' => 'tmp',
+            'directory' => 'foo',
+            'filename' => 'bar',
+            'extension' => 'baz'
+        ]);
         $this->seedFileForMedia($media);
 
         // copy the file and make some checks

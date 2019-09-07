@@ -3,17 +3,16 @@
 namespace Plank\Mediable;
 
 use Illuminate\Contracts\Filesystem\Filesystem;
-use Plank\Mediable\Exceptions\MediaUpload\FileSizeException;
+use Illuminate\Filesystem\FilesystemManager;
+use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Plank\Mediable\Exceptions\MediaUpload\FileExistsException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException;
-use Plank\Mediable\Exceptions\MediaUpload\ForbiddenException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException;
-use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
+use Plank\Mediable\Exceptions\MediaUpload\FileSizeException;
+use Plank\Mediable\Exceptions\MediaUpload\ForbiddenException;
 use Plank\Mediable\Helpers\File;
 use Plank\Mediable\SourceAdapters\RawContentAdapter;
 use Plank\Mediable\SourceAdapters\SourceAdapterFactory;
-use Illuminate\Filesystem\FilesystemManager;
-use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
 
 /**
  * Media Uploader.
@@ -335,9 +334,9 @@ class MediaUploader
 
     /**
      * Add or update the definition of a aggregate type.
-     * @param string           $type       the name of the type
-     * @param string|string[]  $mime_types list of MIME types recognized
-     * @param string|string[]  $extensions list of file extensions recognized
+     * @param string $type the name of the type
+     * @param string|string[] $mime_types list of MIME types recognized
+     * @param string|string[] $extensions list of file extensions recognized
      * @return static
      */
     public function setTypeDefinition($type, $mimeTypes, $extensions)
@@ -357,7 +356,7 @@ class MediaUploader
      */
     public function setAllowedMimeTypes($allowedMimes)
     {
-        $this->config['allowed_mime_types'] = array_map('strtolower', (array) $allowedMimes);
+        $this->config['allowed_mime_types'] = array_map('strtolower', (array)$allowedMimes);
 
         return $this;
     }
@@ -369,7 +368,7 @@ class MediaUploader
      */
     public function setAllowedExtensions($allowedExtensions)
     {
-        $this->config['allowed_extensions'] = array_map('strtolower', (array) $allowedExtensions);
+        $this->config['allowed_extensions'] = array_map('strtolower', (array)$allowedExtensions);
 
         return $this;
     }
@@ -497,86 +496,86 @@ class MediaUploader
      */
     public function upload()
     {
-		$this->verifyFile();
+        $this->verifyFile();
 
-		$model = $this->populateModel($this->makeModel());
-		$this->verifyDestination($model);
+        $model = $this->populateModel($this->makeModel());
+        $this->verifyDestination($model);
 
-		if (is_callable($this->before_save)) {
-			call_user_func($this->before_save, $model, $this->source);
-		}
+        if (is_callable($this->before_save)) {
+            call_user_func($this->before_save, $model, $this->source);
+        }
 
-		$this->filesystem->disk($model->disk)
-			->put($model->getDiskPath(), $this->source->contents(), $this->visibility);
+        $this->filesystem->disk($model->disk)
+            ->put($model->getDiskPath(), $this->source->contents(), $this->visibility);
 
-		$model->save();
+        $model->save();
 
-		return $model;
+        return $model;
     }
 
-	/**
-	 * Process the file upload, overwriting an existing media's file
-	 *
-	 * Uploader will automatically place the file on the same disk as the original media.
-	 *
-	 * @param  Media $media
-	 * @return Media
-	 */
-	public function replace(Media $media)
-	{
-		if (!$this->disk) {
-			$this->toDisk($media->disk);
-		}
+    /**
+     * Process the file upload, overwriting an existing media's file
+     *
+     * Uploader will automatically place the file on the same disk as the original media.
+     *
+     * @param  Media $media
+     * @return Media
+     */
+    public function replace(Media $media)
+    {
+        if (!$this->disk) {
+            $this->toDisk($media->disk);
+        }
 
-		if (!$this->directory) {
-			$this->toDirectory($media->directory);
-		}
+        if (!$this->directory) {
+            $this->toDirectory($media->directory);
+        }
 
-		if (!$this->filename) {
-			$this->useFilename($media->filename);
-		}
+        if (!$this->filename) {
+            $this->useFilename($media->filename);
+        }
 
-		// Remember original file location.
-		// We will only delete it if validation passes
-		$disk = $media->disk;
-		$path = $media->getDiskPath();
+        // Remember original file location.
+        // We will only delete it if validation passes
+        $disk = $media->disk;
+        $path = $media->getDiskPath();
 
-		$model = $this->populateModel($media);
+        $model = $this->populateModel($media);
 
-		$this->verifyDestination($model);
+        $this->verifyDestination($model);
 
-		// Delete original file, if necessary
-		$this->filesystem->disk($disk)->delete($path);
+        // Delete original file, if necessary
+        $this->filesystem->disk($disk)->delete($path);
 
-		// Move the new file into place
-		$this->filesystem->disk($model->disk)
-			->put($model->getDiskPath(), $this->source->contents(), $this->visibility);
+        // Move the new file into place
+        $this->filesystem->disk($model->disk)
+            ->put($model->getDiskPath(), $this->source->contents(), $this->visibility);
 
-		$model->save();
+        $model->save();
 
-		return $model;
-	}
+        return $model;
+    }
 
-	/**
-	 * Validate input and convert to Media attributes
-	 * @param  Media $model
-	 * @return Media
-	 */
-	private function populateModel(Media $model)
-	{
-		$this->verifySource();
+    /**
+     * Validate input and convert to Media attributes
+     * @param  Media $model
+     * @return Media
+     */
+    private function populateModel(Media $model)
+    {
+        $this->verifySource();
 
-		$model->size = $this->verifyFileSize($this->source->size());
-		$model->mime_type = $this->verifyMimeType($this->source->mimeType());
-		$model->extension = $this->verifyExtension($this->source->extension());
-		$model->aggregate_type = $this->inferAggregateType($model->mime_type, $model->extension);
+        $model->size = $this->verifyFileSize($this->source->size());
+        $model->mime_type = $this->verifyMimeType($this->source->mimeType());
+        $model->extension = $this->verifyExtension($this->source->extension());
+        $model->aggregate_type = $this->inferAggregateType($model->mime_type, $model->extension);
 
-		$model->disk = $this->disk ?: $this->config['default_disk'];
-		$model->directory = $this->directory;
-		$model->filename = $this->generateFilename();
+        $model->disk = $this->disk ?: $this->config['default_disk'];
+        $model->directory = $this->directory;
+        $model->filename = $this->generateFilename();
 
-		return $model;
-	}
+        return $model;
+    }
 
     /**
      * Set the before save callback
@@ -853,7 +852,7 @@ class MediaUploader
 
     /**
      * Delete the file on disk.
-     * @param  \Plank\Mediable\Media  $model
+     * @param  \Plank\Mediable\Media $model
      * @return void
      */
     private function deleteExistingFile(Media $model)

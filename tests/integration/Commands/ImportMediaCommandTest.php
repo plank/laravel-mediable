@@ -1,8 +1,8 @@
 <?php
 
-use Plank\Mediable\Media;
-use Plank\Mediable\Commands\ImportMediaCommand;
 use Illuminate\Contracts\Console\Kernel as Artisan;
+use Plank\Mediable\Commands\ImportMediaCommand;
+use Plank\Mediable\Media;
 
 class ImportMediaCommandTest extends TestCase
 {
@@ -89,14 +89,16 @@ class ImportMediaCommandTest extends TestCase
             'filename' => 'bar',
             'extension' => 'png',
             'mime_type' => 'image/png',
-            'aggregate_type' => 'foo']);
+            'aggregate_type' => 'foo'
+        ]);
         $media2 = factory(Media::class)->create([
             'disk' => 'tmp',
             'filename' => 'bar',
             'extension' => 'png',
             'size' => 8444,
             'mime_type' => 'image/png',
-            'aggregate_type' => 'image']);
+            'aggregate_type' => 'image'
+        ]);
         $this->seedFileForMedia($media1, fopen(__DIR__ . '/../../_data/plank.png', 'r'));
         $this->seedFileForMedia($media2, fopen(__DIR__ . '/../../_data/plank.png', 'r'));
 

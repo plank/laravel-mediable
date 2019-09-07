@@ -68,7 +68,7 @@ class StreamAdapter implements SourceAdapterInterface
             return $extension;
         }
 
-        return (string) File::guessExtension($this->mimeType());
+        return (string)File::guessExtension($this->mimeType());
     }
 
     /**
@@ -78,7 +78,7 @@ class StreamAdapter implements SourceAdapterInterface
     {
         $fileInfo = new \finfo(FILEINFO_MIME_TYPE);
 
-        return (string) $fileInfo->buffer($this->contents());
+        return (string)$fileInfo->buffer($this->contents());
     }
 
     /**
@@ -116,6 +116,6 @@ class StreamAdapter implements SourceAdapterInterface
             return $size;
         }
 
-        return (int) mb_strlen($this->contents(), '8bit');
+        return (int)mb_strlen($this->contents(), '8bit');
     }
 }
