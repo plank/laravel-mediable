@@ -66,7 +66,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
             return $extension;
         }
 
-        return File::guessExtension($this->mimeType());
+        return (string) File::guessExtension($this->mimeType());
     }
 
     /**
@@ -82,7 +82,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
      */
     public function contents()
     {
-        return file_get_contents($this->source);
+        return (string) file_get_contents($this->source);
     }
 
     /**
@@ -102,14 +102,15 @@ class RemoteUrlAdapter implements SourceAdapterInterface
     }
 
     /**
-     * Read the headers of the remote content.
-     * @param  string $key Header name
+     * Read a header value by name from the remote content.
+     *
+     * @param  mixed $key Header name
      * @return mixed
      */
     private function getHeader($key)
     {
         if (! $this->headers) {
-            $this->headers = get_headers($this->source, 1);
+            $this->headers = $this->getHeaders();
         }
         if (array_key_exists($key, $this->headers)) {
             //if redirects encountered, return the final values
@@ -119,5 +120,17 @@ class RemoteUrlAdapter implements SourceAdapterInterface
                 return $this->headers[$key];
             }
         }
+    }
+
+    /**
+     * Read all the headers from the remote content.
+     *
+     * @return array
+     */
+    public function getHeaders()
+    {
+        $headers = @get_headers($this->source, 1);
+
+        return $headers ?: [];
     }
 }

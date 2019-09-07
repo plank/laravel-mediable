@@ -3,6 +3,8 @@
 use Illuminate\Database\Eloquent\Collection;
 use Plank\Mediable\Media;
 use Plank\Mediable\MediableCollection;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Support\Facades\DB;
 
 class MediableTest extends TestCase
 {
@@ -20,7 +22,19 @@ class MediableTest extends TestCase
         $mediable->attachMedia($media1, 'foo');
         $result = $mediable->getMedia('foo');
 
-        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $result);
+        $this->assertEquals([2], $result->pluck('id')->toArray());
+    }
+
+    public function test_it_can_attach_to_numeric_tags()
+    {
+        $mediable = factory(SampleMediable::class)->create();
+        $media1 = factory(Media::class)->create(['id' => 2]);
+
+        $mediable->attachMedia($media1, (string)2018);
+        $result = $mediable->getMedia((string)2018);
+
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $result);
         $this->assertEquals([2], $result->pluck('id')->toArray());
     }
 
@@ -407,5 +421,17 @@ class MediableTest extends TestCase
         $query = $mediable->media()->unordered()->toSql();
 
         $this->assertNotRegExp('/order by `order`/i', $query);
+    }
+
+    public function test_it_can_create_mediables_on_custom_table()
+    {
+        config()->set('mediable.mediables_table', 'prefixed_mediables');
+
+        $media = factory(Media::class)->create();
+        $mediable = factory(SampleMediable::class)->create();
+        $mediable->attachMedia($media, 'foo');
+
+        $this->assertEmpty(DB::table('mediables')->get());
+        $this->assertCount(1, DB::table('prefixed_mediables')->get());
     }
 }

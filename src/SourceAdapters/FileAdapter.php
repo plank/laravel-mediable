@@ -64,7 +64,7 @@ class FileAdapter implements SourceAdapterInterface
             return $extension;
         }
 
-        return FileHelper::guessExtension($this->mimeType());
+        return (string) FileHelper::guessExtension($this->mimeType());
     }
 
     /**
@@ -72,7 +72,7 @@ class FileAdapter implements SourceAdapterInterface
      */
     public function mimeType()
     {
-        return $this->source->getMimeType();
+        return (string) $this->source->getMimeType();
     }
 
     /**
@@ -80,7 +80,7 @@ class FileAdapter implements SourceAdapterInterface
      */
     public function contents()
     {
-        return file_get_contents($this->path());
+        return (string) file_get_contents($this->path());
     }
 
     /**
@@ -96,6 +96,6 @@ class FileAdapter implements SourceAdapterInterface
      */
     public function size()
     {
-        return filesize($this->path());
+        return (int) filesize($this->path());
     }
 }

@@ -39,7 +39,7 @@ class RawContentAdapter implements SourceAdapterInterface
      */
     public function path()
     {
-        return null;
+        return '';
     }
 
     /**
@@ -47,7 +47,7 @@ class RawContentAdapter implements SourceAdapterInterface
      */
     public function filename()
     {
-        return null;
+        return '';
     }
 
     /**
@@ -55,7 +55,7 @@ class RawContentAdapter implements SourceAdapterInterface
      */
     public function extension()
     {
-        return File::guessExtension($this->mimeType());
+        return (string) File::guessExtension($this->mimeType());
     }
 
     /**
@@ -65,7 +65,7 @@ class RawContentAdapter implements SourceAdapterInterface
     {
         $fileInfo = new \finfo(FILEINFO_MIME_TYPE);
 
-        return $fileInfo->buffer($this->source) ?: null;
+        return (string) $fileInfo->buffer($this->source);
     }
 
     /**
@@ -89,6 +89,6 @@ class RawContentAdapter implements SourceAdapterInterface
      */
     public function size()
     {
-        return mb_strlen($this->source, '8bit');
+        return (int) mb_strlen($this->source, '8bit');
     }
 }

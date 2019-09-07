@@ -12,8 +12,6 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 /**
  * Media Model.
- *
- * @author Sean Fraser <sean@plankdesign.com>
  * @property int|string $id
  * @property string $disk
  * @property string $directory
@@ -68,7 +66,13 @@ class Media extends Model
      */
     public function models(string $class)
     {
-        return $this->morphedByMany($class, 'mediable')->withPivot('tag', 'order');
+        return $this
+            ->morphedByMany(
+                $class,
+                'mediable',
+                config('mediable.mediables_table', 'mediables')
+            )
+            ->withPivot('tag', 'order');
     }
 
     /**
@@ -278,7 +282,7 @@ class Media extends Model
         if (static::hasGlobalScope(SoftDeletingScope::class) && !$this->forceDeleting) {
             if (config('mediable.detach_on_soft_delete')) {
                 $this->newBaseQueryBuilder()
-                    ->from('mediables')
+                    ->from(config('mediable.mediables_table', 'mediables'))
                     ->where('media_id', $this->getKey())
                     ->delete();
             }
@@ -299,7 +303,7 @@ class Media extends Model
 
     /**
      * Get a UrlGenerator instance for the media.
-     * @return \Plank\Mediable\UrlGenerators\BaseUrlGenerator
+     * @return \Plank\Mediable\UrlGenerators\UrlGeneratorInterface
      */
     protected function getUrlGenerator()
     {

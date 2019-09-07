@@ -9,6 +9,11 @@ return [
     'model' => Plank\Mediable\Media::class,
 
     /*
+     * Name to be used for mediables joining table
+     */
+    'mediables_table' => 'mediables',
+
+    /*
      * Filesystem disk to use if none is specified
      */
     'default_disk' => 'public',
@@ -150,7 +155,7 @@ return [
                 'text/json',
                 'application/json',
                 'application/msword',
-                'application/application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
             ],
             'extensions' => [
                 'doc',
@@ -201,7 +206,7 @@ return [
         'pattern' => [
             '^https?://' => Plank\Mediable\SourceAdapters\RemoteUrlAdapter::class,
             '^/' => Plank\Mediable\SourceAdapters\LocalPathAdapter::class,
-            '^[a-zA-Z]:\\' => Plank\Mediable\SourceAdapters\LocalPathAdapter::class
+            '^[a-zA-Z]:\\\\' => Plank\Mediable\SourceAdapters\LocalPathAdapter::class
         ],
     ],
 

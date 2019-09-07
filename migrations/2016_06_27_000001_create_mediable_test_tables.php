@@ -25,6 +25,21 @@ class CreateMediableTestTables extends Migration
         Schema::table('media', function (Blueprint $table) {
             $table->softDeletes();
         });
+
+        Schema::create('prefixed_mediables', function (Blueprint $table) {
+            $table->integer('media_id')->unsigned();
+            $table->string('mediable_type');
+            $table->integer('mediable_id')->unsigned();
+            $table->string('tag');
+            $table->integer('order')->unsigned();
+
+            $table->primary(['media_id', 'mediable_type', 'mediable_id', 'tag']);
+            $table->index(['mediable_id', 'mediable_type']);
+            $table->index('tag');
+            $table->index('order');
+            $table->foreign('media_id')->references('id')->on('media')
+                ->onDelete('cascade');
+        });
     }
 
     /**
@@ -38,5 +53,6 @@ class CreateMediableTestTables extends Migration
             $table->dropColumn('deleted_at');
         });
         Schema::drop('sample_mediables');
+        Schema::drop('prefixed_mediables');
     }
 }

@@ -55,8 +55,9 @@ class TestCase extends BaseTestCase
             'public_storage' => [
                 'driver' => 'local',
                 'root' => storage_path('public'),
+                'url' => 'http://localhost/storage',
+                'prefix' => '',
                 'visibility' => 'public',
-                'prefix' => 'prefix'
             ],
             's3' => [
                 'driver' => 's3',

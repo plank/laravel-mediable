@@ -30,6 +30,7 @@ class StreamResourceAdapter extends StreamAdapter
         }
 
         parent::__construct(new Stream($source));
+
         $this->resource = $source;
     }
 

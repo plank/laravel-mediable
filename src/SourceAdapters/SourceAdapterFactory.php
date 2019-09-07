@@ -15,13 +15,13 @@ class SourceAdapterFactory
 {
     /**
      * Map of which adapters to use for a given source class.
-     * @var array
+     * @var string[]
      */
     private $classAdapters = [];
 
     /**
      * Map of which adapters to use for a given string pattern.
-     * @var array
+     * @var string[]
      */
     private $patternAdapters = [];
 
@@ -79,7 +79,7 @@ class SourceAdapterFactory
     /**
      * Choose an adapter class for the class of the provided object.
      * @param  object $source
-     * @return SourceAdapterInterface|null
+     * @return string|null
      */
     private function adaptClass($source)
     {
@@ -95,7 +95,7 @@ class SourceAdapterFactory
     /**
      * Choose an adapter class for the provided string.
      * @param  string $source
-     * @return SourceAdapterInterface|null
+     * @return string|null
      */
     private function adaptString(string $source)
     {
@@ -117,7 +117,9 @@ class SourceAdapterFactory
      */
     private function validateAdapterClass(string $class)
     {
-        if (!class_implements($class, SourceAdapterInterface::class)) {
+        $implements = class_implements($class, true);
+
+        if (! in_array(SourceAdapterInterface::class, $implements)) {
             throw ConfigurationException::cannotSetAdapter($class);
         }
     }

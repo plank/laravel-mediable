@@ -14,14 +14,14 @@ use Illuminate\Routing\UrlGenerator as Url;
 class LocalUrlGenerator extends BaseUrlGenerator
 {
     /**
-     * @var \Illuminate\Routing\UrlGenerator
+     * @var \Illuminate\Contracts\Routing\UrlGenerator
      */
     protected $url;
 
     /**
      * Constructor.
      * @param \Illuminate\Contracts\Config\Repository $config
-     * @param \Illuminate\Routing\UrlGenerator $url
+     * @param \Illuminate\Contracts\Routing\UrlGenerator $url
      */
     public function __construct(Config $config, Url $url)
     {
@@ -102,5 +102,27 @@ class LocalUrlGenerator extends BaseUrlGenerator
     private function isInWebroot()
     {
         return strpos($this->getAbsolutePath(), public_path()) === 0;
+    }
+
+    /**
+     * Get the prefix.
+     *
+     * If the prefix and the url are not set, we will assume the prefix
+     * is "storage", in order to point to the default symbolink link.
+     *
+     * Otherwise, we will trust the user has correctly set the prefix and/or the url.
+     *
+     * @return string
+     */
+    private function getPrefix()
+    {
+        $prefix = $this->getDiskConfig('prefix', '');
+        $url = $this->getDiskConfig('url');
+
+        if (! $prefix && ! $url) {
+            return 'storage';
+        }
+
+        return $prefix;
     }
 }

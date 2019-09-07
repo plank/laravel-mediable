@@ -68,6 +68,8 @@ class SourceAdapterTest extends TestCase
         return [
             [new FileAdapter(new File($file, false))],
             [new LocalPathAdapter($file)],
+			[new RemoteUrlAdapter($url)],
+			[new RemoteUrlAdapter('http://example.invalid')],
             [new UploadedFileAdapter(new UploadedFile(
                 $file,
                 'invalid.png',

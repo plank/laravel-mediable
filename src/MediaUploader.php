@@ -47,7 +47,7 @@ class MediaUploader
 
     /**
      * Source adapter.
-     * @var SourceAdapterInterface
+     * @var \Plank\Mediable\SourceAdapters\SourceAdapterInterface
      */
     private $source;
 
@@ -65,7 +65,7 @@ class MediaUploader
 
     /**
      * Name of the new file.
-     * @var string
+     * @var string|null
      */
     private $filename = null;
 
@@ -82,6 +82,12 @@ class MediaUploader
     private $visibility = Filesystem::VISIBILITY_PUBLIC;
 
     /**
+     * Callable allowing to alter the model before save.
+     * @var callable
+     */
+    private $before_save;
+
+    /**
      * Constructor.
      * @param FilesystemManager $filesystem
      * @param SourceAdapterFactory $factory
@@ -96,8 +102,11 @@ class MediaUploader
 
     /**
      * Set the source for the file.
+     *
      * @param  mixed $source
-     * @return $this
+     *
+     * @return static
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\ConfigurationException
      */
     public function fromSource($source)
     {
@@ -120,9 +129,13 @@ class MediaUploader
 
     /**
      * Set the filesystem disk and relative directory where the file will be saved.
+     *
      * @param  string $disk
      * @param  string $directory
-     * @return $this
+     *
+     * @return static
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\ConfigurationException
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\ForbiddenException
      */
     public function toDestination($disk, $directory)
     {
@@ -131,8 +144,12 @@ class MediaUploader
 
     /**
      * Set the filesystem disk on which the file will be saved.
+     *
      * @param string $disk
-     * @return $this
+     *
+     * @return static
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\ConfigurationException
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\ForbiddenException
      */
     public function toDisk($disk)
     {
@@ -251,6 +268,16 @@ class MediaUploader
     }
 
     /**
+     * Overwrite existing file when file already exists at destination.
+     *
+     * @return static
+     */
+    public function onDuplicateUpdate()
+    {
+        return $this->setOnDuplicateBehavior(self::ON_DUPLICATE_UPDATE);
+    }
+
+    /**
      * Append incremented counter to file name when file already exists at destination.
      *
      * @return $this
@@ -261,8 +288,9 @@ class MediaUploader
     }
 
     /**
-     * Overwrite the existing file, updating the original media record
-     * @return $this
+     * Overwrite existing Media when file already exists at destination.
+     *
+     * @return static
      */
     public function onDuplicateReplace()
     {
@@ -307,10 +335,10 @@ class MediaUploader
 
     /**
      * Add or update the definition of a aggregate type.
-     * @param string $type the name of the type
-     * @param array $mimeTypes list of MIME types recognized
-     * @param array $extensions list of file extensions recognized
-     * @return $this
+     * @param string           $type       the name of the type
+     * @param string|string[]  $mime_types list of MIME types recognized
+     * @param string|string[]  $extensions list of file extensions recognized
+     * @return static
      */
     public function setTypeDefinition($type, $mimeTypes, $extensions)
     {
@@ -324,24 +352,24 @@ class MediaUploader
 
     /**
      * Set a list of MIME types that the source file must be restricted to.
-     * @param array $allowedMimes
-     * @return $this
+     * @param string|string[] $allowed_mimes
+     * @return static
      */
     public function setAllowedMimeTypes($allowedMimes)
     {
-        $this->config['allowed_mime_types'] = array_map('strtolower', (array)$allowedMimes);
+        $this->config['allowed_mime_types'] = array_map('strtolower', (array) $allowedMimes);
 
         return $this;
     }
 
     /**
      * Set a list of file extensions that the source file must be restricted to.
-     * @param array $allowedExtensions
-     * @return $this
+     * @param string|string[] $allowed_extensions
+     * @return static
      */
     public function setAllowedExtensions($allowedExtensions)
     {
-        $this->config['allowed_extensions'] = array_map('strtolower', (array)$allowedExtensions);
+        $this->config['allowed_extensions'] = array_map('strtolower', (array) $allowedExtensions);
 
         return $this;
     }
@@ -424,7 +452,7 @@ class MediaUploader
     /**
      * Determine the aggregate type of the file based on the MIME type.
      * @param  string $mime
-     * @return array
+     * @return string[]
      */
     public function possibleAggregateTypesForMimeType($mime)
     {
@@ -441,7 +469,7 @@ class MediaUploader
     /**
      * Determine the aggregate type of the file based on the extension.
      * @param  string $extension
-     * @return array
+     * @return string[]
      */
     public function possibleAggregateTypesForExtension($extension)
     {
@@ -459,90 +487,120 @@ class MediaUploader
      * Process the file upload.
      *
      * Validates the source, then stores the file onto the disk and creates and stores a new Media instance.
-     * @return Media
+     *
+     * @return \Plank\Mediable\Media
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\ConfigurationException
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\FileExistsException
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\FileSizeException
      */
     public function upload()
     {
-        $model = $this->populateModel($this->makeModel());
-        $this->verifyDestination($model);
-        $this->filesystem->disk($model->disk)
-            ->put($model->getDiskPath(), $this->source->contents(), $this->visibility);
+		$this->verifyFile();
 
-        $model->save();
+		$model = $this->populateModel($this->makeModel());
+		$this->verifyDestination($model);
 
-        return $model;
+		if (is_callable($this->before_save)) {
+			call_user_func($this->before_save, $model, $this->source);
+		}
+
+		$this->filesystem->disk($model->disk)
+			->put($model->getDiskPath(), $this->source->contents(), $this->visibility);
+
+		$model->save();
+
+		return $model;
     }
+
+	/**
+	 * Process the file upload, overwriting an existing media's file
+	 *
+	 * Uploader will automatically place the file on the same disk as the original media.
+	 *
+	 * @param  Media $media
+	 * @return Media
+	 */
+	public function replace(Media $media)
+	{
+		if (!$this->disk) {
+			$this->toDisk($media->disk);
+		}
+
+		if (!$this->directory) {
+			$this->toDirectory($media->directory);
+		}
+
+		if (!$this->filename) {
+			$this->useFilename($media->filename);
+		}
+
+		// Remember original file location.
+		// We will only delete it if validation passes
+		$disk = $media->disk;
+		$path = $media->getDiskPath();
+
+		$model = $this->populateModel($media);
+
+		$this->verifyDestination($model);
+
+		// Delete original file, if necessary
+		$this->filesystem->disk($disk)->delete($path);
+
+		// Move the new file into place
+		$this->filesystem->disk($model->disk)
+			->put($model->getDiskPath(), $this->source->contents(), $this->visibility);
+
+		$model->save();
+
+		return $model;
+	}
+
+	/**
+	 * Validate input and convert to Media attributes
+	 * @param  Media $model
+	 * @return Media
+	 */
+	private function populateModel(Media $model)
+	{
+		$this->verifySource();
+
+		$model->size = $this->verifyFileSize($this->source->size());
+		$model->mime_type = $this->verifyMimeType($this->source->mimeType());
+		$model->extension = $this->verifyExtension($this->source->extension());
+		$model->aggregate_type = $this->inferAggregateType($model->mime_type, $model->extension);
+
+		$model->disk = $this->disk ?: $this->config['default_disk'];
+		$model->directory = $this->directory;
+		$model->filename = $this->generateFilename();
+
+		return $model;
+	}
 
     /**
-     * Process the file upload, overwriting an existing media's file
-     *
-     * Uploader will automatically place the file on the same disk as the original media.
-     *
-     * @param  Media $media
-     * @return Media
+     * Set the before save callback
+     * @param callable $callable
+     * @return static
      */
-    public function replace(Media $media)
+    public function beforeSave(callable $callable)
     {
-        if (!$this->disk) {
-            $this->toDisk($media->disk);
-        }
-
-        if (!$this->directory) {
-            $this->toDirectory($media->directory);
-        }
-
-        if (!$this->filename) {
-            $this->useFilename($media->filename);
-        }
-
-        // Remember original file location.
-        // We will only delete it if validation passes
-        $disk = $media->disk;
-        $path = $media->getDiskPath();
-
-        $model = $this->populateModel($media);
-
-        $this->verifyDestination($model);
-
-        // Delete original file, if necessary
-        $this->filesystem->disk($disk)->delete($path);
-
-        // Move the new file into place
-        $this->filesystem->disk($model->disk)
-            ->put($model->getDiskPath(), $this->source->contents(), $this->visibility);
-
-        $model->save();
-
-        return $model;
+        $this->before_save = $callable;
+        return $this;
     }
-
-    /**
-     * Validate input and convert to Media attributes
-     * @param  Media $model
-     * @return Media
-     */
-    private function populateModel(Media $model)
-    {
-        $this->verifySource();
-
-        $model->size = $this->verifyFileSize($this->source->size());
-        $model->mime_type = $this->verifyMimeType($this->source->mimeType());
-        $model->extension = $this->verifyExtension($this->source->extension());
-        $model->aggregate_type = $this->inferAggregateType($model->mime_type, $model->extension);
-
-        $model->disk = $this->disk ?: $this->config['default_disk'];
-        $model->directory = $this->directory;
-        $model->filename = $this->generateFilename();
-
-        return $model;
-    }
-
 
     /**
      * Create a `Media` record for a file already on a disk.
+     *
      * @param  string $disk
      * @param  string $path Path to file, relative to disk root
-     * @return Media
+     *
+     * @return \Plank\Mediable\Media
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\ConfigurationException
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\FileSizeException
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\ForbiddenException
      */
     public function importPath($disk, $path)
     {
@@ -555,12 +613,18 @@ class MediaUploader
 
     /**
      * Create a `Media` record for a file already on a disk.
+     *
      * @param  string $disk
      * @param  string $directory
      * @param  string $filename
      * @param  string $extension
-     * @return Media
-     * @throws FileNotFoundException If the file does not exist
+     *
+     * @return \Plank\Mediable\Media
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\ConfigurationException
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException If the file does not exist
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\FileSizeException
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\ForbiddenException
      */
     public function import($disk, $directory, $filename, $extension)
     {
@@ -590,8 +654,12 @@ class MediaUploader
 
     /**
      * Reanalyze a media record's file and adjust the aggregate type and size, if necessary.
-     * @param  Media $media
+     *
+     * @param  \Plank\Mediable\Media $media
+     *
      * @return bool Whether the model was modified
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\FileSizeException
      */
     public function update(Media $media)
     {
@@ -606,6 +674,23 @@ class MediaUploader
         }
 
         return $dirty;
+    }
+
+    /**
+     * Verify if file is valid
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\ConfigurationException If no source is provided
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException If the source is invalid
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\FileSizeException If the file is too large
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException If the mime type is not allowed
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException If the file extension is not allowed
+     * @return void
+     */
+    public function verifyFile()
+    {
+        $this->verifySource();
+        $this->verifyFileSize($this->source->size());
+        $this->verifyMimeType($this->source->mimeType());
+        $this->verifyExtension($this->source->extension());
     }
 
     /**
@@ -719,8 +804,10 @@ class MediaUploader
 
     /**
      * Decide what to do about duplicated files.
-     * @param  Media $model
-     * @throws FileExistsException If directory is not writable or file already exists at the destination and on_duplicate is set to 'error'
+     *
+     * @param  \Plank\Mediable\Media $model
+     * @return \Plank\Mediable\Media
+     * @throws \Plank\Mediable\Exceptions\MediaUpload\FileExistsException If directory is not writable or file already exists at the destination and on_duplicate is set to 'error'
      */
     private function handleDuplicate(Media $model)
     {
@@ -745,6 +832,7 @@ class MediaUploader
             default:
                 $model->filename = $this->generateUniqueFilename($model);
         }
+        return $model;
     }
 
     /**
@@ -760,12 +848,22 @@ class MediaUploader
             ->where('extension', $model->extension)
             ->delete();
 
+        $this->deleteExistingFile($model);
+    }
+
+    /**
+     * Delete the file on disk.
+     * @param  \Plank\Mediable\Media  $model
+     * @return void
+     */
+    private function deleteExistingFile(Media $model)
+    {
         $this->filesystem->disk($model->disk)->delete($model->getDiskPath());
     }
 
     /**
      * Increment model's filename until one is found that doesn't already exist.
-     * @param  Media $model
+     * @param  \Plank\Mediable\Media $model
      * @return string
      */
     private function generateUniqueFilename(Media $model)
