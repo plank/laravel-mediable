@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class MediableTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->useDatabase();

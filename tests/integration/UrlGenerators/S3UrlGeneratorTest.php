@@ -8,7 +8,7 @@ use Illuminate\Routing\UrlGenerator as Url;
 
 class S3UrlGeneratorTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setup();
         if (!$this->s3ConfigLoaded()) {

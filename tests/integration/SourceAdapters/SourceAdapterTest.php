@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class SourceAdapterTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
     }
@@ -140,7 +140,7 @@ class SourceAdapterTest extends TestCase
     {
         /** @var SourceAdapterInterface $adapter */
         $adapter = new $adapterClass($source);
-        $this->assertInternalType('string', $adapter->contents());
+        $this->assertIsString('string', $adapter->contents());
     }
 
     /**
