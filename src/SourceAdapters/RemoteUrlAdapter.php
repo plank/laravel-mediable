@@ -142,16 +142,4 @@ class RemoteUrlAdapter implements SourceAdapterInterface
 
         return $headers ?: [];
     }
-
-    /**
-     * Read all the headers from the remote content.
-     *
-     * @return array
-     */
-    public function getHeaders()
-    {
-        $headers = @get_headers($this->source, 1);
-
-        return $headers ?: [];
-    }
 }
