@@ -85,6 +85,14 @@ class RemoteUrlAdapter implements SourceAdapterInterface
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getStreamResource()
+    {
+        return fopen($this->source, 'rb');
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function valid(): bool

@@ -79,6 +79,14 @@ class UploadedFileAdapter implements SourceAdapterInterface
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getStreamResource()
+    {
+        return fopen($this->path(), 'rb');
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function valid(): bool

@@ -504,8 +504,7 @@ class MediaUploader
             call_user_func($this->before_save, $model, $this->source);
         }
 
-        $this->filesystem->disk($model->disk)
-            ->put($model->getDiskPath(), $this->source->contents(), $this->visibility);
+        $this->writeToDisk($model);
 
         $model->save();
 
@@ -525,6 +524,7 @@ class MediaUploader
      * @throws FileNotSupportedException
      * @throws FileSizeException
      * @throws ForbiddenException
+     * @throws FileExistsException
      */
     public function replace(Media $media): Media
     {
@@ -552,9 +552,7 @@ class MediaUploader
         // Delete original file, if necessary
         $this->filesystem->disk($disk)->delete($path);
 
-        // Move the new file into place
-        $this->filesystem->disk($model->disk)
-            ->put($model->getDiskPath(), $this->source->contents(), $this->visibility);
+        $this->writeToDisk($model);
 
         $model->save();
 
@@ -946,5 +944,26 @@ class MediaUploader
     private function sanitizeFileName(string $file): string
     {
         return str_replace(['#', '?', '\\', '/'], '-', $file);
+    }
+
+    private function writeToDisk(Media $model): void
+    {
+        $stream = $this->source->getStreamResource();
+
+        if (!is_resource($stream)) {
+            $stream = $this->source->contents();
+        };
+
+        $this->filesystem->disk($model->disk)
+            ->put(
+                $model->getDiskPath(),
+                $stream,
+                $this->visibility
+            );
+
+        if (is_resource($stream))
+        {
+            fclose($stream);
+        }
     }
 }

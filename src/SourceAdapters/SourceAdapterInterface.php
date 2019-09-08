@@ -41,6 +41,15 @@ interface SourceAdapterInterface
     public function mimeType(): string;
 
     /**
+     * Return a stream resource if the original source can be converted to a stream.
+     *
+     * Prevents needing to load the entire contents of the file into memory.
+     *
+     * @return resource
+     */
+    public function getStreamResource();
+
+    /**
      * Get the body of the file.
      * @return string
      */

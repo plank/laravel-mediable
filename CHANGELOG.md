@@ -1,9 +1,10 @@
 # Changelog
 
 ## 3.0.0 -
-- Updated minimum support requirements to PHP 7.2 and Laravel 6.0.
-- added parameter and return type hints across the board
+- Updated minimum support requirements to PHP 7.1 and Laravel 5.6+.
+- Added PHP 7 parameter and return type hints across the board
 - Changed the behaviour of `MediaUploader::onDuplicateReplace()` to preserve the original `Media` record. The old behaviour has been renamed `MediaUploader::onDuplicateDelete()`.
+- Added a new method `getStreamResource` to `SourceAdapterInterface`, uploader will now attempt to use a stream to reduce memory usage.
 - Added `delete()` method to `MediableCollection` for mass deleting media records and files.
 - Added support for file visibility on a file-by-file basis.
 - Cleaned up test suite.

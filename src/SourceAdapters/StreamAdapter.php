@@ -13,6 +13,8 @@ use Psr\Http\Message\StreamInterface;
  */
 class StreamAdapter implements SourceAdapterInterface
 {
+    const BUFFER_SIZE = 1024;
+
     /**
      * The source object.
      * @var StreamInterface
@@ -47,7 +49,7 @@ class StreamAdapter implements SourceAdapterInterface
      */
     public function path(): string
     {
-        return $this->source->getMetadata('uri');
+        return (string)$this->source->getMetadata('uri');
     }
 
     /**
@@ -96,6 +98,33 @@ class StreamAdapter implements SourceAdapterInterface
         }
 
         return $this->contents;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getStreamResource()
+    {
+        if ($this->source->isSeekable())
+        {
+            $this->source->rewind();
+        }
+
+        $stream = fopen('php://temp', 'r+b');
+
+        while (!$this->source->eof()) {
+            $writeResult = fwrite($stream, $this->source->read(self::BUFFER_SIZE));
+            if ($writeResult === false) {
+                throw new \RuntimeException("Could not read Stream");
+            }
+        }
+
+        if ($this->source->isSeekable())
+        {
+            $this->source->rewind();
+        }
+
+        return $stream;
     }
 
     /**

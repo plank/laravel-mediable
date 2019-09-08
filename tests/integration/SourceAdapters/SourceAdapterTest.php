@@ -14,6 +14,24 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class SourceAdapterTest extends TestCase
 {
+    private const READABLE_MODES = [
+        'r' => true,
+        'w+' => true,
+        'r+' => true,
+        'x+' => true,
+        'c+' => true,
+        'rb' => true,
+        'w+b' => true,
+        'r+b' => true,
+        'x+b' => true,
+        'c+b' => true,
+        'rt' => true,
+        'w+t' => true,
+        'r+t' => true,
+        'x+t' => true,
+        'c+t' => true,
+        'a+' => true
+    ];
     public function setUp(): void
     {
         parent::setUp();
@@ -31,6 +49,8 @@ class SourceAdapterTest extends TestCase
         $string = file_get_contents($file);
         $url = 'https://www.plankdesign.com/externaluse/plank.png';
 
+        $uploadedFile = new UploadedFile($file, 'plank.png', 'image/png', 7173, UPLOAD_ERR_OK, true);
+
         $fileResource = fopen($file, 'rb');
         $fileStream = new Stream(fopen($file, 'rb'));
 
@@ -45,22 +65,17 @@ class SourceAdapterTest extends TestCase
         $memoryStream->write($string);
 
         $data = [
-            [FileAdapter::class, new File($file), $file, 'plank'],
-            [
-                UploadedFileAdapter::class,
-                new UploadedFile($file, 'plank.png', 'image/png', 7173, UPLOAD_ERR_OK, true),
-                $file,
-                'plank'
-            ],
-            [LocalPathAdapter::class, $file, $file, 'plank'],
-            [RemoteUrlAdapter::class, $url, $url, 'plank'],
-            [RawContentAdapter::class, $string, null, null],
-            [StreamResourceAdapter::class, $fileResource, $file, 'plank'],
-            [StreamAdapter::class, $fileStream, $file, 'plank'],
-            [StreamResourceAdapter::class, $httpResource, $url, 'plank'],
-            [StreamAdapter::class, $httpStream, $url, 'plank'],
-            [StreamResourceAdapter::class, $memoryResource, 'php://memory', 'memory'],
-            [StreamAdapter::class, $memoryStream, 'php://memory', 'memory'],
+            'FileAdapter' => [FileAdapter::class, new File($file), $file, 'plank'],
+            'UploadedFileAdapter' => [UploadedFileAdapter::class, $uploadedFile, $file,'plank'],
+            'LocalPathAdapter' => [LocalPathAdapter::class, $file, $file, 'plank'],
+            'RemoteUrlAdapter' => [RemoteUrlAdapter::class, $url, $url, 'plank'],
+            'RawContentAdapter' => [RawContentAdapter::class, $string, null, null, false],
+            'StreamResourceAdapter_Local' => [StreamResourceAdapter::class, $fileResource, $file, 'plank'],
+            'StreamAdapter_Local' => [StreamAdapter::class, $fileStream, $file, 'plank', false],
+            'StreamResourceAdapter_Remote' => [StreamResourceAdapter::class, $httpResource, $url, 'plank'],
+            'StreamAdapter_Remote' => [StreamAdapter::class, $httpStream, $url, 'plank', false],
+            'StreamResourceAdapter_Memory' => [StreamResourceAdapter::class, $memoryResource, 'php://memory', 'memory'],
+            'StreamAdapter_Memory' => [StreamAdapter::class, $memoryStream, 'php://memory', 'memory', false],
         ];
         return $data;
     }
@@ -147,7 +162,27 @@ class SourceAdapterTest extends TestCase
     {
         /** @var SourceAdapterInterface $adapter */
         $adapter = new $adapterClass($source);
-        $this->assertIsString('string', $adapter->contents());
+        $this->assertIsString($adapter->contents());
+    }
+
+    /**
+     * @dataProvider adapterProvider
+     */
+    public function test_it_adapts_to_stream($adapterClass, $source)
+    {
+        /** @var SourceAdapterInterface $adapter */
+        $adapter = new $adapterClass($source);
+        $stream = $adapter->getStreamResource();
+        try {
+            $this->assertTrue(is_resource($stream));
+            $metadata = stream_get_meta_data($stream);
+            $this->assertArrayHasKey($metadata['mode'], self::READABLE_MODES);
+        } finally {
+            if (is_resource($stream))
+            {
+                fclose($stream);
+            }
+        }
     }
 
     /**

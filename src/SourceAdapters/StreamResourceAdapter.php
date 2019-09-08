@@ -42,4 +42,12 @@ class StreamResourceAdapter extends StreamAdapter
     {
         return $this->resource;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getStreamResource()
+    {
+        return $this->resource;
+    }
 }

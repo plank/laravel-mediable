@@ -78,6 +78,16 @@ class RawContentAdapter implements SourceAdapterInterface
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getStreamResource()
+    {
+        $stream = fopen('php://memory', 'r+b');
+        fwrite($stream, $this->contents());
+        return $stream;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function valid(): bool
