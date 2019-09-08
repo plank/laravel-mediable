@@ -2,10 +2,8 @@
 
 ## 2.x to 3.x
 
-Minimum PHP version moved to 7.0
-Minimum Laravel version moved to 5.3
-
-The behaviour of `MediaUploader::onDuplicateReplace()` method has been changed to preserve the original `Media` record and any attachments. The old behaviour has been renamed to `MediaUploader::onDuplicateDelete()`.
+Minimum PHP version moved to 7.1
+Minimum Laravel version moved to 5.6
 
 ## 1.x to 2.x
 

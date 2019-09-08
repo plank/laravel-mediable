@@ -249,7 +249,7 @@ class MediaUploaderTest extends TestCase
         $uploader = $this->getUploader()->onDuplicateReplace();
         $method = $this->getPrivateMethod($uploader, 'handleDuplicate');
 
-        $media = factory(Media::class)->create([
+        $media = $this->createMedia([
             'disk' => 'tmp',
             'directory' => '',
             'filename' => 'plank',
@@ -268,7 +268,7 @@ class MediaUploaderTest extends TestCase
         $this->useDatabase();
         $this->useFilesystem('tmp');
 
-        $media = factory(Media::class)->create([
+        $media = $this->createMedia([
             'disk' => 'tmp',
             'directory' => '',
             'filename' => 'plank',
@@ -442,7 +442,7 @@ class MediaUploaderTest extends TestCase
         $this->useDatabase();
         $this->useFilesystem('tmp');
 
-        $media = factory(Media::class)->create([
+        $media = $this->createMedia([
             'disk' => 'tmp',
             'extension' => 'png',
             'mime_type' => 'video/mpeg',
@@ -464,7 +464,7 @@ class MediaUploaderTest extends TestCase
         $this->useDatabase();
         $this->useFilesystem('tmp');
 
-        $media = factory(Media::class)->create([
+        $media = $this->createMedia([
             'disk' => 'tmp',
             'extension' => 'png',
             'size' => 999
@@ -518,20 +518,6 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals(7173, $media->size);
         $this->assertEquals('image', $media->aggregate_type);
         $this->assertEquals(9876, $media->id);
-    }
-
-    protected function mockUploader($filesystem = null, $factory = null)
-    {
-        $this->useFilesystem('tmp');
-        $this->useDatabase();
-
-        $media = Facade::fromSource($this->sampleFilePath())
-            ->toDestination('tmp', 'foo')
-            ->useHashForFilename()
-            ->useOriginalFilename()
-            ->upload();
-
-        $this->assertEquals('plank', $media->filename);
     }
 
     protected function getUploader(): MediaUploader

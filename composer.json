@@ -22,8 +22,8 @@
         "orchestra/testbench": "^3.3|^4.0",
         "phpunit/phpunit": "^8.0",
         "vlucas/phpdotenv": "^3.3",
-        "league/flysystem-aws-s3-v3" : "~1.0.8",
-        "satooshi/php-coveralls": "^1.0.1"
+        "league/flysystem-aws-s3-v3" : "~1.0.23",
+        "php-coveralls/php-coveralls": "^2.1"
     },
     "autoload": {
         "psr-4": {

@@ -30,8 +30,7 @@ class TestCase extends BaseTestCase
     protected function getEnvironmentSetUp($app)
     {
         if (file_exists(dirname(__DIR__) . '/.env')) {
-            $dotenv = new Dotenv\Dotenv(dirname(__DIR__));
-            $dotenv->load();
+            Dotenv\Dotenv::create(dirname(__DIR__))->load();
         }
         //use in-memory database
         $app['config']->set('database.connections.testing', [
@@ -141,5 +140,15 @@ class TestCase extends BaseTestCase
     protected function sampleFile()
     {
         return fopen($this->sampleFilePath(), 'r');
+    }
+
+    protected function makeMedia(array $attributes = []): Media
+    {
+        return factory(Media::class)->make($attributes);
+    }
+
+    protected function createMedia(array $attributes = []): Media
+    {
+        return factory(Media::class)->create($attributes);
     }
 }
