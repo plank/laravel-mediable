@@ -951,8 +951,7 @@ class MediaUploader
                 $this->visibility
             );
 
-        if (is_resource($stream))
-        {
+        if (is_resource($stream)) {
             fclose($stream);
         }
     }

@@ -105,8 +105,7 @@ class StreamAdapter implements SourceAdapterInterface
      */
     public function getStreamResource()
     {
-        if ($this->source->isSeekable())
-        {
+        if ($this->source->isSeekable()) {
             $this->source->rewind();
         }
 
@@ -119,8 +118,7 @@ class StreamAdapter implements SourceAdapterInterface
             }
         }
 
-        if ($this->source->isSeekable())
-        {
+        if ($this->source->isSeekable()) {
             $this->source->rewind();
         }
 

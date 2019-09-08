@@ -178,8 +178,7 @@ class SourceAdapterTest extends TestCase
             $metadata = stream_get_meta_data($stream);
             $this->assertArrayHasKey($metadata['mode'], self::READABLE_MODES);
         } finally {
-            if (is_resource($stream))
-            {
+            if (is_resource($stream)) {
                 fclose($stream);
             }
         }
