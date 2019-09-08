@@ -81,10 +81,10 @@ Occasionally, a file with a matching name might already exist at the destination
     $uploader->onDuplicateIncrement();
 
     // replace old file with new one, update existing Media record
-    $uploader->onDuplicateReplace();
+    $uploader->onDuplicateUpdate();
 
-    // replace old file with new one, delete existing Media record
-    $uploader->onDuplicateDelete();
+    // replace old file and media record with new ones
+    $uploader->onDuplicateReplace();
 
     // cancel upload, throw an exception
     $uploader->onDuplicateError();

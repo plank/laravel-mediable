@@ -563,8 +563,6 @@ class MediaUploader
      */
     private function populateModel(Media $model): Media
     {
-        $this->verifySource();
-
         $model->size = $this->verifyFileSize($this->source->size());
         $model->mime_type = $this->verifyMimeType($this->source->mimeType());
         $model->extension = $this->verifyExtension($this->source->extension());

@@ -85,21 +85,21 @@ class SourceAdapterTest extends TestCase
         $file = __DIR__ . '/../../_data/invalid.png';
         $url = 'https://www.plankdesign.com/externaluse/invalid.png';
 
+        $uploadedFile = new UploadedFile(
+            $file,
+            'invalid.png',
+            'image/png',
+            8444,
+            UPLOAD_ERR_CANT_WRITE,
+            false
+        );
+
         return [
             [new FileAdapter(new File($file, false))],
             [new LocalPathAdapter($file)],
             [new RemoteUrlAdapter($url)],
             [new RemoteUrlAdapter('http://example.invalid')],
-            [
-                new UploadedFileAdapter(new UploadedFile(
-                    $file,
-                    'invalid.png',
-                    'image/png',
-                    8444,
-                    UPLOAD_ERR_CANT_WRITE,
-                    false
-                ))
-            ],
+            [new UploadedFileAdapter($uploadedFile)],
             [new StreamResourceAdapter(fopen($this->sampleFilePath(), 'a'))],
             [new StreamResourceAdapter(fopen('php://stdin', 'w'))],
         ];
