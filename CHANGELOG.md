@@ -1,7 +1,7 @@
 # Changelog
 
 ## 3.0.0 -
-- Updated minimum support requirements to PHP 7.1 and Laravel 5.6+.
+- Updated minimum support requirements to PHP 7.2 and Laravel 5.6+.
 - Added PHP 7 parameter and return type hints across the board
 - Added a new method `getStreamResource` to `SourceAdapterInterface`, uploader will now attempt to use a stream to reduce memory usage.
 - Added `delete()` method to `MediableCollection` for mass deleting media records and files.
