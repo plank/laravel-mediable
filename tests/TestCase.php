@@ -93,7 +93,11 @@ class TestCase extends BaseTestCase
 
     protected function seedFileForMedia(Media $media, $contents = '')
     {
-        app('filesystem')->disk($media->disk)->put($media->getDiskPath(), $contents);
+        app('filesystem')->disk($media->disk)->put(
+            $media->getDiskPath(),
+            $contents,
+            config("filesystems.disks.{$media->disk}.visibility")
+        );
     }
 
     protected function s3ConfigLoaded()

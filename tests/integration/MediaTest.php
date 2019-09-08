@@ -114,12 +114,6 @@ class MediaTest extends TestCase
         $media = $this->makeMedia(['disk' => 'uploads']);
         $this->seedFileForMedia($media);
         $this->assertTrue($media->isPubliclyAccessible());
-
-        $media->makePrivate();
-        $this->assertFalse($media->isPubliclyAccessible());
-
-        $media->makePublic();
-        $this->assertTrue($media->isPubliclyAccessible());
     }
 
     public function test_it_can_be_checked_for_public_visibility_s3()

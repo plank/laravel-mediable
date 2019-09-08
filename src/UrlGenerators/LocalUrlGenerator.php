@@ -30,7 +30,7 @@ class LocalUrlGenerator extends BaseUrlGenerator
      */
     public function isPubliclyAccessible(): bool
     {
-        return (parent::isPubliclyAccessible() || $this->isInWebroot()) && $this->media->isVisible();
+        return (parent::isPubliclyAccessible() || $this->isInWebroot()) ;
     }
 
     /**
@@ -104,7 +104,7 @@ class LocalUrlGenerator extends BaseUrlGenerator
      * Get the prefix.
      *
      * If the prefix and the url are not set, we will assume the prefix
-     * is "storage", in order to point to the default symbolink link.
+     * is "storage", in order to point to the default symbolic link.
      *
      * Otherwise, we will trust the user has correctly set the prefix and/or the url.
      *
