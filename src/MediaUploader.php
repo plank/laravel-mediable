@@ -22,10 +22,10 @@ use Plank\Mediable\SourceAdapters\SourceAdapterFactory;
  */
 class MediaUploader
 {
-    const ON_DUPLICATE_REPLACE = 'replace';
+    const ON_DUPLICATE_UPDATE = 'update';
     const ON_DUPLICATE_INCREMENT = 'increment';
     const ON_DUPLICATE_ERROR = 'error';
-    const ON_DUPLICATE_DELETE = 'delete';
+    const ON_DUPLICATE_REPLACE = 'replace';
 
     /**
      * @var FileSystemManager
@@ -266,16 +266,6 @@ class MediaUploader
     }
 
     /**
-     * Overwrite existing file when file already exists at destination.
-     *
-     * @return $this
-     */
-    public function onDuplicateUpdate(): self
-    {
-        return $this->setOnDuplicateBehavior(self::ON_DUPLICATE_UPDATE);
-    }
-
-    /**
      * Append incremented counter to file name when file already exists at destination.
      *
      * @return $this
@@ -288,6 +278,8 @@ class MediaUploader
     /**
      * Overwrite existing Media when file already exists at destination.
      *
+     * This will delete the old media record and create a new one, detaching any existing associations.
+     *
      * @return $this
      */
     public function onDuplicateReplace(): self
@@ -296,15 +288,15 @@ class MediaUploader
     }
 
     /**
-     * Overwrite existing files and create a new media record.
+     * Overwrite existing files and update the existing media record.
      *
-     * This will delete the old media record and create a new one, detaching any existing associations.
+     * This will retain any existing associations.
      *
      * @return $this
      */
-    public function onDuplicateDelete(): self
+    public function onDuplicateUpdate(): self
     {
-        return $this->setOnDuplicateBehavior(self::ON_DUPLICATE_DELETE);
+        return $this->setOnDuplicateBehavior(self::ON_DUPLICATE_UPDATE);
     }
 
     /**
@@ -824,10 +816,10 @@ class MediaUploader
             case static::ON_DUPLICATE_ERROR:
                 throw FileExistsException::fileExists($model->getDiskPath());
                 break;
-            case static::ON_DUPLICATE_DELETE:
+            case static::ON_DUPLICATE_REPLACE:
                 $this->deleteExistingMedia($model);
                 break;
-            case static::ON_DUPLICATE_REPLACE:
+            case static::ON_DUPLICATE_UPDATE:
                 $model->{$model->getKeyName()} = Media::where('disk', $model->disk)
                     ->where('directory', $model->directory)
                     ->where('filename', $model->filename)
