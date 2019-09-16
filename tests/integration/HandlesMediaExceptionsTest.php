@@ -1,16 +1,16 @@
 <?php
 
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
-use Plank\Mediable\Exceptions\MediaUpload\FileSizeException;
 use Plank\Mediable\Exceptions\MediaUpload\FileExistsException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException;
-use Plank\Mediable\Exceptions\MediaUpload\ForbiddenException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException;
+use Plank\Mediable\Exceptions\MediaUpload\FileSizeException;
+use Plank\Mediable\Exceptions\MediaUpload\ForbiddenException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class HandlesMediaExceptionsTest extends TestCase
 {
-    public function test_it_returns_a_403_for_dissalowed_disk()
+    public function test_it_returns_a_403_for_disallowed_disk()
     {
         $e = (new SampleExceptionHandler())->render(
             ForbiddenException::diskNotAllowed('foo')
@@ -112,6 +112,7 @@ class HandlesMediaExceptionsTest extends TestCase
     protected function assertHttpException($e, $code)
     {
         $this->assertInstanceOf(HttpException::class, $e);
+        /** @var HttpException $e */
         $this->assertEquals($code, $e->getStatusCode());
     }
 }

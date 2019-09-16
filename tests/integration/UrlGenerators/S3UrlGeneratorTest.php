@@ -1,14 +1,13 @@
 <?php
 
+use Illuminate\Filesystem\FilesystemManager;
 use Plank\Mediable\Exceptions\MediaUrlException;
-use Plank\Mediable\UrlGenerators\S3UrlGenerator;
 use Plank\Mediable\Media;
-use Illuminate\Contracts\Config\Repository as Config;
-use Illuminate\Routing\UrlGenerator as Url;
+use Plank\Mediable\UrlGenerators\S3UrlGenerator;
 
 class S3UrlGeneratorTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setup();
         if (!$this->s3ConfigLoaded()) {
@@ -16,16 +15,31 @@ class S3UrlGeneratorTest extends TestCase
         }
     }
 
+    public function tearDown(): void
+    {
+        $filesystemManager = app(FilesystemManager::class);
+        $filesystemManager->disk('s3')
+            ->delete($this->getMedia()->getDiskPath());
+
+        parent::tearDown();
+    }
+
     public function test_it_generates_absolute_path()
     {
         $generator = $this->setupGenerator();
-        $this->assertEquals('https://s3.amazonaws.com/' . env('S3_BUCKET') . '/foo/bar.jpg', $generator->getAbsolutePath());
+        $this->assertEquals(
+            sprintf('https://%s.s3.%s.amazonaws.com/foo/bar.jpg', env('S3_BUCKET'), env('S3_REGION')),
+            $generator->getAbsolutePath()
+        );
     }
 
     public function test_it_generates_url()
     {
         $generator = $this->setupGenerator();
-        $this->assertEquals('https://s3.amazonaws.com/' . env('S3_BUCKET') . '/foo/bar.jpg', $generator->getUrl());
+        $this->assertEquals(
+            sprintf('https://%s.s3.%s.amazonaws.com/foo/bar.jpg', env('S3_BUCKET'), env('S3_REGION')),
+            $generator->getUrl()
+        );
     }
 
     public function test_it_throws_exception_if_not_available()
@@ -38,15 +52,26 @@ class S3UrlGeneratorTest extends TestCase
 
     protected function setupGenerator()
     {
-        $media = factory(Media::class)->make([
+        $media = $this->getMedia();
+        $this->useFilesystem('s3');
+        $filesystemManager = app(FilesystemManager::class);
+        $filesystemManager->disk('s3')
+            ->put(
+                $media->getDiskPath(),
+                file_get_contents(dirname(__DIR__, 2) . '/_data/plank.png')
+            );
+        $generator = new S3UrlGenerator(config(), $filesystemManager);
+        $generator->setMedia($media);
+        return $generator;
+    }
+
+    private function getMedia(): Media
+    {
+        return $this->makeMedia([
             'disk' => 's3',
             'directory' => 'foo',
             'filename' => 'bar',
             'extension' => 'jpg'
         ]);
-        $this->useFilesystem('s3');
-        $generator = new S3UrlGenerator(config(), app(Illuminate\Filesystem\FilesystemManager::class));
-        $generator->setMedia($media);
-        return $generator;
     }
 }

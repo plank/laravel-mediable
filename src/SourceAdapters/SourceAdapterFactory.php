@@ -1,16 +1,14 @@
 <?php
+declare(strict_types=1);
 
 namespace Plank\Mediable\SourceAdapters;
 
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
-use Plank\Mediable\SourceAdapters\StreamResourceAdapter;
 
 /**
  * Source Adapter Factory.
  *
  * Generates SourceAdapter instances for different sources
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 class SourceAdapterFactory
 {
@@ -18,21 +16,21 @@ class SourceAdapterFactory
      * Map of which adapters to use for a given source class.
      * @var string[]
      */
-    private $class_adapters = [];
+    private $classAdapters = [];
 
     /**
      * Map of which adapters to use for a given string pattern.
      * @var string[]
      */
-    private $pattern_adapters = [];
+    private $patternAdapters = [];
 
     /**
      * Create a Source Adapter for the provided source.
-     * @param  object|string $source
-     * @return \Plank\Mediable\SourceAdapters\SourceAdapterInterface
-     * @throws \Plank\Mediable\Exceptions\MediaUpload\ConfigurationException If the provided source does not match any of the mapped classes or patterns
+     * @param  object|string|resource $source
+     * @return SourceAdapterInterface
+     * @throws ConfigurationException If the provided source does not match any of the mapped classes or patterns
      */
-    public function create($source)
+    public function create($source): SourceAdapterInterface
     {
         $adapter = null;
 
@@ -55,26 +53,30 @@ class SourceAdapterFactory
 
     /**
      * Specify the FQCN of a SourceAdapter class to use when the source inherits from a given class.
-     * @param string $adapter_class
-     * @param string $source_class
+     * @param string $adapterClass
+     * @param string $sourceClass
      * @return void
+     *
+     * @throws ConfigurationException
      */
-    public function setAdapterForClass($adapter_class, $source_class)
+    public function setAdapterForClass(string $adapterClass, string $sourceClass): void
     {
-        $this->validateAdapterClass($adapter_class);
-        $this->class_adapters[$source_class] = $adapter_class;
+        $this->validateAdapterClass($adapterClass);
+        $this->classAdapters[$sourceClass] = $adapterClass;
     }
 
     /**
      * Specify the FQCN of a SourceAdapter class to use when the source is a string matching the given pattern.
-     * @param string $adapter_class
-     * @param string $source_pattern
+     * @param string $adapterClass
+     * @param string $sourcePattern
      * @return void
+     *
+     * @throws ConfigurationException
      */
-    public function setAdapterForPattern($adapter_class, $source_pattern)
+    public function setAdapterForPattern(string $adapterClass, string $sourcePattern): void
     {
-        $this->validateAdapterClass($adapter_class);
-        $this->pattern_adapters[$source_pattern] = $adapter_class;
+        $this->validateAdapterClass($adapterClass);
+        $this->patternAdapters[$sourcePattern] = $adapterClass;
     }
 
     /**
@@ -82,13 +84,15 @@ class SourceAdapterFactory
      * @param  object $source
      * @return string|null
      */
-    private function adaptClass($source)
+    private function adaptClass(object $source): ?string
     {
-        foreach ($this->class_adapters as $class => $adapter) {
+        foreach ($this->classAdapters as $class => $adapter) {
             if ($source instanceof $class) {
                 return $adapter;
             }
         }
+
+        return null;
     }
 
     /**
@@ -96,27 +100,29 @@ class SourceAdapterFactory
      * @param  string $source
      * @return string|null
      */
-    private function adaptString($source)
+    private function adaptString(string $source): ?string
     {
-        foreach ($this->pattern_adapters as $pattern => $adapter) {
-            $pattern = '/'.str_replace('/', '\\/', $pattern).'/i';
+        foreach ($this->patternAdapters as $pattern => $adapter) {
+            $pattern = '/' . str_replace('/', '\\/', $pattern) . '/i';
             if (preg_match($pattern, $source)) {
                 return $adapter;
             }
         }
+
+        return null;
     }
 
     /**
      * Verify that the provided class implements the SourceAdapter interface.
      * @param  string $class
-     * @throws \Plank\Mediable\Exceptions\MediaUpload\ConfigurationException If class is not valid
+     * @throws ConfigurationException If class is not valid
      * @return void
      */
-    private function validateAdapterClass($class)
+    private function validateAdapterClass(string $class): void
     {
         $implements = class_implements($class, true);
 
-        if (! in_array(SourceAdapterInterface::class, $implements)) {
+        if (!in_array(SourceAdapterInterface::class, $implements)) {
             throw ConfigurationException::cannotSetAdapter($class);
         }
     }

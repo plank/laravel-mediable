@@ -1,11 +1,11 @@
 <?php
 
-use Plank\Mediable\Media;
 use Illuminate\Contracts\Console\Kernel as Artisan;
+use Plank\Mediable\Media;
 
 class PruneMediaCommandTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->useDatabase();
@@ -31,7 +31,7 @@ class PruneMediaCommandTest extends TestCase
         $media1 = factory(Media::class)->create(['id' => 1, 'disk' => 'tmp', 'directory' => '']);
         $media2 = factory(Media::class)->create(['id' => 2, 'disk' => 'tmp', 'directory' => 'foo']);
 
-        $artisan->call('media:prune', ['disk' => 'tmp', '--directory' => 'foo' ]);
+        $artisan->call('media:prune', ['disk' => 'tmp', '--directory' => 'foo']);
 
         $this->assertEquals([1], Media::pluck('id')->toArray());
         $this->assertEquals("Pruned 1 record(s).\n", $artisan->output());

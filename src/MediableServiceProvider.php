@@ -1,19 +1,21 @@
 <?php
+declare(strict_types=1);
 
 namespace Plank\Mediable;
 
+use CreateMediableTables;
+use Illuminate\Contracts\Container\Container;
+use Illuminate\Support\ServiceProvider;
+use Plank\Mediable\Commands\ImportMediaCommand;
+use Plank\Mediable\Commands\PruneMediaCommand;
+use Plank\Mediable\Commands\SyncMediaCommand;
 use Plank\Mediable\SourceAdapters\SourceAdapterFactory;
 use Plank\Mediable\UrlGenerators\UrlGeneratorFactory;
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Contracts\Container\Container;
-use CreateMediableTables;
 
 /**
  * Mediable Service Provider.
  *
  * Registers Laravel-Mediable package functionality
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 class MediableServiceProvider extends ServiceProvider
 {
@@ -22,15 +24,15 @@ class MediableServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         $this->publishes([
-            __DIR__.'/../config/mediable.php' => config_path('mediable.php'),
+            __DIR__ . '/../config/mediable.php' => config_path('mediable.php'),
         ], 'config');
 
-        if (! class_exists(CreateMediableTables::class)) {
+        if (!class_exists(CreateMediableTables::class)) {
             $this->publishes([
-                __DIR__.'/../migrations/2016_06_27_000000_create_mediable_tables.php' => database_path('migrations/'.date('Y_m_d_His').'_create_mediable_tables.php'),
+                __DIR__ . '/../migrations/2016_06_27_000000_create_mediable_tables.php' => database_path('migrations/' . date('Y_m_d_His') . '_create_mediable_tables.php'),
             ], 'migrations');
         }
     }
@@ -40,10 +42,10 @@ class MediableServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->mergeConfigFrom(
-            __DIR__.'/../config/mediable.php', 'mediable'
+            __DIR__ . '/../config/mediable.php', 'mediable'
         );
 
         $this->registerSourceAdapterFactory();
@@ -59,7 +61,7 @@ class MediableServiceProvider extends ServiceProvider
      * Attaches the default adapter types
      * @return void
      */
-    public function registerSourceAdapterFactory()
+    public function registerSourceAdapterFactory(): void
     {
         $this->app->singleton('mediable.source.factory', function (Container $app) {
             $factory = new SourceAdapterFactory;
@@ -82,10 +84,14 @@ class MediableServiceProvider extends ServiceProvider
      * Bind the Media Uploader to the container.
      * @return void
      */
-    public function registerUploader()
+    public function registerUploader(): void
     {
         $this->app->bind('mediable.uploader', function (Container $app) {
-            return new MediaUploader($this->app['filesystem'], $this->app['mediable.source.factory'], $this->app['config']->get('mediable'));
+            return new MediaUploader(
+                $app['filesystem'],
+                $app['mediable.source.factory'],
+                $app['config']->get('mediable')
+            );
         });
         $this->app->alias('mediable.uploader', MediaUploader::class);
     }
@@ -94,10 +100,10 @@ class MediableServiceProvider extends ServiceProvider
      * Bind the Media Uploader to the container.
      * @return void
      */
-    public function registerMover()
+    public function registerMover(): void
     {
         $this->app->bind('mediable.mover', function (Container $app) {
-            return new MediaMover($this->app['filesystem']);
+            return new MediaMover($app['filesystem']);
         });
         $this->app->alias('mediable.mover', MediaMover::class);
     }
@@ -106,7 +112,7 @@ class MediableServiceProvider extends ServiceProvider
      * Bind the Media Uploader to the container.
      * @return void
      */
-    public function registerUrlGeneratorFactory()
+    public function registerUrlGeneratorFactory(): void
     {
         $this->app->singleton('mediable.url.factory', function (Container $app) {
             $factory = new UrlGeneratorFactory;
@@ -125,12 +131,12 @@ class MediableServiceProvider extends ServiceProvider
      * Add package commands to artisan console.
      * @return void
      */
-    public function registerConsoleCommands()
+    public function registerConsoleCommands(): void
     {
         $this->commands([
-            \Plank\Mediable\Commands\ImportMediaCommand::class,
-            \Plank\Mediable\Commands\PruneMediaCommand::class,
-            \Plank\Mediable\Commands\SyncMediaCommand::class,
+            ImportMediaCommand::class,
+            PruneMediaCommand::class,
+            SyncMediaCommand::class,
         ]);
     }
 }

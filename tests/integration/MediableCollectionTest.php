@@ -5,7 +5,7 @@ use Plank\Mediable\MediableCollection;
 
 class MediableCollectionTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->useDatabase();

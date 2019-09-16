@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Plank\Mediable\SourceAdapters;
 
@@ -21,7 +22,7 @@ class RawContentAdapter implements SourceAdapterInterface
      * Constructor.
      * @param string $source
      */
-    public function __construct($source)
+    public function __construct(string $source)
     {
         $this->source = $source;
     }
@@ -37,7 +38,7 @@ class RawContentAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function path()
+    public function path(): string
     {
         return '';
     }
@@ -45,7 +46,7 @@ class RawContentAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function filename()
+    public function filename(): string
     {
         return '';
     }
@@ -53,32 +54,43 @@ class RawContentAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function extension()
+    public function extension(): string
     {
-        return (string) File::guessExtension($this->mimeType());
+        return (string)File::guessExtension($this->mimeType());
     }
 
     /**
      * {@inheritdoc}
      */
-    public function mimeType()
+    public function mimeType(): string
     {
-        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $fileInfo = new \finfo(FILEINFO_MIME_TYPE);
 
-        return (string) $finfo->buffer($this->source);
+        return (string)$fileInfo->buffer($this->source);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function contents()
+    public function contents(): string
     {
         return $this->source;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getStreamResource()
+    {
+        $stream = fopen('php://memory', 'r+b');
+        fwrite($stream, $this->contents());
+        return $stream;
+    }
+
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         return true;
     }
@@ -86,8 +98,8 @@ class RawContentAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function size()
+    public function size(): int
     {
-        return (int) mb_strlen($this->source, '8bit');
+        return (int)mb_strlen($this->source, '8bit');
     }
 }

@@ -20,7 +20,7 @@ class FileTest extends TestCase
         $this->assertEquals('1.1 MB', File::readableSize(1024 * 1024 + 1024 * 100, 2));
     }
 
-    public function test_it_guesses_the_extension_given_a_mimetype()
+    public function test_it_guesses_the_extension_given_a_mime_type()
     {
         $this->assertEquals('png', File::guessExtension('image/png'));
     }

@@ -1,8 +1,8 @@
 <?php
 
+use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Plank\Mediable\SourceAdapters\SourceAdapterFactory;
 use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
-use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 
 class SourceAdapterFactoryTest extends TestCase
 {
@@ -10,20 +10,20 @@ class SourceAdapterFactoryTest extends TestCase
     {
         $factory = new SourceAdapterFactory;
         $source = $this->createMock(stdClass::class);
-        $source_class = get_class($source);
-        $adapter_class = $this->getMockClass(SourceAdapterInterface::class);
+        $sourceClass = get_class($source);
+        $adapterClass = $this->getMockClass(SourceAdapterInterface::class);
 
-        $factory->setAdapterForClass($adapter_class, $source_class);
-        $this->assertInstanceOf($adapter_class, $factory->create($source));
+        $factory->setAdapterForClass($adapterClass, $sourceClass);
+        $this->assertInstanceOf($adapterClass, $factory->create($source));
     }
 
     public function test_it_allows_setting_adapter_for_pattern()
     {
         $factory = new SourceAdapterFactory;
-        $adapter_class = $this->getMockClass(SourceAdapterInterface::class);
+        $adapterClass = $this->getMockClass(SourceAdapterInterface::class);
 
-        $factory->setAdapterForPattern($adapter_class, '[abc][123]');
-        $this->assertInstanceOf($adapter_class, $factory->create('b1'));
+        $factory->setAdapterForPattern($adapterClass, '[abc][123]');
+        $this->assertInstanceOf($adapterClass, $factory->create('b1'));
     }
 
     public function test_it_throws_exception_if_invalid_adapter_for_class()

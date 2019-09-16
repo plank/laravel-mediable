@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Plank\Mediable\SourceAdapters;
 
@@ -8,8 +9,6 @@ use Plank\Mediable\Helpers\File;
  * Local Path Adapter.
  *
  * Adapts a string representing an absolute path
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 class LocalPathAdapter implements SourceAdapterInterface
 {
@@ -23,7 +22,7 @@ class LocalPathAdapter implements SourceAdapterInterface
      * Constructor.
      * @param string $source
      */
-    public function __construct($source)
+    public function __construct(string $source)
     {
         $this->source = $source;
     }
@@ -36,7 +35,7 @@ class LocalPathAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function path()
+    public function path(): string
     {
         return $this->source;
     }
@@ -44,7 +43,7 @@ class LocalPathAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function filename()
+    public function filename(): string
     {
         return pathinfo($this->source, PATHINFO_FILENAME);
     }
@@ -52,7 +51,7 @@ class LocalPathAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function extension()
+    public function extension(): string
     {
         $extension = pathinfo($this->source, PATHINFO_EXTENSION);
 
@@ -60,13 +59,13 @@ class LocalPathAdapter implements SourceAdapterInterface
             return $extension;
         }
 
-        return (string) File::guessExtension($this->mimeType());
+        return (string)File::guessExtension($this->mimeType());
     }
 
     /**
      * {@inheritdoc}
      */
-    public function mimeType()
+    public function mimeType(): string
     {
         return mime_content_type($this->source);
     }
@@ -74,15 +73,23 @@ class LocalPathAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function contents()
+    public function contents(): string
     {
-        return (string) file_get_contents($this->source);
+        return (string)file_get_contents($this->source);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getStreamResource()
+    {
+        return fopen($this->path(), 'rb');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         return is_readable($this->source);
     }
@@ -90,8 +97,8 @@ class LocalPathAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function size()
+    public function size(): int
     {
-        return (int) filesize($this->source);
+        return (int)filesize($this->source);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Plank\Mediable\SourceAdapters;
 
@@ -8,20 +9,18 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  * Uploaded File Adapter.
  *
  * Adapts the UploadedFile class from Symfony Components.
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 class UploadedFileAdapter implements SourceAdapterInterface
 {
     /**
      * The source object.
-     * @var \Symfony\Component\HttpFoundation\File\UploadedFile
+     * @var UploadedFile
      */
     protected $source;
 
     /**
      * Constructor.
-     * @param \Symfony\Component\HttpFoundation\File\UploadedFile $source
+     * @param UploadedFile $source
      */
     public function __construct(UploadedFile $source)
     {
@@ -36,23 +35,23 @@ class UploadedFileAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function path()
+    public function path(): string
     {
-        return $this->source->getPath().'/'.$this->source->getFilename();
+        return $this->source->getPath() . '/' . $this->source->getFilename();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function filename()
+    public function filename(): string
     {
-        return pathinfo((string) $this->source->getClientOriginalName(), PATHINFO_FILENAME);
+        return pathinfo((string)$this->source->getClientOriginalName(), PATHINFO_FILENAME);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function extension()
+    public function extension(): string
     {
         $extension = $this->source->getClientOriginalExtension();
 
@@ -60,29 +59,37 @@ class UploadedFileAdapter implements SourceAdapterInterface
             return $extension;
         }
 
-        return (string) $this->source->guessExtension();
+        return (string)$this->source->guessExtension();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function mimeType()
+    public function mimeType(): string
     {
-        return (string) $this->source->getClientMimeType();
+        return (string)$this->source->getClientMimeType();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function contents()
+    public function contents(): string
     {
-        return (string) file_get_contents($this->path());
+        return (string)file_get_contents($this->path());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getStreamResource()
+    {
+        return fopen($this->path(), 'rb');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         return $this->source->isValid();
     }
@@ -90,8 +97,8 @@ class UploadedFileAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function size()
+    public function size(): int
     {
-        return (int) $this->source->getClientSize();
+        return (int)$this->source->getClientSize();
     }
 }

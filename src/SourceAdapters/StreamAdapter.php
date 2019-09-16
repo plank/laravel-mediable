@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Plank\Mediable\SourceAdapters;
 
@@ -12,9 +13,11 @@ use Psr\Http\Message\StreamInterface;
  */
 class StreamAdapter implements SourceAdapterInterface
 {
+    const BUFFER_SIZE = 1024;
+
     /**
      * The source object.
-     * @var \Psr\Http\Message\StreamInterface
+     * @var StreamInterface
      */
     protected $source;
 
@@ -26,7 +29,7 @@ class StreamAdapter implements SourceAdapterInterface
 
     /**
      * Constructor.
-     * @param \Psr\Http\Message\StreamInterface $source
+     * @param StreamInterface $source
      */
     public function __construct(StreamInterface $source)
     {
@@ -44,15 +47,15 @@ class StreamAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function path()
+    public function path(): string
     {
-        return $this->source->getMetadata('uri');
+        return (string)$this->source->getMetadata('uri');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function filename()
+    public function filename(): string
     {
         return pathinfo($this->path(), PATHINFO_FILENAME);
     }
@@ -60,7 +63,7 @@ class StreamAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function extension()
+    public function extension(): string
     {
         $extension = pathinfo($this->path(), PATHINFO_EXTENSION);
 
@@ -68,27 +71,27 @@ class StreamAdapter implements SourceAdapterInterface
             return $extension;
         }
 
-        return (string) File::guessExtension($this->mimeType());
+        return (string)File::guessExtension($this->mimeType());
     }
 
     /**
      * {@inheritdoc}
      */
-    public function mimeType()
+    public function mimeType(): string
     {
-        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $fileInfo = new \finfo(FILEINFO_MIME_TYPE);
 
-        return (string) $finfo->buffer($this->contents());
+        return (string)$fileInfo->buffer($this->contents());
     }
 
     /**
      * {@inheritdoc}
      */
-    public function contents()
+    public function contents(): string
     {
         if (is_null($this->contents)) {
             if ($this->source->isSeekable()) {
-                $this->contents = (string) $this->source;
+                $this->contents = (string)$this->source;
             } else {
                 $this->contents = $this->source->getContents();
             }
@@ -98,9 +101,34 @@ class StreamAdapter implements SourceAdapterInterface
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getStreamResource()
+    {
+        if ($this->source->isSeekable()) {
+            $this->source->rewind();
+        }
+
+        $stream = fopen('php://temp', 'r+b');
+
+        while (!$this->source->eof()) {
+            $writeResult = fwrite($stream, $this->source->read(self::BUFFER_SIZE));
+            if ($writeResult === false) {
+                throw new \RuntimeException("Could not read Stream");
+            }
+        }
+
+        if ($this->source->isSeekable()) {
+            $this->source->rewind();
+        }
+
+        return $stream;
+    }
+
+    /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         return $this->source->isReadable();
     }
@@ -108,14 +136,14 @@ class StreamAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function size()
+    public function size(): int
     {
         $size = $this->source->getSize();
 
-        if (! is_null($size)) {
+        if (!is_null($size)) {
             return $size;
         }
 
-        return (int) mb_strlen($this->contents(), '8bit');
+        return (int)mb_strlen($this->contents(), '8bit');
     }
 }

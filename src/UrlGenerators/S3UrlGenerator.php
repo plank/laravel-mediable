@@ -1,27 +1,24 @@
 <?php
+declare(strict_types=1);
 
 namespace Plank\Mediable\UrlGenerators;
 
-use Plank\Mediable\Exceptions\MediaUrlException;
 use Illuminate\Contracts\Config\Repository as Config;
+use Illuminate\Contracts\Filesystem\Cloud;
 use Illuminate\Filesystem\FilesystemManager;
+use Plank\Mediable\Exceptions\MediaUrlException;
 
-/**
- * S3 Url Generator.
- *
- * @author Sean Fraser <sean@plankdesign.com>
- */
 class S3UrlGenerator extends BaseUrlGenerator
 {
     /**
      * Filesystem Manager.
-     * @var \Illuminate\Filesystem\FilesystemManager
+     * @var FilesystemManager
      */
     protected $filesystem;
 
     /**
      * Constructor.
-     * @param \Illuminate\Contracts\Config\Repository  $config
+     * @param \Illuminate\Contracts\Config\Repository $config
      * @param \Illuminate\Filesystem\FilesystemManager $filesystem
      */
     public function __construct(Config $config, FilesystemManager $filesystem)
@@ -33,7 +30,7 @@ class S3UrlGenerator extends BaseUrlGenerator
     /**
      * {@inheritdoc}
      */
-    public function getAbsolutePath()
+    public function getAbsolutePath(): string
     {
         return $this->getUrl();
     }
@@ -41,13 +38,14 @@ class S3UrlGenerator extends BaseUrlGenerator
     /**
      * {@inheritdoc}
      */
-    public function getUrl()
+    public function getUrl(): string
     {
-        if (! $this->isPubliclyAccessible()) {
+        if (!$this->isPubliclyAccessible()) {
             throw MediaUrlException::cloudMediaNotPubliclyAccessible($this->media->disk);
         }
 
-        $adapter = $this->filesystem->disk($this->media->disk)->getDriver()->getAdapter();
-        return $adapter->getClient()->getObjectUrl($adapter->getBucket(), $this->media->getDiskPath());
+        /** @var Cloud $filesystem */
+        $filesystem = $this->filesystem->disk($this->media->disk);
+        return $filesystem->url($this->media->getDiskPath());
     }
 }

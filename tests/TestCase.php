@@ -2,17 +2,15 @@
 
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Filesystem\Filesystem;
-use Plank\Mediable\Media;
 use Orchestra\Testbench\TestCase as BaseTestCase;
+use Plank\Mediable\Media;
 
 class TestCase extends BaseTestCase
 {
-    protected $queriesCount;
-
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
-        $this->withFactories(__DIR__.'/_factories');
+        $this->withFactories(__DIR__ . '/_factories');
     }
 
     protected function getPackageProviders($app)
@@ -32,8 +30,7 @@ class TestCase extends BaseTestCase
     protected function getEnvironmentSetUp($app)
     {
         if (file_exists(dirname(__DIR__) . '/.env')) {
-            $dotenv = new Dotenv\Dotenv(dirname(__DIR__));
-            $dotenv->load();
+            Dotenv\Dotenv::create(dirname(__DIR__))->load();
         }
         //use in-memory database
         $app['config']->set('database.connections.testing', [
@@ -58,11 +55,12 @@ class TestCase extends BaseTestCase
                 'driver' => 'local',
                 'root' => storage_path('public'),
                 'url' => 'http://localhost/storage',
+                'prefix' => '',
                 'visibility' => 'public',
             ],
             's3' => [
                 'driver' => 's3',
-                'key'    => env('S3_KEY'),
+                'key' => env('S3_KEY'),
                 'secret' => env('S3_SECRET'),
                 'region' => env('S3_REGION'),
                 'bucket' => env('S3_BUCKET'),
@@ -95,7 +93,11 @@ class TestCase extends BaseTestCase
 
     protected function seedFileForMedia(Media $media, $contents = '')
     {
-        app('filesystem')->disk($media->disk)->put($media->getDiskPath(), $contents);
+        app('filesystem')->disk($media->disk)->put(
+            $media->getDiskPath(),
+            $contents,
+            config("filesystems.disks.{$media->disk}.visibility")
+        );
     }
 
     protected function s3ConfigLoaded()
@@ -117,7 +119,7 @@ class TestCase extends BaseTestCase
             return;
         }
         $root = $this->app['config']->get('filesystems.disks.' . $disk . '.root');
-        $filesystem =  $this->app->make(Filesystem::class);
+        $filesystem = $this->app->make(Filesystem::class);
         $filesystem->cleanDirectory($root);
     }
 
@@ -127,5 +129,30 @@ class TestCase extends BaseTestCase
         foreach ($disks as $disk) {
             $this->useFilesystem($disk);
         }
+    }
+
+    protected function sampleFilePath()
+    {
+        return realpath(__DIR__ . '/_data/plank.png');
+    }
+
+    protected function alternateFilePath()
+    {
+        return realpath(__DIR__ . '/_data/plank2.png');
+    }
+
+    protected function sampleFile()
+    {
+        return fopen($this->sampleFilePath(), 'r');
+    }
+
+    protected function makeMedia(array $attributes = []): Media
+    {
+        return factory(Media::class)->make($attributes);
+    }
+
+    protected function createMedia(array $attributes = []): Media
+    {
+        return factory(Media::class)->create($attributes);
     }
 }

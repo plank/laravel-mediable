@@ -1,30 +1,38 @@
 <?php
+declare(strict_types=1);
 
 namespace Plank\Mediable;
 
-use Plank\Mediable\Helpers\File;
+use Carbon\Carbon;
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Plank\Mediable\Exceptions\MediaUrlException;
+use Plank\Mediable\Helpers\File;
+use Plank\Mediable\UrlGenerators\UrlGeneratorInterface;
 
 /**
  * Media Model.
- *
+ * @property int|string $id
  * @property string $disk
  * @property string $directory
  * @property string $filename
- * @property-read string $basename
  * @property string $extension
+ * @property string $basename
  * @property string $mime_type
  * @property string $aggregate_type
  * @property int $size
- *
- * @method static \Illuminate\Database\Eloquent\Builder|\Plank\Mediable\Media forPathOnDisk(string $disk, string $path)
- * @method static \Illuminate\Database\Eloquent\Builder|\Plank\Mediable\Media inDirectory(string $disk, string $directory, bool $recursive = false)
- * @method static \Illuminate\Database\Eloquent\Builder|\Plank\Mediable\Media inOrUnderDirectory(string $disk, string $directory)
- * @method static \Illuminate\Database\Eloquent\Builder|\Plank\Mediable\Media unordered()
- * @method static \Illuminate\Database\Eloquent\Builder|\Plank\Mediable\Media whereBasename(string $basename)
- * @author Sean Fraser <sean@plankdesign.com>
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ * @property Pivot $pivot
+ * @method static Builder inDirectory(string $disk, string $directory, bool $recursive = false)
+ * @method static Builder inOrUnderDirectory(string $disk, string $directory)
+ * @method static Builder whereBasename(string $basename)
+ * @method static Builder forPathOnDisk(string $disk, string $path)
+ * @method static Builder unordered()
  */
 class Media extends Model
 {
@@ -58,9 +66,9 @@ class Media extends Model
     /**
      * Retrieve all associated models of given class.
      * @param  string $class FQCN
-     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
+     * @return MorphToMany
      */
-    public function models($class)
+    public function models(string $class): MorphToMany
     {
         return $this
             ->morphedByMany(
@@ -75,25 +83,25 @@ class Media extends Model
      * Retrieve the file extension.
      * @return string
      */
-    public function getBasenameAttribute()
+    public function getBasenameAttribute(): string
     {
-        return $this->filename.'.'.$this->extension;
+        return $this->filename . '.' . $this->extension;
     }
 
     /**
      * Query scope for to find media in a particular directory.
-     * @param  \Illuminate\Database\Eloquent\Builder  $q
-     * @param  string                                 $disk      Filesystem disk to search in
-     * @param  string                                 $directory Path relative to disk
-     * @param  bool                                   $recursive (_optional_) If true, will find media in or under the specified directory
+     * @param  Builder $q
+     * @param  string $disk Filesystem disk to search in
+     * @param  string $directory Path relative to disk
+     * @param  bool $recursive (_optional_) If true, will find media in or under the specified directory
      * @return void
      */
-    public function scopeInDirectory(Builder $q, $disk, $directory, $recursive = false)
+    public function scopeInDirectory(Builder $q, string $disk, string $directory, bool $recursive = false): void
     {
         $q->where('disk', $disk);
         if ($recursive) {
             $directory = str_replace(['%', '_'], ['\%', '\_'], $directory);
-            $q->where('directory', 'like', $directory.'%');
+            $q->where('directory', 'like', $directory . '%');
         } else {
             $q->where('directory', '=', $directory);
         }
@@ -101,23 +109,23 @@ class Media extends Model
 
     /**
      * Query scope for finding media in a particular directory or one of its subdirectories.
-     * @param  \Illuminate\Database\Eloquent\Builder  $q
-     * @param  string                                 $disk      Filesystem disk to search in
-     * @param  string                                 $directory Path relative to disk
+     * @param  Builder|Media $q
+     * @param  string $disk Filesystem disk to search in
+     * @param  string $directory Path relative to disk
      * @return void
      */
-    public function scopeInOrUnderDirectory(Builder $q, $disk, $directory)
+    public function scopeInOrUnderDirectory(Builder $q, string $disk, string $directory): void
     {
         $q->inDirectory($disk, $directory, true);
     }
 
     /**
      * Query scope for finding media by basename.
-     * @param  \Illuminate\Database\Eloquent\Builder $q
-     * @param  string                                $basename filename and extension
+     * @param  Builder $q
+     * @param  string $basename filename and extension
      * @return void
      */
-    public function scopeWhereBasename(Builder $q, $basename)
+    public function scopeWhereBasename(Builder $q, string $basename): void
     {
         $q->where('filename', pathinfo($basename, PATHINFO_FILENAME))
             ->where('extension', pathinfo($basename, PATHINFO_EXTENSION));
@@ -125,12 +133,12 @@ class Media extends Model
 
     /**
      * Query scope finding media at a path relative to a disk.
-     * @param  \Illuminate\Database\Eloquent\Builder $q
-     * @param  string                                $disk
-     * @param  string                                $path directory, filename and extension
+     * @param  Builder $q
+     * @param  string $disk
+     * @param  string $path directory, filename and extension
      * @return void
      */
-    public function scopeForPathOnDisk(Builder $q, $disk, $path)
+    public function scopeForPathOnDisk(Builder $q, string $disk, string $path): void
     {
         $q->where('disk', $disk)
             ->where('directory', File::cleanDirname($path))
@@ -140,10 +148,10 @@ class Media extends Model
 
     /**
      * Query scope to remove the order by clause from the query.
-     * @param  \Illuminate\Database\Eloquent\Builder $q
+     * @param  Builder $q
      * @return void
      */
-    public function scopeUnordered(Builder $q)
+    public function scopeUnordered(Builder $q): void
     {
         $query = $q->getQuery();
         if ($query->orders) {
@@ -156,7 +164,7 @@ class Media extends Model
      * @param  int $precision (_optional_) Number of decimal places to include.
      * @return string
      */
-    public function readableSize($precision = 1)
+    public function readableSize(int $precision = 1): string
     {
         return File::readableSize($this->size, $precision);
     }
@@ -165,16 +173,16 @@ class Media extends Model
      * Get the path to the file relative to the root of the disk.
      * @return string
      */
-    public function getDiskPath()
+    public function getDiskPath(): string
     {
-        return ltrim(rtrim($this->directory, '/').'/'.ltrim($this->basename, '/'), '/');
+        return ltrim(rtrim((string)$this->directory, '/') . '/' . ltrim((string)$this->basename, '/'), '/');
     }
 
     /**
      * Get the absolute filesystem path to the file.
      * @return string
      */
-    public function getAbsolutePath()
+    public function getAbsolutePath(): string
     {
         return $this->getUrlGenerator()->getAbsolutePath();
     }
@@ -183,17 +191,17 @@ class Media extends Model
      * Check if the file is located below the public webroot.
      * @return bool
      */
-    public function isPubliclyAccessible()
+    public function isPubliclyAccessible(): bool
     {
         return $this->getUrlGenerator()->isPubliclyAccessible();
     }
 
     /**
      * Get the absolute URL to the media file.
-     * @throws \Plank\Mediable\Exceptions\MediaUrlException If media's disk is not publicly accessible
+     * @throws MediaUrlException If media's disk is not publicly accessible
      * @return string
      */
-    public function getUrl()
+    public function getUrl(): string
     {
         return $this->getUrlGenerator()->getUrl();
     }
@@ -202,16 +210,35 @@ class Media extends Model
      * Check if the file exists on disk.
      * @return bool
      */
-    public function fileExists()
+    public function fileExists(): bool
     {
         return $this->storage()->has($this->getDiskPath());
+    }
+
+    /**
+     *
+     * @return bool
+     */
+    public function isVisible(): bool
+    {
+        return $this->storage()->getVisibility($this->getDiskPath()) === 'public';
+    }
+
+    public function makePrivate(): void
+    {
+        $this->storage()->setVisibility($this->getDiskPath(), 'private');
+    }
+
+    public function makePublic(): void
+    {
+        $this->storage()->setVisibility($this->getDiskPath(), 'public');
     }
 
     /**
      * Retrieve the contents of the file.
      * @return string
      */
-    public function contents()
+    public function contents(): string
     {
         return $this->storage()->get($this->getDiskPath());
     }
@@ -221,10 +248,10 @@ class Media extends Model
      *
      * Will invoke the `save()` method on the model after the associated file has been moved to prevent synchronization errors
      * @param  string $destination directory relative to disk root
-     * @param  string $filename    filename. Do not include extension
+     * @param  string $filename filename. Do not include extension
      * @return void
      */
-    public function move($destination, $filename = null)
+    public function move(string $destination, string $filename = null): void
     {
         app('mediable.mover')->move($this, $destination, $filename);
     }
@@ -234,10 +261,10 @@ class Media extends Model
      *
      * Will invoke the `save()` method on the model after the associated file has been copied to prevent synchronization errors
      * @param  string $destination directory relative to disk root
-     * @param  string $filename    optional filename. Do not include extension
-     * @return \Plank\Mediable\Media
+     * @param  string $filename optional filename. Do not include extension
+     * @return Media
      */
-    public function copyTo($destination, $filename = null)
+    public function copyTo($destination, $filename = null): self
     {
         return app('mediable.mover')->copyTo($this, $destination, $filename);
     }
@@ -246,17 +273,17 @@ class Media extends Model
      * Rename the file in place.
      * @param  string $filename
      * @return void
-     * @see \Plank\Mediable\Media::move()
+     * @see Media::move()
      */
-    public function rename($filename)
+    public function rename(string $filename): void
     {
         $this->move($this->directory, $filename);
     }
 
-    protected function handleMediaDeletion()
+    protected function handleMediaDeletion(): void
     {
         // optionally detach mediable relationships on soft delete
-        if (static::hasGlobalScope(SoftDeletingScope::class) && ! $this->forceDeleting) {
+        if (static::hasGlobalScope(SoftDeletingScope::class) && !$this->forceDeleting) {
             if (config('mediable.detach_on_soft_delete')) {
                 $this->newBaseQueryBuilder()
                     ->from(config('mediable.mediables_table', 'mediables'))
@@ -271,18 +298,18 @@ class Media extends Model
 
     /**
      * Get the filesystem object for this media.
-     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     * @return Filesystem
      */
-    protected function storage()
+    protected function storage(): Filesystem
     {
         return app('filesystem')->disk($this->disk);
     }
 
     /**
      * Get a UrlGenerator instance for the media.
-     * @return \Plank\Mediable\UrlGenerators\UrlGeneratorInterface
+     * @return UrlGeneratorInterface
      */
-    protected function getUrlGenerator()
+    protected function getUrlGenerator(): UrlGeneratorInterface
     {
         return app('mediable.url.factory')->create($this);
     }

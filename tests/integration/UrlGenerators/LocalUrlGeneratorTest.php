@@ -1,10 +1,8 @@
 <?php
 
 use Plank\Mediable\Exceptions\MediaUrlException;
-use Plank\Mediable\UrlGenerators\LocalUrlGenerator;
 use Plank\Mediable\Media;
-use Illuminate\Contracts\Config\Repository as Config;
-use Illuminate\Routing\UrlGenerator as Url;
+use Plank\Mediable\UrlGenerators\LocalUrlGenerator;
 
 class LocalUrlGeneratorTest extends TestCase
 {

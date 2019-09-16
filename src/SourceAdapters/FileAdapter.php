@@ -1,16 +1,15 @@
 <?php
+declare(strict_types=1);
 
 namespace Plank\Mediable\SourceAdapters;
 
-use Symfony\Component\HttpFoundation\File\File;
 use Plank\Mediable\Helpers\File as FileHelper;
+use Symfony\Component\HttpFoundation\File\File;
 
 /**
  * File Adapter.
  *
  * Adapts the File class from Symfony Components
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 class FileAdapter implements SourceAdapterInterface
 {
@@ -40,15 +39,15 @@ class FileAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function path()
+    public function path(): string
     {
-        return $this->source->getPath().'/'.$this->source->getFilename();
+        return $this->source->getPath() . '/' . $this->source->getFilename();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function filename()
+    public function filename(): string
     {
         return pathinfo($this->source->getFilename(), PATHINFO_FILENAME);
     }
@@ -56,7 +55,7 @@ class FileAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function extension()
+    public function extension(): string
     {
         $extension = pathinfo($this->path(), PATHINFO_EXTENSION);
 
@@ -64,29 +63,37 @@ class FileAdapter implements SourceAdapterInterface
             return $extension;
         }
 
-        return (string) FileHelper::guessExtension($this->mimeType());
+        return (string)FileHelper::guessExtension($this->mimeType());
     }
 
     /**
      * {@inheritdoc}
      */
-    public function mimeType()
+    public function mimeType(): string
     {
-        return (string) $this->source->getMimeType();
+        return (string)$this->source->getMimeType();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function contents()
+    public function contents(): string
     {
-        return (string) file_get_contents($this->path());
+        return (string)file_get_contents($this->path());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getStreamResource()
+    {
+        return fopen($this->path(), 'rb');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         return file_exists($this->path());
     }
@@ -94,8 +101,8 @@ class FileAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function size()
+    public function size(): int
     {
-        return (int) filesize($this->path());
+        return (int)filesize($this->path());
     }
 }

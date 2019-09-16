@@ -1,20 +1,38 @@
 <?php
 
-use Plank\Mediable\Stream;
 use Plank\Mediable\SourceAdapters\FileAdapter;
+use Plank\Mediable\SourceAdapters\LocalPathAdapter;
 use Plank\Mediable\SourceAdapters\RawContentAdapter;
+use Plank\Mediable\SourceAdapters\RemoteUrlAdapter;
+use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
 use Plank\Mediable\SourceAdapters\StreamAdapter;
 use Plank\Mediable\SourceAdapters\StreamResourceAdapter;
 use Plank\Mediable\SourceAdapters\UploadedFileAdapter;
-use Plank\Mediable\SourceAdapters\LocalPathAdapter;
-use Plank\Mediable\SourceAdapters\RemoteUrlAdapter;
+use Plank\Mediable\Stream;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Psr\Http\Message\StreamInterface;
 
 class SourceAdapterTest extends TestCase
 {
-    public function setUp()
+    private const READABLE_MODES = [
+        'r' => true,
+        'w+' => true,
+        'r+' => true,
+        'x+' => true,
+        'c+' => true,
+        'rb' => true,
+        'w+b' => true,
+        'r+b' => true,
+        'x+b' => true,
+        'c+b' => true,
+        'rt' => true,
+        'w+t' => true,
+        'r+t' => true,
+        'x+t' => true,
+        'c+t' => true,
+        'a+' => true
+    ];
+    public function setUp(): void
     {
         parent::setUp();
     }
@@ -22,14 +40,16 @@ class SourceAdapterTest extends TestCase
     protected function getEnvironmentSetUp($app)
     {
         parent::getEnvironmentSetUp($app);
-        $app['filesystem']->disk('uploads')->put('plank.png', fopen(__DIR__.'/../../_data/plank.png', 'r'));
+        $app['filesystem']->disk('uploads')->put('plank.png', $this->sampleFile());
     }
 
     public function adapterProvider()
     {
-        $file = realpath(__DIR__.'/../../_data/plank.png');
+        $file = $this->sampleFilePath();
         $string = file_get_contents($file);
         $url = 'https://www.plankdesign.com/externaluse/plank.png';
+
+        $uploadedFile = new UploadedFile($file, 'plank.png', 'image/png', 7173, UPLOAD_ERR_OK, true);
 
         $fileResource = fopen($file, 'rb');
         $fileStream = new Stream(fopen($file, 'rb'));
@@ -45,17 +65,17 @@ class SourceAdapterTest extends TestCase
         $memoryStream->write($string);
 
         $data = [
-            [FileAdapter::class, new File($file), $file, 'plank'],
-            [UploadedFileAdapter::class, new UploadedFile($file, 'plank.png', 'image/png', 7173, UPLOAD_ERR_OK, true), $file, 'plank'],
-            [LocalPathAdapter::class, $file, $file, 'plank'],
-            [RemoteUrlAdapter::class, $url, $url, 'plank'],
-            [RawContentAdapter::class, $string, null, null],
-            [StreamResourceAdapter::class, $fileResource, $file, 'plank'],
-            [StreamAdapter::class, $fileStream, $file, 'plank'],
-            [StreamResourceAdapter::class, $httpResource, $url, 'plank'],
-            [StreamAdapter::class, $httpStream, $url, 'plank'],
-            [StreamResourceAdapter::class, $memoryResource, 'php://memory', 'memory'],
-            [StreamAdapter::class, $memoryStream, 'php://memory', 'memory'],
+            'FileAdapter' => [FileAdapter::class, new File($file), $file, 'plank'],
+            'UploadedFileAdapter' => [UploadedFileAdapter::class, $uploadedFile, $file,'plank'],
+            'LocalPathAdapter' => [LocalPathAdapter::class, $file, $file, 'plank'],
+            'RemoteUrlAdapter' => [RemoteUrlAdapter::class, $url, $url, 'plank'],
+            'RawContentAdapter' => [RawContentAdapter::class, $string, null, null, false],
+            'StreamResourceAdapter_Local' => [StreamResourceAdapter::class, $fileResource, $file, 'plank'],
+            'StreamAdapter_Local' => [StreamAdapter::class, $fileStream, $file, 'plank', false],
+            'StreamResourceAdapter_Remote' => [StreamResourceAdapter::class, $httpResource, $url, 'plank'],
+            'StreamAdapter_Remote' => [StreamAdapter::class, $httpStream, $url, 'plank', false],
+            'StreamResourceAdapter_Memory' => [StreamResourceAdapter::class, $memoryResource, 'php://memory', 'memory'],
+            'StreamAdapter_Memory' => [StreamAdapter::class, $memoryStream, 'php://memory', 'memory', false],
         ];
         return $data;
     }
@@ -65,13 +85,22 @@ class SourceAdapterTest extends TestCase
         $file = __DIR__ . '/../../_data/invalid.png';
         $url = 'https://www.plankdesign.com/externaluse/invalid.png';
 
+        $uploadedFile = new UploadedFile(
+            $file,
+            'invalid.png',
+            'image/png',
+            8444,
+            UPLOAD_ERR_CANT_WRITE,
+            false
+        );
+
         return [
             [new FileAdapter(new File($file, false))],
             [new LocalPathAdapter($file)],
             [new RemoteUrlAdapter($url)],
             [new RemoteUrlAdapter('http://example.invalid')],
-            [new UploadedFileAdapter(new UploadedFile($file, 'invalid.png', 'image/png', 8444, UPLOAD_ERR_CANT_WRITE, false))],
-            [new StreamResourceAdapter(fopen(realpath(__DIR__.'/../../_data/plank.png'), 'a'))],
+            [new UploadedFileAdapter($uploadedFile)],
+            [new StreamResourceAdapter(fopen($this->sampleFilePath(), 'a'))],
             [new StreamResourceAdapter(fopen('php://stdin', 'w'))],
         ];
     }
@@ -79,80 +108,106 @@ class SourceAdapterTest extends TestCase
     /**
      * @dataProvider adapterProvider
      */
-    public function test_it_can_return_source($adapter, $source)
+    public function test_it_can_return_source($adapterClass, $source)
     {
-        $adapter = new $adapter($source);
+        /** @var SourceAdapterInterface $adapter */
+        $adapter = new $adapterClass($source);
         $this->assertEquals($source, $adapter->getSource());
     }
 
     /**
      * @dataProvider adapterProvider
      */
-    public function test_it_adapts_absolute_path($adapter, $source, $path)
+    public function test_it_adapts_absolute_path($adapterClass, $source, $path)
     {
-        $adapter = new $adapter($source);
+        /** @var SourceAdapterInterface $adapter */
+        $adapter = new $adapterClass($source);
         $this->assertEquals($path, $adapter->path());
     }
 
     /**
      * @dataProvider adapterProvider
      */
-    public function test_it_adapts_filename($adapter, $source, $path, $filename)
+    public function test_it_adapts_filename($adapterClass, $source, $path, $filename)
     {
-        $adapter = new $adapter($source);
+        /** @var SourceAdapterInterface $adapter */
+        $adapter = new $adapterClass($source);
         $this->assertEquals($filename, $adapter->filename());
     }
 
     /**
      * @dataProvider adapterProvider
      */
-    public function test_it_adapts_extension($adapter, $source)
+    public function test_it_adapts_extension($adapterClass, $source)
     {
-        $adapter = new $adapter($source);
+        /** @var SourceAdapterInterface $adapter */
+        $adapter = new $adapterClass($source);
         $this->assertEquals('png', $adapter->extension());
     }
 
     /**
      * @dataProvider adapterProvider
      */
-    public function test_it_adapts_mime_type($adapter, $source)
+    public function test_it_adapts_mime_type($adapterClass, $source)
     {
-        $adapter = new $adapter($source);
+        /** @var SourceAdapterInterface $adapter */
+        $adapter = new $adapterClass($source);
         $this->assertEquals('image/png', $adapter->mimeType());
     }
 
     /**
      * @dataProvider adapterProvider
      */
-    public function test_it_adapts_file_contents($adapter, $source)
+    public function test_it_adapts_file_contents($adapterClass, $source)
     {
-        $adapter = new $adapter($source);
-
-        $this->assertInternalType('string', $adapter->contents());
+        /** @var SourceAdapterInterface $adapter */
+        $adapter = new $adapterClass($source);
+        $this->assertIsString($adapter->contents());
     }
 
     /**
      * @dataProvider adapterProvider
      */
-    public function test_it_adapts_file_size($adapter, $source)
+    public function test_it_adapts_to_stream($adapterClass, $source)
     {
-        $adapter = new $adapter($source);
+        /** @var SourceAdapterInterface $adapter */
+        $adapter = new $adapterClass($source);
+        $stream = $adapter->getStreamResource();
+        try {
+            $this->assertTrue(is_resource($stream));
+            $metadata = stream_get_meta_data($stream);
+            $this->assertArrayHasKey($metadata['mode'], self::READABLE_MODES);
+        } finally {
+            if (is_resource($stream)) {
+                fclose($stream);
+            }
+        }
+    }
+
+    /**
+     * @dataProvider adapterProvider
+     */
+    public function test_it_adapts_file_size($adapterClass, $source)
+    {
+        /** @var SourceAdapterInterface $adapter */
+        $adapter = new $adapterClass($source);
         $this->assertEquals(7173, $adapter->size());
     }
 
     /**
      * @dataProvider adapterProvider
      */
-    public function test_it_verifies_file_validity($adapter, $source)
+    public function test_it_verifies_file_validity($adapterClass, $source)
     {
-        $adapter = new $adapter($source);
+        /** @var SourceAdapterInterface $adapter */
+        $adapter = new $adapterClass($source);
         $this->assertTrue($adapter->valid());
     }
 
     /**
      * @dataProvider invalidAdapterProvider
      */
-    public function test_it_verifies_file_validity_failure($adapter)
+    public function test_it_verifies_file_validity_failure(SourceAdapterInterface $adapter)
     {
         $this->assertFalse($adapter->valid());
     }

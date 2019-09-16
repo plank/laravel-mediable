@@ -1,5 +1,50 @@
 # Changelog
 
+## 3.0.0 -
+- Updated minimum support requirements to PHP 7.2 and Laravel 5.6+.
+- Added PHP 7 parameter and return type hints across the board
+- Added a new method `getStreamResource` to `SourceAdapterInterface`, uploader will now attempt to use a stream to reduce memory usage.
+- Added `delete()` method to `MediableCollection` for mass deleting media records and files.
+- Added support for file visibility on a file-by-file basis.
+- Cleaned up test suite.
+- fixed a number of docblocks
+
+## 2.9.0 - 2019-03-22
+- The name of the Mediables pivot table is now configurable (Thanks @nadinengland!)
+
+## 2.8.2 - 2019-03-08
+- Fix windows paths pattern (Thanks @aalyusuf!)
+
+## 2.8.1 - 2019-01-27
+- Add methods to facade for IDE autocompletion (Thanks @simonschaufi!)
+
+## 2.8.0 - 2018-09-20
+- Added update on duplicate behaviour to MediaUploader (Thanks @pet1330!)
+- Fixed remote URL data source raising an error when headers cannot be read (Thanks @sebdesign!)
+
+## 2.7.3 - 2018-07-05
+- Return correct types in source adapter methods (Thanks @sebdesign!)
+- Add docblocks for Media properties and query scopes (Thanks @sebdesign!)
+
+## 2.7.2 - 2018-07-03
+- Fixed docblocks (Thanks @sebdesign!)
+
+## 2.7.1 - 2018-06-04
+- Fixed tags with numeric values
+
+## 2.7.0 - 2018-05-11
+- Added `MediaUploader::verifyFile()` to apply validation to a source without uploading (Thanks @JulesPrimo)
+- Added `MediaUploader::beforeSave()` to allow editing custom fields on Media records before they are saved (Thanks @JulesPrimo)
+
+## 2.6.2 - 2018-03-11
+- Fix URL generation for local disks using symbolic links in different Laravel versions (Thanks @sebdesign !)
+
+## 2.6.1 - 2018-02-20
+- `MediaUploader::onDuplicateIncrement()` behaviour adjusted to use hyphens instead of parenthesis (Thanks @ryankilf!)
+
+## 2.6.0 - 2018-02-13
+- Added `Media::copyTo()` method (Thanks @johannesschobel!)
+
 ## 2.5.0 - 2017-08-30
 - Added `Mediable::lastMedia()` convenience method (Thanks @pet1330!)
 

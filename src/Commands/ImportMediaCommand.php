@@ -1,18 +1,18 @@
 <?php
+declare(strict_types=1);
 
 namespace Plank\Mediable\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Filesystem\FilesystemManager;
+use Plank\Mediable\Exceptions\MediaUploadException;
 use Plank\Mediable\Helpers\File;
 use Plank\Mediable\Media;
 use Plank\Mediable\MediaUploader;
-use Plank\Mediable\Exceptions\MediaUploadException;
 
 /**
  * Import Media Artisan Command.
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 class ImportMediaCommand extends Command
 {
@@ -33,13 +33,13 @@ class ImportMediaCommand extends Command
 
     /**
      * Filesystem Manager instance.
-     * @var \Illuminate\Filesystem\FilesystemManager
+     * @var FilesystemManager
      */
     protected $filesystem;
 
     /**
      * Uploader instance.
-     * @var \Plank\Mediable\MediaUploader
+     * @var MediaUploader
      */
     protected $uploader;
 
@@ -55,8 +55,8 @@ class ImportMediaCommand extends Command
 
     /**
      * Constructor.
-     * @param \Illuminate\Filesystem\FilesystemManager $filesystem
-     * @param \Plank\Mediable\MediaUploader            $uploader
+     * @param FilesystemManager $filesystem
+     * @param MediaUploader $uploader
      */
     public function __construct(FileSystemManager $filesystem, MediaUploader $uploader)
     {
@@ -70,14 +70,14 @@ class ImportMediaCommand extends Command
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         $this->resetCounters();
 
         $disk = $this->argument('disk');
         $directory = $this->option('directory') ?: '';
-        $recursive = ! $this->option('non-recursive');
-        $force = (bool) $this->option('force');
+        $recursive = !$this->option('non-recursive');
+        $force = (bool)$this->option('force');
 
         $files = $this->listFiles($disk, $directory, $recursive);
         $existing_media = Media::inDirectory($disk, $directory, $recursive)->get();
@@ -92,17 +92,17 @@ class ImportMediaCommand extends Command
             }
         }
 
-        $this->outputCounters($force);
+        $this->outputCounters();
     }
 
     /**
      * Generate a list of all files in the specified directory.
-     * @param  string  $disk
-     * @param  string  $directory
-     * @param  bool    $recursive
+     * @param  string $disk
+     * @param  string $directory
+     * @param  bool $recursive
      * @return array
      */
-    protected function listFiles($disk, $directory = '', $recursive = true)
+    protected function listFiles(string $disk, string $directory = '', bool $recursive = true): array
     {
         if ($recursive) {
             return $this->filesystem->disk($disk)->allFiles($directory);
@@ -114,16 +114,16 @@ class ImportMediaCommand extends Command
     /**
      * Search through the record list for one matching the provided path.
      * @param  string $path
-     * @param  \Illuminate\Database\Eloquent\Collection $existing_media
-     * @return \Plank\Mediable\Media|null
+     * @param  Collection $existingMedia
+     * @return Media|null
      */
-    protected function getRecordForFile($path, $existing_media)
+    protected function getRecordForFile(string $path, Collection $existingMedia): ?Media
     {
         $directory = File::cleanDirname($path);
         $filename = pathinfo($path, PATHINFO_FILENAME);
         $extension = pathinfo($path, PATHINFO_EXTENSION);
 
-        return $existing_media->filter(function (Media $media) use ($directory, $filename, $extension) {
+        return $existingMedia->filter(function (Media $media) use ($directory, $filename, $extension) {
             return $media->directory == $directory && $media->filename == $filename && $media->extension == $extension;
         })->first();
     }
@@ -134,7 +134,7 @@ class ImportMediaCommand extends Command
      * @param  string $path
      * @return void
      */
-    protected function createRecordForFile($disk, $path)
+    protected function createRecordForFile(string $disk, string $path): void
     {
         try {
             $this->uploader->importPath($disk, $path);
@@ -153,7 +153,7 @@ class ImportMediaCommand extends Command
      * @param  string $path
      * @return void
      */
-    protected function updateRecordForFile(Media $media, $path)
+    protected function updateRecordForFile(Media $media, string $path): void
     {
         try {
             if ($this->uploader->update($media)) {
@@ -172,10 +172,9 @@ class ImportMediaCommand extends Command
 
     /**
      * Send the counter total to the console.
-     * @param  bool $force
      * @return void
      */
-    protected function outputCounters($force)
+    protected function outputCounters(): void
     {
         $this->info(sprintf('Imported %d file(s).', $this->counters['created']));
         if ($this->counters['updated'] > 0) {
@@ -190,7 +189,7 @@ class ImportMediaCommand extends Command
      * Reset the counters of processed files.
      * @return void
      */
-    protected function resetCounters()
+    protected function resetCounters(): void
     {
         $this->counters = [
             'created' => 0,

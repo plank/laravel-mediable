@@ -49,6 +49,7 @@ Once you have set up as many disks as you need, edit ``config/mediable.php`` to 
     ],
     //...
 
+.. _disk_visibility:
 
 Disk Visibility
 ^^^^^^^^^^^^^^^

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Plank\Mediable\SourceAdapters;
 
@@ -21,10 +22,11 @@ class StreamResourceAdapter extends StreamAdapter
     /**
      * Constructor.
      * @param resource $source
+     * @throws ConfigurationException
      */
     public function __construct($source)
     {
-        if (! is_resource($source) || get_resource_type($source) !== 'stream') {
+        if (!is_resource($source) || get_resource_type($source) !== 'stream') {
             throw ConfigurationException::unrecognizedSource($source);
         }
 
@@ -37,6 +39,14 @@ class StreamResourceAdapter extends StreamAdapter
      * {@inheritdoc}
      */
     public function getSource()
+    {
+        return $this->resource;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getStreamResource()
     {
         return $this->resource;
     }

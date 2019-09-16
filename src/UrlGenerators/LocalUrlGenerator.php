@@ -1,29 +1,25 @@
 <?php
+declare(strict_types=1);
 
 namespace Plank\Mediable\UrlGenerators;
 
-use Plank\Mediable\Exceptions\MediaUrlException;
 use Illuminate\Contracts\Config\Repository as Config;
-use Illuminate\Routing\UrlGenerator as Url;
+use Illuminate\Contracts\Routing\UrlGenerator;
+use Plank\Mediable\Exceptions\MediaUrlException;
 
-/**
- * Local Url Generator.
- *
- * @author Sean Fraser <sean@plankdesign.com>
- */
 class LocalUrlGenerator extends BaseUrlGenerator
 {
     /**
-     * @var \Illuminate\Routing\UrlGenerator
+     * @var UrlGenerator
      */
     protected $url;
 
     /**
      * Constructor.
-     * @param \Illuminate\Contracts\Config\Repository $config
-     * @param \Illuminate\Routing\UrlGenerator        $url
+     * @param Config $config
+     * @param UrlGenerator $url
      */
-    public function __construct(Config $config, Url $url)
+    public function __construct(Config $config, UrlGenerator $url)
     {
         parent::__construct($config);
         $this->url = $url;
@@ -32,25 +28,25 @@ class LocalUrlGenerator extends BaseUrlGenerator
     /**
      * {@inheritdoc}
      */
-    public function isPubliclyAccessible()
+    public function isPubliclyAccessible(): bool
     {
-        return  parent::isPubliclyAccessible() || $this->isInWebroot();
+        return (parent::isPubliclyAccessible() || $this->isInWebroot()) ;
     }
 
     /**
      * Get the path to relative to the webroot.
      * @return string
-     * @throws \Plank\Mediable\Exceptions\MediaUrlException If media's disk is not publicly accessible
+     * @throws MediaUrlException If media's disk is not publicly accessible
      */
-    public function getPublicPath()
+    public function getPublicPath(): string
     {
-        if (! $this->isPubliclyAccessible()) {
-            throw MediaUrlException::mediaNotPubliclyAccessible($this->getAbsolutePath(), public_path());
+        if (!$this->isPubliclyAccessible()) {
+            throw MediaUrlException::mediaNotPubliclyAccessible($this->getAbsolutePath());
         }
         if ($this->isInWebroot()) {
             $path = str_replace(public_path(), '', $this->getAbsolutePath());
         } else {
-            $path = rtrim($this->getPrefix(), '/').'/'.$this->media->getDiskPath();
+            $path = rtrim($this->getPrefix(), '/') . '/' . $this->media->getDiskPath();
         }
 
         return $this->cleanDirectorySeparators($path);
@@ -60,7 +56,7 @@ class LocalUrlGenerator extends BaseUrlGenerator
      * {@inheritdoc}
      * @throws \Plank\Mediable\Exceptions\MediaUrlException If media's disk is not publicly accessible
      */
-    public function getUrl()
+    public function getUrl(): string
     {
         $path = $this->getPublicPath();
 
@@ -71,7 +67,7 @@ class LocalUrlGenerator extends BaseUrlGenerator
                 $path = $this->media->getDiskPath();
             }
 
-            return rtrim($url, '/').'/'.trim($path, '/');
+            return rtrim($url, '/') . '/' . trim($path, '/');
         }
 
         return $this->url->asset($path);
@@ -80,9 +76,9 @@ class LocalUrlGenerator extends BaseUrlGenerator
     /**
      * {@inheritdoc}
      */
-    public function getAbsolutePath()
+    public function getAbsolutePath(): string
     {
-        return $this->getDiskConfig('root').DIRECTORY_SEPARATOR.$this->media->getDiskPath();
+        return $this->getDiskConfig('root') . DIRECTORY_SEPARATOR . $this->media->getDiskPath();
     }
 
     /**
@@ -90,7 +86,7 @@ class LocalUrlGenerator extends BaseUrlGenerator
      * @param  string $path
      * @return string
      */
-    protected function cleanDirectorySeparators($path)
+    protected function cleanDirectorySeparators(string $path): string
     {
         if (DIRECTORY_SEPARATOR != '/') {
             $path = str_replace(DIRECTORY_SEPARATOR, '/', $path);
@@ -99,16 +95,16 @@ class LocalUrlGenerator extends BaseUrlGenerator
         return $path;
     }
 
-    private function isInWebroot()
+    private function isInWebroot(): bool
     {
-        return strpos($this->getAbsolutePath(), public_path()) === 0;
+        return strpos(realpath($this->getAbsolutePath()), realpath(public_path())) === 0;
     }
 
     /**
      * Get the prefix.
      *
      * If the prefix and the url are not set, we will assume the prefix
-     * is "storage", in order to point to the default symbolink link.
+     * is "storage", in order to point to the default symbolic link.
      *
      * Otherwise, we will trust the user has correctly set the prefix and/or the url.
      *
@@ -119,7 +115,7 @@ class LocalUrlGenerator extends BaseUrlGenerator
         $prefix = $this->getDiskConfig('prefix', '');
         $url = $this->getDiskConfig('url');
 
-        if (! $prefix && ! $url) {
+        if (!$prefix && !$url) {
             return 'storage';
         }
 

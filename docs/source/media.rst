@@ -45,6 +45,8 @@ The following attributes and methods would be exposed:
 	$media->extension;
 	// jpg
 
+`$media->getUrl()` will throw an exception if the file or its disk has its visibility set to private. You can check if it is safe to generate a url for a record with the `$media->isPubliclyAccessible()` method.
+
 Querying Media
 ---------------------
 
@@ -108,3 +110,14 @@ Soft Deletes
 If you subclass the ``Media`` class and add Laravel's ``SoftDeletes`` trait, the media will only delete its associated file and detach its relationship if ``forceDelete()`` is used.
 
 You can change the ``detach_on_soft_delete`` setting to ``true`` in ``config/mediable.php`` to have relationships automatically detach when either the ``Media`` record or ``Mediable`` model are soft deleted.
+
+Setting Visibility
+---------------------
+
+You can update the visibility of a `Media` record's file
+
+::
+
+	<?php
+	$media->makePublic();
+	$media->makePrivate();

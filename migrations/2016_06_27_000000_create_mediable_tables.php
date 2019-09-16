@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateMediableTables extends Migration
 {
@@ -40,7 +40,8 @@ class CreateMediableTables extends Migration
             $table->index(['mediable_id', 'mediable_type']);
             $table->index('tag');
             $table->index('order');
-            $table->foreign('media_id')->references('id')->on('media')
+            $table->foreign('media_id')
+                ->references('id')->on('media')
                 ->onDelete('cascade');
         });
     }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Plank\Mediable\SourceAdapters;
 
@@ -8,8 +9,6 @@ use Plank\Mediable\Helpers\File;
  * URL Adapter.
  *
  * Adapts a string representing a URL
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 class RemoteUrlAdapter implements SourceAdapterInterface
 {
@@ -29,7 +28,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
      * Constructor.
      * @param string $source
      */
-    public function __construct($source)
+    public function __construct(string $source)
     {
         $this->source = $source;
     }
@@ -42,7 +41,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function path()
+    public function path(): string
     {
         return $this->source;
     }
@@ -50,7 +49,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function filename()
+    public function filename(): string
     {
         return pathinfo($this->source, PATHINFO_FILENAME);
     }
@@ -58,7 +57,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function extension()
+    public function extension(): string
     {
         $extension = pathinfo($this->source, PATHINFO_EXTENSION);
 
@@ -66,13 +65,13 @@ class RemoteUrlAdapter implements SourceAdapterInterface
             return $extension;
         }
 
-        return (string) File::guessExtension($this->mimeType());
+        return (string)File::guessExtension($this->mimeType());
     }
 
     /**
      * {@inheritdoc}
      */
-    public function mimeType()
+    public function mimeType(): string
     {
         return $this->getHeader('Content-Type');
     }
@@ -80,36 +79,44 @@ class RemoteUrlAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function contents()
+    public function contents(): string
     {
-        return (string) file_get_contents($this->source);
+        return (string)file_get_contents($this->source);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getStreamResource()
+    {
+        return fopen($this->source, 'rb');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
-        return strpos($this->getHeader(0), '200') !== false;
+        return strpos((string)$this->getHeader(0), '200') !== false;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function size()
+    public function size(): int
     {
-        return $this->getHeader('Content-Length');
+        return (int)$this->getHeader('Content-Length');
     }
 
     /**
      * Read a header value by name from the remote content.
      *
-     * @param  mixed $key Header name
-     * @return mixed
+     * @param  string|int $key Header name
+     * @return string|null
      */
-    private function getHeader($key)
+    private function getHeader($key, $default = null): ?string
     {
-        if (! $this->headers) {
+        if (!$this->headers) {
             $this->headers = $this->getHeaders();
         }
         if (array_key_exists($key, $this->headers)) {
@@ -120,6 +127,8 @@ class RemoteUrlAdapter implements SourceAdapterInterface
                 return $this->headers[$key];
             }
         }
+
+        return null;
     }
 
     /**
@@ -127,7 +136,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
      *
      * @return array
      */
-    public function getHeaders()
+    public function getHeaders(): array
     {
         $headers = @get_headers($this->source, 1);
 

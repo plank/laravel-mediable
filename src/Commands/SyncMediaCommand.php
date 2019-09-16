@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Plank\Mediable\Commands;
 
@@ -6,8 +7,6 @@ use Illuminate\Console\Command;
 
 /**
  * Synchronize Media Artisan Command.
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 class SyncMediaCommand extends Command
 {
@@ -31,12 +30,12 @@ class SyncMediaCommand extends Command
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         $disk = $this->argument('disk');
         $directory = $this->option('directory') ?: '';
-        $non_recursive = (bool) $this->option('non-recursive');
-        $force = (bool) $this->option('force');
+        $non_recursive = (bool)$this->option('non-recursive');
+        $force = (bool)$this->option('force');
 
         $this->call('media:prune', [
             'disk' => $disk,
