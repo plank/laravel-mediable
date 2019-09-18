@@ -1,6 +1,9 @@
 # Changelog
 
-## 3.0.0 -
+## 3.0.1 - 2019-09-18
+- Fixed public visibility not being respected when generating URLs for local files that are not in the webroot.
+
+## 3.0.0 - 2019-09-16
 - Updated minimum support requirements to PHP 7.2 and Laravel 5.6+.
 - Added PHP 7 parameter and return type hints across the board
 - Added a new method `getStreamResource` to `SourceAdapterInterface`, uploader will now attempt to use a stream to reduce memory usage.
