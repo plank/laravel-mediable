@@ -39,17 +39,19 @@ class TestCase extends BaseTestCase
             'prefix' => ''
         ]);
         $app['config']->set('database.default', 'testing');
-
+        $app['config']->set('filesystems.default', 'uploads');
         $app['config']->set('filesystems.disks', [
             //private local storage
             'tmp' => [
                 'driver' => 'local',
                 'root' => storage_path('tmp'),
+                'visibility' => 'private'
             ],
             //public local storage
             'uploads' => [
                 'driver' => 'local',
                 'root' => public_path('uploads'),
+                'visibility' => 'public'
             ],
             'public_storage' => [
                 'driver' => 'local',
