@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Filesystem\FilesystemManager;
-use Plank\Mediable\Exceptions\MediaUrlException;
 use Plank\Mediable\Media;
 use Plank\Mediable\UrlGenerators\S3UrlGenerator;
 
@@ -40,14 +39,6 @@ class S3UrlGeneratorTest extends TestCase
             sprintf('https://%s.s3.%s.amazonaws.com/foo/bar.jpg', env('S3_BUCKET'), env('S3_REGION')),
             $generator->getUrl()
         );
-    }
-
-    public function test_it_throws_exception_if_not_available()
-    {
-        config()->set('filesystems.disks.s3.visibility', 'private');
-        $generator = $this->setupGenerator();
-        $this->expectException(MediaUrlException::class);
-        $generator->getUrl();
     }
 
     protected function setupGenerator()

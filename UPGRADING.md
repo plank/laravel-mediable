@@ -1,5 +1,11 @@
 # Upgrading
 
+## 3.x to 4.x
+
+* UrlGenerators no longer throw `MediaUrlException` when the file does not have public visibility. This removes the need to read IO for files local disks or to make HTTP calls for files on s3 disks. Visibility can still checked with `$media->isPubliclyAccessible()`, if necessary.
+* Highly recommended to explicitly specify the `'url'` config value on all disks used to generate URLs.
+* No longer reading the `'prefix'` config of local disks. Value should be included in the `'url'` config instead.  
+
 ## 2.x to 3.x
 
 * Minimum PHP version moved to 7.2
