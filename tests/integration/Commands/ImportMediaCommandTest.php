@@ -64,11 +64,12 @@ class ImportMediaCommandTest extends TestCase
 
     public function test_it_skips_files_of_unmatched_aggregate_type()
     {
-        $this->markTestIncomplete('working locally, failing in Travis. Need to investigate further.');
         $artisan = $this->getArtisan();
         $filesystem = app(\Illuminate\Filesystem\FilesystemManager::class);
+        /** @var \Plank\Mediable\MediaUploader $uploader */
         $uploader = app('mediable.uploader');
         $uploader->setAllowUnrecognizedTypes(false);
+        $uploader->setAllowedAggregateTypes(['image']);
         $command = new ImportMediaCommand($filesystem, $uploader);
 
         $media = factory(Media::class)->make(['disk' => 'tmp', 'extension' => 'foo', 'mime_type' => 'bar']);
@@ -82,7 +83,6 @@ class ImportMediaCommandTest extends TestCase
 
     public function test_it_updates_existing_media()
     {
-        $this->markTestIncomplete('working locally, sporadically failing in Travis. Need to investigate further.');
         $artisan = $this->getArtisan();
         $media1 = factory(Media::class)->create([
             'disk' => 'tmp',
@@ -95,7 +95,7 @@ class ImportMediaCommandTest extends TestCase
             'disk' => 'tmp',
             'filename' => 'bar',
             'extension' => 'png',
-            'size' => 8444,
+            'size' => 7173,
             'mime_type' => 'image/png',
             'aggregate_type' => 'image'
         ]);

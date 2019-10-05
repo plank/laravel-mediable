@@ -301,14 +301,15 @@ class MediaUploaderTest extends TestCase
         $media = factory(Media::class)->make([
             'disk' => 'tmp',
             'directory' => '',
-            'filename' => 'plank',
+            'filename' => 'duplicate',
             'extension' => 'png'
         ]);
+        $this->seedFileForMedia($media);
 
         $method->invoke($uploader, $media);
 
 
-        $this->assertEquals('plank-1', $media->filename);
+        $this->assertEquals('duplicate-1', $media->filename);
     }
 
     public function test_it_uploads_files()
