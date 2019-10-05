@@ -13,10 +13,6 @@ script:
   - vendor/bin/phpunit --coverage-clover build/logs/clover.xml
 after_script:
   - php vendor/bin/php-coveralls -v
-branches:
-  only:
-  - master
-  - develop
 cache:
   directories:
     - $HOME/.composer/cache

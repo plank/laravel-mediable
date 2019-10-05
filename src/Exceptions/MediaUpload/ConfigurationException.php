@@ -28,8 +28,6 @@ class ConfigurationException extends MediaUploadException
             $source = get_class($source);
         } elseif (is_resource($source)) {
             $source = get_resource_type($source);
-        } else {
-            $source = (string)$source;
         }
 
         return new static("Could not recognize source, `{$source}` provided.");
