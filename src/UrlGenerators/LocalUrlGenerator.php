@@ -55,6 +55,6 @@ class LocalUrlGenerator extends BaseUrlGenerator
 
     private function isInWebroot(): bool
     {
-        return strpos(realpath($this->getAbsolutePath()), realpath(public_path())) === 0;
+        return strpos($this->getAbsolutePath(), public_path()) === 0;
     }
 }
