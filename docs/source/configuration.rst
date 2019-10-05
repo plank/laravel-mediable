@@ -10,8 +10,6 @@ Disks
 ------------------------
 Laravel-Mediable is built on top of Laravel's Filesystem component. Before you use the package, you will need to configure the filesystem disks where you would like files to be stored in ``config/filesystems.php``. `Learn more about filesystem disk <https://laravel.com/docs/5.2/filesystem>`_.
 
-An example setup with one private disk (``local``) and one publicly accessible disk (``uploads``):
-
 ::
 
     <?php
@@ -20,11 +18,15 @@ An example setup with one private disk (``local``) and one publicly accessible d
         'local' => [
             'driver' => 'local',
             'root'   => storage_path('app'),
+            'url' => 'https://example.com/storage/app',
+            'visibility' => 'public'
         ],
 
         'uploads' => [
             'driver' => 'local',
             'root'   => public_path('uploads'),
+            'url' => 'https://example.com/uploads',
+            'visibility' => 'public'
         ],
     ]
     //...
@@ -45,124 +47,10 @@ Once you have set up as many disks as you need, edit ``config/mediable.php`` to 
      * Filesystems that can be used for media storage
      */
     'allowed_disks' => [
+        'local',
         'uploads',
     ],
     //...
-
-.. _disk_visibility:
-
-Disk Visibility
-^^^^^^^^^^^^^^^
-
-This package is able to generate public URLs for accessing media, and uses the disk config to determine how this should be done.
-
-URLs can always be generated for ``Media`` placed on a disk located below the webroot.
-
-::
-
-    <?php
-    'disks' => [
-        'uploads' => [
-            'driver' => 'local',
-            'root' => public_path('uploads'),
-        ],
-    ]
-
-    //...
-
-    $media->getUrl(); // returns http://domain.com/uploads/foo.jpg
-
-``Media`` placed on a disk located elsewhere will throw an exception.
-
-::
-
-    <?php
-    'disks' => [
-        'private' => [
-            'driver' => 'local',
-            'root' => storage_path('private'),
-        ],
-    ]
-
-    //...
-
-    $media->getUrl(); // Throws a Plank\Mediable\Exceptions\MediableUrlException
-
-If you are using symbolic links to make local disks accessible, you can instruct the package to generate URLs with the ``'visibility' => 'public'`` key. By default, the package will assume that the symlink is named ``'storage'``, as per `laravel's documentation <https://laravel.com/docs/5.3/filesystem#the-public-disk>`_. This can be modified with the ``'prefix'`` key.
-
-::
-
-    <?php
-    'disks' => [
-        'public' => [
-            'driver' => 'local',
-            'root' => storage_path('public'),
-            'visibility' => 'public',
-            'prefix' => 'assets'
-        ],
-    ]
-
-    //...
-
-    $media->getUrl(); // returns http://domain.com/assets/foo.jpg
-
-Whether you are using symbolic links or not, you can set the ``'url'`` config value to generate disk urls on another domain. Note that you can specify any path in the url, as the root path doesn't have to match, as long as you have set up your web server accordingly.
-
-::
-
-    <?php
-    'disks' => [
-        'uploads' => [
-            'driver' => 'local',
-            'root' => public_path('uploads'),
-            'url' => 'http://example.com/assets',
-        ],
-    ]
-
-    //...
-
-    $media->getUrl(); // returns http://example.com/assets/foo.jpg
-
-However, if you are using a symbolic link to make a local disk accessible, the prefix will be appended to the disk url.
-
-::
-
-    <?php
-    'disks' => [
-        'public' => [
-            'driver' => 'local',
-            'root' => storage_path('public'),
-            'visibility' => 'public',
-            'prefix' => 'assets',
-            'url' => 'http://example.com',
-        ],
-    ]
-
-    //...
-
-    $media->getUrl(); // returns http://example.com/assets/foo.jpg
-
-
-Permissions for S3-based disks is set on the buckets themselves. You can inform the package that ``Media`` on an S3 disk can be linked by URL by adding the ``'visibility' => 'public'`` key to the disk config.
-
-::
-
-    <?php
-    'disks' => [
-        'cloud' => [
-            'driver' => 's3',
-            'key'    => env('S3_KEY'),
-            'secret' => env('S3_SECRET'),
-            'region' => env('S3_REGION'),
-            'bucket' => env('S3_BUCKET'),
-            'version' => 'latest',
-            'visibility' => 'public'
-        ],
-    ]
-
-    //...
-
-    $media->getUrl(); // returns https://s3.amazonaws.com/bucket/foo.jpg
 
 
 .. _validation:

@@ -51,13 +51,13 @@ class TestCase extends BaseTestCase
             'uploads' => [
                 'driver' => 'local',
                 'root' => public_path('uploads'),
+                'url' => 'http://localhost/uploads',
                 'visibility' => 'public'
             ],
             'public_storage' => [
                 'driver' => 'local',
                 'root' => storage_path('public'),
                 'url' => 'http://localhost/storage',
-                'prefix' => '',
                 'visibility' => 'public',
             ],
             's3' => [
