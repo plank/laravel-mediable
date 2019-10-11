@@ -8,6 +8,8 @@
          convertWarningsToExceptions="true"
          processIsolation="false"
          stopOnFailure="false"
+         executionOrder="random"
+         resolveDependencies="true"
 >
     <testsuites>
         <testsuite name="Package Test Suite">

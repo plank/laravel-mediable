@@ -6,7 +6,6 @@ namespace Plank\Mediable\UrlGenerators;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Filesystem\Cloud;
 use Illuminate\Filesystem\FilesystemManager;
-use Plank\Mediable\Exceptions\MediaUrlException;
 
 class S3UrlGenerator extends BaseUrlGenerator
 {
@@ -40,10 +39,6 @@ class S3UrlGenerator extends BaseUrlGenerator
      */
     public function getUrl(): string
     {
-        if (!$this->isPubliclyAccessible()) {
-            throw MediaUrlException::cloudMediaNotPubliclyAccessible($this->media->disk);
-        }
-
         /** @var Cloud $filesystem */
         $filesystem = $this->filesystem->disk($this->media->disk);
         return $filesystem->url($this->media->getDiskPath());

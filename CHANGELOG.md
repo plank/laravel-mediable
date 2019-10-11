@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.0.0
+- changed UrlGenerators to use the underlying filesystemAdapter's `url()` method
+- UrlGenerators no longer throw `MediaUrlException` when the file does not have public visibility. This removes the need to read IO for files local disks or to make HTTP calls for files on s3 disks.
+- Removed `LocalUrlGenerator::getPublicPath()`
+- No longer reading the `'prefix'` config of local disks. Value should be included in the `'url'` config instead.  
+
 ## 3.0.1 - 2019-09-18
 - Fixed public visibility not being respected when generating URLs for local files that are not in the webroot.
 
