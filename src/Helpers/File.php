@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Plank\Mediable\Helpers;
 
-use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
+use Symfony\Component\Mime\MimeTypes;
 
 class File
 {
@@ -48,12 +48,12 @@ class File
      * @param  string $mimeType
      * @return string|null The guessed extension or null if it cannot be guessed
      *
-     * @see ExtensionGuesser
+     * @see MimeTypes
      */
     public static function guessExtension(string $mimeType): ?string
     {
-        $guesser = ExtensionGuesser::getInstance();
+        $guesser = MimeTypes::getDefault();
 
-        return $guesser->guess($mimeType);
+        return $guesser->getExtensions($mimeType)[0] ?? null;
     }
 }
