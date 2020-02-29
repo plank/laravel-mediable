@@ -7,6 +7,8 @@ use Plank\Mediable\Media;
 
 class TestCase extends BaseTestCase
 {
+    const TEST_FILE_SIZE = 7173;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -141,6 +143,11 @@ class TestCase extends BaseTestCase
     protected function alternateFilePath()
     {
         return realpath(__DIR__ . '/_data/plank2.png');
+    }
+
+    protected function remoteFilePath()
+    {
+        return 'https://www.plankdesign.com/externaluse/plank.png';
     }
 
     protected function sampleFile()

@@ -276,13 +276,13 @@ class MediaUploaderTest extends TestCase
             'aggregate_type' => 'bar'
         ]);
 
-        $this->seedFileForMedia($media, fopen(__DIR__ . '/../_data/plank.png', 'r'));
+        $this->seedFileForMedia($media, fopen($this->sampleFilePath(), 'r'));
 
         $creaetdAt = $media->created_at;
         $updatedAt = $media->updated_at;
         sleep(1); // required to check the update time is different
 
-        $result = Facade::fromSource(__DIR__ . '/../_data/plank.png')
+        $result = Facade::fromSource($this->sampleFilePath())
             ->onDuplicateUpdate()
             ->toDestination('tmp', '')->upload();
 
@@ -327,7 +327,7 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('tmp', $media->disk);
         $this->assertEquals('foo/bar.png', $media->getDiskPath());
         $this->assertEquals('image/png', $media->mime_type);
-        $this->assertEquals(7173, $media->size);
+        $this->assertEquals(self::TEST_FILE_SIZE, $media->size);
         $this->assertEquals('image', $media->aggregate_type);
     }
 
@@ -336,7 +336,7 @@ class MediaUploaderTest extends TestCase
         $this->useDatabase();
         $this->useFilesystem('tmp');
 
-        $string = file_get_contents(__DIR__ . '/../_data/plank.png');
+        $string = file_get_contents($this->sampleFilePath());
 
         $media = Facade::fromString($string)
             ->toDestination('tmp', 'foo')
@@ -348,7 +348,7 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('tmp', $media->disk);
         $this->assertEquals('foo/bar.png', $media->getDiskPath());
         $this->assertEquals('image/png', $media->mime_type);
-        $this->assertEquals(7173, $media->size);
+        $this->assertEquals(self::TEST_FILE_SIZE, $media->size);
         $this->assertEquals('image', $media->aggregate_type);
     }
 
@@ -357,7 +357,7 @@ class MediaUploaderTest extends TestCase
         $this->useDatabase();
         $this->useFilesystem('tmp');
 
-        $resource = fopen(realpath(__DIR__ . '/../_data/plank.png'), 'r');
+        $resource = fopen(realpath($this->sampleFilePath()), 'r');
 
         $media = Facade::fromSource($resource)
             ->toDestination('tmp', 'foo')
@@ -369,7 +369,7 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('tmp', $media->disk);
         $this->assertEquals('foo/bar.png', $media->getDiskPath());
         $this->assertEquals('image/png', $media->mime_type);
-        $this->assertEquals(7173, $media->size);
+        $this->assertEquals(self::TEST_FILE_SIZE, $media->size);
         $this->assertEquals('image', $media->aggregate_type);
     }
 
@@ -390,7 +390,7 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('tmp', $media->disk);
         $this->assertEquals('foo/bar.png', $media->getDiskPath());
         $this->assertEquals('image/png', $media->mime_type);
-        $this->assertEquals(7173, $media->size);
+        $this->assertEquals(self::TEST_FILE_SIZE, $media->size);
         $this->assertEquals('image', $media->aggregate_type);
     }
 
@@ -399,7 +399,7 @@ class MediaUploaderTest extends TestCase
         $this->useDatabase();
         $this->useFilesystem('tmp');
 
-        $stream = new Stream(fopen('https://www.plankdesign.com/externaluse/plank.png', 'r'));
+        $stream = new Stream(fopen($this->remoteFilePath(), 'r'));
 
         $media = Facade::fromSource($stream)
             ->toDestination('tmp', 'foo')
@@ -411,7 +411,7 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('tmp', $media->disk);
         $this->assertEquals('foo/bar.png', $media->getDiskPath());
         $this->assertEquals('image/png', $media->mime_type);
-        $this->assertEquals(7173, $media->size);
+        $this->assertEquals(self::TEST_FILE_SIZE, $media->size);
         $this->assertEquals('image', $media->aggregate_type);
     }
 
@@ -434,7 +434,7 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('tmp', $media->disk);
         $this->assertEquals('foo/bar.png', $media->getDiskPath());
         $this->assertEquals('image/png', $media->mime_type);
-        $this->assertEquals(7173, $media->size);
+        $this->assertEquals(self::TEST_FILE_SIZE, $media->size);
         $this->assertEquals('image', $media->aggregate_type);
     }
 
@@ -457,7 +457,7 @@ class MediaUploaderTest extends TestCase
         $this->assertTrue($result);
         $this->assertEquals('image/png', $media->mime_type);
         $this->assertEquals('image', $media->aggregate_type);
-        $this->assertEquals(7173, $media->size);
+        $this->assertEquals(self::TEST_FILE_SIZE, $media->size);
     }
 
     public function test_it_replaces_existing_media()
@@ -503,7 +503,7 @@ class MediaUploaderTest extends TestCase
         $this->useDatabase();
         $this->useFilesystem('tmp');
 
-        $media = Facade::fromSource(__DIR__ . '/../_data/plank.png')
+        $media = Facade::fromSource($this->sampleFilePath())
             ->toDestination('tmp', 'foo')
             ->useFilename('bar')
             ->beforeSave(function ($model) {
@@ -516,9 +516,43 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('tmp', $media->disk);
         $this->assertEquals('foo/bar.png', $media->getDiskPath());
         $this->assertEquals('image/png', $media->mime_type);
-        $this->assertEquals(7173, $media->size);
+        $this->assertEquals(self::TEST_FILE_SIZE, $media->size);
         $this->assertEquals('image', $media->aggregate_type);
         $this->assertEquals(9876, $media->id);
+    }
+
+    public function test_it_uploads_files_with_altered_destination()
+    {
+        $this->useDatabase();
+        $this->useFilesystem('tmp');
+
+        $media = $this->createMedia([
+            'disk' => 'tmp',
+            'directory' => 'baz',
+            'filename' => 'buzz',
+            'extension' => 'png',
+        ]);
+
+        $this->seedFileForMedia($media, fopen($this->alternateFilePath(), 'r'));
+
+        $media = Facade::fromSource($this->sampleFilePath())
+            ->toDestination('tmp', 'foo')
+            ->useFilename('bar')
+            ->onDuplicateReplace()
+            ->beforeSave(function (Media $model) {
+                $model->directory = 'baz';
+                $model->filename = 'buzz';
+            })
+            ->upload();
+
+        $this->assertInstanceOf(Media::class, $media);
+        $this->assertTrue($media->fileExists());
+        $this->assertEquals('tmp', $media->disk);
+        $this->assertEquals('baz/buzz.png', $media->getDiskPath());
+        $this->assertEquals('image/png', $media->mime_type);
+        $this->assertEquals(self::TEST_FILE_SIZE, $media->size);
+        $this->assertEquals('image', $media->aggregate_type);
+        $this->assertEquals(file_get_contents($this->sampleFilePath()), $media->contents());
     }
 
     protected function getUploader(): MediaUploader

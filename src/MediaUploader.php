@@ -490,14 +490,13 @@ class MediaUploader
         $this->verifyFile();
 
         $model = $this->populateModel($this->makeModel());
-        $this->verifyDestination($model);
 
         if (is_callable($this->before_save)) {
             call_user_func($this->before_save, $model, $this->source);
         }
 
+        $this->verifyDestination($model);
         $this->writeToDisk($model);
-
         $model->save();
 
         return $model;
@@ -539,11 +538,13 @@ class MediaUploader
 
         $model = $this->populateModel($media);
 
-        $this->verifyDestination($model);
+        if (is_callable($this->before_save)) {
+            call_user_func($this->before_save, $model, $this->source);
+        }
 
+        $this->verifyDestination($model);
         // Delete original file, if necessary
         $this->filesystem->disk($disk)->delete($path);
-
         $this->writeToDisk($model);
 
         $model->save();
@@ -643,6 +644,10 @@ class MediaUploader
         $model->size = $this->verifyFileSize($storage->size($model->getDiskPath()));
 
         $storage->setVisibility($model->getDiskPath(), $this->visibility);
+
+        if (is_callable($this->before_save)) {
+            call_user_func($this->before_save, $model, $this->source);
+        }
 
         $model->save();
 
