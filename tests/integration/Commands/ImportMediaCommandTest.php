@@ -99,8 +99,8 @@ class ImportMediaCommandTest extends TestCase
             'mime_type' => 'image/png',
             'aggregate_type' => 'image'
         ]);
-        $this->seedFileForMedia($media1, fopen(__DIR__ . '/../../_data/plank.png', 'r'));
-        $this->seedFileForMedia($media2, fopen(__DIR__ . '/../../_data/plank.png', 'r'));
+        $this->seedFileForMedia($media1, fopen($this->sampleFilePath(), 'r'));
+        $this->seedFileForMedia($media2, fopen($this->sampleFilePath(), 'r'));
 
         $artisan->call('media:import', ['disk' => 'tmp', '--force' => true]);
         $this->assertEquals(['image', 'image'], Media::pluck('aggregate_type')->toArray());
