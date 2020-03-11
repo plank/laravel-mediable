@@ -938,7 +938,7 @@ class MediaUploader
      */
     private function sanitizeFileName(string $file): string
     {
-        return str_replace(['#', '?', '\\', '/'], '-', $file);
+        return str_replace(['#', '?', '\\', '/',' '], '-', $file);
     }
 
     private function writeToDisk(Media $model): void
