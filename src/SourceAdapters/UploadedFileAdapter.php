@@ -99,6 +99,6 @@ class UploadedFileAdapter implements SourceAdapterInterface
      */
     public function size(): int
     {
-        return (int)$this->source->getClientSize();
+        return (int)$this->source->getSize();
     }
 }
