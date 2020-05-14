@@ -65,13 +65,14 @@ class MediableServiceProvider extends ServiceProvider
     {
         $this->app->singleton('mediable.source.factory', function (Container $app) {
             $factory = new SourceAdapterFactory;
-            $adapters = $app['config']->get('mediable.source_adapters');
 
-            foreach ($adapters['class'] as $source => $adapter) {
+            $classAdapters = $app['config']->get('mediable.source_adapters.class', []);
+            foreach ($classAdapters as $source => $adapter) {
                 $factory->setAdapterForClass($adapter, $source);
             }
 
-            foreach ($adapters['pattern'] as $source => $adapter) {
+            $patternAdapters = $app['config']->get('mediable.source_adapters.pattern', []);
+            foreach ($patternAdapters as $source => $adapter) {
                 $factory->setAdapterForPattern($adapter, $source);
             }
 
@@ -117,7 +118,7 @@ class MediableServiceProvider extends ServiceProvider
         $this->app->singleton('mediable.url.factory', function (Container $app) {
             $factory = new UrlGeneratorFactory;
 
-            $config = $app['config']->get('mediable.url_generators');
+            $config = $app['config']->get('mediable.url_generators', []);
             foreach ($config as $driver => $generator) {
                 $factory->setGeneratorForFilesystemDriver($generator, $driver);
             }
