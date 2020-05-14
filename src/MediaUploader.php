@@ -95,7 +95,7 @@ class MediaUploader
     {
         $this->filesystem = $filesystem;
         $this->factory = $factory;
-        $this->config = $config ?: config('mediable');
+        $this->config = $config ?: config('mediable', []);
     }
 
     /**
@@ -407,7 +407,7 @@ class MediaUploader
      */
     public function inferAggregateType(string $mimeType, string $extension): string
     {
-        $allowedTypes = $this->config['allowed_aggregate_types'];
+        $allowedTypes = $this->config['allowed_aggregate_types'] ?? [];
         $typesForMime = $this->possibleAggregateTypesForMimeType($mimeType);
         $typesForExtension = $this->possibleAggregateTypesForExtension($extension);
 
@@ -420,12 +420,12 @@ class MediaUploader
         if (count($intersection)) {
             $type = $intersection[0];
         } elseif (empty($typesForMime) && empty($typesForExtension)) {
-            if (!$this->config['allow_unrecognized_types']) {
+            if (!$this->config['allow_unrecognized_types'] ?? false) {
                 throw FileNotSupportedException::unrecognizedFileType($mimeType, $extension);
             }
             $type = Media::TYPE_OTHER;
         } else {
-            if ($this->config['strict_type_checking']) {
+            if ($this->config['strict_type_checking'] ?? false) {
                 throw FileNotSupportedException::strictTypeMismatch($mimeType, $extension);
             }
             $merged = array_merge($typesForMime, $typesForExtension);
@@ -447,7 +447,7 @@ class MediaUploader
     public function possibleAggregateTypesForMimeType(string $mime): array
     {
         $types = [];
-        foreach ($this->config['aggregate_types'] as $type => $attributes) {
+        foreach ($this->config['aggregate_types'] ?? [] as $type => $attributes) {
             if (in_array($mime, $attributes['mime_types'])) {
                 $types[] = $type;
             }
@@ -464,7 +464,7 @@ class MediaUploader
     public function possibleAggregateTypesForExtension(string $extension): array
     {
         $types = [];
-        foreach ($this->config['aggregate_types'] as $type => $attributes) {
+        foreach ($this->config['aggregate_types'] ?? [] as $type => $attributes) {
             if (in_array($extension, $attributes['extensions'])) {
                 $types[] = $type;
             }
@@ -701,7 +701,7 @@ class MediaUploader
      */
     private function makeModel(): Media
     {
-        $class = $this->config['model'];
+        $class = $this->config['model'] ?? Media::class;
 
         return new $class;
     }
@@ -715,11 +715,11 @@ class MediaUploader
      */
     private function verifyDisk(string $disk): string
     {
-        if (!array_key_exists($disk, config('filesystems.disks'))) {
+        if (!array_key_exists($disk, config('filesystems.disks', []))) {
             throw ConfigurationException::diskNotFound($disk);
         }
 
-        if (!in_array($disk, $this->config['allowed_disks'])) {
+        if (!in_array($disk, $this->config['allowed_disks'] ?? [])) {
             throw ForbiddenException::diskNotAllowed($disk);
         }
 
@@ -750,7 +750,7 @@ class MediaUploader
      */
     private function verifyMimeType(string $mimeType): string
     {
-        $allowed = $this->config['allowed_mime_types'];
+        $allowed = $this->config['allowed_mime_types'] ?? [];
         if (!empty($allowed) && !in_array(strtolower($mimeType), $allowed)) {
             throw FileNotSupportedException::mimeRestricted(strtolower($mimeType), $allowed);
         }
@@ -766,7 +766,7 @@ class MediaUploader
      */
     private function verifyExtension(string $extension): string
     {
-        $allowed = $this->config['allowed_extensions'];
+        $allowed = $this->config['allowed_extensions'] ?? [];
         if (!empty($allowed) && !in_array(strtolower($extension), $allowed)) {
             throw FileNotSupportedException::extensionRestricted(strtolower($extension), $allowed);
         }
@@ -782,7 +782,7 @@ class MediaUploader
      */
     private function verifyFileSize(int $size): int
     {
-        $max = $this->config['max_size'];
+        $max = $this->config['max_size'] ?? 0;
         if ($max > 0 && $size > $max) {
             throw FileSizeException::fileIsTooBig($size, $max);
         }
@@ -815,7 +815,7 @@ class MediaUploader
      */
     private function handleDuplicate(Media $model): Media
     {
-        switch ($this->config['on_duplicate']) {
+        switch ($this->config['on_duplicate'] ?? MediaUploader::ON_DUPLICATE_INCREMENT) {
             case static::ON_DUPLICATE_ERROR:
                 throw FileExistsException::fileExists($model->getDiskPath());
                 break;
