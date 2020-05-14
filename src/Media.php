@@ -48,6 +48,7 @@ class Media extends Model
     const TYPE_OTHER = 'other';
     const TYPE_ALL = 'all';
 
+    protected $table = 'media';
     protected $guarded = ['id', 'disk', 'directory', 'filename', 'extension', 'size', 'mime_type', 'aggregate_type'];
 
     /**
