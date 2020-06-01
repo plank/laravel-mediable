@@ -50,6 +50,9 @@ class Media extends Model
 
     protected $table = 'media';
     protected $guarded = ['id', 'disk', 'directory', 'filename', 'extension', 'size', 'mime_type', 'aggregate_type'];
+    protected $casts = [
+        'size' => 'int',
+    ];
 
     /**
      * {@inheritdoc}
