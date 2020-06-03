@@ -47,7 +47,7 @@ class SourceAdapterTest extends TestCase
     {
         $file = $this->sampleFilePath();
         $string = file_get_contents($file);
-        $url = 'https://www.plankdesign.com/externaluse/plank.png';
+        $url = 'https://www.plankdesign.com/externaluse/plank.png?foo=bar.baz';
 
         $uploadedFile = new UploadedFile($file, 'plank.png', 'image/png', 7173, UPLOAD_ERR_OK, true);
 
@@ -69,13 +69,13 @@ class SourceAdapterTest extends TestCase
             'UploadedFileAdapter' => [UploadedFileAdapter::class, $uploadedFile, $file,'plank'],
             'LocalPathAdapter' => [LocalPathAdapter::class, $file, $file, 'plank'],
             'RemoteUrlAdapter' => [RemoteUrlAdapter::class, $url, $url, 'plank'],
-            'RawContentAdapter' => [RawContentAdapter::class, $string, null, null, false],
+            'RawContentAdapter' => [RawContentAdapter::class, $string, null, '', false],
             'StreamResourceAdapter_Local' => [StreamResourceAdapter::class, $fileResource, $file, 'plank'],
             'StreamAdapter_Local' => [StreamAdapter::class, $fileStream, $file, 'plank', false],
             'StreamResourceAdapter_Remote' => [StreamResourceAdapter::class, $httpResource, $url, 'plank'],
             'StreamAdapter_Remote' => [StreamAdapter::class, $httpStream, $url, 'plank', false],
-            'StreamResourceAdapter_Memory' => [StreamResourceAdapter::class, $memoryResource, 'php://memory', 'memory'],
-            'StreamAdapter_Memory' => [StreamAdapter::class, $memoryStream, 'php://memory', 'memory', false],
+            'StreamResourceAdapter_Memory' => [StreamResourceAdapter::class, $memoryResource, 'php://memory', ''],
+            'StreamAdapter_Memory' => [StreamAdapter::class, $memoryStream, 'php://memory', ''],
         ];
         return $data;
     }
@@ -132,7 +132,7 @@ class SourceAdapterTest extends TestCase
     {
         /** @var SourceAdapterInterface $adapter */
         $adapter = new $adapterClass($source);
-        $this->assertEquals($filename, $adapter->filename());
+        $this->assertSame($filename, $adapter->filename());
     }
 
     /**
