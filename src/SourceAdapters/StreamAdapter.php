@@ -57,7 +57,7 @@ class StreamAdapter implements SourceAdapterInterface
      */
     public function filename(): string
     {
-        return pathinfo($this->path(), PATHINFO_FILENAME);
+        return pathinfo(parse_url($this->path(), PHP_URL_PATH) ?? '', PATHINFO_FILENAME);
     }
 
     /**
@@ -65,7 +65,10 @@ class StreamAdapter implements SourceAdapterInterface
      */
     public function extension(): string
     {
-        $extension = pathinfo($this->path(), PATHINFO_EXTENSION);
+        $extension = pathinfo(
+            parse_url($this->path(), PHP_URL_PATH) ?? '',
+            PATHINFO_EXTENSION
+        );
 
         if ($extension) {
             return $extension;

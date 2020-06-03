@@ -51,7 +51,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
      */
     public function filename(): string
     {
-        return pathinfo($this->source, PATHINFO_FILENAME);
+        return pathinfo(parse_url($this->source, PHP_URL_PATH), PATHINFO_FILENAME);
     }
 
     /**
@@ -59,7 +59,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
      */
     public function extension(): string
     {
-        $extension = pathinfo($this->source, PATHINFO_EXTENSION);
+        $extension = pathinfo(parse_url($this->source, PHP_URL_PATH), PATHINFO_EXTENSION);
 
         if ($extension) {
             return $extension;
