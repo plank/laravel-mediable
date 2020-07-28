@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Plank\Mediable\Exceptions\MediaMoveException;
 use Plank\Mediable\Exceptions\MediaUrlException;
 use Plank\Mediable\Helpers\File;
 use Plank\Mediable\UrlGenerators\UrlGeneratorInterface;
@@ -254,10 +255,11 @@ class Media extends Model
      * @param  string $destination directory relative to disk root
      * @param  string $filename filename. Do not include extension
      * @return void
+     * @throws MediaMoveException
      */
     public function move(string $destination, string $filename = null): void
     {
-        app('mediable.mover')->move($this, $destination, $filename);
+        $this->getMediaMover()->move($this, $destination, $filename);
     }
 
     /**
@@ -267,10 +269,49 @@ class Media extends Model
      * @param  string $destination directory relative to disk root
      * @param  string $filename optional filename. Do not include extension
      * @return Media
+     * @throws MediaMoveException
      */
-    public function copyTo($destination, $filename = null): self
+    public function copyTo(string $destination, string $filename = null): self
     {
-        return app('mediable.mover')->copyTo($this, $destination, $filename);
+        return $this->getMediaMover()->copyTo($this, $destination, $filename);
+    }
+
+    /**
+     * Move the file to a new location on another disk.
+     *
+     * Will invoke the `save()` method on the model after the associated file has been moved to prevent synchronization errors
+     * @param  string $disk the disk to move the file to
+     * @param  string $directory directory relative to disk root
+     * @param  string $filename filename. Do not include extension
+     * @return void
+     * @throws MediaMoveException If attempting to change the file extension or a file with the same name already exists at the destination
+     */
+    public function moveToDisk(string $disk, string $destination, string $filename = null): void
+    {
+        $this->getMediaMover()->moveToDisk($this, $disk, $destination, $filename);
+    }
+
+    /**
+     * Copy the file from one Media object to another one on a different disk.
+     *
+     * This method creates a new Media object as well as duplicates the associated file on the disk.
+     *
+     * @param  Media $media The media to copy from
+     * @param  string $disk the disk to copy the file to
+     * @param  string $directory directory relative to disk root
+     * @param  string $filename optional filename. Do not include extension
+     *
+     * @return Media
+     * @throws MediaMoveException If a file with the same name already exists at the destination or it fails to copy the file
+     */
+    public function copyToDisk(string $disk, string $destination, string $filename = null): self
+    {
+        return $this->getMediaMover()->copyToDisk($this, $disk, $destination, $filename);
+    }
+
+    protected function getMediaMover(): MediaMover
+    {
+        return app('mediable.mover');
     }
 
     /**

@@ -45,7 +45,8 @@ class MediableServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/mediable.php', 'mediable'
+            __DIR__ . '/../config/mediable.php',
+            'mediable'
         );
 
         $this->registerSourceAdapterFactory();

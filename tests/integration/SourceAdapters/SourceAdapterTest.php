@@ -47,7 +47,7 @@ class SourceAdapterTest extends TestCase
     {
         $file = $this->sampleFilePath();
         $string = file_get_contents($file);
-        $url = 'https://www.plankdesign.com/externaluse/plank.png?foo=bar.baz';
+        $url = $this->remoteFilePath() . '?foo=bar.baz';
 
         $uploadedFile = new UploadedFile($file, 'plank.png', 'image/png', 7173, UPLOAD_ERR_OK, true);
 
@@ -83,7 +83,7 @@ class SourceAdapterTest extends TestCase
     public function invalidAdapterProvider()
     {
         $file = __DIR__ . '/../../_data/invalid.png';
-        $url = 'https://www.plankdesign.com/externaluse/invalid.png';
+        $url = 'https://raw.githubusercontent.com/plank/laravel-mediable/master/tests/_data/invalid.png';
 
         $uploadedFile = new UploadedFile(
             $file,
