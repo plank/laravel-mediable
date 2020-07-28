@@ -147,7 +147,7 @@ class TestCase extends BaseTestCase
 
     protected function remoteFilePath()
     {
-        return 'https://www.plankdesign.com/externaluse/plank.png';
+        return 'https://raw.githubusercontent.com/plank/laravel-mediable/master/tests/_data/plank.png';
     }
 
     protected function sampleFile()

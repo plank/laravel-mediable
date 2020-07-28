@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Plank\Mediable;
 
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\FilesystemManager;
 use Plank\Mediable\Exceptions\MediaMoveException;
 
@@ -39,11 +40,7 @@ class MediaMover
     {
         $storage = $this->filesystem->disk($media->disk);
 
-        if ($filename) {
-            $filename = $this->removeExtensionFromFilename($filename, $media->extension);
-        } else {
-            $filename = $media->filename;
-        }
+        $filename = $this->cleanFilename($media, $filename);
 
         $directory = trim($directory, '/');
         $targetPath = $directory . '/' . $filename . '.' . $media->extension;
@@ -54,6 +51,48 @@ class MediaMover
 
         $storage->move($media->getDiskPath(), $targetPath);
 
+        $media->filename = $filename;
+        $media->directory = $directory;
+        $media->save();
+    }
+
+    /**
+     * Move the file to a new location on another disk.
+     *
+     * Will invoke the `save()` method on the model after the associated file has been moved to prevent synchronization errors
+     * @param  Media $media
+     * @param  string $disk the disk to move the file to
+     * @param  string $directory directory relative to disk root
+     * @param  string $filename filename. Do not include extension
+     * @return void
+     * @throws MediaMoveException If attempting to change the file extension or a file with the same name already exists at the destination
+     */
+    public function moveToDisk(Media $media, string $disk, string $directory, string $filename = null): void
+    {
+        if ($media->disk === $disk) {
+            $this->move($media, $directory, $filename);
+            return;
+        }
+
+        $currentStorage = $this->filesystem->disk($media->disk);
+        $targetStorage = $this->filesystem->disk($disk);
+
+        $filename = $this->cleanFilename($media, $filename);
+        $directory = trim($directory, '/');
+        $targetPath = $directory . '/' . $filename . '.' . $media->extension;
+
+        if ($targetStorage->has($targetPath)) {
+            throw MediaMoveException::destinationExistsOnDisk($disk, $targetPath);
+        }
+
+        try {
+            $targetStorage->put($targetPath, $currentStorage->readStream($media->getDiskPath()));
+            $currentStorage->delete($media->getDiskPath());
+        } catch (FileNotFoundException $e) {
+            throw MediaMoveException::fileNotFound($media->disk, $media->getDiskPath(), $e);
+        }
+
+        $media->disk = $disk;
         $media->filename = $filename;
         $media->directory = $directory;
         $media->save();
@@ -75,11 +114,7 @@ class MediaMover
     {
         $storage = $this->filesystem->disk($media->disk);
 
-        if ($filename) {
-            $filename = $this->removeExtensionFromFilename($filename, $media->extension);
-        } else {
-            $filename = $media->filename;
-        }
+        $filename = $this->cleanFilename($media, $filename);
 
         $directory = trim($directory, '/');
         $targetPath = $directory . '/' . $filename . '.' . $media->extension;
@@ -90,8 +125,8 @@ class MediaMover
 
         try {
             $storage->copy($media->getDiskPath(), $targetPath);
-        } catch (\Exception $exception) {
-            throw MediaMoveException::failedToCopy($media->getDiskPath(), $targetPath);
+        } catch (\Exception $e) {
+            throw MediaMoveException::failedToCopy($media->getDiskPath(), $targetPath, $e);
         }
 
         // now we copy the Media object
@@ -103,6 +138,63 @@ class MediaMover
         $newMedia->save();
 
         return $newMedia;
+    }
+
+    /**
+     * Copy the file from one Media object to another one on a different disk.
+     *
+     * This method creates a new Media object as well as duplicates the associated file on the disk.
+     *
+     * @param  Media $media The media to copy from
+     * @param  string $disk the disk to copy the file to
+     * @param  string $directory directory relative to disk root
+     * @param  string $filename optional filename. Do not include extension
+     *
+     * @return Media
+     * @throws MediaMoveException If a file with the same name already exists at the destination or it fails to copy the file
+     */
+    public function copyToDisk(Media $media, string $disk, string $directory, string $filename = null): Media
+    {
+        if ($media->disk === $disk) {
+            return $this->copyTo($media, $directory, $filename);
+        }
+
+        $currentStorage = $this->filesystem->disk($media->disk);
+        $targetStorage = $this->filesystem->disk($disk);
+
+        $filename = $this->cleanFilename($media, $filename);
+        $directory = trim($directory, '/');
+        $targetPath = $directory . '/' . $filename . '.' . $media->extension;
+
+        if ($targetStorage->has($targetPath)) {
+            throw MediaMoveException::destinationExistsOnDisk($disk, $targetPath);
+        }
+
+        try {
+            $targetStorage->put($targetPath, $currentStorage->readStream($media->getDiskPath()));
+        } catch (FileNotFoundException $e) {
+            throw MediaMoveException::fileNotFound($media->disk, $media->getDiskPath(), $e);
+        }
+
+        // now we copy the Media object
+        /** @var Media $newMedia */
+        $newMedia = $media->replicate();
+        $newMedia->disk = $disk;
+        $newMedia->filename = $filename;
+        $newMedia->directory = $directory;
+
+        $newMedia->save();
+
+        return $newMedia;
+    }
+
+    protected function cleanFilename(Media $media, ?string $filename): string
+    {
+        if ($filename) {
+            return $this->removeExtensionFromFilename($filename, $media->extension);
+        }
+
+        return $media->filename;
     }
 
     /**

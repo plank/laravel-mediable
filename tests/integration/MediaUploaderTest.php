@@ -378,7 +378,7 @@ class MediaUploaderTest extends TestCase
         $this->useDatabase();
         $this->useFilesystem('tmp');
 
-        $resource = fopen('https://www.plankdesign.com/externaluse/plank.png', 'r');
+        $resource = fopen($this->remoteFilePath(), 'r');
 
         $media = Facade::fromSource($resource)
             ->toDestination('tmp', 'foo')
