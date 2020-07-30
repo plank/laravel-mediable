@@ -66,7 +66,7 @@ Moving Media
 
 You should taking caution if manually changing a media record's attributes, as your record and file could go out of sync.
 
-You can change the location of a media file on disk. You cannot move a media to a different disk this way.
+You can change the location of a media file on disk.
 
 ::
 
@@ -74,17 +74,19 @@ You can change the location of a media file on disk. You cannot move a media to 
 	$media->move('new/directory');
 	$media->move('new/directory', 'new-filename');
 	$media->rename('new-filename');
+    $media->moveToDisk('uploads', 'new/directory', 'new-filename');
 
 Copying Media
 ---------------------
 
-You can duplicate a media file to a different location on disk with the ``copyTo()`` method. Doing so will create a new `Media` record for the new file. If a filename is not provided, the new file will copy the original filename. 
+You can duplicate a media file to a different location on disk with the ``copyTo()`` method. Doing so will create a new `Media` record for the new file. If a filename is not provided, the new file will copy the original filename.
 
 ::
 
     <?php
     $newMedia = $media->copyTo('new/directory');
     $newMedia = $media->copyTo('new/directory', 'new-filename');
+    $newMedia = $media->copyToDisk('uploads', 'new/directory', 'new-filename');
 
 Deleting Media
 ---------------------

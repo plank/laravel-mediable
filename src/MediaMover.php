@@ -87,6 +87,7 @@ class MediaMover
 
         try {
             $targetStorage->put($targetPath, $currentStorage->readStream($media->getDiskPath()));
+            $targetStorage->setVisibility($targetPath, $currentStorage->getVisibility($media->getDiskPath()));
             $currentStorage->delete($media->getDiskPath());
         } catch (FileNotFoundException $e) {
             throw MediaMoveException::fileNotFound($media->disk, $media->getDiskPath(), $e);
@@ -172,6 +173,7 @@ class MediaMover
 
         try {
             $targetStorage->put($targetPath, $currentStorage->readStream($media->getDiskPath()));
+            $targetStorage->setVisibility($targetPath, $currentStorage->getVisibility($media->getDiskPath()));
         } catch (FileNotFoundException $e) {
             throw MediaMoveException::fileNotFound($media->disk, $media->getDiskPath(), $e);
         }

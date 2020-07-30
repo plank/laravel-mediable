@@ -282,7 +282,7 @@ class MediaTest extends TestCase
         $media1->move('', 'bar.baz');
     }
 
-    public function test_it_can_be_moved_to_another_disk()
+    public function test_it_can_be_moved_to_another_disk_public()
     {
         $this->useFilesystem('tmp');
         $this->useFilesystem('uploads');
@@ -297,15 +297,17 @@ class MediaTest extends TestCase
         ]);
         $original_path = $media->getAbsolutePath();
         $this->seedFileForMedia($media);
+        $media->makePublic();
 
         $media->moveToDisk('uploads', 'alpha/beta', 'gamma');
         $this->assertEquals('uploads', $media->disk);
         $this->assertEquals('alpha/beta/gamma.baz', $media->getDiskPath());
         $this->assertTrue($media->fileExists());
         $this->assertFalse(file_exists($original_path));
+        $this->assertTrue($media->isVisible());
     }
 
-    public function test_it_can_be_copied_to_another_disk()
+    public function test_it_can_be_moved_to_another_disk_private()
     {
         $this->useFilesystem('tmp');
         $this->useFilesystem('uploads');
@@ -320,16 +322,74 @@ class MediaTest extends TestCase
         ]);
         $original_path = $media->getAbsolutePath();
         $this->seedFileForMedia($media);
+        $media->makePrivate();
+
+        $media->moveToDisk('uploads', 'alpha/beta', 'gamma');
+        $this->assertEquals('uploads', $media->disk);
+        $this->assertEquals('alpha/beta/gamma.baz', $media->getDiskPath());
+        $this->assertTrue($media->fileExists());
+        $this->assertFalse(file_exists($original_path));
+        $this->assertFalse($media->isVisible());
+    }
+
+    public function test_it_can_be_copied_to_another_disk_public()
+    {
+        $this->useFilesystem('tmp');
+        $this->useFilesystem('uploads');
+
+        $this->useDatabase();
+
+        $media = $this->makeMedia([
+            'disk' => 'tmp',
+            'directory' => 'foo',
+            'filename' => 'bar',
+            'extension' => 'baz'
+        ]);
+        $original_path = $media->getAbsolutePath();
+        $this->seedFileForMedia($media);
+        $media->makePublic();
 
         $newMedia = $media->copyToDisk('uploads', 'alpha/beta', 'gamma');
         $this->assertEquals('uploads', $newMedia->disk);
         $this->assertEquals('alpha/beta/gamma.baz', $newMedia->getDiskPath());
         $this->assertTrue($newMedia->fileExists());
+        $this->assertTrue($newMedia->isVisible());
 
         //original should be unchanged
         $this->assertEquals('tmp', $media->disk);
         $this->assertEquals('foo/bar.baz', $media->getDiskPath());
         $this->assertTrue($media->fileExists());
+        $this->assertTrue($media->isVisible());
+    }
+
+    public function test_it_can_be_copied_to_another_disk_private()
+    {
+        $this->useFilesystem('tmp');
+        $this->useFilesystem('uploads');
+
+        $this->useDatabase();
+
+        $media = $this->makeMedia([
+            'disk' => 'tmp',
+            'directory' => 'foo',
+            'filename' => 'bar',
+            'extension' => 'baz'
+        ]);
+        $original_path = $media->getAbsolutePath();
+        $this->seedFileForMedia($media);
+        $media->makePrivate();
+
+        $newMedia = $media->copyToDisk('uploads', 'alpha/beta', 'gamma');
+        $this->assertEquals('uploads', $newMedia->disk);
+        $this->assertEquals('alpha/beta/gamma.baz', $newMedia->getDiskPath());
+        $this->assertTrue($newMedia->fileExists());
+        $this->assertFalse($newMedia->isVisible());
+
+        //original should be unchanged
+        $this->assertEquals('tmp', $media->disk);
+        $this->assertEquals('foo/bar.baz', $media->getDiskPath());
+        $this->assertTrue($media->fileExists());
+        $this->assertFalse($media->isVisible());
     }
 
     public function test_it_can_access_file_contents()
