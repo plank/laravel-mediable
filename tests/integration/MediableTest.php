@@ -424,7 +424,7 @@ class MediableTest extends TestCase
 
         $query = $mediable->media()->unordered()->toSql();
 
-        $this->assertNotRegExp('/order by `order`/i', $query);
+        $this->assertEquals(0, preg_match('/order by `order`/i', $query));
     }
 
     public function test_it_can_create_mediables_on_custom_table()
