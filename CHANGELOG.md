@@ -3,6 +3,7 @@
 ## 4.4.0 - 2020-09-09
 - Added support for Laravel 8.0
 - Dropping support for Laravel versions < 6.0
+- Dropping support for PHP versions 7.2
 
 ## 4.3.2 - 2020-08-15
 - Fix composer version constraint of `league/flysystem` to allow minor version bumps
