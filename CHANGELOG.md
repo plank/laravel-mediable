@@ -1,10 +1,46 @@
 # Changelog
 
-## 4.0.0
+## 4.4.0 - 2020-09-09
+- Added support for Laravel 8.0
+- Dropping support for Laravel versions < 6.0
+- Dropping support for PHP versions 7.2
+
+## 4.3.2 - 2020-08-15
+- Fix composer version constraint of `league/flysystem` to allow minor version bumps
+- Removed redundant index from the Media table database migration
+
+## 4.3.1 - 2020-07-29
+- `Media::moveToDisk()` and `Media::copyToDisk()` now correctly transfer file visibility to the new disk.
+
+## 4.3.0 - 2020-07-27
+- Added `Media::moveToDisk()` and `Media::copyToDisk()` methods.
+
+## 4.2.3 - 2020-06-02
+- The `Media::$size` property is now cast as int, fixing a TypeError. (Thanks @boumanb!)
+- Fixed `RemoteUrlAdapter`, `StreamAdapter`, and `StreamResourceAdapter` potentially returning an incorrect filename and/or extension if the query params of the URL contains certain characters.
+
+## 4.2.2 - 2020-05-13
+- Fix bug with package auto-discovery with PHP 7.4
+- Fix issue caused by a bug with doctrine/inflector 1.4.0
+
+## 4.2.1 - 2020-03-10
+- Replaced usage of the `getClientSize()` method deprecated in Symphony 4.1 with `getSize()`
+
+## 4.2.0 - 2020-03-06
+- Added support for Laravel 7.0
+
+## 4.1.0 - 2020-02-29
+- Fixed the timing of the beforeSave callback. Now occurs before onDuplicate validation occurs. This allows the callback to be used to determine where to place the file
+- The beforeSave callback is now called triggered by the `MediaUploader::replace()` and `MediaUploader::import()` methods as well
+
+## 4.0.1 - 2020-02-18
+- Added support for the new Symfony MimeTypes class in favor of the deprecated ExtensionGuesser (Thanks @crishoj!)
+
+## 4.0.0 - 2019-10-11
 - changed UrlGenerators to use the underlying filesystemAdapter's `url()` method
 - UrlGenerators no longer throw `MediaUrlException` when the file does not have public visibility. This removes the need to read IO for files local disks or to make HTTP calls for files on s3 disks.
 - Removed `LocalUrlGenerator::getPublicPath()`
-- No longer reading the `'prefix'` config of local disks. Value should be included in the `'url'` config instead.  
+- No longer reading the `'prefix'` config of local disks. Value should be included in the `'url'` config instead.
 
 ## 3.0.1 - 2019-09-18
 - Fixed public visibility not being respected when generating URLs for local files that are not in the webroot.

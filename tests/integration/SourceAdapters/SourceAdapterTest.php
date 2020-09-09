@@ -49,7 +49,7 @@ class SourceAdapterTest extends TestCase
         $string = file_get_contents($file);
         $url = $this->remoteFilePath() . '?foo=bar.baz';
 
-        $uploadedFile = new UploadedFile($file, 'plank.png', 'image/png', 7173, UPLOAD_ERR_OK, true);
+        $uploadedFile = new UploadedFile($file, 'plank.png', 'image/png', UPLOAD_ERR_OK, true);
 
         $fileResource = fopen($file, 'rb');
         $fileStream = new Stream(fopen($file, 'rb'));
