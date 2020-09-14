@@ -53,7 +53,9 @@ trait Mediable
             ->morphToMany(
                 config('mediable.model'),
                 'mediable',
-                config('mediable.mediables_table', 'mediables')
+                config('mediable.mediables_table', 'mediables'),
+                'mediable_id',
+                config('mediable.mediables_table_related_key', 'media_id')
             )
             ->withPivot('tag', 'order')
             ->orderBy('order');
