@@ -80,7 +80,10 @@ class ImportMediaCommand extends Command
         $force = (bool)$this->option('force');
 
         $files = $this->listFiles($disk, $directory, $recursive);
-        $existing_media = Media::inDirectory($disk, $directory, $recursive)->get();
+        $existing_media = $this->makeModel()
+            ->newQuery()
+            ->inDirectory($disk, $directory, $recursive)
+            ->get();
 
         foreach ($files as $path) {
             if ($record = $this->getRecordForFile($path, $existing_media)) {
@@ -196,5 +199,16 @@ class ImportMediaCommand extends Command
             'updated' => 0,
             'skipped' => 0,
         ];
+    }
+
+    /**
+     * Generate an instance of the `Media` class.
+     * @return Media
+     */
+    private function makeModel(): Media
+    {
+        $class = config('mediable.model', Media::class);
+
+        return new $class;
     }
 }

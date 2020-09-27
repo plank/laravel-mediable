@@ -54,7 +54,10 @@ class PruneMediaCommand extends Command
         $recursive = !$this->option('non-recursive');
         $counter = 0;
 
-        $records = Media::inDirectory($disk, $directory, $recursive)->get();
+        $records = $this->makeModel()
+            ->newQuery()
+            ->inDirectory($disk, $directory, $recursive)
+            ->get();
 
         foreach ($records as $media) {
             if (!$media->fileExists()) {
@@ -65,5 +68,16 @@ class PruneMediaCommand extends Command
         }
 
         $this->info("Pruned {$counter} record(s).");
+    }
+
+    /**
+     * Generate an instance of the `Media` class.
+     * @return Media
+     */
+    private function makeModel(): Media
+    {
+        $class = config('mediable.model', Media::class);
+
+        return new $class;
     }
 }
