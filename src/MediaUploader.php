@@ -823,7 +823,8 @@ class MediaUploader
                 $this->deleteExistingMedia($model);
                 break;
             case static::ON_DUPLICATE_UPDATE:
-                $model->{$model->getKeyName()} = Media::where('disk', $model->disk)
+                $model->{$model->getKeyName()} = $model->newQuery()
+                    ->where('disk', $model->disk)
                     ->where('directory', $model->directory)
                     ->where('filename', $model->filename)
                     ->where('extension', $model->extension)
@@ -846,7 +847,8 @@ class MediaUploader
      */
     private function deleteExistingMedia(Media $model): void
     {
-        Media::where('disk', $model->disk)
+        $model->newQuery()
+            ->where('disk', $model->disk)
             ->where('directory', $model->directory)
             ->where('filename', $model->filename)
             ->where('extension', $model->extension)
