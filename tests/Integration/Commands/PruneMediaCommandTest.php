@@ -1,7 +1,10 @@
 <?php
 
+namespace Plank\Mediable\Tests\Integration\Commands;
+
 use Illuminate\Contracts\Console\Kernel as Artisan;
 use Plank\Mediable\Media;
+use Plank\Mediable\Tests\TestCase;
 
 class PruneMediaCommandTest extends TestCase
 {

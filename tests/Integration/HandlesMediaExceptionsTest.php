@@ -1,11 +1,16 @@
 <?php
 
+namespace Plank\Mediable\Tests\Integration;
+
+use Exception;
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Plank\Mediable\Exceptions\MediaUpload\FileExistsException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException;
 use Plank\Mediable\Exceptions\MediaUpload\FileSizeException;
 use Plank\Mediable\Exceptions\MediaUpload\ForbiddenException;
+use Plank\Mediable\Tests\Mocks\SampleExceptionHandler;
+use Plank\Mediable\Tests\TestCase;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class HandlesMediaExceptionsTest extends TestCase

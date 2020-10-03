@@ -13,7 +13,7 @@
 >
     <testsuites>
         <testsuite name="Package Test Suite">
-            <directory suffix=".php">./tests/integration/</directory>
+            <directory suffix="Test.php">./tests/integration/</directory>
         </testsuite>
     </testsuites>
     <filter>

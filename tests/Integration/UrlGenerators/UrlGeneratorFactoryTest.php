@@ -1,9 +1,13 @@
 <?php
 
+namespace Plank\Mediable\Tests\Integration\UrlGenerators;
+
 use Plank\Mediable\Exceptions\MediaUrlException;
 use Plank\Mediable\Media;
+use Plank\Mediable\Tests\TestCase;
 use Plank\Mediable\UrlGenerators\UrlGeneratorFactory;
 use Plank\Mediable\UrlGenerators\UrlGeneratorInterface;
+use stdClass;
 
 class UrlGeneratorFactoryTest extends TestCase
 {

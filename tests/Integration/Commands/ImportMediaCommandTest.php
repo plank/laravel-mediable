@@ -1,8 +1,12 @@
 <?php
 
+namespace Plank\Mediable\Tests\Integration\Commands;
+
 use Illuminate\Contracts\Console\Kernel as Artisan;
+use Illuminate\Filesystem\FilesystemManager;
 use Plank\Mediable\Commands\ImportMediaCommand;
 use Plank\Mediable\Media;
+use Plank\Mediable\Tests\TestCase;
 
 class ImportMediaCommandTest extends TestCase
 {
@@ -65,7 +69,7 @@ class ImportMediaCommandTest extends TestCase
     public function test_it_skips_files_of_unmatched_aggregate_type()
     {
         $artisan = $this->getArtisan();
-        $filesystem = app(\Illuminate\Filesystem\FilesystemManager::class);
+        $filesystem = app(FilesystemManager::class);
         /** @var \Plank\Mediable\MediaUploader $uploader */
         $uploader = app('mediable.uploader');
         $uploader->setAllowUnrecognizedTypes(false);

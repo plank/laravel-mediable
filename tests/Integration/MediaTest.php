@@ -1,8 +1,14 @@
 <?php
 
+namespace Plank\Mediable\Tests\Integration;
+
 use Illuminate\Support\Facades\DB;
 use Plank\Mediable\Exceptions\MediaMoveException;
 use Plank\Mediable\Media;
+use Plank\Mediable\Tests\Mocks\MediaSoftDelete;
+use Plank\Mediable\Tests\Mocks\SampleMediable;
+use Plank\Mediable\Tests\Mocks\SampleMediableSoftDelete;
+use Plank\Mediable\Tests\TestCase;
 
 class MediaTest extends TestCase
 {
@@ -345,7 +351,6 @@ class MediaTest extends TestCase
             'filename' => 'bar',
             'extension' => 'baz'
         ]);
-        $original_path = $media->getAbsolutePath();
         $this->seedFileForMedia($media);
         $media->makePublic();
 
@@ -375,7 +380,6 @@ class MediaTest extends TestCase
             'filename' => 'bar',
             'extension' => 'baz'
         ]);
-        $original_path = $media->getAbsolutePath();
         $this->seedFileForMedia($media);
         $media->makePrivate();
 
@@ -501,5 +505,22 @@ class MediaTest extends TestCase
         $this->assertNotEmpty(DB::table('prefixed_mediables')->get());
         $media->delete();
         $this->assertEmpty(DB::table('prefixed_mediables')->get());
+    }
+
+    public function test_it_can_stream_contents()
+    {
+        $this->useFilesystem('tmp');
+
+        $media = $this->makeMedia([
+            'disk' => 'tmp',
+            'directory' => 'foo',
+            'filename' => 'bar',
+            'extension' => 'baz'
+        ]);
+        $this->seedFileForMedia($media, 'test');
+
+        $stream = $media->stream();
+
+        $this->assertEquals('test', $stream->getContents());
     }
 }

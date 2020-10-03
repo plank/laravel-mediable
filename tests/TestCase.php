@@ -1,9 +1,14 @@
 <?php
 
+namespace Plank\Mediable\Tests;
+
+use Dotenv\Dotenv;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Filesystem\Filesystem;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Plank\Mediable\Media;
+use Plank\Mediable\MediableServiceProvider;
+use ReflectionClass;
 
 class TestCase extends BaseTestCase
 {
@@ -12,13 +17,13 @@ class TestCase extends BaseTestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->withFactories(__DIR__ . '/_factories');
+        $this->withFactories(__DIR__ . '/Factories');
     }
 
     protected function getPackageProviders($app)
     {
         return [
-            Plank\Mediable\MediableServiceProvider::class
+            MediableServiceProvider::class
         ];
     }
 
@@ -32,7 +37,7 @@ class TestCase extends BaseTestCase
     protected function getEnvironmentSetUp($app)
     {
         if (file_exists(dirname(__DIR__) . '/.env')) {
-            Dotenv\Dotenv::create(dirname(__DIR__))->load();
+            Dotenv::create(dirname(__DIR__))->load();
         }
         //use in-memory database
         $app['config']->set('database.connections.testing', [

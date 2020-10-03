@@ -1,8 +1,11 @@
 <?php
 
+namespace Plank\Mediable\Tests\Integration\UrlGenerators;
+
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Support\Facades\Storage;
 use Plank\Mediable\Media;
+use Plank\Mediable\Tests\TestCase;
 use Plank\Mediable\UrlGenerators\LocalUrlGenerator;
 
 class LocalUrlGeneratorTest extends TestCase

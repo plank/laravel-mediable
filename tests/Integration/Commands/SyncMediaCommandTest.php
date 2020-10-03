@@ -1,6 +1,9 @@
 <?php
 
+namespace Plank\Mediable\Tests\Integration\Commands;
+
 use Plank\Mediable\Commands\SyncMediaCommand;
+use Plank\Mediable\Tests\TestCase;
 
 class SyncMediaCommandTest extends TestCase
 {

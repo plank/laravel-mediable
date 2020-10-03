@@ -1,6 +1,9 @@
 <?php
 
+namespace Plank\Mediable\Tests\Integration\Helpers;
+
 use Plank\Mediable\Helpers\File;
+use Plank\Mediable\Tests\TestCase;
 
 class FileTest extends TestCase
 {
