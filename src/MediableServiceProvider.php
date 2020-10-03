@@ -54,6 +54,7 @@ class MediableServiceProvider extends ServiceProvider
         $this->registerMover();
         $this->registerUrlGeneratorFactory();
         $this->registerConsoleCommands();
+        $this->registerImageManipulator();
     }
 
     /**
@@ -127,6 +128,11 @@ class MediableServiceProvider extends ServiceProvider
             return $factory;
         });
         $this->app->alias('mediable.url.factory', UrlGeneratorFactory::class);
+    }
+
+    public function registerImageManipulator(): void
+    {
+        $this->app->singleton(ImageManipulator::class);
     }
 
     /**

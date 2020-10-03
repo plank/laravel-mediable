@@ -13,7 +13,10 @@ class LocalUrlGeneratorTest extends TestCase
     public function test_it_generates_absolute_path()
     {
         $generator = $this->setupGenerator();
-        $this->assertEquals(public_path('uploads/foo/bar.jpg'), $generator->getAbsolutePath());
+        $this->assertEquals(
+            public_path('uploads/foo/bar.jpg'),
+            $generator->getAbsolutePath()
+        );
     }
 
     public function test_it_generates_url()
@@ -68,26 +71,32 @@ class LocalUrlGeneratorTest extends TestCase
         );
         $generator = new LocalUrlGenerator(config(), $filesystem);
 
-        $media = factory(Media::class)->make([
-            'disk' => 'uploads',
-            'directory' => 'foo',
-            'filename' => 'bar',
-            'extension' => 'jpg'
-        ]);
+        $media = factory(Media::class)->make(
+            [
+                'disk' => 'uploads',
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'extension' => 'jpg'
+            ]
+        );
         $this->seedFileForMedia($media);
         $generator->setMedia($media);
         $this->assertTrue($generator->isPubliclyAccessible());
     }
 
-    protected function setupGenerator($disk = 'uploads', bool $public = null): LocalUrlGenerator
-    {
+    protected function setupGenerator(
+        $disk = 'uploads',
+        bool $public = null
+    ): LocalUrlGenerator {
         /** @var Media $media */
-        $media = factory(Media::class)->make([
-            'disk' => $disk,
-            'directory' => 'foo',
-            'filename' => 'bar',
-            'extension' => 'jpg'
-        ]);
+        $media = factory(Media::class)->make(
+            [
+                'disk' => $disk,
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'extension' => 'jpg'
+            ]
+        );
         $this->useFilesystem($disk);
         $this->seedFileForMedia($media);
 

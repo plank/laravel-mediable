@@ -35,14 +35,21 @@ class ImportMediaCommandTest extends TestCase
         $artisan->call('media:import', ['disk' => 'tmp']);
 
         $this->assertEquals("Imported 1 file(s).\n", $artisan->output());
-        $this->assertEquals(['bar', 'foo'], Media::orderBy('filename')->pluck('filename')->toArray());
+        $this->assertEquals(
+            ['bar', 'foo'],
+            Media::orderBy('filename')->pluck('filename')->toArray()
+        );
     }
 
     public function test_it_creates_media_for_unmatched_files_in_directory()
     {
         $artisan = $this->getArtisan();
-        $media1 = factory(Media::class)->make(['disk' => 'tmp', 'directory' => 'a', 'filename' => 'foo']);
-        $media2 = factory(Media::class)->make(['disk' => 'tmp', 'directory' => 'a/b', 'filename' => 'bar']);
+        $media1 = factory(Media::class)->make(
+            ['disk' => 'tmp', 'directory' => 'a', 'filename' => 'foo']
+        );
+        $media2 = factory(Media::class)->make(
+            ['disk' => 'tmp', 'directory' => 'a/b', 'filename' => 'bar']
+        );
         $this->seedFileForMedia($media1);
         $this->seedFileForMedia($media2);
 
@@ -55,12 +62,19 @@ class ImportMediaCommandTest extends TestCase
     public function test_it_creates_media_for_unmatched_files_non_recursively()
     {
         $artisan = $this->getArtisan();
-        $media1 = factory(Media::class)->make(['disk' => 'tmp', 'directory' => 'a', 'filename' => 'foo']);
-        $media2 = factory(Media::class)->make(['disk' => 'tmp', 'directory' => 'a/b', 'filename' => 'bar']);
+        $media1 = factory(Media::class)->make(
+            ['disk' => 'tmp', 'directory' => 'a', 'filename' => 'foo']
+        );
+        $media2 = factory(Media::class)->make(
+            ['disk' => 'tmp', 'directory' => 'a/b', 'filename' => 'bar']
+        );
         $this->seedFileForMedia($media1);
         $this->seedFileForMedia($media2);
 
-        $artisan->call('media:import', ['disk' => 'tmp', '--directory' => 'a', '--non-recursive' => true]);
+        $artisan->call(
+            'media:import',
+            ['disk' => 'tmp', '--directory' => 'a', '--non-recursive' => true]
+        );
 
         $this->assertEquals("Imported 1 file(s).\n", $artisan->output());
         $this->assertEquals(['foo'], Media::pluck('filename')->toArray());
@@ -76,39 +90,54 @@ class ImportMediaCommandTest extends TestCase
         $uploader->setAllowedAggregateTypes(['image']);
         $command = new ImportMediaCommand($filesystem, $uploader);
 
-        $media = factory(Media::class)->make(['disk' => 'tmp', 'extension' => 'foo', 'mime_type' => 'bar']);
+        $media = factory(Media::class)->make(
+            ['disk' => 'tmp', 'extension' => 'foo', 'mime_type' => 'bar']
+        );
         $this->seedFileForMedia($media);
 
         $artisan->registerCommand($command);
 
         $artisan->call('media:import', ['disk' => 'tmp']);
-        $this->assertEquals("Imported 0 file(s).\nSkipped 1 file(s).\n", $artisan->output());
+        $this->assertEquals(
+            "Imported 0 file(s).\nSkipped 1 file(s).\n",
+            $artisan->output()
+        );
     }
 
     public function test_it_updates_existing_media()
     {
         $artisan = $this->getArtisan();
-        $media1 = factory(Media::class)->create([
-            'disk' => 'tmp',
-            'filename' => 'bar',
-            'extension' => 'png',
-            'mime_type' => 'image/png',
-            'aggregate_type' => 'foo'
-        ]);
-        $media2 = factory(Media::class)->create([
-            'disk' => 'tmp',
-            'filename' => 'bar',
-            'extension' => 'png',
-            'size' => 7173,
-            'mime_type' => 'image/png',
-            'aggregate_type' => 'image'
-        ]);
+        $media1 = factory(Media::class)->create(
+            [
+                'disk' => 'tmp',
+                'filename' => 'bar',
+                'extension' => 'png',
+                'mime_type' => 'image/png',
+                'aggregate_type' => 'foo'
+            ]
+        );
+        $media2 = factory(Media::class)->create(
+            [
+                'disk' => 'tmp',
+                'filename' => 'bar',
+                'extension' => 'png',
+                'size' => 7173,
+                'mime_type' => 'image/png',
+                'aggregate_type' => 'image'
+            ]
+        );
         $this->seedFileForMedia($media1, fopen($this->sampleFilePath(), 'r'));
         $this->seedFileForMedia($media2, fopen($this->sampleFilePath(), 'r'));
 
         $artisan->call('media:import', ['disk' => 'tmp', '--force' => true]);
-        $this->assertEquals(['image', 'image'], Media::pluck('aggregate_type')->toArray());
-        $this->assertEquals("Imported 0 file(s).\nUpdated 1 record(s).\nSkipped 1 file(s).\n", $artisan->output());
+        $this->assertEquals(
+            ['image', 'image'],
+            Media::pluck('aggregate_type')->toArray()
+        );
+        $this->assertEquals(
+            "Imported 0 file(s).\nUpdated 1 record(s).\nSkipped 1 file(s).\n",
+            $artisan->output()
+        );
     }
 
     protected function getArtisan()

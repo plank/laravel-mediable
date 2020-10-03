@@ -68,6 +68,9 @@ class SourceAdapterFactoryTest extends TestCase
 
     public function test_it_is_accessible_via_the_container()
     {
-        $this->assertInstanceOf(SourceAdapterFactory::class, app('mediable.source.factory'));
+        $this->assertInstanceOf(
+            SourceAdapterFactory::class,
+            app('mediable.source.factory')
+        );
     }
 }
