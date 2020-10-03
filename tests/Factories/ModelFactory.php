@@ -1,5 +1,9 @@
 <?php
 
+use Plank\Mediable\Tests\Mocks\MediaSoftDelete;
+use Plank\Mediable\Tests\Mocks\SampleMediable;
+use Plank\Mediable\Tests\Mocks\SampleMediableSoftDelete;
+
 $factory->define(Plank\Mediable\Media::class, function (Faker\Generator $faker) {
     $types = config('mediable.aggregate_types');
     $type = $faker->randomElement(array_keys($types));

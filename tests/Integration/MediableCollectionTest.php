@@ -1,7 +1,11 @@
 <?php
 
+namespace Plank\Mediable\Tests\Integration;
+
 use Plank\Mediable\Media;
 use Plank\Mediable\MediableCollection;
+use Plank\Mediable\Tests\Mocks\SampleMediable;
+use Plank\Mediable\Tests\TestCase;
 
 class MediableCollectionTest extends TestCase
 {

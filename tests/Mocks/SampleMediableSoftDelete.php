@@ -1,5 +1,7 @@
 <?php
 
+namespace Plank\Mediable\Tests\Mocks;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Plank\Mediable\Mediable;

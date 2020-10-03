@@ -1,5 +1,7 @@
 <?php
 
+namespace Plank\Mediable\Tests\Mocks;
+
 use Illuminate\Database\Eloquent\Model;
 use Plank\Mediable\Mediable;
 

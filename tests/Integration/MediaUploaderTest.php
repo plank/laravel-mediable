@@ -1,5 +1,7 @@
 <?php
 
+namespace Plank\Mediable\Tests\Integration;
+
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Plank\Mediable\Exceptions\MediaUpload\FileExistsException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException;
@@ -11,6 +13,9 @@ use Plank\Mediable\MediaUploader;
 use Plank\Mediable\MediaUploaderFacade as Facade;
 use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
 use Plank\Mediable\Stream;
+use Plank\Mediable\Tests\Mocks\MediaSubclass;
+use Plank\Mediable\Tests\TestCase;
+use stdClass;
 
 class MediaUploaderTest extends TestCase
 {

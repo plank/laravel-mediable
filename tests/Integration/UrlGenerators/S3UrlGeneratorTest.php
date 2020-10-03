@@ -1,7 +1,10 @@
 <?php
 
+namespace Plank\Mediable\Tests\Integration\UrlGenerators;
+
 use Illuminate\Filesystem\FilesystemManager;
 use Plank\Mediable\Media;
+use Plank\Mediable\Tests\TestCase;
 use Plank\Mediable\UrlGenerators\S3UrlGenerator;
 
 class S3UrlGeneratorTest extends TestCase

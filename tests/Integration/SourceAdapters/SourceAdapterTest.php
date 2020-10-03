@@ -1,5 +1,7 @@
 <?php
 
+namespace Plank\Mediable\Tests\Integration\SourceAdapters;
+
 use Plank\Mediable\SourceAdapters\FileAdapter;
 use Plank\Mediable\SourceAdapters\LocalPathAdapter;
 use Plank\Mediable\SourceAdapters\RawContentAdapter;
@@ -9,6 +11,7 @@ use Plank\Mediable\SourceAdapters\StreamAdapter;
 use Plank\Mediable\SourceAdapters\StreamResourceAdapter;
 use Plank\Mediable\SourceAdapters\UploadedFileAdapter;
 use Plank\Mediable\Stream;
+use Plank\Mediable\Tests\TestCase;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -89,7 +92,6 @@ class SourceAdapterTest extends TestCase
             $file,
             'invalid.png',
             'image/png',
-            8444,
             UPLOAD_ERR_CANT_WRITE,
             false
         );

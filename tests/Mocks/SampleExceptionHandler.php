@@ -1,5 +1,7 @@
 <?php
 
+namespace Plank\Mediable\Tests\Mocks;
+
 use Plank\Mediable\HandlesMediaUploadExceptions;
 
 class SampleExceptionHandler
@@ -16,7 +18,7 @@ class SampleExceptionHandler
      * @param  \Exception $e
      * @return \Symfony\Component\HttpKernel\Exception\HttpException|\Exception
      */
-    public function render(Exception $e)
+    public function render(\Exception $e)
     {
         return $this->transformMediaUploadException($e);
     }

@@ -1,8 +1,13 @@
 <?php
 
+namespace Plank\Mediable\Tests\Integration;
+
 use Illuminate\Support\Facades\DB;
 use Plank\Mediable\Media;
 use Plank\Mediable\MediableCollection;
+use Plank\Mediable\Tests\Mocks\SampleMediable;
+use Plank\Mediable\Tests\Mocks\SampleMediableSoftDelete;
+use Plank\Mediable\Tests\TestCase;
 
 class MediableTest extends TestCase
 {
