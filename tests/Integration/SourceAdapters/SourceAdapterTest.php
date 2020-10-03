@@ -35,6 +35,7 @@ class SourceAdapterTest extends TestCase
         'c+t' => true,
         'a+' => true
     ];
+
     public function setUp(): void
     {
         parent::setUp();
@@ -52,7 +53,13 @@ class SourceAdapterTest extends TestCase
         $string = file_get_contents($file);
         $url = $this->remoteFilePath() . '?foo=bar.baz';
 
-        $uploadedFile = new UploadedFile($file, 'plank.png', 'image/png', UPLOAD_ERR_OK, true);
+        $uploadedFile = new UploadedFile(
+            $file,
+            'plank.png',
+            'image/png',
+            UPLOAD_ERR_OK,
+            true
+        );
 
         $fileResource = fopen($file, 'rb');
         $fileStream = new Stream(fopen($file, 'rb'));
@@ -69,16 +76,53 @@ class SourceAdapterTest extends TestCase
 
         $data = [
             'FileAdapter' => [FileAdapter::class, new File($file), $file, 'plank'],
-            'UploadedFileAdapter' => [UploadedFileAdapter::class, $uploadedFile, $file,'plank'],
+            'UploadedFileAdapter' => [
+                UploadedFileAdapter::class,
+                $uploadedFile,
+                $file,
+                'plank'
+            ],
             'LocalPathAdapter' => [LocalPathAdapter::class, $file, $file, 'plank'],
             'RemoteUrlAdapter' => [RemoteUrlAdapter::class, $url, $url, 'plank'],
             'RawContentAdapter' => [RawContentAdapter::class, $string, null, '', false],
-            'StreamResourceAdapter_Local' => [StreamResourceAdapter::class, $fileResource, $file, 'plank'],
-            'StreamAdapter_Local' => [StreamAdapter::class, $fileStream, $file, 'plank', false],
-            'StreamResourceAdapter_Remote' => [StreamResourceAdapter::class, $httpResource, $url, 'plank'],
-            'StreamAdapter_Remote' => [StreamAdapter::class, $httpStream, $url, 'plank', false],
-            'StreamResourceAdapter_Memory' => [StreamResourceAdapter::class, $memoryResource, 'php://memory', ''],
-            'StreamAdapter_Memory' => [StreamAdapter::class, $memoryStream, 'php://memory', ''],
+            'StreamResourceAdapter_Local' => [
+                StreamResourceAdapter::class,
+                $fileResource,
+                $file,
+                'plank'
+            ],
+            'StreamAdapter_Local' => [
+                StreamAdapter::class,
+                $fileStream,
+                $file,
+                'plank',
+                false
+            ],
+            'StreamResourceAdapter_Remote' => [
+                StreamResourceAdapter::class,
+                $httpResource,
+                $url,
+                'plank'
+            ],
+            'StreamAdapter_Remote' => [
+                StreamAdapter::class,
+                $httpStream,
+                $url,
+                'plank',
+                false
+            ],
+            'StreamResourceAdapter_Memory' => [
+                StreamResourceAdapter::class,
+                $memoryResource,
+                'php://memory',
+                ''
+            ],
+            'StreamAdapter_Memory' => [
+                StreamAdapter::class,
+                $memoryStream,
+                'php://memory',
+                ''
+            ],
         ];
         return $data;
     }
@@ -209,8 +253,9 @@ class SourceAdapterTest extends TestCase
     /**
      * @dataProvider invalidAdapterProvider
      */
-    public function test_it_verifies_file_validity_failure(SourceAdapterInterface $adapter)
-    {
+    public function test_it_verifies_file_validity_failure(
+        SourceAdapterInterface $adapter
+    ) {
         $this->assertFalse($adapter->valid());
     }
 }

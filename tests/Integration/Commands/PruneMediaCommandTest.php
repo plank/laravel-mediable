@@ -31,8 +31,12 @@ class PruneMediaCommandTest extends TestCase
     public function test_it_prunes_directory()
     {
         $artisan = $this->getArtisan();
-        $media1 = factory(Media::class)->create(['id' => 1, 'disk' => 'tmp', 'directory' => '']);
-        $media2 = factory(Media::class)->create(['id' => 2, 'disk' => 'tmp', 'directory' => 'foo']);
+        $media1 = factory(Media::class)->create(
+            ['id' => 1, 'disk' => 'tmp', 'directory' => '']
+        );
+        $media2 = factory(Media::class)->create(
+            ['id' => 2, 'disk' => 'tmp', 'directory' => 'foo']
+        );
 
         $artisan->call('media:prune', ['disk' => 'tmp', '--directory' => 'foo']);
 
@@ -43,8 +47,12 @@ class PruneMediaCommandTest extends TestCase
     public function test_it_prunes_non_recursively()
     {
         $artisan = $this->getArtisan();
-        $media1 = factory(Media::class)->create(['id' => 1, 'disk' => 'tmp', 'directory' => '']);
-        $media2 = factory(Media::class)->create(['id' => 2, 'disk' => 'tmp', 'directory' => 'foo']);
+        $media1 = factory(Media::class)->create(
+            ['id' => 1, 'disk' => 'tmp', 'directory' => '']
+        );
+        $media2 = factory(Media::class)->create(
+            ['id' => 2, 'disk' => 'tmp', 'directory' => 'foo']
+        );
 
         $artisan->call('media:prune', ['disk' => 'tmp', '--non-recursive' => true]);
 

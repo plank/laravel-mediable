@@ -14,14 +14,19 @@ class MediaTest extends TestCase
 {
     public function test_it_has_path_accessors()
     {
-        $media = $this->makeMedia([
-            'disk' => 'tmp',
-            'directory' => 'a/b/c',
-            'filename' => 'foo.bar',
-            'extension' => 'jpg',
-        ]);
+        $media = $this->makeMedia(
+            [
+                'disk' => 'tmp',
+                'directory' => 'a/b/c',
+                'filename' => 'foo.bar',
+                'extension' => 'jpg',
+            ]
+        );
 
-        $this->assertEquals(storage_path('tmp/a/b/c/foo.bar.jpg'), $media->getAbsolutePath());
+        $this->assertEquals(
+            storage_path('tmp/a/b/c/foo.bar.jpg'),
+            $media->getAbsolutePath()
+        );
         $this->assertEquals('a/b/c/foo.bar.jpg', $media->getDiskPath());
         $this->assertEquals('a/b/c', $media->directory);
         $this->assertEquals('foo.bar.jpg', $media->basename);
@@ -71,27 +76,34 @@ class MediaTest extends TestCase
     {
         $this->useDatabase();
 
-        $this->createMedia([
-            'id' => 4,
-            'disk' => 'tmp',
-            'directory' => 'foo/bar/baz',
-            'filename' => 'bat',
-            'extension' => 'jpg'
-        ]);
-        $this->assertEquals(4, Media::forPathOnDisk('tmp', 'foo/bar/baz/bat.jpg')->first()->id);
+        $this->createMedia(
+            [
+                'id' => 4,
+                'disk' => 'tmp',
+                'directory' => 'foo/bar/baz',
+                'filename' => 'bat',
+                'extension' => 'jpg'
+            ]
+        );
+        $this->assertEquals(
+            4,
+            Media::forPathOnDisk('tmp', 'foo/bar/baz/bat.jpg')->first()->id
+        );
     }
 
     public function test_it_can_be_queried_by_path_on_disk_when_directory_is_empty()
     {
         $this->useDatabase();
 
-        $this->createMedia([
-            'id' => 4,
-            'disk' => 'tmp',
-            'directory' => '',
-            'filename' => 'bat',
-            'extension' => 'jpg'
-        ]);
+        $this->createMedia(
+            [
+                'id' => 4,
+                'disk' => 'tmp',
+                'directory' => '',
+                'filename' => 'bat',
+                'extension' => 'jpg'
+            ]
+        );
         $this->assertEquals(4, Media::forPathOnDisk('tmp', 'bat.jpg')->first()->id);
     }
 
@@ -155,12 +167,14 @@ class MediaTest extends TestCase
 
     public function test_it_can_generate_a_url_to_the_local_file()
     {
-        $media = $this->makeMedia([
-            'disk' => 'uploads',
-            'directory' => 'foo/bar',
-            'filename' => 'baz',
-            'extension' => 'jpg'
-        ]);
+        $media = $this->makeMedia(
+            [
+                'disk' => 'uploads',
+                'directory' => 'foo/bar',
+                'filename' => 'baz',
+                'extension' => 'jpg'
+            ]
+        );
         $this->seedFileForMedia($media);
         $this->assertEquals('http://localhost/uploads/foo/bar/baz.jpg', $media->getUrl());
     }
@@ -168,12 +182,14 @@ class MediaTest extends TestCase
     public function test_it_can_generate_a_custom_url_to_the_local_file()
     {
         $this->app['config']->set('filesystems.disks.uploads.url', 'http://example.com');
-        $media = $this->makeMedia([
-            'disk' => 'uploads',
-            'directory' => 'foo/bar',
-            'filename' => 'baz',
-            'extension' => 'jpg'
-        ]);
+        $media = $this->makeMedia(
+            [
+                'disk' => 'uploads',
+                'directory' => 'foo/bar',
+                'filename' => 'baz',
+                'extension' => 'jpg'
+            ]
+        );
         $this->seedFileForMedia($media);
         $this->assertEquals('http://example.com/foo/bar/baz.jpg', $media->getUrl());
     }
@@ -183,16 +199,22 @@ class MediaTest extends TestCase
         if (!$this->s3ConfigLoaded()) {
             $this->markTestSkipped('S3 Credentials not available.');
         }
-        $media = $this->makeMedia([
-            'disk' => 's3',
-            'directory' => 'foo/bar',
-            'filename' => 'baz',
-            'extension' => 'jpg'
-        ]);
+        $media = $this->makeMedia(
+            [
+                'disk' => 's3',
+                'directory' => 'foo/bar',
+                'filename' => 'baz',
+                'extension' => 'jpg'
+            ]
+        );
         $this->seedFileForMedia($media);
         try {
             $this->assertEquals(
-                sprintf('https://%s.s3.%s.amazonaws.com/foo/bar/baz.jpg', env('S3_BUCKET'), env('S3_REGION')),
+                sprintf(
+                    'https://%s.s3.%s.amazonaws.com/foo/bar/baz.jpg',
+                    env('S3_BUCKET'),
+                    env('S3_REGION')
+                ),
                 $media->getUrl()
             );
         } finally {
@@ -215,12 +237,14 @@ class MediaTest extends TestCase
         $this->useFilesystem('tmp');
         $this->useDatabase();
 
-        $media = $this->makeMedia([
-            'disk' => 'tmp',
-            'directory' => 'foo',
-            'filename' => 'bar',
-            'extension' => 'baz'
-        ]);
+        $media = $this->makeMedia(
+            [
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'extension' => 'baz'
+            ]
+        );
         $this->seedFileForMedia($media);
 
         $media->move('alpha/beta');
@@ -238,12 +262,14 @@ class MediaTest extends TestCase
         $this->useFilesystem('tmp');
         $this->useDatabase();
 
-        $media = $this->makeMedia([
-            'disk' => 'tmp',
-            'directory' => 'foo',
-            'filename' => 'bar',
-            'extension' => 'baz'
-        ]);
+        $media = $this->makeMedia(
+            [
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'extension' => 'baz'
+            ]
+        );
         $this->seedFileForMedia($media);
 
         // copy the file and make some checks
@@ -269,18 +295,22 @@ class MediaTest extends TestCase
     {
         $this->useFilesystem('tmp');
 
-        $media1 = $this->makeMedia([
-            'disk' => 'tmp',
-            'directory' => '',
-            'filename' => 'foo',
-            'extension' => 'baz'
-        ]);
-        $media2 = $this->makeMedia([
-            'disk' => 'tmp',
-            'directory' => '',
-            'filename' => 'bar',
-            'extension' => 'baz'
-        ]);
+        $media1 = $this->makeMedia(
+            [
+                'disk' => 'tmp',
+                'directory' => '',
+                'filename' => 'foo',
+                'extension' => 'baz'
+            ]
+        );
+        $media2 = $this->makeMedia(
+            [
+                'disk' => 'tmp',
+                'directory' => '',
+                'filename' => 'bar',
+                'extension' => 'baz'
+            ]
+        );
         $this->seedFileForMedia($media1);
         $this->seedFileForMedia($media2);
 
@@ -295,12 +325,14 @@ class MediaTest extends TestCase
 
         $this->useDatabase();
 
-        $media = $this->makeMedia([
-            'disk' => 'tmp',
-            'directory' => 'foo',
-            'filename' => 'bar',
-            'extension' => 'baz'
-        ]);
+        $media = $this->makeMedia(
+            [
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'extension' => 'baz'
+            ]
+        );
         $original_path = $media->getAbsolutePath();
         $this->seedFileForMedia($media);
         $media->makePublic();
@@ -320,12 +352,14 @@ class MediaTest extends TestCase
 
         $this->useDatabase();
 
-        $media = $this->makeMedia([
-            'disk' => 'tmp',
-            'directory' => 'foo',
-            'filename' => 'bar',
-            'extension' => 'baz'
-        ]);
+        $media = $this->makeMedia(
+            [
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'extension' => 'baz'
+            ]
+        );
         $original_path = $media->getAbsolutePath();
         $this->seedFileForMedia($media);
         $media->makePrivate();
@@ -345,12 +379,14 @@ class MediaTest extends TestCase
 
         $this->useDatabase();
 
-        $media = $this->makeMedia([
-            'disk' => 'tmp',
-            'directory' => 'foo',
-            'filename' => 'bar',
-            'extension' => 'baz'
-        ]);
+        $media = $this->makeMedia(
+            [
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'extension' => 'baz'
+            ]
+        );
         $this->seedFileForMedia($media);
         $media->makePublic();
 
@@ -374,12 +410,14 @@ class MediaTest extends TestCase
 
         $this->useDatabase();
 
-        $media = $this->makeMedia([
-            'disk' => 'tmp',
-            'directory' => 'foo',
-            'filename' => 'bar',
-            'extension' => 'baz'
-        ]);
+        $media = $this->makeMedia(
+            [
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'extension' => 'baz'
+            ]
+        );
         $this->seedFileForMedia($media);
         $media->makePrivate();
 
@@ -400,10 +438,12 @@ class MediaTest extends TestCase
     {
         $this->useFilesystem('tmp');
 
-        $media = $this->makeMedia([
-            'disk' => 'tmp',
-            'extension' => 'html'
-        ]);
+        $media = $this->makeMedia(
+            [
+                'disk' => 'tmp',
+                'extension' => 'html'
+            ]
+        );
         $this->seedFileForMedia($media, '<h1>Hello World</h1>');
         $this->assertEquals('<h1>Hello World</h1>', $media->contents());
     }
@@ -413,12 +453,14 @@ class MediaTest extends TestCase
         $this->useDatabase();
         $this->useFilesystem('tmp');
 
-        $media = $this->createMedia([
-            'disk' => 'tmp',
-            'directory' => '',
-            'filename' => 'file',
-            'extension' => 'txt'
-        ]);
+        $media = $this->createMedia(
+            [
+                'disk' => 'tmp',
+                'directory' => '',
+                'filename' => 'file',
+                'extension' => 'txt'
+            ]
+        );
         $this->seedFileForMedia($media);
         $path = $media->getAbsolutePath();
 
@@ -491,8 +533,8 @@ class MediaTest extends TestCase
         $this->assertCount(1, $media->models(SampleMediable::class)->get());
     }
 
-    public function test_it_cascades_relationships_on_soft_delete_with_config_via_custom_mediables_table()
-    {
+    public function test_it_cascades_relationships_on_soft_delete_with_config_via_custom_mediables_table(
+    ) {
         $this->useDatabase();
 
         config()->set('mediable.mediables_table', 'prefixed_mediables');
@@ -511,12 +553,14 @@ class MediaTest extends TestCase
     {
         $this->useFilesystem('tmp');
 
-        $media = $this->makeMedia([
-            'disk' => 'tmp',
-            'directory' => 'foo',
-            'filename' => 'bar',
-            'extension' => 'baz'
-        ]);
+        $media = $this->makeMedia(
+            [
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'extension' => 'baz'
+            ]
+        );
         $this->seedFileForMedia($media, 'test');
 
         $stream = $media->stream();

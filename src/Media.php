@@ -14,6 +14,7 @@ use Plank\Mediable\Exceptions\MediaMoveException;
 use Plank\Mediable\Exceptions\MediaUrlException;
 use Plank\Mediable\Helpers\File;
 use Plank\Mediable\UrlGenerators\UrlGeneratorInterface;
+use Psr\Http\Message\StreamInterface;
 
 /**
  * Media Model.
@@ -246,6 +247,17 @@ class Media extends Model
     public function contents(): string
     {
         return $this->storage()->get($this->getDiskPath());
+    }
+
+    /**
+     * Get a read stream to the file
+     * @return StreamInterface
+     */
+    public function stream()
+    {
+        return \GuzzleHttp\Psr7\stream_for(
+            $this->storage()->readStream($this->getDiskPath())
+        );
     }
 
     /**

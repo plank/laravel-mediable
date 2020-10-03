@@ -30,7 +30,11 @@ class S3UrlGeneratorTest extends TestCase
     {
         $generator = $this->setupGenerator();
         $this->assertEquals(
-            sprintf('https://%s.s3.%s.amazonaws.com/foo/bar.jpg', env('S3_BUCKET'), env('S3_REGION')),
+            sprintf(
+                'https://%s.s3.%s.amazonaws.com/foo/bar.jpg',
+                env('S3_BUCKET'),
+                env('S3_REGION')
+            ),
             $generator->getAbsolutePath()
         );
     }
@@ -39,7 +43,11 @@ class S3UrlGeneratorTest extends TestCase
     {
         $generator = $this->setupGenerator();
         $this->assertEquals(
-            sprintf('https://%s.s3.%s.amazonaws.com/foo/bar.jpg', env('S3_BUCKET'), env('S3_REGION')),
+            sprintf(
+                'https://%s.s3.%s.amazonaws.com/foo/bar.jpg',
+                env('S3_BUCKET'),
+                env('S3_REGION')
+            ),
             $generator->getUrl()
         );
     }
@@ -61,11 +69,13 @@ class S3UrlGeneratorTest extends TestCase
 
     private function getMedia(): Media
     {
-        return $this->makeMedia([
-            'disk' => 's3',
-            'directory' => 'foo',
-            'filename' => 'bar',
-            'extension' => 'jpg'
-        ]);
+        return $this->makeMedia(
+            [
+                'disk' => 's3',
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'extension' => 'jpg'
+            ]
+        );
     }
 }
