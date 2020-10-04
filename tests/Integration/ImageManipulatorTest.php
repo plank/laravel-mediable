@@ -65,6 +65,7 @@ class ImageManipulatorTest extends TestCase
 
         $media = $this->makeMedia(
             [
+                'id' => 10,
                 'disk' => 'tmp',
                 'directory' => 'foo',
                 'filename' => 'bar',
@@ -105,6 +106,42 @@ class ImageManipulatorTest extends TestCase
         $this->assertEquals('image/png', $result->mime_type);
         $this->assertEquals('image', $result->aggregate_type);
         $this->assertEquals(449, $result->size);
+        $this->assertEquals('test', $result->variant_name);
+        $this->assertEquals(10, $result->original_media_id);
+        $this->assertTrue($media->fileExists());
+    }
+
+    public function test_it_can_create_a_variant_of_a_variant()
+    {
+        $this->useFilesystem('tmp');
+        $this->useDatabase();
+
+        $media = $this->makeMedia(
+            [
+                'id' => 20,
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'extension' => 'png',
+                'aggregate_type' => 'image',
+                'variant_name' => 'other',
+                'original_media_id' => 19
+            ]
+        );
+        $this->seedFileForMedia($media, $this->sampleFile());
+
+        $manipulation = ImageManipulation::make(
+            function (Image $image) {
+                $image->resize(16, 16);
+            }
+        );
+
+        $imageManipulator = $this->getManipulator();
+        $imageManipulator->addVariantManipulation('test', $manipulation);
+        $result = $imageManipulator->createVariant('test', $media);
+
+        $this->assertEquals('test', $result->variant_name);
+        $this->assertEquals(19, $result->original_media_id);
         $this->assertTrue($media->fileExists());
     }
 

@@ -231,6 +231,17 @@ class MediableTest extends TestCase
         $this->assertEquals([2, 3], $mediable->getMedia('baz')->pluck('id')->toArray());
     }
 
+    public function test_it_can_be_queried_by_any_media()
+    {
+        $mediable = factory(SampleMediable::class)->create();
+        $mediable2 = factory(SampleMediable::class)->create();
+        $media = factory(Media::class)->create();
+        $mediable->attachMedia($media, 'foo');
+
+        $result = SampleMediable::whereHasMedia([], false)->get();
+        $this->assertEquals([$mediable->getKey()], $result->modelKeys());
+    }
+
     public function test_it_can_be_queried_by_tag()
     {
         $mediable = factory(SampleMediable::class)->create();
@@ -299,6 +310,8 @@ class MediableTest extends TestCase
 
         $result = SampleMediable::withMedia()->first();
         $this->assertTrue($result->relationLoaded('media'));
+        $this->assertFalse($result->media[0]->relationLoaded('originalMedia'));
+        $this->assertFalse($result->media[0]->relationLoaded('variants'));
     }
 
     public function test_it_can_eager_load_media_by_tag()
@@ -313,6 +326,8 @@ class MediableTest extends TestCase
 
         $this->assertTrue($result->relationLoaded('media'));
         $this->assertEquals([2], $result->media->pluck('id')->toArray());
+        $this->assertFalse($result->media[0]->relationLoaded('originalMedia'));
+        $this->assertFalse($result->media[0]->relationLoaded('variants'));
     }
 
     public function test_it_can_eager_load_media_by_tag_matching_all()
@@ -326,6 +341,85 @@ class MediableTest extends TestCase
         $result = SampleMediable::withMedia(['bar', 'foo'], true)->first();
         $this->assertTrue($result->relationLoaded('media'));
         $this->assertEquals([2, 2], $result->media->pluck('id')->toArray());
+        $this->assertFalse($result->media[0]->relationLoaded('originalMedia'));
+        $this->assertFalse($result->media[0]->relationLoaded('variants'));
+
+        $result = SampleMediable::withMediaMatchAll(['bar', 'foo'])->first();
+        $this->assertTrue($result->relationLoaded('media'));
+        $this->assertEquals([2, 2], $result->media->pluck('id')->toArray());
+        $this->assertFalse($result->media[0]->relationLoaded('originalMedia'));
+        $this->assertFalse($result->media[0]->relationLoaded('variants'));
+    }
+
+    public function test_it_can_eager_load_media_with_variants()
+    {
+        $mediable = factory(SampleMediable::class)->create();
+        $media = factory(Media::class)->create();
+        $mediable->attachMedia($media, 'foo');
+
+        $result = SampleMediable::withMedia([], false, true)->first();
+        $this->assertTrue($result->relationLoaded('media'));
+        $this->assertTrue($result->media[0]->relationLoaded('originalMedia'));
+        $this->assertTrue($result->media[0]->relationLoaded('variants'));
+
+        $result = SampleMediable::withMediaAndVariants()->first();
+        $this->assertTrue($result->relationLoaded('media'));
+        $this->assertTrue($result->media[0]->relationLoaded('originalMedia'));
+        $this->assertTrue($result->media[0]->relationLoaded('variants'));
+    }
+
+    public function test_it_can_eager_load_media_with_variants_by_tag()
+    {
+        $mediable = factory(SampleMediable::class)->create();
+        $media1 = factory(Media::class)->create(['id' => 1]);
+        $media2 = factory(Media::class)->create(['id' => 2]);
+        $mediable->attachMedia($media1, 'foo');
+        $mediable->attachMedia($media2, 'bar');
+
+        $result = SampleMediable::withMedia(['bar'], false, true)->first();
+        $this->assertTrue($result->relationLoaded('media'));
+        $this->assertEquals([2], $result->media->pluck('id')->toArray());
+        $this->assertTrue($result->media[0]->relationLoaded('originalMedia'));
+        $this->assertTrue($result->media[0]->relationLoaded('variants'));
+
+        $result = SampleMediable::withMediaAndVariants(['bar'])->first();
+        $this->assertTrue($result->relationLoaded('media'));
+        $this->assertEquals([2], $result->media->pluck('id')->toArray());
+        $this->assertTrue($result->media[0]->relationLoaded('originalMedia'));
+        $this->assertTrue($result->media[0]->relationLoaded('variants'));
+    }
+
+    public function test_it_can_eager_load_media_with_variants_by_tag_matching_all()
+    {
+        $mediable = factory(SampleMediable::class)->create();
+        $media1 = factory(Media::class)->create(['id' => 1]);
+        $media2 = factory(Media::class)->create(['id' => 2]);
+        $mediable->attachMedia($media1, 'foo');
+        $mediable->attachMedia($media2, ['bar', 'foo', 'baz']);
+
+        $result = SampleMediable::withMedia(['bar', 'foo'], true, true)->first();
+        $this->assertTrue($result->relationLoaded('media'));
+        $this->assertEquals([2, 2], $result->media->pluck('id')->toArray());
+        $this->assertTrue($result->media[0]->relationLoaded('originalMedia'));
+        $this->assertTrue($result->media[0]->relationLoaded('variants'));
+
+        $result = SampleMediable::withMediaAndVariants(['bar', 'foo'], true)->first();
+        $this->assertTrue($result->relationLoaded('media'));
+        $this->assertEquals([2, 2], $result->media->pluck('id')->toArray());
+        $this->assertTrue($result->media[0]->relationLoaded('originalMedia'));
+        $this->assertTrue($result->media[0]->relationLoaded('variants'));
+
+        $result = SampleMediable::withMediaMatchAll(['bar', 'foo'], true)->first();
+        $this->assertTrue($result->relationLoaded('media'));
+        $this->assertEquals([2, 2], $result->media->pluck('id')->toArray());
+        $this->assertTrue($result->media[0]->relationLoaded('originalMedia'));
+        $this->assertTrue($result->media[0]->relationLoaded('variants'));
+
+        $result = SampleMediable::withMediaAndVariantsMatchAll(['bar', 'foo'])->first();
+        $this->assertTrue($result->relationLoaded('media'));
+        $this->assertEquals([2, 2], $result->media->pluck('id')->toArray());
+        $this->assertTrue($result->media[0]->relationLoaded('originalMedia'));
+        $this->assertTrue($result->media[0]->relationLoaded('variants'));
     }
 
     public function test_it_can_lazy_eager_load_media()
@@ -337,6 +431,8 @@ class MediableTest extends TestCase
         $result = SampleMediable::first();
         $this->assertSame($result, $result->loadMedia());
         $this->assertTrue($result->relationLoaded('media'));
+        $this->assertFalse($result->media[0]->relationLoaded('originalMedia'));
+        $this->assertFalse($result->media[0]->relationLoaded('variants'));
     }
 
     public function test_it_can_lazy_eager_load_media_by_tag()
@@ -351,6 +447,8 @@ class MediableTest extends TestCase
         $this->assertSame($result, $result->loadMedia(['bar']));
         $this->assertTrue($result->relationLoaded('media'));
         $this->assertEquals([2], $result->media->pluck('id')->toArray());
+        $this->assertFalse($result->media[0]->relationLoaded('originalMedia'));
+        $this->assertFalse($result->media[0]->relationLoaded('variants'));
     }
 
     public function test_it_can_lazy_eager_load_media_by_tag_matching_all()
@@ -365,6 +463,94 @@ class MediableTest extends TestCase
         $this->assertSame($result, $result->loadMedia(['bar', 'foo'], true));
         $this->assertTrue($result->relationLoaded('media'));
         $this->assertEquals([2, 2], $result->media->pluck('id')->toArray());
+        $this->assertFalse($result->media[0]->relationLoaded('originalMedia'));
+        $this->assertFalse($result->media[0]->relationLoaded('variants'));
+
+        $result = SampleMediable::first();
+        $this->assertSame($result, $result->loadMediaMatchAll(['bar', 'foo']));
+        $this->assertTrue($result->relationLoaded('media'));
+        $this->assertEquals([2, 2], $result->media->pluck('id')->toArray());
+        $this->assertFalse($result->media[0]->relationLoaded('originalMedia'));
+        $this->assertFalse($result->media[0]->relationLoaded('variants'));
+    }
+
+    public function test_it_can_lazy_eager_load_media_with_variants()
+    {
+        $mediable = factory(SampleMediable::class)->create();
+        $media = factory(Media::class)->create();
+        $mediable->attachMedia($media, 'foo');
+
+        $result = SampleMediable::first();
+        $this->assertSame($result, $result->loadMedia([], false, true));
+        $this->assertTrue($result->relationLoaded('media'));
+        $this->assertTrue($result->media[0]->relationLoaded('originalMedia'));
+        $this->assertTrue($result->media[0]->relationLoaded('variants'));
+
+        $result = SampleMediable::first();
+        $this->assertSame($result, $result->loadMediaWithVariants());
+        $this->assertTrue($result->relationLoaded('media'));
+        $this->assertTrue($result->media[0]->relationLoaded('originalMedia'));
+        $this->assertTrue($result->media[0]->relationLoaded('variants'));
+    }
+
+    public function test_it_can_lazy_eager_load_media_with_variants_by_tag()
+    {
+        $mediable = factory(SampleMediable::class)->create();
+        $media1 = factory(Media::class)->create(['id' => 1]);
+        $media2 = factory(Media::class)->create(['id' => 2]);
+        $mediable->attachMedia($media1, 'foo');
+        $mediable->attachMedia($media2, 'bar');
+
+        $result = SampleMediable::first();
+        $this->assertSame($result, $result->loadMedia(['bar'], false, true));
+        $this->assertTrue($result->relationLoaded('media'));
+        $this->assertEquals([2], $result->media->pluck('id')->toArray());
+        $this->assertTrue($result->media[0]->relationLoaded('originalMedia'));
+        $this->assertTrue($result->media[0]->relationLoaded('variants'));
+
+        $result = SampleMediable::first();
+        $this->assertSame($result, $result->loadMediaWithVariants(['bar']));
+        $this->assertTrue($result->relationLoaded('media'));
+        $this->assertEquals([2], $result->media->pluck('id')->toArray());
+        $this->assertTrue($result->media[0]->relationLoaded('originalMedia'));
+        $this->assertTrue($result->media[0]->relationLoaded('variants'));
+    }
+
+    public function test_it_can_lazy_eager_load_media_with_variants_by_tag_matching_all()
+    {
+        $mediable = factory(SampleMediable::class)->create();
+        $media1 = factory(Media::class)->create(['id' => 1]);
+        $media2 = factory(Media::class)->create(['id' => 2]);
+        $mediable->attachMedia($media1, 'foo');
+        $mediable->attachMedia($media2, ['bar', 'foo', 'baz']);
+
+        $result = SampleMediable::first();
+        $this->assertSame($result, $result->loadMedia(['bar', 'foo'], true, true));
+        $this->assertTrue($result->relationLoaded('media'));
+        $this->assertEquals([2, 2], $result->media->pluck('id')->toArray());
+        $this->asserttrue($result->media[0]->relationLoaded('originalMedia'));
+        $this->asserttrue($result->media[0]->relationLoaded('variants'));
+
+        $result = SampleMediable::first();
+        $this->assertSame($result, $result->loadMediaWithVariants(['bar', 'foo'], true));
+        $this->assertTrue($result->relationLoaded('media'));
+        $this->assertEquals([2, 2], $result->media->pluck('id')->toArray());
+        $this->asserttrue($result->media[0]->relationLoaded('originalMedia'));
+        $this->asserttrue($result->media[0]->relationLoaded('variants'));
+
+        $result = SampleMediable::first();
+        $this->assertSame($result, $result->loadMediaMatchAll(['bar', 'foo'], true));
+        $this->assertTrue($result->relationLoaded('media'));
+        $this->assertEquals([2, 2], $result->media->pluck('id')->toArray());
+        $this->asserttrue($result->media[0]->relationLoaded('originalMedia'));
+        $this->asserttrue($result->media[0]->relationLoaded('variants'));
+
+        $result = SampleMediable::first();
+        $this->assertSame($result, $result->loadMediaWithVariantsMatchAll(['bar', 'foo']));
+        $this->assertTrue($result->relationLoaded('media'));
+        $this->assertEquals([2, 2], $result->media->pluck('id')->toArray());
+        $this->asserttrue($result->media[0]->relationLoaded('originalMedia'));
+        $this->asserttrue($result->media[0]->relationLoaded('variants'));
     }
 
     public function test_it_uses_custom_collection()
