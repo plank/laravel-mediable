@@ -2,6 +2,7 @@
 
 namespace Plank\Mediable\Tests\Integration;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Plank\Mediable\Exceptions\MediaMoveException;
 use Plank\Mediable\Media;
@@ -566,5 +567,136 @@ class MediaTest extends TestCase
         $stream = $media->stream();
 
         $this->assertEquals('test', $stream->getContents());
+    }
+
+    public function test_it_can_detect_variant_status()
+    {
+        $media = $this->makeMedia(
+            [
+                'original_media_id' => null,
+                'variant_name' => null
+            ]
+        );
+
+        $this->assertTrue($media->isOriginal());
+        $this->assertFalse($media->isVariant());
+
+        $media->original_media_id = 99;
+        $media->variant_name = 'foo';
+
+        $this->assertFalse($media->isOriginal());
+        $this->assertTrue($media->isVariant());
+
+        $result = $media->makeOriginal();
+
+        $this->assertSame($result, $media);
+        $this->assertTrue($media->isOriginal());
+        $this->assertFalse($media->isVariant());
+        $this->assertNull($media->original_media_id);
+        $this->assertNull($media->variant_name);
+    }
+
+    public function test_it_can_be_queried_by_variant_status()
+    {
+        $this->useDatabase();
+        $media1 = $this->createMedia(
+            [
+                'original_media_id' => null,
+                'variant_name' => null
+            ]
+        );
+
+        $media2 = $this->createMedia(
+            [
+                'original_media_id' => $media1->getKey(),
+                'variant_name' => 'foo'
+            ]
+        );
+
+        $media3 = $this->createMedia(
+            [
+                'original_media_id' => $media1->getKey(),
+                'variant_name' => 'bar'
+            ]
+        );
+
+        $this->assertEquals(
+            [$media1->getKey()],
+            Media::whereIsOriginal()->get()->modelKeys()
+        );
+
+        $this->assertEquals(
+            [$media2->getKey(), $media3->getKey()],
+            Media::whereIsVariant()->orderBy('id')->get()->modelKeys()
+        );
+
+        $this->assertEquals(
+            [$media3->getKey()],
+            Media::whereIsVariant('bar')->get()->modelKeys()
+        );
+    }
+
+    public function test_it_can_find_other_variants()
+    {
+        $media1 = $this->makeMedia(
+            [
+                'id' => 4,
+                'original_media_id' => null,
+                'variant_name' => null
+            ]
+        );
+
+        $media2 = $this->makeMedia(
+            [
+                'id' => 5,
+                'original_media_id' => $media1->getKey(),
+                'variant_name' => 'foo'
+            ]
+        );
+
+        $media3 = $this->makeMedia(
+            [
+                'id' => 6,
+                'original_media_id' => $media1->getKey(),
+                'variant_name' => 'bar'
+            ]
+        );
+
+        $media1->setRelation('variants', new Collection([$media2, $media3]));
+        $media2->setRelation('originalMedia', $media1);
+        $media3->setRelation('originalMedia', $media1);
+
+        $this->assertEquals($media1, $media1->findOriginal());
+        $this->assertEquals($media1, $media2->findOriginal());
+        $this->assertEquals($media1, $media3->findOriginal());
+
+        $this->assertEquals($media2, $media1->findVariant('foo'));
+        $this->assertEquals($media2, $media2->findVariant('foo'));
+        $this->assertEquals($media2, $media3->findVariant('foo'));
+
+        $this->assertEquals($media3, $media1->findVariant('bar'));
+        $this->assertEquals($media3, $media2->findVariant('bar'));
+        $this->assertEquals($media3, $media3->findVariant('bar'));
+
+        $this->assertEquals(
+            new Collection(['foo' => $media2, 'bar' => $media3]),
+            $media1->getAllVariants()
+        );
+        $this->assertEquals(
+            new Collection(['original' => $media1, 'bar' => $media3]),
+            $media2->getAllVariants()
+        );
+        $this->assertEquals(
+            new Collection(['original' => $media1, 'foo' => $media2]),
+            $media3->getAllVariants()
+        );
+
+        $all = new Collection(
+            ['original' => $media1, 'foo' => $media2, 'bar' => $media3]
+        );
+
+        $this->assertEquals($all, $media1->getAllVariantsAndSelf());
+        $this->assertEquals($all, $media2->getAllVariantsAndSelf());
+        $this->assertEquals($all, $media3->getAllVariantsAndSelf());
     }
 }

@@ -6,7 +6,10 @@ namespace Plank\Mediable;
 use Carbon\Carbon;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -26,15 +29,21 @@ use Psr\Http\Message\StreamInterface;
  * @property string $basename
  * @property string $mime_type
  * @property string $aggregate_type
+ * @property string $variant_name
+ * @property int|string $original_media_id
  * @property int $size
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Pivot $pivot
+ * @property Collection|Media[] $variants
+ * @property Media $originalMedia
  * @method static Builder inDirectory(string $disk, string $directory, bool $recursive = false)
  * @method static Builder inOrUnderDirectory(string $disk, string $directory)
  * @method static Builder whereBasename(string $basename)
  * @method static Builder forPathOnDisk(string $disk, string $path)
  * @method static Builder unordered()
+ * @method static Builder whereIsOriginal()
+ * @method static Builder whereIsVariant(string $variant_name = null)
  */
 class Media extends Model
 {
@@ -50,8 +59,23 @@ class Media extends Model
     const TYPE_OTHER = 'other';
     const TYPE_ALL = 'all';
 
+    const VARIANT_NAME_ORIGINAL = 'original';
+
     protected $table = 'media';
-    protected $guarded = ['id', 'disk', 'directory', 'filename', 'extension', 'size', 'mime_type', 'aggregate_type'];
+
+    protected $guarded = [
+        'id',
+        'disk',
+        'directory',
+        'filename',
+        'extension',
+        'size',
+        'mime_type',
+        'aggregate_type',
+        'variant_name',
+        'original_media_id'
+    ];
+
     protected $casts = [
         'size' => 'int',
     ];
@@ -83,6 +107,90 @@ class Media extends Model
                 config('mediable.mediables_table', 'mediables')
             )
             ->withPivot('tag', 'order');
+    }
+
+    /**
+     * Relationship to variants derived from this file
+     * @return HasMany
+     */
+    public function variants(): HasMany
+    {
+        return $this->hasMany(
+            get_class($this),
+            'original_media_id'
+        );
+    }
+
+    /**
+     * Relationship to the file that this file was derived from
+     * @return BelongsTo
+     */
+    public function originalMedia(): BelongsTo
+    {
+        return $this->belongsTo(
+            get_class($this),
+            'original_media_id'
+        );
+    }
+
+    /**
+     * Retrieve all other variants and originals of the media
+     * @return Collection|Media[]
+     */
+    public function getAllVariants(): Collection
+    {
+        // if we have an original, then the variants relation should contain all others
+        if ($this->isOriginal()) {
+            return $this->variants->keyBy('variant_name');
+        }
+
+        // otherwise, get the original's variants, remove this one and add the original
+        $collection = $this->originalMedia->variants->except($this->getKey())
+            ->keyBy('variant_name');
+        $collection->offsetSet(self::VARIANT_NAME_ORIGINAL, $this->originalMedia);
+
+        return $collection;
+    }
+
+    public function getAllVariantsAndSelf(): Collection
+    {
+        if ($this->isOriginal()) {
+            $collection = $this->variants->keyBy('variant_name');
+            $collection->offsetSet(self::VARIANT_NAME_ORIGINAL, $this);
+            return $collection;
+        }
+
+        // otherwise, get the original's variants, remove this one and add the original
+        $collection = $this->originalMedia->variants->keyBy('variant_name');
+        $collection->offsetSet(self::VARIANT_NAME_ORIGINAL, $this->originalMedia);
+
+        return $collection;
+    }
+
+    public function findVariant(string $variantName): ?Media
+    {
+        $filter = function (Media $media) use ($variantName) {
+            return $media->variant_name === $variantName;
+        };
+
+        if ($this->isOriginal()) {
+            return $this->variants->first($filter);
+        }
+
+        if ($variantName == $this->variant_name) {
+            return $this;
+        }
+
+        return $this->originalMedia->variants->first($filter);
+    }
+
+    public function findOriginal(): Media
+    {
+        if ($this->isOriginal()) {
+            return $this;
+        }
+
+        return $this->originalMedia;
     }
 
     /**
@@ -162,6 +270,19 @@ class Media extends Model
         $query = $q->getQuery();
         if ($query->orders) {
             $query->orders = null;
+        }
+    }
+
+    public function scopeWhereIsOriginal(Builder $q): void
+    {
+        $q->whereNull('original_media_id');
+    }
+
+    public function scopeWhereIsVariant(Builder $q, string $variant_name = null)
+    {
+        $q->whereNotNull('original_media_id');
+        if ($variant_name) {
+            $q->where('variant_name', $variant_name);
         }
     }
 
@@ -261,6 +382,41 @@ class Media extends Model
     }
 
     /**
+     * Verify if the Media is an original file and not a variant
+     * @return bool
+     */
+    public function isOriginal(): bool
+    {
+        return $this->original_media_id === null;
+    }
+
+    /**
+     * Verify if the Media is a variant of another
+     * @return bool
+     */
+    public function isVariant(): bool
+    {
+        return $this->original_media_id !== null;
+    }
+
+    /**
+     * Convert the model into an original.
+     * Detaches the Media for its previous original and other variants
+     * @return $this
+     */
+    public function makeOriginal(): self
+    {
+        if ($this->isOriginal()) {
+            return $this;
+        }
+
+        $this->variant_name = null;
+        $this->original_media_id = null;
+
+        return $this;
+    }
+
+    /**
      * Move the file to a new location on disk.
      *
      * Will invoke the `save()` method on the model after the associated file has been moved to prevent synchronization errors
@@ -272,6 +428,17 @@ class Media extends Model
     public function move(string $destination, string $filename = null): void
     {
         $this->getMediaMover()->move($this, $destination, $filename);
+    }
+
+    /**
+     * Rename the file in place.
+     * @param  string $filename
+     * @return void
+     * @see Media::move()
+     */
+    public function rename(string $filename): void
+    {
+        $this->move($this->directory, $filename);
     }
 
     /**
@@ -324,17 +491,6 @@ class Media extends Model
     protected function getMediaMover(): MediaMover
     {
         return app('mediable.mover');
-    }
-
-    /**
-     * Rename the file in place.
-     * @param  string $filename
-     * @return void
-     * @see Media::move()
-     */
-    public function rename(string $filename): void
-    {
-        $this->move($this->directory, $filename);
     }
 
     protected function handleMediaDeletion(): void

@@ -72,6 +72,10 @@ class ImageManipulator
         $newMedia->mime_type = $this->getMimeTypeForOutputFormat($outputFormat);
         $newMedia->aggregate_type = Media::TYPE_IMAGE;
         $newMedia->size = $outputStream->getSize();
+        $newMedia->variant_name = $variantName;
+        $newMedia->original_media_id = $media->isOriginal()
+            ? $media->getKey()
+            : $media->original_media_id; // attach variants of variants to the same original
 
         if ($beforeSave = $manipulation->getBeforeSave()) {
             $beforeSave($newMedia);

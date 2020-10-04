@@ -22,10 +22,16 @@ class CreateMediableTables extends Migration
             $table->string('mime_type', 128);
             $table->string('aggregate_type', 32);
             $table->integer('size')->unsigned();
+            $table->string('variant_name', 255)->nullable();
+            $table->integer('original_media_id')->unsigned()->nullable();
             $table->timestamps();
 
             $table->unique(['disk', 'directory', 'filename', 'extension']);
             $table->index('aggregate_type');
+
+            $table->foreign('original_media_id')
+                ->references('id')->on('media')
+                ->nullOnDelete();
         });
 
         Schema::create('mediables', function (Blueprint $table) {
@@ -41,7 +47,7 @@ class CreateMediableTables extends Migration
             $table->index('order');
             $table->foreign('media_id')
                 ->references('id')->on('media')
-                ->onDelete('cascade');
+                ->cascadeOnDelete();
         });
     }
 
