@@ -678,6 +678,16 @@ class MediaTest extends TestCase
         $this->assertEquals($media3, $media2->findVariant('bar'));
         $this->assertEquals($media3, $media3->findVariant('bar'));
 
+        $this->assertTrue($media1->hasVariant('foo'));
+        $this->assertTrue($media2->hasVariant('foo'));
+        $this->assertTrue($media3->hasVariant('foo'));
+        $this->assertTrue($media1->hasVariant('bar'));
+        $this->assertTrue($media2->hasVariant('bar'));
+        $this->assertTrue($media3->hasVariant('bar'));
+        $this->assertFalse($media1->hasVariant('original'));
+        $this->assertFalse($media2->hasVariant('original'));
+        $this->assertFalse($media3->hasVariant('original'));
+
         $this->assertEquals(
             new Collection(['foo' => $media2, 'bar' => $media3]),
             $media1->getAllVariants()

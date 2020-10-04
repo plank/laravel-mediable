@@ -2,7 +2,7 @@
 
 namespace Plank\Mediable\Tests\Mocks;
 
-class MockClosure
+class MockCallable
 {
     public function __invoke()
     {

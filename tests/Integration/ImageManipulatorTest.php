@@ -13,15 +13,26 @@ use Plank\Mediable\Tests\TestCase;
 
 class ImageManipulatorTest extends TestCase
 {
+    public function test_it_sets_and_has_variants()
+    {
+        $manipulator = $this->getManipulator();
+        $this->assertFalse($manipulator->hasVariantDefinition('foo'));
+        $manipulator->defineVariant(
+            'foo',
+            new ImageManipulation($this->getMockCallable())
+        );
+        $this->assertTrue($manipulator->hasVariantDefinition('foo'));
+    }
+
     public function test_it_throws_for_non_image_media()
     {
         $this->expectException(ImageManipulationException::class);
         $this->expectErrorMessage(
             "Cannot manipulate media with an aggregate type other than 'image', got 'document'."
         );
-        $this->getManipulator()->createVariant(
-            'variant',
-            $this->makeMedia(['aggregate_type' => 'document'])
+        $this->getManipulator()->createImageVariant(
+            $this->makeMedia(['aggregate_type' => 'document']),
+            'variant'
         );
     }
 
@@ -29,9 +40,9 @@ class ImageManipulatorTest extends TestCase
     {
         $this->expectException(ImageManipulationException::class);
         $this->expectErrorMessage("Unknown variant 'invalid'.");
-        $this->getManipulator()->createVariant(
-            'invalid',
-            $this->makeMedia(['aggregate_type' => 'image'])
+        $this->getManipulator()->createImageVariant(
+            $this->makeMedia(['aggregate_type' => 'image']),
+            'invalid'
         );
     }
 
@@ -54,8 +65,8 @@ class ImageManipulatorTest extends TestCase
         );
         $this->seedFileForMedia($media);
         $manipulator = $this->getManipulator();
-        $manipulator->addVariantManipulation('foo', $manipulation);
-        $manipulator->createVariant('foo', $media);
+        $manipulator->defineVariant('foo', $manipulation);
+        $manipulator->createImageVariant($media, 'foo');
     }
 
     public function test_it_can_create_a_variant()
@@ -75,7 +86,7 @@ class ImageManipulatorTest extends TestCase
         );
         $this->seedFileForMedia($media, $this->sampleFile());
 
-        $beforeSave = $this->getMockCallback();
+        $beforeSave = $this->getMockCallable();
         $beforeSave->expects($this->once())
             ->method('__invoke')
             ->with(
@@ -95,8 +106,8 @@ class ImageManipulatorTest extends TestCase
         )->beforeSave($beforeSave);
 
         $imageManipulator = $this->getManipulator();
-        $imageManipulator->addVariantManipulation('test', $manipulation);
-        $result = $imageManipulator->createVariant('test', $media);
+        $imageManipulator->defineVariant('test', $manipulation);
+        $result = $imageManipulator->createImageVariant($media, 'test');
 
         $this->assertTrue($result->exists);
         $this->assertEquals('tmp', $result->disk);
@@ -137,8 +148,8 @@ class ImageManipulatorTest extends TestCase
         );
 
         $imageManipulator = $this->getManipulator();
-        $imageManipulator->addVariantManipulation('test', $manipulation);
-        $result = $imageManipulator->createVariant('test', $media);
+        $imageManipulator->defineVariant('test', $manipulation);
+        $result = $imageManipulator->createImageVariant($media, 'test');
 
         $this->assertEquals('test', $result->variant_name);
         $this->assertEquals(19, $result->original_media_id);
@@ -183,8 +194,8 @@ class ImageManipulatorTest extends TestCase
         )->setOutputFormat($format)->setOutputQuality($quality);
 
         $imageManipulator = $this->getManipulator();
-        $imageManipulator->addVariantManipulation('test', $manipulation);
-        $result = $imageManipulator->createVariant('test', $media);
+        $imageManipulator->defineVariant('test', $manipulation);
+        $result = $imageManipulator->createImageVariant($media, 'test');
 
         $this->assertEquals($format, $result->extension);
         $this->assertEquals($mime, $result->mime_type);

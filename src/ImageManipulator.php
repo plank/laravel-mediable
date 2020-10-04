@@ -17,7 +17,7 @@ class ImageManipulator
     /**
      * @var ImageManipulation[]
      */
-    private $variantManipulations = [];
+    private $variantDefinitions = [];
 
     /**
      * @var FilesystemManager
@@ -30,26 +30,43 @@ class ImageManipulator
         $this->filesystem = $filesystem;
     }
 
-    public function addVariantManipulation(
+    public function defineVariant(
         string $variantName,
         ImageManipulation $manipulation
     ) {
-        $this->variantManipulations[$variantName] = $manipulation;
+        $this->variantDefinitions[$variantName] = $manipulation;
+    }
+
+    public function hasVariantDefinition(string $variantName): bool
+    {
+        return isset($this->variantDefinitions[$variantName]);
     }
 
     /**
-     * @param ImageManipulation $manipulation
-     * @param Media $media
-     * @return StreamInterface
-     * @throws ImageManipulationException
+     * @param string $variantName
+     * @return ImageManipulation
+     * @throws ImageManipulationException if Variant is not defined
      */
-    public function createVariant(string $variantName, Media $media): Media
+    public function getVariantDefinition(string $variantName): ImageManipulation
     {
-        if ($media->aggregate_type != Media::TYPE_IMAGE) {
-            throw ImageManipulationException::invalidMediaType($media->aggregate_type);
+        if (isset($this->variantDefinitions[$variantName])) {
+            return $this->variantDefinitions[$variantName];
         }
 
-        $manipulation = $this->getVariantManipulation($variantName);
+        throw ImageManipulationException::unknownVariant($variantName);
+    }
+
+    /**
+     * @param Media $media
+     * @param string $variantName
+     * @return Media
+     * @throws ImageManipulationException
+     */
+    public function createImageVariant(Media $media, string $variantName): Media
+    {
+        $this->validateMedia($media);
+
+        $manipulation = $this->getVariantDefinition($variantName);
 
         $outputFormat = $this->determineOutputFormat($manipulation, $media);
         $image = $this->imageManager->make($media->stream());
@@ -89,20 +106,6 @@ class ImageManipulator
         return $newMedia;
     }
 
-    /**
-     * @param string $variantName
-     * @return ImageManipulation
-     * @throws ImageManipulationException
-     */
-    private function getVariantManipulation(string $variantName): ImageManipulation
-    {
-        if (isset($this->variantManipulations[$variantName])) {
-            return $this->variantManipulations[$variantName];
-        }
-
-        throw ImageManipulationException::unknownVariant($variantName);
-    }
-
     private function getMimeTypeForOutputFormat(string $outputFormat): string
     {
         return ImageManipulation::MIME_TYPE_MAP[$outputFormat];
@@ -112,7 +115,7 @@ class ImageManipulator
      * @param ImageManipulation $manipulation
      * @param Media $media
      * @return string
-     * @throws ImageManipulationException
+     * @throws ImageManipulationException If output format cannot be determined
      */
     private function determineOutputFormat(
         ImageManipulation $manipulation,
@@ -142,5 +145,12 @@ class ImageManipulator
         }
 
         throw ImageManipulationException::unknownOutputFormat();
+    }
+
+    public function validateMedia(Media $media)
+    {
+        if ($media->aggregate_type != Media::TYPE_IMAGE) {
+            throw ImageManipulationException::invalidMediaType($media->aggregate_type);
+        }
     }
 }
