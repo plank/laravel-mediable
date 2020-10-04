@@ -167,6 +167,11 @@ class Media extends Model
         return $collection;
     }
 
+    public function hasVariant(string $variantName): bool
+    {
+        return $this->findVariant($variantName) !== null;
+    }
+
     public function findVariant(string $variantName): ?Media
     {
         $filter = function (Media $media) use ($variantName) {

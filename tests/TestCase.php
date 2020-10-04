@@ -8,7 +8,7 @@ use Illuminate\Filesystem\Filesystem;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Plank\Mediable\Media;
 use Plank\Mediable\MediableServiceProvider;
-use Plank\Mediable\Tests\Mocks\MockClosure;
+use Plank\Mediable\Tests\Mocks\MockCallable;
 use ReflectionClass;
 
 class TestCase extends BaseTestCase
@@ -171,8 +171,8 @@ class TestCase extends BaseTestCase
         return factory(Media::class)->create($attributes);
     }
 
-    protected function getMockCallback()
+    protected function getMockCallable()
     {
-        return $this->createPartialMock(MockClosure::class, ['__invoke']);
+        return $this->createPartialMock(MockCallable::class, ['__invoke']);
     }
 }
