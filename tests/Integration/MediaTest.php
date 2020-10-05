@@ -3,6 +3,7 @@
 namespace Plank\Mediable\Tests\Integration;
 
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use Plank\Mediable\Exceptions\MediaMoveException;
 use Plank\Mediable\Media;
@@ -580,12 +581,15 @@ class MediaTest extends TestCase
 
         $this->assertTrue($media->isOriginal());
         $this->assertFalse($media->isVariant());
+        $this->assertFalse($media->isVariant('foo'));
 
         $media->original_media_id = 99;
         $media->variant_name = 'foo';
 
         $this->assertFalse($media->isOriginal());
         $this->assertTrue($media->isVariant());
+        $this->assertTrue($media->isVariant('foo'));
+        $this->assertFalse($media->isVariant('bar'));
 
         $result = $media->makeOriginal();
 
@@ -594,6 +598,54 @@ class MediaTest extends TestCase
         $this->assertFalse($media->isVariant());
         $this->assertNull($media->original_media_id);
         $this->assertNull($media->variant_name);
+        $this->assertFalse($media->isVariant('foo'));
+    }
+
+    public function test_it_can_be_made_a_variant_of_another()
+    {
+        $this->useDatabase();
+
+        $media1 = $this->createMedia(
+            [
+                'original_media_id' => null,
+                'variant_name' => null
+            ]
+        );
+
+        $media2 = $this->createMedia(
+            [
+                'original_media_id' => null,
+                'variant_name' => null
+            ]
+        );
+
+        $media2->makeVariantOf($media1->getKey(), 'foo');
+
+        $this->assertEquals($media1->getKey(), $media2->original_media_id);
+        $this->assertEquals('foo', $media2->variant_name);
+
+        $media2->makeOriginal();
+        $media1->original_media_id = 99;
+
+        $media2->makeVariantOf($media1, 'foo');
+
+        $this->assertEquals(99, $media2->original_media_id);
+        $this->assertEquals('foo', $media2->variant_name);
+    }
+
+    public function test_it_throws_if_cant_find_new_original()
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->useDatabase();
+
+        $media = $this->makeMedia(
+            [
+                'original_media_id' => null,
+                'variant_name' => null
+            ]
+        );
+
+        $media->makeVariantOf(9999, 'not_found');
     }
 
     public function test_it_can_be_queried_by_variant_status()

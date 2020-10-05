@@ -13,6 +13,14 @@ use Plank\Mediable\Tests\TestCase;
 
 class ImageManipulatorTest extends TestCase
 {
+    public function test_it_can_be_accessed_via_facade()
+    {
+        $this->assertInstanceOf(
+            ImageManipulator::class,
+            \Plank\Mediable\Facades\ImageManipulator::getFacadeRoot()
+        );
+    }
+
     public function test_it_sets_and_has_variants()
     {
         $manipulator = $this->getManipulator();

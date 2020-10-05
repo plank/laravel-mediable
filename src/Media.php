@@ -397,11 +397,13 @@ class Media extends Model
 
     /**
      * Verify if the Media is a variant of another
+     * @param string|null $variantName if specified, will check if the model if a specific kind of variant
      * @return bool
      */
-    public function isVariant(): bool
+    public function isVariant(string $variantName = null): bool
     {
-        return $this->original_media_id !== null;
+        return $this->original_media_id !== null
+            && (!$variantName || $this->variant_name === $variantName);
     }
 
     /**
@@ -417,6 +419,20 @@ class Media extends Model
 
         $this->variant_name = null;
         $this->original_media_id = null;
+
+        return $this;
+    }
+
+    public function makeVariantOf($media, string $variantName): self
+    {
+        if (!$media instanceof static) {
+            $media = $this->newQuery()->findOrFail($media);
+        }
+
+        $this->variant_name = $variantName;
+        $this->original_media_id = $media->isOriginal()
+            ? $media->getKey()
+            : $media->original_media_id;
 
         return $this;
     }
