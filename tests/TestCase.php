@@ -31,7 +31,8 @@ class TestCase extends BaseTestCase
     protected function getPackageAliases($app)
     {
         return [
-            'MediaUploader' => 'Plank\Mediable\MediaUploaderFacade',
+            'MediaUploader' => \Plank\Mediable\Facades\MediaUploader::class,
+            'ImageManipulator' => \Plank\Mediable\Facades\ImageManipulator::class,
         ];
     }
 

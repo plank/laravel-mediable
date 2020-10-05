@@ -5,7 +5,6 @@ namespace Plank\Mediable;
 use Illuminate\Filesystem\FilesystemManager;
 use Intervention\Image\ImageManager;
 use Plank\Mediable\Exceptions\ImageManipulationException;
-use Psr\Http\Message\StreamInterface;
 
 class ImageManipulator
 {

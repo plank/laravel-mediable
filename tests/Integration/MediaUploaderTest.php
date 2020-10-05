@@ -10,7 +10,7 @@ use Plank\Mediable\Exceptions\MediaUpload\FileSizeException;
 use Plank\Mediable\Exceptions\MediaUpload\ForbiddenException;
 use Plank\Mediable\Media;
 use Plank\Mediable\MediaUploader;
-use Plank\Mediable\MediaUploaderFacade as Facade;
+use Plank\Mediable\Facades\MediaUploader as Facade;
 use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
 use Plank\Mediable\Stream;
 use Plank\Mediable\Tests\Mocks\MediaSubclass;
