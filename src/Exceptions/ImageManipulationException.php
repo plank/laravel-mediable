@@ -25,4 +25,9 @@ class ImageManipulationException extends \Exception
             "Unable to determine valid output format for file."
         );
     }
+
+    public static function fileExists(string $path): self
+    {
+        return new static("A file already exists at `{$path}`.");
+    }
 }

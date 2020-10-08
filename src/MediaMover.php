@@ -6,6 +6,7 @@ namespace Plank\Mediable;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\FilesystemManager;
 use Plank\Mediable\Exceptions\MediaMoveException;
+use Plank\Mediable\Helpers\File;
 
 /**
  * Media Mover Class.
@@ -41,8 +42,7 @@ class MediaMover
         $storage = $this->filesystem->disk($media->disk);
 
         $filename = $this->cleanFilename($media, $filename);
-
-        $directory = trim($directory, '/');
+        $directory = File::sanitizePath($directory);
         $targetPath = $directory . '/' . $filename . '.' . $media->extension;
 
         if ($storage->has($targetPath)) {
@@ -78,7 +78,7 @@ class MediaMover
         $targetStorage = $this->filesystem->disk($disk);
 
         $filename = $this->cleanFilename($media, $filename);
-        $directory = trim($directory, '/');
+        $directory = File::sanitizePath($directory);
         $targetPath = $directory . '/' . $filename . '.' . $media->extension;
 
         if ($targetStorage->has($targetPath)) {
@@ -116,8 +116,8 @@ class MediaMover
         $storage = $this->filesystem->disk($media->disk);
 
         $filename = $this->cleanFilename($media, $filename);
+        $directory = File::sanitizePath($directory);
 
-        $directory = trim($directory, '/');
         $targetPath = $directory . '/' . $filename . '.' . $media->extension;
 
         if ($storage->has($targetPath)) {
@@ -164,7 +164,7 @@ class MediaMover
         $targetStorage = $this->filesystem->disk($disk);
 
         $filename = $this->cleanFilename($media, $filename);
-        $directory = trim($directory, '/');
+        $directory = File::sanitizePath($directory);
         $targetPath = $directory . '/' . $filename . '.' . $media->extension;
 
         if ($targetStorage->has($targetPath)) {
@@ -193,7 +193,9 @@ class MediaMover
     protected function cleanFilename(Media $media, ?string $filename): string
     {
         if ($filename) {
-            return $this->removeExtensionFromFilename($filename, $media->extension);
+            return File::sanitizeFileName(
+                $this->removeExtensionFromFilename($filename, $media->extension)
+            );
         }
 
         return $media->filename;

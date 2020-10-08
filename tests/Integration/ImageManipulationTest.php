@@ -9,14 +9,14 @@ class ImageManipulationTest extends TestCase
 {
     public function test_can_get_set_manipulation_callback()
     {
-        $callback = $this->getCallback();
+        $callback = $this->getMockCallable();
         $manipulation = new ImageManipulation($callback);
         $this->assertSame($callback, $manipulation->getCallback());
     }
 
     public function test_can_get_set_output_quality()
     {
-        $manipulation = new ImageManipulation($this->getCallback());
+        $manipulation = new ImageManipulation($this->getMockCallable());
         $this->assertEquals(90, $manipulation->getOutputQuality());
         $manipulation->setOutputQuality(-100);
         $this->assertEquals(0, $manipulation->getOutputQuality());
@@ -28,37 +28,82 @@ class ImageManipulationTest extends TestCase
 
     public function test_can_get_set_output_format()
     {
-        $manipulation = new ImageManipulation($this->getCallback());
+        $manipulation = new ImageManipulation($this->getMockCallable());
         $this->assertNull($manipulation->getOutputFormat());
         $manipulation->setOutputFormat('jpg');
         $this->assertEquals('jpg', $manipulation->getOutputFormat());
-        $manipulation->toBmpFormat();
+        $manipulation->outputBmpFormat();
         $this->assertEquals('bmp', $manipulation->getOutputFormat());
-        $manipulation->toGifFormat();
+        $manipulation->outputGifFormat();
         $this->assertEquals('gif', $manipulation->getOutputFormat());
-        $manipulation->toPngFormat();
+        $manipulation->outputPngFormat();
         $this->assertEquals('png', $manipulation->getOutputFormat());
-        $manipulation->toTiffFormat();
+        $manipulation->outputTiffFormat();
         $this->assertEquals('tif', $manipulation->getOutputFormat());
-        $manipulation->toWebpFormat();
+        $manipulation->outputWebpFormat();
         $this->assertEquals('webp', $manipulation->getOutputFormat());
-        $manipulation->toJpegFormat();
+        $manipulation->outputJpegFormat();
         $this->assertEquals('jpg', $manipulation->getOutputFormat());
     }
 
     public function test_can_get_set_before_save_callback()
     {
-        $callback = $this->getCallback();
-        $manipulation = new ImageManipulation($this->getCallback());
+        $callback = $this->getMockCallable();
+        $manipulation = new ImageManipulation($this->getMockCallable());
 
         $this->assertNull($manipulation->getBeforeSave());
         $manipulation->beforeSave($callback);
         $this->assertSame($callback, $manipulation->getBeforeSave());
     }
 
-    private function getCallback()
+    public function test_destination_setters()
     {
-        return function () {
-        };
+        $manipulation = new ImageManipulation($this->getMockCallable());
+
+        $this->assertNull($manipulation->getDisk());
+        $this->assertNull($manipulation->getDirectory());
+        $this->assertNull($manipulation->getFilename());
+        $this->assertFalse($manipulation->usingHashForFilename());
+
+        $manipulation->toDisk('tmp');
+        $this->assertEquals('tmp', $manipulation->getDisk());
+
+        $manipulation->toDirectory('bar');
+        $this->assertEquals('bar', $manipulation->getDirectory());
+
+        $manipulation->toDestination('uploads', 'bat');
+        $this->assertEquals('uploads', $manipulation->getDisk());
+        $this->assertEquals('bat', $manipulation->getDirectory());
+
+        $manipulation->useFilename('potato');
+        $this->assertEquals('potato', $manipulation->getFilename());
+        $this->assertFalse($manipulation->usingHashForFilename());
+
+        $manipulation->useHashForFilename();
+        $this->assertNull($manipulation->getFilename());
+        $this->assertTrue($manipulation->usingHashForFilename());
+
+        $manipulation->useOriginalFilename();
+        $this->assertNull($manipulation->getFilename());
+        $this->assertFalse($manipulation->usingHashForFilename());
+    }
+
+    public function test_get_duplicate_behaviours()
+    {
+        $manipulation = new ImageManipulation($this->getMockCallable());
+        $this->assertEquals(
+            ImageManipulation::ON_DUPLICATE_INCREMENT,
+            $manipulation->getOnDuplicateBehaviour()
+        );
+        $manipulation->onDuplicateError();
+        $this->assertEquals(
+            ImageManipulation::ON_DUPLICATE_ERROR,
+            $manipulation->getOnDuplicateBehaviour()
+        );
+        $manipulation->onDuplicateIncrement();
+        $this->assertEquals(
+            ImageManipulation::ON_DUPLICATE_INCREMENT,
+            $manipulation->getOnDuplicateBehaviour()
+        );
     }
 }

@@ -163,7 +163,7 @@ class MediaUploader
      */
     public function toDirectory(string $directory): self
     {
-        $this->directory = trim($this->sanitizePath($directory), DIRECTORY_SEPARATOR);
+        $this->directory = File::sanitizePath($directory);
 
         return $this;
     }
@@ -175,7 +175,7 @@ class MediaUploader
      */
     public function useFilename(string $filename): self
     {
-        $this->filename = $this->sanitizeFilename($filename);
+        $this->filename = File::sanitizeFilename($filename);
         $this->hashFilename = false;
 
         return $this;
@@ -818,7 +818,6 @@ class MediaUploader
         switch ($this->config['on_duplicate'] ?? MediaUploader::ON_DUPLICATE_INCREMENT) {
             case static::ON_DUPLICATE_ERROR:
                 throw FileExistsException::fileExists($model->getDiskPath());
-                break;
             case static::ON_DUPLICATE_REPLACE:
                 $this->deleteExistingMedia($model);
                 break;
@@ -902,7 +901,7 @@ class MediaUploader
             return $this->generateHash();
         }
 
-        return $this->sanitizeFileName($this->source->filename());
+        return File::sanitizeFileName($this->source->filename());
     }
 
     /**
@@ -923,25 +922,7 @@ class MediaUploader
         return hash_final($ctx);
     }
 
-    /**
-     * Remove any disallowed characters from a directory value.
-     * @param  string $path
-     * @return string
-     */
-    private function sanitizePath(string $path): string
-    {
-        return str_replace(['#', '?', '\\'], '-', $path);
-    }
 
-    /**
-     * Remove any disallowed characters from a filename.
-     * @param  string $file
-     * @return string
-     */
-    private function sanitizeFileName(string $file): string
-    {
-        return str_replace(['#', '?', '\\', '/'], '-', $file);
-    }
 
     private function writeToDisk(Media $model): void
     {

@@ -27,4 +27,20 @@ class FileTest extends TestCase
     {
         $this->assertEquals('png', File::guessExtension('image/png'));
     }
+
+    public function test_it_sanitizes_filenames()
+    {
+        $this->assertEquals(
+            'hello-world-what-s_new-with.you',
+            File::sanitizeFileName("héllo/world! \\  \t whàt\'ς_new with.you?")
+        );
+    }
+
+    public function test_it_sanitizes_paths()
+    {
+        $this->assertEquals(
+            'hello/world-what-s_new-with.you',
+            File::sanitizePath("/héllo/world! \\  \t whàt\'ς_new with.you??")
+        );
+    }
 }
