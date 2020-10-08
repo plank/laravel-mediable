@@ -5,6 +5,7 @@ namespace Plank\Mediable;
 use Illuminate\Filesystem\FilesystemManager;
 use Intervention\Image\ImageManager;
 use Plank\Mediable\Exceptions\ImageManipulationException;
+use Psr\Http\Message\StreamInterface;
 
 class ImageManipulator
 {
@@ -58,12 +59,36 @@ class ImageManipulator
     /**
      * @param Media $media
      * @param string $variantName
+     * @param bool $forceRecreate
      * @return Media
      * @throws ImageManipulationException
+     * @throws \Illuminate\Contracts\Filesystem\FileExistsException
      */
-    public function createImageVariant(Media $media, string $variantName): Media
-    {
+    public function createImageVariant(
+        Media $media,
+        string $variantName,
+        bool $forceRecreate = false
+    ): Media {
         $this->validateMedia($media);
+
+        $modelClass = config('mediable.model');
+        /** @var Media $variant */
+        $variant = new $modelClass();
+        $recreating = false;
+        $originalVariant = null;
+
+        // don't recreate if that variant already exists for the model
+        if ($media->hasVariant($variantName)) {
+            $variant = $media->findVariant($variantName);
+            if ($forceRecreate) {
+                // replace the existing variant
+                $recreating = true;
+                $originalVariant = clone $variant;
+            } else {
+                // variant already exists, nothing more to do
+                return $variant;
+            }
+        }
 
         $manipulation = $this->getVariantDefinition($variantName);
 
@@ -78,31 +103,43 @@ class ImageManipulator
             $manipulation->getOutputQuality()
         );
 
-        $modelClass = config('mediable.model');
-        /** @var Media $newMedia */
-        $newMedia = new $modelClass();
-        $newMedia->disk = $media->disk;
-        $newMedia->directory = $media->directory;
-        $newMedia->filename = sprintf('%s-%s', $media->filename, $variantName);
-        $newMedia->extension = $outputFormat;
-        $newMedia->mime_type = $this->getMimeTypeForOutputFormat($outputFormat);
-        $newMedia->aggregate_type = Media::TYPE_IMAGE;
-        $newMedia->size = $outputStream->getSize();
-        $newMedia->variant_name = $variantName;
-        $newMedia->original_media_id = $media->isOriginal()
+        $variant->variant_name = $variantName;
+        $variant->original_media_id = $media->isOriginal()
             ? $media->getKey()
             : $media->original_media_id; // attach variants of variants to the same original
 
+        $variant->disk = $manipulation->getDisk() ?? $media->disk;
+        $variant->directory = $manipulation->getDirectory() ?? $media->directory;
+        $variant->filename = $this->determineFilename(
+            $media->findOriginal(),
+            $manipulation,
+            $variant,
+            $outputStream
+        );
+        $variant->extension = $outputFormat;
+        $variant->mime_type = $this->getMimeTypeForOutputFormat($outputFormat);
+        $variant->aggregate_type = Media::TYPE_IMAGE;
+        $variant->size = $outputStream->getSize();
+
+        $this->checkForDuplicates($variant, $manipulation, $originalVariant);
         if ($beforeSave = $manipulation->getBeforeSave()) {
-            $beforeSave($newMedia);
+            $beforeSave($variant, $originalVariant);
+            // destination may have been changed, check for duplicates again
+            $this->checkForDuplicates($variant, $manipulation, $originalVariant);
         }
 
-        $this->filesystem->disk($newMedia->disk)
-            ->writeStream($newMedia->getDiskPath(), $outputStream->detach());
+        if ($recreating) {
+            // delete the original file for that variant
+            $this->filesystem->disk($originalVariant->disk)
+                ->delete($originalVariant->getDiskPath());
+        }
 
-        $newMedia->save();
+        $this->filesystem->disk($variant->disk)
+            ->writeStream($variant->getDiskPath(), $outputStream->detach());
 
-        return $newMedia;
+        $variant->save();
+
+        return $variant;
     }
 
     private function getMimeTypeForOutputFormat(string $outputFormat): string
@@ -146,10 +183,89 @@ class ImageManipulator
         throw ImageManipulationException::unknownOutputFormat();
     }
 
+    public function determineFilename(
+        Media $originalMedia,
+        ImageManipulation $manipulation,
+        Media $variant,
+        StreamInterface $stream
+    ): string {
+        if ($filename = $manipulation->getFilename()) {
+            return $filename;
+        }
+
+        if ($manipulation->usingHashForFilename()) {
+            return $this->getHashFromStream($stream);
+        }
+        return sprintf('%s-%s', $originalMedia->filename, $variant->variant_name);
+    }
+
     public function validateMedia(Media $media)
     {
         if ($media->aggregate_type != Media::TYPE_IMAGE) {
             throw ImageManipulationException::invalidMediaType($media->aggregate_type);
         }
+    }
+
+    private function getHashFromStream(StreamInterface $stream): string
+    {
+        $stream->rewind();
+        $hash = hash_init('md5');
+        while ($chunk = $stream->read(64)) {
+            hash_update($hash, $chunk);
+        }
+        $filename = hash_final($hash);
+        $stream->rewind();
+
+        return $filename;
+    }
+
+    private function checkForDuplicates(
+        Media $variant,
+        ImageManipulation $manipulation,
+        Media $originalVariant = null
+    ) {
+        if ($originalVariant
+            && $variant->disk === $originalVariant->disk
+            && $variant->getDiskPath() === $originalVariant->getDiskPath()
+        ) {
+            // same as the original, no conflict as we are going to replace the file anyways
+            return;
+        }
+
+        if (!$this->filesystem->disk($variant->disk)->has($variant->getDiskPath())) {
+            // no conflict, carry on
+            return;
+        }
+
+        switch ($manipulation->getOnDuplicateBehaviour()) {
+            case ImageManipulation::ON_DUPLICATE_ERROR:
+                throw ImageManipulationException::fileExists($variant->getDiskPath());
+
+            case ImageManipulation::ON_DUPLICATE_INCREMENT:
+            default:
+                $variant->filename = $this->generateUniqueFilename($variant);
+                break;
+        }
+    }
+
+    /**
+     * Increment model's filename until one is found that doesn't already exist.
+     * @param Media $model
+     * @return string
+     */
+    private function generateUniqueFilename(Media $model): string
+    {
+        $storage = $this->filesystem->disk($model->disk);
+        $counter = 0;
+        do {
+            $filename = "{$model->filename}";
+            if ($counter > 0) {
+                $filename .= '-' . $counter;
+            }
+            $path = "{$model->directory}/{$filename}.{$model->extension}";
+            ++$counter;
+        } while ($storage->has($path));
+
+        return $filename;
     }
 }

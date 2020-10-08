@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Plank\Mediable\Helpers;
 
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
 use Symfony\Component\Mime\MimeTypes;
 
@@ -21,6 +22,32 @@ class File
         }
 
         return trim($dirname, '/');
+    }
+
+    /**
+     * Remove any disallowed characters from a directory value.
+     * @param  string $path
+     * @return string
+     */
+    public static function sanitizePath(string $path): string
+    {
+        return trim(
+            preg_replace('/[^a-zA-Z0-9-_\/.%]+/', '-', Str::ascii($path)),
+            DIRECTORY_SEPARATOR . '-'
+        );
+    }
+
+    /**
+     * Remove any disallowed characters from a filename.
+     * @param  string $file
+     * @return string
+     */
+    public static function sanitizeFileName(string $file): string
+    {
+        return trim(
+            preg_replace('/[^a-zA-Z0-9-_.%]+/', '-', Str::ascii($file)),
+            '-'
+        );
     }
 
     /**
@@ -59,6 +86,10 @@ class File
         }
 
         // fall back to the older ExtensionGuesser class (deprecated since Symfony 4.3)
-        return ExtensionGuesser::getInstance()->guess($mimeType);
+        if (class_exists(ExtensionGuesser::class)) {
+            return ExtensionGuesser::getInstance()->guess($mimeType);
+        }
+
+        return null;
     }
 }

@@ -186,7 +186,11 @@ class Media extends Model
             return $this;
         }
 
-        return $this->originalMedia->variants->first($filter);
+        if ($this->originalMedia) {
+            return $this->originalMedia->variants->first($filter);
+        }
+
+        return null;
     }
 
     public function findOriginal(): Media

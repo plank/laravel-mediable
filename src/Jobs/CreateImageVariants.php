@@ -25,18 +25,24 @@ class CreateImageVariants implements ShouldQueue
     private $model;
 
     /**
+     * @var bool
+     */
+    private $forceRecreate;
+
+    /**
      * CreateImageVariants constructor.
      * @param Media $model
      * @param string|string[] $variantNames
      * @throws ImageManipulationException
      */
-    public function __construct(Media $model, $variantNames)
+    public function __construct(Media $model, $variantNames, bool $forceRecreate = false)
     {
         $variantNames = (array) $variantNames;
         $this->validate($model, $variantNames);
 
         $this->variantNames = $variantNames;
         $this->model = $model;
+        $this->forceRecreate = $forceRecreate;
     }
 
     public function handle()
@@ -44,7 +50,8 @@ class CreateImageVariants implements ShouldQueue
         foreach ($this->getVariantNames() as $variantName) {
             $this->getImageManipulator()->createImageVariant(
                 $this->getModel(),
-                $variantName
+                $variantName,
+                $this->getForceRecreate()
             );
         }
     }
@@ -82,5 +89,13 @@ class CreateImageVariants implements ShouldQueue
     private function getImageManipulator(): ImageManipulator
     {
         return app(ImageManipulator::class);
+    }
+
+    /**
+     * @return bool
+     */
+    public function getForceRecreate(): bool
+    {
+        return $this->forceRecreate;
     }
 }

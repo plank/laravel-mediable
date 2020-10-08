@@ -78,12 +78,12 @@ The ImageManipulation class also offers a fluent interface for defining how the 
 ::
 
     <?php
-    $manipulation->toJpegFormat();
-    $manipulation->toPngFormat();
-    $manipulation->toGifFormat();
-    $manipulation->toTiffFormat();
-    $manipulation->toBmpFormat();
-    $manipulation->toWebpFormat();
+    $manipulation->outputJpegFormat();
+    $manipulation->outputPngFormat();
+    $manipulation->outputGifFormat();
+    $manipulation->outputTiffFormat();
+    $manipulation->outputBmpFormat();
+    $manipulation->outputWebpFormat();
     $manipulation->setOutputFormat($format);
 
 If outputting to JPEG format, it is also possible to set the desired level of lossy compression, from 0 (low quality, smaller file size) to 100 (high quality, larger file size). Defaults to 90. This value is ignored by other formats.
@@ -91,18 +91,43 @@ If outputting to JPEG format, it is also possible to set the desired level of lo
 ::
 
     <?php
-    $manipulation->toJpegFormat()->setOutputQuality(50);
+    $manipulation->outputJpegFormat()->setOutputQuality(50);
 
 
 .. note::
     Intervention/image requires different dependency libraries to be installed in order to output different format. Review the `intervention image documentation <http://image.intervention.io/getting_started/formats>`_ for more details.
 
+Output Destination
+^^^^^^^^^^^^^^^^^^
+
+By default, variants will be created in the same disk and directory as the original file, with a filename that includes the variant name as as suffix. You can choose to customize the output disk, directory and filename.
+
+..
+
+    <?php
+    $manipulator->toDisk('uploads');
+    $manipulator->toDirectory('files/variants');
+
+    // shorthand for the above
+    $manipulator->toDestination('uploads', 'files/variants');
+
+    $manipulator->useFilename('my-custom-filename');
+    $manipulator->useHashForFilename();
+    $manipulator->useOriginalFilename(); //restore default behaviour
+
+If another file exists at the output destination, the ImageManipulator will attempt to find a unique filename by appending an incrementing number. This can be configured to throw an exception instead if a conflict is discovered.
+
+::
+
+    <?php
+    $manipulator->onDuplicateIncrement(); // default behaviour
+    $manipulator->onDuplicateError();
+
+
 Before Save Callback
 ^^^^^^^^^^^^^^^^^^^^
 
-You can specify a callback which will be invoked after the image manipulation is processed, but before the file is written to disk and a ``Media`` record is written to the database. The callback will be passed the populated ``Media`` record, which can be modified.
-
-By default, variants will be created in the same disk and directory as the original file, with a filename that includes the variant name as the suffix. However, these fields can be modified using this callback, which will change the output destination. The callback can also be used to set additional fields.
+You can specify a callback which will be invoked after the image manipulation is processed, but before the file is written to disk and a ``Media`` record is written to the database. The callback will be passed the populated ``Media`` record, which can be modified. This can also be used to set additional fields.
 
 ::
 
@@ -111,6 +136,8 @@ By default, variants will be created in the same disk and directory as the origi
         $media->directory = 'thumbnails';
         $media->someOtherField = 'potato';
     });
+
+.. note:: Modifying the disk, directory, filename, or extension fields will cause the output destination to be changed accordingly. Duplicates will be checked again against the new location.
 
 Creating Variants
 -----------------
@@ -134,6 +161,18 @@ Depending on the size of the files and the nature of the manipulations, creating
 
     CreateImageVariants::dispatch($media, ['square', 'bw-square']);
 
+Recreating Variants
+^^^^^^^^^^^^^^^^^^^
+
+If a variant with the requested variant name already exists for the provided media, the ``ImageManipulator`` will skip over it. If you need to regenerate a variant (e.g. because the manipulations changed), you can tell the ``ImageManipulator`` to recreate the variant by passing an additional ``$forceRecreate`` parameter.
+
+::
+
+    <?php
+    $variantMedia = ImageManipulator::createImageVariant($originalMedia, 'thumbnail', true);
+    CreateImageVariants::dispatch($media, ['square', 'bw-square'], true);
+
+Doing so will cause the original file to be deleted, and a new one created at the specified output destination. The variant record will retain its primary key and any associations, but it attributes will be updated as necessary
 
 Using Variants
 --------------

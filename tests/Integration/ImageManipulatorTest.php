@@ -68,6 +68,7 @@ class ImageManipulatorTest extends TestCase
                 'disk' => 'tmp',
                 'filename' => 'foo',
                 'extension' => 'psd',
+                'mime_type' => 'image/vnd.adobe.photoshop',
                 'aggregate_type' => 'image'
             ]
         );
@@ -89,6 +90,7 @@ class ImageManipulatorTest extends TestCase
                 'directory' => 'foo',
                 'filename' => 'bar',
                 'extension' => 'png',
+                'mime_type' => 'image/png',
                 'aggregate_type' => 'image'
             ]
         );
@@ -135,16 +137,19 @@ class ImageManipulatorTest extends TestCase
         $this->useFilesystem('tmp');
         $this->useDatabase();
 
-        $media = $this->makeMedia(
+        $originalMedia = $this->createMedia(['filename' => 'bar']);
+
+        $media = $this->createMedia(
             [
                 'id' => 20,
                 'disk' => 'tmp',
                 'directory' => 'foo',
-                'filename' => 'bar',
+                'filename' => 'bar-other',
                 'extension' => 'png',
+                'mime_type' => 'image/png',
                 'aggregate_type' => 'image',
                 'variant_name' => 'other',
-                'original_media_id' => 19
+                'original_media_id' => $originalMedia->getKey()
             ]
         );
         $this->seedFileForMedia($media, $this->sampleFile());
@@ -159,8 +164,9 @@ class ImageManipulatorTest extends TestCase
         $imageManipulator->defineVariant('test', $manipulation);
         $result = $imageManipulator->createImageVariant($media, 'test');
 
+        $this->assertEquals('bar-test', $result->filename);
         $this->assertEquals('test', $result->variant_name);
-        $this->assertEquals(19, $result->original_media_id);
+        $this->assertEquals($originalMedia->getKey(), $result->original_media_id);
         $this->assertTrue($media->fileExists());
     }
 
@@ -190,6 +196,7 @@ class ImageManipulatorTest extends TestCase
                 'directory' => 'foo',
                 'filename' => 'bar',
                 'extension' => 'png',
+                'mime_type' => 'image/png',
                 'aggregate_type' => 'image'
             ]
         );
@@ -209,6 +216,368 @@ class ImageManipulatorTest extends TestCase
         $this->assertEquals($mime, $result->mime_type);
         $this->assertEquals('image', $result->aggregate_type);
         $this->assertTrue($media->fileExists());
+    }
+
+    public function test_it_can_output_to_custom_destination()
+    {
+        $this->useFilesystem('tmp');
+        $this->useFilesystem('uploads');
+        $this->useDatabase();
+
+        $media = $this->makeMedia(
+            [
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'extension' => 'png',
+                'mime_type' => 'image/png',
+                'aggregate_type' => 'image'
+            ]
+        );
+        $this->seedFileForMedia($media, $this->sampleFile());
+
+        $manipulation = ImageManipulation::make(
+            function (Image $image) {
+                $image->resize(16, 16);
+            }
+        )->toDestination('uploads', 'potato')->useFilename('onion');
+
+        $imageManipulator = $this->getManipulator();
+        $imageManipulator->defineVariant('test', $manipulation);
+        $result = $imageManipulator->createImageVariant($media, 'test');
+
+        $this->assertEquals('uploads', $result->disk);
+        $this->assertEquals('potato', $result->directory);
+        $this->assertEquals('onion', $result->filename);
+        $this->assertTrue($media->fileExists());
+    }
+
+    public function test_it_can_output_to_hash_filename()
+    {
+        $this->useFilesystem('tmp');
+        $this->useFilesystem('uploads');
+        $this->useDatabase();
+
+        $media = $this->makeMedia(
+            [
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'extension' => 'png',
+                'mime_type' => 'image/png',
+                'aggregate_type' => 'image'
+            ]
+        );
+        $this->seedFileForMedia($media, $this->sampleFile());
+
+        $manipulation = ImageManipulation::make(
+            function (Image $image) {
+                $image->resize(16, 16);
+            }
+        )->toDisk('uploads')
+            ->toDirectory('potato')
+            ->useHashForFilename();
+
+        $imageManipulator = $this->getManipulator();
+        $imageManipulator->defineVariant('test', $manipulation);
+        $result = $imageManipulator->createImageVariant($media, 'test');
+
+        $this->assertEquals('uploads', $result->disk);
+        $this->assertEquals('potato', $result->directory);
+        $this->assertSame(1, preg_match('/^[a-f0-9]{32}$/', $result->filename));
+        $this->assertTrue($media->fileExists());
+    }
+
+    public function test_it_errors_on_duplicate()
+    {
+        $this->expectException(ImageManipulationException::class);
+        $this->useFilesystem('tmp');
+        $this->useDatabase();
+
+        $media = $this->makeMedia(
+            [
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar-test',
+                'extension' => 'png',
+                'mime_type' => 'image/png',
+                'aggregate_type' => 'image'
+            ]
+        );
+        $this->seedFileForMedia($media, $this->sampleFile());
+        $media->filename = 'bar';
+        $this->seedFileForMedia($media, $this->sampleFile());
+
+        $manipulation = ImageManipulation::make(
+            function (Image $image) {
+                $image->resize(16, 16);
+            }
+        )->onDuplicateError();
+
+        $imageManipulator = $this->getManipulator();
+        $imageManipulator->defineVariant('test', $manipulation);
+        $imageManipulator->createImageVariant($media, 'test');
+    }
+
+    public function test_it_errors_on_duplicate_after_before_save()
+    {
+        $this->expectException(ImageManipulationException::class);
+        $this->useFilesystem('tmp');
+        $this->useDatabase();
+
+        $media = $this->makeMedia(
+            [
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'extension' => 'png',
+                'mime_type' => 'image/png',
+                'aggregate_type' => 'image'
+            ]
+        );
+        $this->seedFileForMedia($media, $this->sampleFile());
+
+        $manipulation = ImageManipulation::make(
+            function (Image $image) {
+                $image->resize(16, 16);
+            }
+        )->onDuplicateError()
+            ->beforeSave(
+                function (Media $variant) {
+                    $variant->filename = 'bar';
+                }
+            );
+
+        $imageManipulator = $this->getManipulator();
+        $imageManipulator->defineVariant('test', $manipulation);
+        $imageManipulator->createImageVariant($media, 'test');
+    }
+
+    public function test_it_increments_on_duplicate()
+    {
+        $this->useFilesystem('tmp');
+        $this->useDatabase();
+
+        $media = $this->makeMedia(
+            [
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar-test',
+                'extension' => 'png',
+                'mime_type' => 'image/png',
+                'aggregate_type' => 'image'
+            ]
+        );
+        $this->seedFileForMedia($media, $this->sampleFile());
+        $media->filename = 'bar-test-1';
+        $this->seedFileForMedia($media, $this->sampleFile());
+        $media->filename = 'bar';
+        $this->seedFileForMedia($media, $this->sampleFile());
+
+        $manipulation = ImageManipulation::make(
+            function (Image $image) {
+                $image->resize(16, 16);
+            }
+        )->onDuplicateIncrement();
+
+        $imageManipulator = $this->getManipulator();
+        $imageManipulator->defineVariant('test', $manipulation);
+        $result = $imageManipulator->createImageVariant($media, 'test');
+
+        $this->assertEquals('bar-test-2', $result->filename);
+    }
+
+    public function test_it_increments_on_duplicate_after_before_save()
+    {
+        $this->useFilesystem('tmp');
+        $this->useDatabase();
+
+        $media = $this->makeMedia(
+            [
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'extension' => 'png',
+                'mime_type' => 'image/png',
+                'aggregate_type' => 'image'
+            ]
+        );
+        $this->seedFileForMedia($media, $this->sampleFile());
+
+        $manipulation = ImageManipulation::make(
+            function (Image $image) {
+                $image->resize(16, 16);
+            }
+        )->onDuplicateIncrement()
+            ->beforeSave(
+                function (Media $variant) {
+                    $variant->filename = 'bar';
+                }
+            );
+
+        $imageManipulator = $this->getManipulator();
+        $imageManipulator->defineVariant('test', $manipulation);
+        $result = $imageManipulator->createImageVariant($media, 'test');
+
+        $this->assertEquals('bar-1', $result->filename);
+    }
+
+    public function test_it_skips_existing_variants()
+    {
+        $this->useFilesystem('tmp');
+        $this->useDatabase();
+
+        $originalMedia = $this->createMedia(
+            [
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'aggregate_type' => 'image'
+            ]
+        );
+        $previousVariant = $this->createMedia(
+            [
+                'disk' => 'uploads',
+                'directory' => 'foo',
+                'filename' => 'bar-test',
+                'aggregate_type' => 'image',
+                'variant_name' => 'test',
+                'original_media_id' => $originalMedia->getKey()
+            ]
+        );
+
+        $manipulation = ImageManipulation::make(
+            function (Image $image) {
+                $image->resize(16, 16);
+            }
+        );
+
+        $imageManipulator = $this->getManipulator();
+        $imageManipulator->defineVariant('test', $manipulation);
+
+        // from original
+        $result = $imageManipulator->createImageVariant($originalMedia, 'test');
+        $this->assertEquals($previousVariant->getKey(), $result->getKey());
+        $this->assertEquals($previousVariant->filename, $result->filename);
+        $this->assertEquals($previousVariant->variant_name, $result->variant_name);
+        $this->assertEquals(
+            $previousVariant->original_media_id,
+            $result->original_media_id
+        );
+
+        //from variant
+        $result = $imageManipulator->createImageVariant($previousVariant, 'test');
+        $this->assertEquals($previousVariant->getKey(), $result->getKey());
+        $this->assertEquals($previousVariant->filename, $result->filename);
+        $this->assertEquals($previousVariant->variant_name, $result->variant_name);
+        $this->assertEquals(
+            $previousVariant->original_media_id,
+            $result->original_media_id
+        );
+    }
+
+    public function test_it_can_recreate_an_existing_variant()
+    {
+        $this->useFilesystem('tmp');
+        $this->useDatabase();
+
+        $originalMedia = $this->createMedia(
+            [
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'extension' => 'png',
+                'mime_type' => 'image/png',
+                'aggregate_type' => 'image'
+            ]
+        );
+        $this->seedFileForMedia($originalMedia, $this->sampleFile());
+        $previousVariant = $this->createMedia(
+            [
+                'disk' => 'uploads',
+                'directory' => 'foo',
+                'filename' => 'bar-test',
+                'extension' => 'png',
+                'mime_type' => 'image/png',
+                'aggregate_type' => 'image',
+                'variant_name' => 'test',
+                'size' => 0,
+                'original_media_id' => $originalMedia->getKey()
+            ]
+        );
+        $this->seedFileForMedia($previousVariant);
+
+        $manipulation = ImageManipulation::make(
+            function (Image $image) {
+                $image->resize(16, 16);
+            }
+        );
+
+        $imageManipulator = $this->getManipulator();
+        $imageManipulator->defineVariant('test', $manipulation);
+
+        // from original
+        $result = $imageManipulator->createImageVariant($originalMedia, 'test', true);
+        $this->assertEquals($previousVariant->getKey(), $result->getKey());
+        $this->assertGreaterThan(0, $result->size);
+
+        $this->seedFileForMedia($previousVariant, $this->sampleFile());
+
+        $result2 = $imageManipulator->createImageVariant($previousVariant, 'test', true);
+        $this->assertEquals($previousVariant->getKey(), $result2->getKey());
+        $this->assertEquals($result->size, $result2->size);
+    }
+
+    public function test_it_can_recreate_existing_variant_to_a_new_destination()
+    {
+        $this->useFilesystem('tmp');
+        $this->useFilesystem('uploads');
+        $this->useDatabase();
+
+        $originalMedia = $this->createMedia(
+            [
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'extension' => 'png',
+                'mime_type' => 'image/png',
+                'aggregate_type' => 'image'
+            ]
+        );
+        $this->seedFileForMedia($originalMedia, $this->sampleFile());
+        $previousVariant = $this->createMedia(
+            [
+                'disk' => 'uploads',
+                'directory' => 'foo',
+                'filename' => 'bar-test',
+                'extension' => 'png',
+                'mime_type' => 'image/png',
+                'aggregate_type' => 'image',
+                'variant_name' => 'test',
+                'size' => 0,
+                'original_media_id' => $originalMedia->getKey()
+            ]
+        );
+        $this->seedFileForMedia($previousVariant);
+
+        $manipulation = ImageManipulation::make(
+            function (Image $image) {
+                $image->resize(16, 16);
+            }
+        )->toDestination('uploads', 'potato');
+
+        $imageManipulator = $this->getManipulator();
+        $imageManipulator->defineVariant('test', $manipulation);
+
+        // from original
+        $result = $imageManipulator->createImageVariant($originalMedia, 'test', true);
+        $this->assertEquals($previousVariant->getKey(), $result->getKey());
+        $this->assertEquals('uploads', $result->disk);
+        $this->assertEquals('potato', $result->directory);
+        $this->assertGreaterThan(0, $result->size);
+        $this->assertTrue($result->fileExists());
+
+        $this->assertFalse($previousVariant->fileExists());
     }
 
     public function getManipulator(): ImageManipulator

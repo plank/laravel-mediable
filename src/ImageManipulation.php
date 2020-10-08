@@ -2,6 +2,9 @@
 
 namespace Plank\Mediable;
 
+use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
+use Plank\Mediable\Helpers\File;
+
 class ImageManipulation
 {
     public const FORMAT_JPG = 'jpg';
@@ -28,6 +31,9 @@ class ImageManipulation
         self::FORMAT_WEBP => 'image/webp'
     ];
 
+    public const ON_DUPLICATE_INCREMENT = 'increment';
+    public const ON_DUPLICATE_ERROR = 'error';
+
     /** @var callable */
     private $callback;
 
@@ -36,6 +42,21 @@ class ImageManipulation
 
     /** @var int */
     private $outputQuality = 90;
+
+    /** @var string|null */
+    private $disk;
+
+    /** @var string|null */
+    private $directory;
+
+    /** @var string|null */
+    private $filename;
+
+    /** @var bool */
+    private $hashFilename = false;
+
+    /** @var string */
+    private $onDuplicateBehaviour = self::ON_DUPLICATE_INCREMENT;
 
     /** @var callable|null */
     private $beforeSave;
@@ -51,9 +72,9 @@ class ImageManipulation
     }
 
     /**
-     * @return \Closure
+     * @return callable
      */
-    public function getCallback(): \Closure
+    public function getCallback(): callable
     {
         return $this->callback;
     }
@@ -99,7 +120,7 @@ class ImageManipulation
     /**
      * @return $this
      */
-    public function toJpegFormat(): self
+    public function outputJpegFormat(): self
     {
         $this->setOutputFormat(self::FORMAT_JPG);
 
@@ -109,7 +130,7 @@ class ImageManipulation
     /**
      * @return $this
      */
-    public function toPngFormat(): self
+    public function outputPngFormat(): self
     {
         $this->setOutputFormat(self::FORMAT_PNG);
 
@@ -119,7 +140,7 @@ class ImageManipulation
     /**
      * @return $this
      */
-    public function toGifFormat(): self
+    public function outputGifFormat(): self
     {
         $this->setOutputFormat(self::FORMAT_GIF);
 
@@ -129,7 +150,7 @@ class ImageManipulation
     /**
      * @return $this
      */
-    public function toTiffFormat(): self
+    public function outputTiffFormat(): self
     {
         $this->setOutputFormat(self::FORMAT_TIFF);
 
@@ -139,7 +160,7 @@ class ImageManipulation
     /**
      * @return $this
      */
-    public function toBmpFormat(): self
+    public function outputBmpFormat(): self
     {
         $this->setOutputFormat(self::FORMAT_BMP);
 
@@ -149,7 +170,7 @@ class ImageManipulation
     /**
      * @return $this
      */
-    public function toWebpFormat(): self
+    public function outputWebpFormat(): self
     {
         $this->setOutputFormat(self::FORMAT_WEBP);
 
@@ -162,6 +183,143 @@ class ImageManipulation
     public function getBeforeSave(): ?callable
     {
         return $this->beforeSave;
+    }
+
+    /**
+     * Set the filesystem disk and relative directory where the file will be saved.
+     *
+     * @param  string $disk
+     * @param  string $directory
+     *
+     * @return $this
+     */
+    public function toDestination(string $disk, string $directory): self
+    {
+        return $this->toDisk($disk)->toDirectory($directory);
+    }
+
+    /**
+     * Set the filesystem disk on which the file will be saved.
+     *
+     * @param string $disk
+     *
+     * @return $this
+     */
+    public function toDisk(string $disk): self
+    {
+        if (!array_key_exists($disk, config('filesystems.disks', []))) {
+            throw ConfigurationException::diskNotFound($disk);
+        }
+        $this->disk = $disk;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDisk(): ?string
+    {
+        return $this->disk;
+    }
+
+    /**
+     * Set the directory relative to the filesystem disk at which the file will be saved.
+     * @param string $directory
+     * @return $this
+     */
+    public function toDirectory(string $directory): self
+    {
+        $this->directory = File::sanitizePath($directory);
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDirectory(): ?string
+    {
+        return $this->directory;
+    }
+
+    /**
+     * Specify the filename to copy to the file to.
+     * @param string $filename
+     * @return $this
+     */
+    public function useFilename(string $filename): self
+    {
+        $this->filename = File::sanitizeFilename($filename);
+        $this->hashFilename = false;
+
+        return $this;
+    }
+
+    /**
+     * Indicates to the uploader to generate a filename using the file's MD5 hash.
+     * @return $this
+     */
+    public function useHashForFilename(): self
+    {
+        $this->hashFilename = true;
+        $this->filename = null;
+
+        return $this;
+    }
+
+    /**
+     * Restore the default behaviour of using the source file's filename.
+     * @return $this
+     */
+    public function useOriginalFilename(): self
+    {
+        $this->filename = null;
+        $this->hashFilename = false;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getFilename(): ?string
+    {
+        return $this->filename;
+    }
+
+    /**
+     * @return bool
+     */
+    public function usingHashForFilename(): bool
+    {
+        return $this->hashFilename;
+    }
+
+    /**
+     * @return $this
+     */
+    public function onDuplicateIncrement(): self
+    {
+        $this->onDuplicateBehaviour = self::ON_DUPLICATE_INCREMENT;
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function onDuplicateError(): self
+    {
+        $this->onDuplicateBehaviour = self::ON_DUPLICATE_ERROR;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOnDuplicateBehaviour(): string
+    {
+        return $this->onDuplicateBehaviour;
     }
 
     /**

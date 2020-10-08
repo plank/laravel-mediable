@@ -3,7 +3,16 @@
 ## 4.x to 5.x
 
 * Two columns added to the `media` table: `variant_name` (varchar)  and `original_media_id` (should match `media.id` column type)
+
+    ```php
+    $table->string('variant_name', 255)->nullable();
+    $table->integer('original_media_id')->unsigned()->nullable();
+    $table->foreign('original_media_id')
+         ->references('id')->on('media')
+         ->nullOnDelete();
+    ```
 * `Plank\Mediable\MediaUploaderFacade` moved to `Plank\Mediable\Facades\MediaUploader`
+* Directory and filename validation now only allows URL and filesystem safe ASCII characters (alphanumeric plus `.`, `-`, `_`, and `/` for directories). Will automatically attempt to transliterate UTF-8 accented characters and ligatures into their ASCII equivalent, all other characters will be converted to hyphens.
 * The following methods now include an extra `$withVariants` parameter :
     * `Mediable::scopeWithMedia()`
     * `Mediable::scopeWithMediaMatchAll()`
