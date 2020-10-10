@@ -152,14 +152,22 @@ Variants can be created from the ``ImageManipulator`` class. This will create a 
     $variantMedia = ImageManipulator::createImageVariant($originalMedia, 'thumbnail');
 
 
-Depending on the size of the files and the nature of the manipulations, creating variants may be a time consuming operation. As such, it may be more beneficial to perform the operation asynchronously. The ``CreateImageVariants`` job can be used to easily queue variants to be processed. Multiple variant names can be provided in order to process the creation of several variants as part of the same worker process.
+Depending on the size of the files and the nature of the manipulations, creating variants may be a time consuming operation. As such, it may be more beneficial to perform the operation asynchronously. The ``CreateImageVariants`` job can be used to easily queue variants to be processed. A collection of ``Media`` records and multiple variant names can be provided in order to process the creation of several variants as part of the same worker process.
 
 ::
 
     <?php
     use Plank\Mediable\Jobs\CreateImageVariants;
+    use Illuminate\Database\Eloquent\Collection;
 
-    CreateImageVariants::dispatch($media, ['square', 'bw-square']);
+    // will produce one variant
+    CreateImageVariants::dispatch($media, ['square']);
+
+    // will produce 4 variants (2 of each media)
+    CreateImageVariants::dispatch(
+        new Collection([$media1, $media2]),
+        ['square', 'bw-square']
+    );
 
 Recreating Variants
 ^^^^^^^^^^^^^^^^^^^
@@ -172,7 +180,7 @@ If a variant with the requested variant name already exists for the provided med
     $variantMedia = ImageManipulator::createImageVariant($originalMedia, 'thumbnail', true);
     CreateImageVariants::dispatch($media, ['square', 'bw-square'], true);
 
-Doing so will cause the original file to be deleted, and a new one created at the specified output destination. The variant record will retain its primary key and any associations, but it attributes will be updated as necessary
+Doing so will cause the original file to be deleted, and a new one created at the specified output destination. The variant record will retain its primary key and any associations, but its attributes will be updated as necessary.
 
 Using Variants
 --------------
@@ -191,7 +199,7 @@ However, variants also remember the name of the variant definition and the origi
 Original vs. Variants
 ^^^^^^^^^^^^^^^^^^^^^
 
-An "original" ``Media`` record is one the one that was initially uploaded to the server. A variant is the derivative that was created by manipulating the original. You can distinguish them with these methods
+An "original" ``Media`` record is one the one that was initially uploaded to the server. A variant is the derivative that was created by manipulating the original. You can distinguish them with these methods:
 
 ::
 
