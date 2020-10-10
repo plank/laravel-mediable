@@ -5,6 +5,7 @@ namespace Plank\Mediable\Jobs;
 use Carbon\Traits\Serialization;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Plank\Mediable\Exceptions\ImageManipulationException;
@@ -20,9 +21,9 @@ class CreateImageVariants implements ShouldQueue
      */
     private $variantNames;
     /**
-     * @var Media
+     * @var Collection|Media[]
      */
-    private $model;
+    private $models;
 
     /**
      * @var bool
@@ -31,28 +32,31 @@ class CreateImageVariants implements ShouldQueue
 
     /**
      * CreateImageVariants constructor.
-     * @param Media $model
+     * @param Media|Collection|Media[] $model
      * @param string|string[] $variantNames
      * @throws ImageManipulationException
      */
-    public function __construct(Media $model, $variantNames, bool $forceRecreate = false)
+    public function __construct($models, $variantNames, bool $forceRecreate = false)
     {
+        $models = $this->collect($models);
         $variantNames = (array) $variantNames;
-        $this->validate($model, $variantNames);
+        $this->validate($models, $variantNames);
 
         $this->variantNames = $variantNames;
-        $this->model = $model;
+        $this->models = $models;
         $this->forceRecreate = $forceRecreate;
     }
 
     public function handle()
     {
-        foreach ($this->getVariantNames() as $variantName) {
-            $this->getImageManipulator()->createImageVariant(
-                $this->getModel(),
-                $variantName,
-                $this->getForceRecreate()
-            );
+        foreach ($this->getModels() as $model) {
+            foreach ($this->getVariantNames() as $variantName) {
+                $this->getImageManipulator()->createImageVariant(
+                    $model,
+                    $variantName,
+                    $this->getForceRecreate()
+                );
+            }
         }
     }
 
@@ -65,11 +69,11 @@ class CreateImageVariants implements ShouldQueue
     }
 
     /**
-     * @return Media
+     * @return Collection|Media[]
      */
-    public function getModel(): Media
+    public function getModels(): Collection
     {
-        return $this->model;
+        return $this->models;
     }
 
     /**
@@ -77,10 +81,12 @@ class CreateImageVariants implements ShouldQueue
      * @param array $variantNames
      * @throws ImageManipulationException
      */
-    private function validate(Media $media, array $variantNames): void
+    private function validate(Collection $models, array $variantNames): void
     {
         $imageManipulator = $this->getImageManipulator();
-        $imageManipulator->validateMedia($media);
+        foreach ($models as $media) {
+            $imageManipulator->validateMedia($media);
+        }
         foreach ($variantNames as $variantName) {
             $imageManipulator->getVariantDefinition($variantName);
         }
@@ -97,5 +103,17 @@ class CreateImageVariants implements ShouldQueue
     public function getForceRecreate(): bool
     {
         return $this->forceRecreate;
+    }
+
+    /**
+     * @param Media|Collection|Media[] $models
+     * @return bool
+     */
+    private function collect($models): Collection
+    {
+        if ($models instanceof Media) {
+            $models = [$models];
+        }
+        return new Collection($models);
     }
 }
