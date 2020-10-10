@@ -3,10 +3,10 @@ Using Media
 
 .. highlight:: php
 
-Media Paths & URLs
+Media Paths
 ---------------------
 
-``Media`` records keep track of the location of their file and are able to generate a number of paths and URLs relative to the file. Consider the following example, given a ``Media`` instance with the following attributes:
+``Media`` records keep track of the location of their file and are able to generate a number of paths relative to the file. Consider the following example, given a ``Media`` instance with the following attributes:
 
 
 ::
@@ -27,9 +27,6 @@ The following attributes and methods would be exposed:
 	$media->getAbsolutePath();
 	// /var/www/site/public/uploads/foo/bar/picture.jpg
 
-	$media->getUrl();
-	// http://localhost/uploads/foo/bar/picture.jpg
-
 	$media->getDiskPath();
 	// foo/bar/picture.jpg
 
@@ -45,7 +42,43 @@ The following attributes and methods would be exposed:
 	$media->extension;
 	// jpg
 
+URLs and Downloads
+---------------------
+
+URLs can be generated for Media stored on a public disk and set to public visibility.
+
+::
+
+	$media->getUrl();
+	// http://localhost/uploads/foo/bar/picture.jpg
+
 `$media->getUrl()` will throw an exception if the file or its disk has its visibility set to private. You can check if it is safe to generate a url for a record with the `$media->isPubliclyAccessible()` method.
+
+For private files stored on an Amazon S3 disk, it is possible to generate a temporary signed URL to allow authorized users the ability to download the file for a specified period of time.
+
+::
+
+    <?php
+    $media->getTemporaryUrl(Carbon::now->addMinutes(5));
+
+For private files, it is possible to expose them to authorized users by streaming the file from the server.
+
+::
+
+    <?php
+    return response()->streamDownload(
+        function() use ($media) {
+            $stream = $media->stream();
+            while($bytes = $stream->read(1024)) {
+                echo $bytes;
+            }
+        },
+        $media->basename,
+        [
+            'Content-Type' => $media->mime_type,
+            'Content-Length' => $media->size
+        ]
+    );
 
 Querying Media
 ---------------------

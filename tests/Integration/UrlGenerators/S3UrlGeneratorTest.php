@@ -2,10 +2,13 @@
 
 namespace Plank\Mediable\Tests\Integration\UrlGenerators;
 
+use Carbon\Carbon;
 use Illuminate\Filesystem\FilesystemManager;
 use Plank\Mediable\Media;
 use Plank\Mediable\Tests\TestCase;
 use Plank\Mediable\UrlGenerators\S3UrlGenerator;
+
+use function GuzzleHttp\Psr7\parse_query;
 
 class S3UrlGeneratorTest extends TestCase
 {
@@ -49,6 +52,38 @@ class S3UrlGeneratorTest extends TestCase
                 env('S3_REGION')
             ),
             $generator->getUrl()
+        );
+    }
+
+    public function test_it_generates_temporary_url()
+    {
+        $generator = $this->setupGenerator();
+        $url = $generator->getTemporaryUrl(Carbon::now()->addDay());
+        [$uri, $queryString] = explode('?', $url);
+        $this->assertEquals(
+            sprintf(
+                'https://%s.s3.%s.amazonaws.com/foo/bar.jpg',
+                env('S3_BUCKET'),
+                env('S3_REGION')
+            ),
+            $uri
+        );
+        parse_str($queryString, $queryParams);
+        $this->assertArrayHasKey(
+            'X-Amz-Credential',
+            $queryParams
+        );
+        $this->assertArrayHasKey(
+            'X-Amz-Expires',
+            $queryParams
+        );
+        $this->assertArrayHasKey(
+            'X-Amz-Algorithm',
+            $queryParams
+        );
+        $this->assertArrayHasKey(
+            'X-Amz-Signature',
+            $queryParams
         );
     }
 

@@ -19,4 +19,9 @@ class MediaUrlException extends Exception
     {
         return new static("Could not set UrlGenerator, class `{$class}` does not extend `Plank\Mediable\UrlGenerators\UrlGenerator`");
     }
+
+    public static function temporaryUrlsNotSupported(string $disk): self
+    {
+        return new static("Temporary URLs are not supported for files on disk '{$disk}'");
+    }
 }
