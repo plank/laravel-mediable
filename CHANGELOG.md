@@ -1,5 +1,18 @@
 # Changelog
 
+## 5.0.0
+- Added Support for creating variants of images using the intervention/image library. Once generated, variants of Media are linked to the original to facilitate finding the right one for a given context.
+- Added support for generating temporary signed URLs for files stored on Amazon S3.
+- Added `Media::stream()` method which returns a \Psr\Http\Message\StreamInterface to facilitate managing large files.
+- Directory and filename validation now only allows URL and filesystem safe ASCII characters (alphanumeric plus `.`, `-`, `_`, and `/` for directories). Will automatically attempt to transliterate UTF-8 accented characters and ligatures into their ASCII equivalent, all other characters will be converted to hyphens.
+- `Plank\Mediable\MediaUploaderFacade` moved to `Plank\Mediable\Facades\MediaUploader`
+
+## 4.4.2 - 2020-09-26
+- Fixed a handful of bugs related to using a custom table name when using a custom media class
+
+## 4.4.1 - 2020-09-14
+- Fixed Morph relation when subclassing Media (Thanks @GeoSot!)
+
 ## 4.4.0 - 2020-09-09
 - Added support for Laravel 8.0
 - Dropping support for Laravel versions < 6.0
