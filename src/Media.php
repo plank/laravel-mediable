@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Plank\Mediable\Exceptions\MediaMoveException;
 use Plank\Mediable\Exceptions\MediaUrlException;
 use Plank\Mediable\Helpers\File;
+use Plank\Mediable\UrlGenerators\TemporaryUrlGeneratorInterface;
 use Plank\Mediable\UrlGenerators\UrlGeneratorInterface;
 use Psr\Http\Message\StreamInterface;
 
@@ -340,6 +341,16 @@ class Media extends Model
     public function getUrl(): string
     {
         return $this->getUrlGenerator()->getUrl();
+    }
+
+    public function getTemporaryUrl(\DateTimeInterface $expiry): string
+    {
+        $generator = $this->getUrlGenerator();
+        if ($generator instanceof TemporaryUrlGeneratorInterface) {
+            return $generator->getTemporaryUrl($expiry);
+        }
+
+        throw MediaUrlException::temporaryUrlsNotSupported($this->disk);
     }
 
     /**

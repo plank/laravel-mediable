@@ -2,15 +2,20 @@
 
 namespace Plank\Mediable\Tests\Integration;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use Plank\Mediable\Exceptions\MediaMoveException;
+use Plank\Mediable\Exceptions\MediaUrlException;
 use Plank\Mediable\Media;
 use Plank\Mediable\Tests\Mocks\MediaSoftDelete;
 use Plank\Mediable\Tests\Mocks\SampleMediable;
 use Plank\Mediable\Tests\Mocks\SampleMediableSoftDelete;
 use Plank\Mediable\Tests\TestCase;
+use Plank\Mediable\UrlGenerators\TemporaryUrlGeneratorInterface;
+use Plank\Mediable\UrlGenerators\UrlGeneratorFactory;
+use Plank\Mediable\UrlGenerators\UrlGeneratorInterface;
 
 class MediaTest extends TestCase
 {
@@ -760,5 +765,41 @@ class MediaTest extends TestCase
         $this->assertEquals($all, $media1->getAllVariantsAndSelf());
         $this->assertEquals($all, $media2->getAllVariantsAndSelf());
         $this->assertEquals($all, $media3->getAllVariantsAndSelf());
+    }
+
+    public function test_it_generates_temporary_urls()
+    {
+        $media = $this->makeMedia();
+        $expiry = Carbon::now();
+
+        $generator = $this->createMock(
+            TemporaryUrlGeneratorInterface::class
+        );
+        $generator->expects($this->once())
+            ->method('getTemporaryUrl')
+            ->with($expiry)
+            ->willReturn($url = 'https://example.com/path');
+        $factory = $this->createMock(UrlGeneratorFactory::class);
+        $factory->expects($this->once())
+            ->method('create')
+            ->willReturn($generator);
+        app()->instance('mediable.url.factory', $factory);
+
+        $this->assertEquals($url, $media->getTemporaryUrl($expiry));
+    }
+
+    public function test_it_throws_for_unsupported_temporary_urls()
+    {
+        $this->expectException(MediaUrlException::class);
+        $media = $this->makeMedia();
+
+        $generator = $this->createMock(UrlGeneratorInterface::class);
+        $factory = $this->createMock(UrlGeneratorFactory::class);
+        $factory->expects($this->once())
+            ->method('create')
+            ->willReturn($generator);
+        app()->instance('mediable.url.factory', $factory);
+
+        $media->getTemporaryUrl(Carbon::now());
     }
 }
