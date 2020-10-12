@@ -9,6 +9,7 @@ class SyncMediaCommandTest extends TestCase
 {
     public function test_it_calls_prune_and_install()
     {
+        $this->withoutMockingConsoleOutput();
         /** @var SyncMediaCommand $command */
         $command = $this->getMockBuilder(SyncMediaCommand::class)
             ->setMethods(['call', 'option', 'argument'])

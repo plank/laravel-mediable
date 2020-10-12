@@ -15,6 +15,7 @@ class ImportMediaCommandTest extends TestCase
         parent::setUp();
         $this->useDatabase();
         $this->useFilesystem('tmp');
+        $this->withoutMockingConsoleOutput();
     }
 
     public function getEnvironmentSetUp($app)

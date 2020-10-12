@@ -13,6 +13,7 @@ class PruneMediaCommandTest extends TestCase
         parent::setUp();
         $this->useDatabase();
         $this->useFilesystem('tmp');
+        $this->withoutMockingConsoleOutput();
     }
 
     public function test_it_deletes_media_without_files()

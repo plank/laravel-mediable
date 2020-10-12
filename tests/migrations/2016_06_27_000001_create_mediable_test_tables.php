@@ -52,7 +52,7 @@ class CreateMediableTestTables extends Migration
         Schema::table('media', function (Blueprint $table) {
             $table->dropColumn('deleted_at');
         });
-        Schema::drop('sample_mediables');
-        Schema::drop('prefixed_mediables');
+        Schema::dropIfExists('sample_mediables');
+        Schema::dropIfExists('prefixed_mediables');
     }
 }
