@@ -1,9 +1,15 @@
 <?php
 
+namespace Plank\Mediable\Tests;
+
+use Dotenv\Dotenv;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Filesystem\Filesystem;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Plank\Mediable\Media;
+use Plank\Mediable\MediableServiceProvider;
+use Plank\Mediable\Tests\Mocks\MockCallable;
+use ReflectionClass;
 
 class TestCase extends BaseTestCase
 {
@@ -12,27 +18,28 @@ class TestCase extends BaseTestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->withFactories(__DIR__ . '/_factories');
+        $this->withFactories(__DIR__ . '/Factories');
     }
 
     protected function getPackageProviders($app)
     {
         return [
-            Plank\Mediable\MediableServiceProvider::class
+            MediableServiceProvider::class
         ];
     }
 
     protected function getPackageAliases($app)
     {
         return [
-            'MediaUploader' => 'Plank\Mediable\MediaUploaderFacade',
+            'MediaUploader' => \Plank\Mediable\Facades\MediaUploader::class,
+            'ImageManipulator' => \Plank\Mediable\Facades\ImageManipulator::class,
         ];
     }
 
     protected function getEnvironmentSetUp($app)
     {
         if (file_exists(dirname(__DIR__) . '/.env')) {
-            Dotenv\Dotenv::create(dirname(__DIR__))->load();
+            Dotenv::create(dirname(__DIR__))->load();
         }
         //use in-memory database
         $app['config']->set('database.connections.testing', [
@@ -111,10 +118,15 @@ class TestCase extends BaseTestCase
 
     protected function useDatabase()
     {
-        $artisan = $this->app->make(Kernel::class);
         $this->app->useDatabasePath(dirname(__DIR__));
-        //Remigrate all database tables
-        $artisan->call('migrate:refresh');
+        $this->loadMigrationsFrom(
+            [
+                '--path' => [
+                    dirname(__DIR__) . '/migrations',
+                    __DIR__ . '/migrations'
+                ]
+            ]
+        );
     }
 
     protected function useFilesystem($disk)
@@ -163,5 +175,10 @@ class TestCase extends BaseTestCase
     protected function createMedia(array $attributes = []): Media
     {
         return factory(Media::class)->create($attributes);
+    }
+
+    protected function getMockCallable()
+    {
+        return $this->createPartialMock(MockCallable::class, ['__invoke']);
     }
 }

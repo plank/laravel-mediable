@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="false"
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         backupGlobals="false"
          backupStaticAttributes="false"
          bootstrap="vendor/autoload.php"
-         colors="true"
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
@@ -10,18 +10,18 @@
          stopOnFailure="false"
          executionOrder="random"
          resolveDependencies="true"
->
-    <testsuites>
-        <testsuite name="Package Test Suite">
-            <directory suffix=".php">./tests/integration/</directory>
-        </testsuite>
-    </testsuites>
-    <filter>
-        <whitelist>
-            <directory suffix=".php">./src/</directory>
-        </whitelist>
-    </filter>
-    <php>
-        <ini name="display_errors" value="true"/>
-    </php>
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+  <coverage>
+    <include>
+      <directory suffix=".php">./src/</directory>
+    </include>
+  </coverage>
+  <testsuites>
+    <testsuite name="Package Test Suite">
+      <directory suffix="Test.php">./tests/Integration/</directory>
+    </testsuite>
+  </testsuites>
+  <php>
+    <ini name="display_errors" value="true"/>
+  </php>
 </phpunit>

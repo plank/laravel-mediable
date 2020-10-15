@@ -17,9 +17,11 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
  *
  * @property MediableCollection $media
  * @property Pivot $pivot
- * @method static Builder withMedia($tags = [], bool $matchAll = false)
- * @method static Builder withMediaMatchAll($tags = [])
- * @method static Builder whereHasMedia($tags, bool $matchAll = false)
+ * @method static Builder withMedia($tags = [], bool $matchAll = false, bool $withVariants = false)
+ * @method static Builder withMediaAndVariants($tags = [], bool $matchAll = false)
+ * @method static Builder withMediaMatchAll($tags = [], bool $withVariants = false)
+ * @method static Builder withMediaAndVariantsMatchAll($tags = [])
+ * @method static Builder whereHasMedia($tags = [], bool $matchAll = false)
  * @method static Builder whereHasMediaMatchAll($tags)
  *
  */
@@ -68,122 +70,216 @@ trait Mediable
      * @param  bool $matchAll
      * @return void
      */
-    public function scopeWhereHasMedia(Builder $q, $tags, bool $matchAll = false): void
+    public function scopeWhereHasMedia(Builder $q, $tags = [], bool $matchAll = false): void
     {
-        if ($matchAll && is_array($tags) && count($tags) > 1) {
-            $this->scopeWhereHasMediaMatchAll($q, $tags);
+        $tags = (array)$tags;
+        if ($matchAll && count($tags) > 1) {
+            $grammar = $q->getQuery()->getGrammar();
+            $subquery = $this->newMatchAllQuery($tags)
+                ->selectRaw('count(*)')
+                ->whereRaw(
+                    $grammar->wrap($this->media()->getQualifiedForeignPivotKeyName())
+                    . ' = ' . $grammar->wrap($this->getQualifiedKeyName())
+                );
+            $q->whereRaw('(' . $subquery->toSql() . ') >= 1', $subquery->getBindings());
+
             return;
         }
+
         $q->whereHas('media', function (Builder $q) use ($tags) {
-            $q->whereIn('tag', (array)$tags);
+            if (count($tags) > 0) {
+                $q->whereIn('tag', $tags);
+            }
         });
     }
 
     /**
-     * Query scope to detect the presence of one or more attached media that is bound to all of the specified tags simultaneously.
+     * Query scope to detect the presence of one or more attached media that is bound to
+     * all of the specified tags simultaneously.
      * @param  Builder $q
      * @param  string|string[] $tags
      * @return void
      */
     public function scopeWhereHasMediaMatchAll(Builder $q, array $tags): void
     {
-        $grammar = $q->getQuery()->getGrammar();
-        $subquery = $this->newMatchAllQuery($tags)
-            ->selectRaw('count(*)')
-            ->whereRaw(
-                $grammar->wrap($this->media()->getQualifiedForeignPivotKeyName())
-                . ' = ' . $grammar->wrap($this->getQualifiedKeyName())
-            );
-        $q->whereRaw('(' . $subquery->toSql() . ') >= 1', $subquery->getBindings());
+        $this->scopeWhereHasMedia($q, $tags, true);
     }
 
     /**
      * Query scope to eager load attached media.
      *
-     * @param  Builder|Mediable $q
-     * @param  string|string[] $tags If one or more tags are specified, only media attached to those tags will be loaded.
-     * @param  bool $matchAll Only load media matching all provided tags
+     * @param Builder|Mediable $q
+     * @param string|string[] $tags If one or more tags are specified, only media attached to those tags will be loaded.
+     * @param bool $matchAll Only load media matching all provided tags
+     * @param bool $withVariants If true, also load the variants and/or originalMedia relation of each Media
      * @return void
      */
-    public function scopeWithMedia(Builder $q, $tags = [], bool $matchAll = false): void
-    {
+    public function scopeWithMedia(
+        Builder $q,
+        $tags = [],
+        bool $matchAll = false,
+        bool $withVariants = false
+    ): void {
         $tags = (array)$tags;
 
         if (empty($tags)) {
-            $q->with('media');
+            if ($withVariants) {
+                $q->with(
+                    'media.variants',
+                    'media.originalMedia.variants'
+                );
+            } else {
+                $q->with('media');
+            }
+
             return;
         }
 
         if ($matchAll) {
-            $q->withMediaMatchAll($tags);
+            $q->with(
+                [
+                    'media' => function (MorphToMany $q) use ($tags, $withVariants) {
+                        $this->addMatchAllToEagerLoadQuery($q, $tags);
+                        if ($withVariants) {
+                            $q->with(['variants', 'originalMedia.variants']);
+                        }
+                    }
+                ]
+            );
             return;
         }
 
-        $q->with([
-            'media' => function (MorphToMany $q) use ($tags) {
-                $q->wherePivotIn('tag', $tags);
-            }
-        ]);
+        $q->with(
+            [
+                'media' => function (MorphToMany $q) use ($tags, $withVariants) {
+                    $q->wherePivotIn('tag', $tags);
+
+                    if ($withVariants) {
+                        $q->with(['variants', 'originalMedia.variants']);
+                    }
+                }
+            ]
+        );
+    }
+
+    /**
+     * Query scope to eager load attached media, as well as their variants
+     * of those media.
+     * @param Builder $q
+     * @param array $tags
+     * @param bool $matchAll
+     */
+    public function scopeWithMediaAndVariants(
+        Builder $q,
+        $tags = [],
+        bool $matchAll = false
+    ) {
+        $this->scopeWithMedia($q, $tags, $matchAll, true);
     }
 
     /**
      * Query scope to eager load attached media assigned to multiple tags.
      * @param  Builder $q
      * @param  string|string[] $tags
+     * @param bool $withVariants If true, also load the variants and/or originalMedia relation of each Media
      * @return void
      */
-    public function scopeWithMediaMatchAll(Builder $q, $tags = []): void
-    {
+    public function scopeWithMediaMatchAll(
+        Builder $q,
+        $tags = [],
+        bool $withVariants = false
+    ): void {
         $tags = (array)$tags;
-        $q->with([
-            'media' => function (MorphToMany $q) use ($tags) {
-                $this->addMatchAllToEagerLoadQuery($q, $tags);
-            }
-        ]);
+        $this->scopeWithMedia($q, $tags, true, $withVariants);
     }
 
     /**
-     * Lazy eager load attached media relationships.
-     * @param  string|string[] $tags If one or more tags are specified, only media attached to those tags will be loaded.
-     * @param  bool $matchAll Only load media matching all provided tags
+     * Query scope to eager load attached media assigned to multiple tags, as well as the variants of those media.
+     * @param Builder $q
+     * @param array $tags
+     */
+    public function scopeWithMediaAndVariantsMatchAll(Builder $q, $tags = []): void
+    {
+        $this->scopeWithMedia($q, $tags, true, true);
+    }
+
+    /**
+     * Lazy eager load attached media.
+     * @param string|string[] $tags If one or more tags are specified, only media attached to those tags will be loaded.
+     * @param bool $matchAll Only load media matching all provided tags
+     * @param bool $withVariants If true, also load the variants and/or originalMedia relation of each Media
      * @return $this
      */
-    public function loadMedia($tags = [], bool $matchAll = false): self
-    {
+    public function loadMedia(
+        $tags = [],
+        bool $matchAll = false,
+        bool $withVariants = false
+    ): self {
         $tags = (array)$tags;
 
         if (empty($tags)) {
-            return $this->load('media');
+            if ($withVariants) {
+                return $this->load(['media.originalMedia.variants', 'media.variants']);
+            } else {
+                return $this->load('media');
+            }
         }
 
         if ($matchAll) {
-            return $this->loadMediaMatchAll($tags);
+            return $this->load(
+                [
+                    'media' => function (MorphToMany $q) use ($tags, $withVariants) {
+                        $this->addMatchAllToEagerLoadQuery($q, $tags);
+                        if ($withVariants) {
+                            $q->with(['originalMedia.variants', 'variants']);
+                        }
+                    }
+                ]
+            );
         }
 
-        $this->load([
-            'media' => function (MorphToMany $q) use ($tags) {
-                $q->wherePivotIn('tag', $tags);
-            }
-        ]);
+        return $this->load(
+            [
+                'media' => function (MorphToMany $q) use ($tags, $withVariants) {
+                    $q->wherePivotIn('tag', $tags);
+                    if ($withVariants) {
+                        $q->with(['originalMedia.variants', 'variants']);
+                    }
+                }
+            ]
+        );
+    }
 
-        return $this;
+    /** Lazy eager load attached media, as well as their variants.
+     * @param array $tags
+     * @param bool $matchAll
+     * @return $this
+     */
+    public function loadMediaWithVariants($tags = [], bool $matchAll = false): self
+    {
+        return $this->loadMedia($tags, $matchAll, true);
     }
 
     /**
      * Lazy eager load attached media relationships matching all provided tags.
      * @param  string|string[] $tags one or more tags
+     * @param bool $withVariants If true, also load the variants and/or originalMedia relation of each Media
      * @return $this
      */
-    public function loadMediaMatchAll($tags = []): self
+    public function loadMediaMatchAll($tags = [], bool $withVariants = false): self
     {
-        $tags = (array)$tags;
-        $this->load([
-            'media' => function (MorphToMany $q) use ($tags) {
-                $this->addMatchAllToEagerLoadQuery($q, $tags);
-            }
-        ]);
+        return $this->loadMedia($tags, true, $withVariants);
+    }
 
-        return $this;
+    /**
+     * Lazy eager load attached media relationships matching all provided tags, as well
+     * as the variants of those media.
+     * @param array $tags
+     * @return $this
+     */
+    public function loadMediaWithVariantsMatchAll($tags = []): self
+    {
+        return $this->loadMedia($tags, true, true);
     }
 
     /**

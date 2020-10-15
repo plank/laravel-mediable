@@ -6,6 +6,7 @@ Uploading Files
 The easiest way to upload media to your server is with the ``MediaUploader`` class, which handles validating the file, moving it to its destination and creating a ``Media`` record to reference it. You can get an instance of the MediaUploader using the Facade and configure it with a fluent interface.
 
 To upload a file to the root of the default disk (set in ``config/mediable.php``), all you need to do is the following:
+
 ::
 
     <?php
@@ -80,16 +81,15 @@ Occasionally, a file with a matching name might already exist at the destination
     // keep both, append incrementing counter to new file name
     $uploader->onDuplicateIncrement();
 
-    // replace old file with new one, update existing Media record
+    // replace old file with new one, update existing Media record, maintain associations
     $uploader->onDuplicateUpdate();
 
-    // replace old file and media record with new ones
+    // replace old file and media record with new ones, break associations
     $uploader->onDuplicateReplace();
 
     // cancel upload, throw an exception
     $uploader->onDuplicateError();
 
-:note: In previous versions, ``onDuplicateReplace()`` behaved like ``onDuplicateDelete()``
 
 Validation
 --------------------

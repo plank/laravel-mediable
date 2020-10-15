@@ -16,45 +16,93 @@ class MediableCollection extends Collection
 {
     /**
      * Lazy eager load media attached to items in the collection.
-     * @param  string|string[] $tags
+     * @param string|string[] $tags
      * If one or more tags are specified, only media attached to those tags will be loaded.
-     * @param bool $match_all If true, only load media attached to all tags simultaneously
+     * @param bool $matchAll If true, only load media attached to all tags simultaneously
+     * @param bool $withVariants If true, also load the variants and/or originalMedia relation of each Media
      * @return $this
      */
-    public function loadMedia($tags = [], bool $match_all = false): self
-    {
+    public function loadMedia(
+        $tags = [],
+        bool $matchAll = false,
+        bool $withVariants = false
+    ): self {
+        if ($this->isEmpty()) {
+            return $this;
+        }
+
         $tags = (array)$tags;
 
         if (empty($tags)) {
-            return $this->load('media');
+            if ($withVariants) {
+                return $this->load(['media.originalMedia.variants', 'media.variants']);
+            } else {
+                return $this->load('media');
+            }
         }
 
-        if ($match_all) {
-            return $this->loadMediaMatchAll($tags);
+        if ($matchAll) {
+            $closure = function (MorphToMany $q) use ($tags, $withVariants) {
+                $this->addMatchAllToEagerLoadQuery($q, $tags);
+
+                if ($withVariants) {
+                    $q->with(['originalMedia.variants', 'variants']);
+                }
+            };
+            $closure = Closure::bind($closure, $this->first(), $this->first());
+
+            return $this->load(['media' => $closure]);
         }
 
-        $closure = function (MorphToMany $q) use ($tags) {
-            $q->wherePivotIn('tag', $tags);
-        };
 
-        return $this->load(['media' => $closure]);
+        return $this->load(
+            [
+                'media' => function (MorphToMany $q) use ($tags, $withVariants) {
+                    $q->wherePivotIn('tag', $tags);
+
+                    if ($withVariants) {
+                        $q->with(['originalMedia.variants', 'variants']);
+                    }
+                }
+            ]
+        );
     }
 
     /**
-     * Lazy eager load media attached to items in the collection bound all of the provided tags simultaneously.
-     * @param  string|string[] $tags
+     * Lazy eager load media attached to items in the collection, as well as their variants.
+     * @param string|string[] $tags
      * If one or more tags are specified, only media attached to those tags will be loaded.
+     * @param bool $matchAll If true, only load media attached to all tags simultaneously
      * @return $this
      */
-    public function loadMediaMatchAll($tags = []): self
+    public function loadMediaWithVariants($tags = [], bool $matchAll = false): self
     {
-        $tags = (array)$tags;
-        $closure = function (MorphToMany $q) use ($tags) {
-            $this->addMatchAllToEagerLoadQuery($q, $tags);
-        };
-        $closure = Closure::bind($closure, $this->first(), $this->first());
+        return $this->loadMedia($tags, $matchAll, true);
+    }
 
-        return $this->load(['media' => $closure]);
+    /**
+     * Lazy eager load media attached to items in the collection bound all of the provided
+     * tags simultaneously.
+     * @param  string|string[] $tags
+     * @param bool $withVariants If true, also load the variants and/or originalMedia relation of each Media
+     * If one or more tags are specified, only media attached to all of those tags will be loaded.
+     * @return $this
+     */
+    public function loadMediaMatchAll($tags = [], bool $withVariants = false): self
+    {
+        return $this->loadMedia($tags, true, $withVariants);
+    }
+
+    /**
+     * Lazy eager load media attached to items in the collection bound all of the provided
+     * tags simultaneously, as well as the variants of those media.
+     * @param  string|string[] $tags
+     * If one or more tags are specified, only media attached to all of those tags will be loaded.
+     * @return $this
+     */
+    public function loadMediaWithVariantsMatchAll($tags = []): self
+    {
+        return $this->loadMedia($tags, true, true);
     }
 
     public function delete(): void

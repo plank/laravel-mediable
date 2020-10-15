@@ -26,15 +26,15 @@ class MediableServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->publishes([
-            __DIR__ . '/../config/mediable.php' => config_path('mediable.php'),
-        ], 'config');
+        $root = dirname(__DIR__);
+        $this->publishes(
+            [
+                $root . '/config/mediable.php' => config_path('mediable.php'),
+            ],
+            'config'
+        );
 
-        if (!class_exists(CreateMediableTables::class)) {
-            $this->publishes([
-                __DIR__ . '/../migrations/2016_06_27_000000_create_mediable_tables.php' => database_path('migrations/' . date('Y_m_d_His') . '_create_mediable_tables.php'),
-            ], 'migrations');
-        }
+        $this->loadMigrationsFrom($root . '/migrations');
     }
 
     /**
@@ -45,7 +45,7 @@ class MediableServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/mediable.php',
+            dirname(__DIR__) . '/config/mediable.php',
             'mediable'
         );
 
@@ -54,6 +54,7 @@ class MediableServiceProvider extends ServiceProvider
         $this->registerMover();
         $this->registerUrlGeneratorFactory();
         $this->registerConsoleCommands();
+        $this->registerImageManipulator();
     }
 
     /**
@@ -127,6 +128,11 @@ class MediableServiceProvider extends ServiceProvider
             return $factory;
         });
         $this->app->alias('mediable.url.factory', UrlGeneratorFactory::class);
+    }
+
+    public function registerImageManipulator(): void
+    {
+        $this->app->singleton(ImageManipulator::class);
     }
 
     /**

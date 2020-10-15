@@ -197,10 +197,18 @@ You can also load only media attached to specific tags.
 ::
 
     <?php
-    $posts = Post::withMedia(['thumbnail', 'featured']); // attached to either tags
-    $posts = Post::withMediaMatchAll(['thumbnail', 'featured']); // attached to both tags
+    $posts = Post::withMedia(['thumbnail', 'featured'])->get(); // attached to either tags
+    $posts = Post::withMediaMatchAll(['thumbnail', 'featured'])->get(); // attached to both tags
 
-**Note**: if using this approach to conditionally preload media by tag, you will not be able to access media with other tags using ``getMedia()`` without first reloading the media relationship on that record.
+:Note: if using this approach to conditionally preload media by tag, you will not be able to access media with other tags using ``getMedia()`` without first reloading the media relationship on that record.
+
+If you are using :ref:`variants`, they can also be eager loaded at the same time
+
+::
+
+    <?php
+    Post::withMediaAndVariants($tags)->get();
+    Post::withMediaAndVariantsMatchAll($tags)->get();
 
 Lazy Eager Loading
 ^^^^^^^^^^^^^^^^^^^
@@ -240,7 +248,20 @@ The same method is available as part of the ``Mediable`` trait, and can be used 
 
 Any of these methods can be used to reload the media relationship of the model.
 
-**Note**: if using this approach to conditionally preload media by tag, you will not be able to access media with other tags using ``getMedia()`` without first reloading the media relationship on that record.
+:Note: if using this approach to conditionally preload media by tag, you will not be able to access media with other tags using ``getMedia()`` without first reloading the media relationship on that record.
+
+Variants can also be eager loaded this way.
+
+::
+
+    <?php
+    // lazy eager load from a collection of Mediables
+    $posts->loadMediaAndVariants($tags);
+    $posts->loadMediaAndVariantsMatchAll($tags);
+
+    // lazy eager load from a single Mediable model
+    $post->loadMediaAndVariants($tags);
+    $post->loadMediaAndVariantsMatchAll($tags);
 
 Automatic Rehydration
 ----------------------
