@@ -13,42 +13,46 @@ class CreateMediableTables extends Migration
      */
     public function up()
     {
-        Schema::create('media', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('disk', 32);
-            $table->string('directory');
-            $table->string('filename');
-            $table->string('extension', 32);
-            $table->string('mime_type', 128);
-            $table->string('aggregate_type', 32);
-            $table->integer('size')->unsigned();
-            $table->string('variant_name', 255)->nullable();
-            $table->integer('original_media_id')->unsigned()->nullable();
-            $table->timestamps();
+        if (!Schema::hasTable('media')) {
+            Schema::create(
+                'media',
+                function (Blueprint $table) {
+                    $table->increments('id');
+                    $table->string('disk', 32);
+                    $table->string('directory');
+                    $table->string('filename');
+                    $table->string('extension', 32);
+                    $table->string('mime_type', 128);
+                    $table->string('aggregate_type', 32);
+                    $table->integer('size')->unsigned();
+                    $table->timestamps();
 
-            $table->unique(['disk', 'directory', 'filename', 'extension']);
-            $table->index('aggregate_type');
+                    $table->unique(['disk', 'directory', 'filename', 'extension']);
+                    $table->index('aggregate_type');
+                }
+            );
+        }
 
-            $table->foreign('original_media_id')
-                ->references('id')->on('media')
-                ->nullOnDelete();
-        });
+        if (!Schema::hasTable('mediables')) {
+            Schema::create(
+                'mediables',
+                function (Blueprint $table) {
+                    $table->integer('media_id')->unsigned();
+                    $table->string('mediable_type');
+                    $table->integer('mediable_id')->unsigned();
+                    $table->string('tag');
+                    $table->integer('order')->unsigned();
 
-        Schema::create('mediables', function (Blueprint $table) {
-            $table->integer('media_id')->unsigned();
-            $table->string('mediable_type');
-            $table->integer('mediable_id')->unsigned();
-            $table->string('tag');
-            $table->integer('order')->unsigned();
-
-            $table->primary(['media_id', 'mediable_type', 'mediable_id', 'tag']);
-            $table->index(['mediable_id', 'mediable_type']);
-            $table->index('tag');
-            $table->index('order');
-            $table->foreign('media_id')
-                ->references('id')->on('media')
-                ->cascadeOnDelete();
-        });
+                    $table->primary(['media_id', 'mediable_type', 'mediable_id', 'tag']);
+                    $table->index(['mediable_id', 'mediable_type']);
+                    $table->index('tag');
+                    $table->index('order');
+                    $table->foreign('media_id')
+                        ->references('id')->on('media')
+                        ->cascadeOnDelete();
+                }
+            );
+        }
     }
 
     /**
@@ -58,7 +62,7 @@ class CreateMediableTables extends Migration
      */
     public function down()
     {
-        Schema::drop('mediables');
-        Schema::drop('media');
+        Schema::dropIfExists('mediables');
+        Schema::dropIfExists('media');
     }
 }

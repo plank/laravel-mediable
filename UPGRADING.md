@@ -2,15 +2,8 @@
 
 ## 4.x to 5.x
 
-* Two columns added to the `media` table: `variant_name` (varchar)  and `original_media_id` (should match `media.id` column type)
-
-    ```php
-    $table->string('variant_name', 255)->nullable();
-    $table->integer('original_media_id')->unsigned()->nullable();
-    $table->foreign('original_media_id')
-         ->references('id')->on('media')
-         ->nullOnDelete();
-    ```
+* Database migration files are now served from within the package. In your migrations table, rename the `XXXX_XX_XX_XXXXXX_create_mediable_tables.php` entry to `2016_06_27_000000_create_mediable_tables.php` and delete your local copy of the migration file from the /database/migrations directory. If any customizations were made to the tables, those should be defined as one or more separate ALTER table migrations.
+* Two columns added to the `media` table: `variant_name` (varchar)  and `original_media_id` (should match `media.id` column type). Migration file is included with the package.
 * `Plank\Mediable\MediaUploaderFacade` moved to `Plank\Mediable\Facades\MediaUploader`
 * Directory and filename validation now only allows URL and filesystem safe ASCII characters (alphanumeric plus `.`, `-`, `_`, and `/` for directories). Will automatically attempt to transliterate UTF-8 accented characters and ligatures into their ASCII equivalent, all other characters will be converted to hyphens.
 * The following methods now include an extra `$withVariants` parameter :

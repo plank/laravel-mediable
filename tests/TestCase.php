@@ -118,10 +118,15 @@ class TestCase extends BaseTestCase
 
     protected function useDatabase()
     {
-        $artisan = $this->app->make(Kernel::class);
         $this->app->useDatabasePath(dirname(__DIR__));
-        //Remigrate all database tables
-        $artisan->call('migrate:refresh');
+        $this->loadMigrationsFrom(
+            [
+                '--path' => [
+                    dirname(__DIR__) . '/migrations',
+                    __DIR__ . '/migrations'
+                ]
+            ]
+        );
     }
 
     protected function useFilesystem($disk)
