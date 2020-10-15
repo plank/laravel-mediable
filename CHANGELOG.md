@@ -1,5 +1,18 @@
 # Changelog
 
+## 5.0.0 - 2020-10-14
+- Added support for creating image variants using the intervention/image library. Variants can be created synchronously in the current process or asychronously as queued jobs. Media records keep track of variants created from them.
+- Fixed Laravel 8+ migration squashing. Database migrations are now loaded from within the package instead of copied to the application's database/migration directory. See UPGRADING.md for steps to avoid conflicts.
+- Directory and filename validation now only allows URL and filesystem safe ASCII characters (alphanumeric plus `.`, `-`, `_`, and `/` for directories). Will automatically attempt to transliterate UTF-8 accented characters and ligatures into their ASCII equivalent, all other characters will be converted to hyphens.
+- Added `Media::stream()` method to easily retrieve a PSR-7 compatible Stream.
+- Added support for generating temporary URLs for files hosted on Amazon S3 buckets.
+
+## 4.4.2 - 2020-09-26
+- Fixed a handful of bugs related to using a custom table name when using a custom media class
+
+## 4.4.1 - 2020-09-14
+- Fixed Morph relation when subclassing Media (Thanks @GeoSot!)
+
 ## 4.4.0 - 2020-09-09
 - Added support for Laravel 8.0
 - Dropping support for Laravel versions < 6.0
