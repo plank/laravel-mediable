@@ -114,7 +114,7 @@ class MediableCollection extends Collection
         /** @var MorphToMany $relation */
         $relation = $this->first()->media();
         $query = $relation->newPivotStatement();
-        $classes = collect();
+        $classes = [];
 
         $this->each(function (Model $item) use ($query, $relation, $classes) {
             // collect list of ids of each class in case not all
@@ -132,7 +132,7 @@ class MediableCollection extends Collection
         $query->delete();
 
         // delete each item by class
-        $classes->each(function (array $ids, string $class) {
+        collect($classes)->each(function (array $ids, string $class) {
             $class::whereIn((new $class)->getKeyName(), $ids)->delete();
         });
     }
