@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Plank\Mediable;
 
 use Closure;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
@@ -116,24 +116,33 @@ class MediableCollection extends Collection
         $query = $relation->newPivotStatement();
         $classes = [];
 
-        $this->each(function (Model $item) use ($query, $relation, $classes) {
-            // collect list of ids of each class in case not all
-            // items belong to the same class
-            $classes[get_class($item)][] = $item->getKey();
+        $this->each(
+            function (Model $item) use ($query, $relation, &$classes) {
+                // collect list of ids of each class in case not all
+                // items belong to the same class
+                $classes[get_class($item)][] = $item->getKey();
+            }
+        );
 
-            // select pivots matching each item for deletion
-            $query->orWhere(function (Builder $q) use ($item, $relation) {
-                $q->where($relation->getMorphType(), get_class($item));
-                $q->where($relation->getQualifiedForeignPivotKeyName(), $item->getKey());
-            });
-        });
+        // delete each item by class
+        collect($classes)->each(
+            function (array $ids, string $class) use ($query, $relation) {
+                // select pivots matching each item for deletion
+                $query->orWhere(
+                    function (Builder $q) use ($class, $ids, $relation) {
+                        $q->where($relation->getMorphType(), $class);
+                        $q->whereIn(
+                            $relation->getQualifiedForeignPivotKeyName(),
+                            $ids
+                        );
+                    }
+                );
+
+                $class::whereIn((new $class)->getKeyName(), $ids)->delete();
+            }
+        );
 
         // delete pivots
         $query->delete();
-
-        // delete each item by class
-        collect($classes)->each(function (array $ids, string $class) {
-            $class::whereIn((new $class)->getKeyName(), $ids)->delete();
-        });
     }
 }
