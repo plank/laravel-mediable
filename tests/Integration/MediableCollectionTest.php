@@ -2,6 +2,7 @@
 
 namespace Plank\Mediable\Tests\Integration;
 
+use Illuminate\Support\Facades\DB;
 use Plank\Mediable\Media;
 use Plank\Mediable\MediableCollection;
 use Plank\Mediable\Tests\Mocks\SampleMediable;
@@ -145,5 +146,31 @@ class MediableCollectionTest extends TestCase
         $this->assertEquals([2, 2], $collection[0]->media->pluck('id')->toArray());
         $this->assertTrue($collection[0]->media[0]->relationLoaded('originalMedia'));
         $this->assertTrue($collection[0]->media[0]->relationLoaded('variants'));
+    }
+
+    public function testDelete()
+    {
+        $mediable1 = factory(SampleMediable::class)->create(['id' => 1]);
+        $mediable2 = factory(SampleMediable::class)->create(['id' => 2]);
+        $mediable3 = factory(SampleMediable::class)->create(['id' => 3]);
+        $media1 = factory(Media::class)->create(['id' => 1]);
+        $media2 = factory(Media::class)->create(['id' => 2]);
+        $mediable1->attachMedia($media1, 'foo');
+        $mediable1->attachMedia($media2, ['foo', 'bar', 'baz']);
+        $mediable2->attachMedia($media2, ['foo']);
+        $mediable3->attachMedia($media2, ['foo']);
+        $collection = new MediableCollection([$mediable1, $mediable2]);
+
+        $collection->delete();
+
+        $mediableResults = SampleMediable::all();
+        $this->assertEquals([3], $mediableResults->modelKeys());
+
+        $query = $mediable1->media()->newPivotStatement();
+        $pivots = $query->get();
+        $this->assertCount(1, $pivots);
+        $this->assertEquals("2", $pivots[0]->media_id);
+        $this->assertEquals("3", $pivots[0]->mediable_id);
+        $this->assertEquals("foo", $pivots[0]->tag);
     }
 }
