@@ -311,7 +311,7 @@ trait Mediable
 
     /**
      * Replace the existing media collection for the specified tag(s).
-     * @param string|int[]|int|Media|Collection $media
+     * @param string|int|int[]|Media|Collection $media
      * @param string|string[] $tags
      * @return void
      */
