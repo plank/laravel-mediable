@@ -284,7 +284,7 @@ trait Mediable
 
     /**
      * Attach a media entity to the model with one or more tags.
-     * @param string|int|Media|Collection $media Either a string or numeric id, an array of ids, an instance of `Media` or an instance of `Collection`
+     * @param string|int|int[]|Media|Collection $media Either a string or numeric id, an array of ids, an instance of `Media` or an instance of `Collection`
      * @param string|string[] $tags One or more tags to define the relation
      * @return void
      */
@@ -311,7 +311,7 @@ trait Mediable
 
     /**
      * Replace the existing media collection for the specified tag(s).
-     * @param string|int|Media|Collection $media
+     * @param string|int|int[]|Media|Collection $media
      * @param string|string[] $tags
      * @return void
      */
