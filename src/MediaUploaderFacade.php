@@ -36,8 +36,8 @@ use Illuminate\Support\Facades\Facade;
  * @method static Media upload()
  * @method static Media replace(Media $media)
  * @method static MediaUploader beforeSave(callable $callable)
- * @method static Media importPath($disk, $path)
- * @method static Media import($disk, $directory, $filename, $extension)
+ * @method static Media importPath($disk, $path, array $attributes = [])
+ * @method static Media import($disk, $directory, $filename, $extension, array $attributes = [])
  * @method static bool update(Media $media)
  * @method static void verifyFile()
  */

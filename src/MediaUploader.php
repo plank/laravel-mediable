@@ -592,6 +592,7 @@ class MediaUploader
      *
      * @param  string $disk
      * @param  string $path Path to file, relative to disk root
+     * @param  array  $attributes
      *
      * @return Media
      * @throws ConfigurationException
@@ -600,13 +601,14 @@ class MediaUploader
      * @throws FileSizeException
      * @throws ForbiddenException
      */
-    public function importPath(string $disk, string $path): Media
+    public function importPath(string $disk, string $path, array $attributes = []): Media
     {
         $directory = File::cleanDirname($path);
+        $directory= str_replace($this->filesystem->disk($disk)->path(''),'',$directory);
         $filename = pathinfo($path, PATHINFO_FILENAME);
         $extension = pathinfo($path, PATHINFO_EXTENSION);
 
-        return $this->import($disk, $directory, $filename, $extension);
+        return $this->import($disk, $directory, $filename, $extension, $attributes);
     }
 
     /**
@@ -616,6 +618,7 @@ class MediaUploader
      * @param  string $directory
      * @param  string $filename
      * @param  string $extension
+     * @param  array  $attributes
      *
      * @return Media
      * @throws ConfigurationException
@@ -624,12 +627,12 @@ class MediaUploader
      * @throws FileSizeException
      * @throws ForbiddenException
      */
-    public function import(string $disk, string $directory, string $filename, string $extension): Media
+    public function import(string $disk, string $directory, string $filename, string $extension, array $attributes = []): Media
     {
         $disk = $this->verifyDisk($disk);
         $storage = $this->filesystem->disk($disk);
 
-        $model = $this->makeModel();
+        $model = $this->makeModel($attributes);
         $model->disk = $disk;
         $model->directory = $directory;
         $model->filename = $filename;
@@ -697,13 +700,14 @@ class MediaUploader
 
     /**
      * Generate an instance of the `Media` class.
+     * @param  array  $attributes
      * @return Media
      */
-    private function makeModel(): Media
+    private function makeModel(array $attributes = []): Media
     {
         $class = $this->config['model'] ?? Media::class;
 
-        return new $class;
+        return new $class($attributes);
     }
 
     /**
