@@ -6,7 +6,7 @@
 [![StyleCI](https://styleci.io/repos/63791110/shield)](https://styleci.io/repos/63791110)
 [![Packagist](https://img.shields.io/packagist/v/plank/laravel-mediable.svg?style=flat-square)](https://packagist.org/packages/plank/laravel-mediable)
 
-Laravel-Mediable is a package for easily uploading and attaching media files to models with Laravel 5.
+Laravel-Mediable is a package for easily uploading and attaching media files to models with Laravel.
 
 ## Features
 
