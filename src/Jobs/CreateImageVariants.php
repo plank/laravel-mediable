@@ -2,19 +2,19 @@
 
 namespace Plank\Mediable\Jobs;
 
-use Carbon\Traits\Serialization;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Plank\Mediable\Exceptions\ImageManipulationException;
 use Plank\Mediable\ImageManipulator;
 use Plank\Mediable\Media;
 
 class CreateImageVariants implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, Serialization;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
      * @var string[]

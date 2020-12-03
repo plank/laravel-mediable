@@ -528,29 +528,29 @@ class MediableTest extends TestCase
         $this->assertSame($result, $result->loadMedia(['bar', 'foo'], true, true));
         $this->assertTrue($result->relationLoaded('media'));
         $this->assertEquals([2, 2], $result->media->pluck('id')->toArray());
-        $this->asserttrue($result->media[0]->relationLoaded('originalMedia'));
-        $this->asserttrue($result->media[0]->relationLoaded('variants'));
+        $this->assertTrue($result->media[0]->relationLoaded('originalMedia'));
+        $this->assertTrue($result->media[0]->relationLoaded('variants'));
 
         $result = SampleMediable::first();
         $this->assertSame($result, $result->loadMediaWithVariants(['bar', 'foo'], true));
         $this->assertTrue($result->relationLoaded('media'));
         $this->assertEquals([2, 2], $result->media->pluck('id')->toArray());
-        $this->asserttrue($result->media[0]->relationLoaded('originalMedia'));
-        $this->asserttrue($result->media[0]->relationLoaded('variants'));
+        $this->assertTrue($result->media[0]->relationLoaded('originalMedia'));
+        $this->assertTrue($result->media[0]->relationLoaded('variants'));
 
         $result = SampleMediable::first();
         $this->assertSame($result, $result->loadMediaMatchAll(['bar', 'foo'], true));
         $this->assertTrue($result->relationLoaded('media'));
         $this->assertEquals([2, 2], $result->media->pluck('id')->toArray());
-        $this->asserttrue($result->media[0]->relationLoaded('originalMedia'));
-        $this->asserttrue($result->media[0]->relationLoaded('variants'));
+        $this->assertTrue($result->media[0]->relationLoaded('originalMedia'));
+        $this->assertTrue($result->media[0]->relationLoaded('variants'));
 
         $result = SampleMediable::first();
         $this->assertSame($result, $result->loadMediaWithVariantsMatchAll(['bar', 'foo']));
         $this->assertTrue($result->relationLoaded('media'));
         $this->assertEquals([2, 2], $result->media->pluck('id')->toArray());
-        $this->asserttrue($result->media[0]->relationLoaded('originalMedia'));
-        $this->asserttrue($result->media[0]->relationLoaded('variants'));
+        $this->assertTrue($result->media[0]->relationLoaded('originalMedia'));
+        $this->assertTrue($result->media[0]->relationLoaded('variants'));
     }
 
     public function test_it_uses_custom_collection()
