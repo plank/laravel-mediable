@@ -1,5 +1,18 @@
 # Changelog
 
+## 5.0.4 - 2020-12-02
+- Fixed serialization of `CreateImageVariants` job.
+
+## 5.0.3 - 2020-10-28
+- Fixed docblock of `attachMedia()` and `SyncMedia()` (Thanks @hailwood!)
+
+## 5.0.2 - 2020-10-22
+- Fixed additional bugs with the `MediableCollection::delete()` method
+- Optimized the execution speed of `MediableCollection::delete()`
+
+## 5.0.1 - 2020-10-22
+- fixed notices generated from collection offset access in `MediableCollection::delete()`
+
 ## 5.0.0 - 2020-10-14
 - Added support for creating image variants using the intervention/image library. Variants can be created synchronously in the current process or asychronously as queued jobs. Media records keep track of variants created from them.
 - Fixed Laravel 8+ migration squashing. Database migrations are now loaded from within the package instead of copied to the application's database/migration directory. See UPGRADING.md for steps to avoid conflicts.

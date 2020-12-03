@@ -2,6 +2,7 @@
 
 namespace Plank\Mediable\Tests\Integration\Jobs;
 
+use GuzzleHttp\Promise\Create;
 use Illuminate\Database\Eloquent\Collection;
 use Plank\Mediable\ImageManipulation;
 use Plank\Mediable\ImageManipulator;
@@ -88,5 +89,29 @@ class CreateImageVariantsTest extends TestCase
 
         $job = new CreateImageVariants($model, [$variant1, $variant2], true);
         $job->handle();
+    }
+
+    public function test_it_will_serialize_models()
+    {
+        $this->useDatabase();
+        $model = $this->createMedia(['aggregate_type' => 'image']);
+        $variant = 'foo';
+
+        $manipulator = $this->createMock(ImageManipulator::class);
+        $manipulator->expects($this->once())
+            ->method('validateMedia')
+            ->with($model);
+        $manipulator->expects($this->any())
+            ->method('getVariantDefinition')
+            ->withConsecutive([$variant])
+            ->willReturn($this->createMock(ImageManipulation::class));
+        app()->instance(ImageManipulator::class, $manipulator);
+
+        $job = new CreateImageVariants($model, [$variant], true);
+        /** @var CreateImageVariants $result */
+        $result = unserialize(serialize($job));
+        $this->assertEquals([$model->getKey()], $result->getModels()->modelKeys());
+        $this->assertEquals([$variant], $result->getVariantNames());
+        $this->assertTrue($result->getForceRecreate());
     }
 }
