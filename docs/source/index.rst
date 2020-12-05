@@ -1,15 +1,9 @@
 Plank/Laravel-Mediable
 ============================================
 
-.. image:: https://img.shields.io/travis/plank/laravel-mediable/master.svg?style=flat-square
-    :target: https://travis-ci.org/plank/laravel-mediable
-    :alt: TravisCI
 .. image:: https://img.shields.io/coveralls/plank/laravel-mediable.svg?style=flat-square
     :target: https://coveralls.io/github/plank/laravel-mediable
     :alt: Coveralls
-.. image:: https://img.shields.io/sensiolabs/i/0eaf2725-64f4-4494-ae61-ca3961ba50c5.svg?style=flat-square
-    :target: https://insight.sensiolabs.com/projects/0eaf2725-64f4-4494-ae61-ca3961ba50c5
-    :alt: SensioLabsInsight
 .. image:: https://styleci.io/repos/63791110/shield
     :target: https://styleci.io/repos/63791110
     :alt: StyleCI
