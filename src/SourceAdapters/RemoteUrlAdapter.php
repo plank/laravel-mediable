@@ -138,7 +138,10 @@ class RemoteUrlAdapter implements SourceAdapterInterface
      */
     public function getHeaders(): array
     {
-        $headers = @get_headers($this->source, 1);
+        $headers = @get_headers(
+            $this->source,
+            version_compare(phpversion(), '8.0.0', '>=') ? true : 1
+        );
 
         return $headers ?: [];
     }

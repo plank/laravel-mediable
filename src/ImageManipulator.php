@@ -93,7 +93,7 @@ class ImageManipulator
         $manipulation = $this->getVariantDefinition($variantName);
 
         $outputFormat = $this->determineOutputFormat($manipulation, $media);
-        $image = $this->imageManager->make($media->stream());
+        $image = $this->imageManager->make($media->contents());
 
         $callback = $manipulation->getCallback();
         $callback($image);
