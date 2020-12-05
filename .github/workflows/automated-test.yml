@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-versions: ['7.3', '7.4']
+        php-versions: ['7.3', '7.4', '8.0']
         prefer-lowest: ['','--prefer-lowest']
     name: PHP ${{ matrix.php-versions }} ${{ matrix.prefer-lowest }}
     steps:
