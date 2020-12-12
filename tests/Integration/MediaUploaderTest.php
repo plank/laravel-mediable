@@ -29,6 +29,30 @@ class MediaUploaderTest extends TestCase
         $this->assertInstanceOf(MediaUploader::class, Facade::getFacadeRoot());
     }
 
+    public function test_facade_instantiates_unique_instances()
+    {
+        /** @var MediaUploader $uploader1 */
+        $uploader1 = Facade::getFacadeRoot();
+        $uploader1->setAllowedAggregateTypes(['image', 'vector']);
+
+        /** @var MediaUploader $uploader2 */
+        $uploader2 = Facade::getFacadeRoot();
+        $uploader2->setAllowedAggregateTypes(['archive']);
+
+        $config = $this->getPrivateProperty($uploader1, 'config');
+        $config->setAccessible(true);
+        $this->assertNotEquals(
+            $config->getValue($uploader1),
+            $config->getValue($uploader2)
+        );
+    }
+
+    public function test_facade_is_mockable()
+    {
+        Facade::shouldReceive('upload')->once();
+        Facade::upload();
+    }
+
     public function test_it_can_set_on_duplicate_behavior_via_facade()
     {
         $uploader = Facade::onDuplicateError();
