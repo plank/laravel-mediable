@@ -54,4 +54,13 @@ class MediaUploader extends Facade
     {
         return 'mediable.uploader';
     }
+
+    public static function getFacadeRoot()
+    {
+        // prevent the facade from behaving like a singleton
+        if (!self::isMock()) {
+            self::clearResolvedInstance('mediable.uploader');
+        }
+        return parent::getFacadeRoot();
+    }
 }
