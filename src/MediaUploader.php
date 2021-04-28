@@ -26,6 +26,7 @@ class MediaUploader
     const ON_DUPLICATE_INCREMENT = 'increment';
     const ON_DUPLICATE_ERROR = 'error';
     const ON_DUPLICATE_REPLACE = 'replace';
+    const ON_DUPLICATE_REPLACE_WITH_VARIANTS = 'replace_with_variants';
 
     /**
      * @var FileSystemManager
@@ -285,6 +286,20 @@ class MediaUploader
     public function onDuplicateReplace(): self
     {
         return $this->setOnDuplicateBehavior(self::ON_DUPLICATE_REPLACE);
+    }
+
+    /**
+     * Overwrite existing Media when file already exists at destination and delete any variants of the original record.
+     *
+     * This will delete the old media record and create a new one, detaching any existing associations.
+     *
+     * This will also delete any existing
+     *
+     * @return $this
+     */
+    public function onDuplicateReplaceWithVariants(): self
+    {
+        return $this->setOnDuplicateBehavior(self::ON_DUPLICATE_REPLACE_WITH_VARIANTS);
     }
 
     /**
@@ -821,6 +836,9 @@ class MediaUploader
             case static::ON_DUPLICATE_REPLACE:
                 $this->deleteExistingMedia($model);
                 break;
+            case static::ON_DUPLICATE_REPLACE_WITH_VARIANTS:
+                $this->deleteExistingMedia($model, true);
+                break;
             case static::ON_DUPLICATE_UPDATE:
                 $model->{$model->getKeyName()} = $model->newQuery()
                     ->where('disk', $model->disk)
@@ -844,16 +862,23 @@ class MediaUploader
      * @param  Media $model
      * @return void
      */
-    private function deleteExistingMedia(Media $model): void
+    private function deleteExistingMedia(Media $model, bool $withVariants = false): void
     {
-        $model->newQuery()
+        $original = $model->newQuery()
             ->where('disk', $model->disk)
             ->where('directory', $model->directory)
             ->where('filename', $model->filename)
             ->where('extension', $model->extension)
-            ->delete();
-
-        $this->deleteExistingFile($model);
+            ->first();
+        if ($original) {
+            $models = $withVariants ? $original->getAllVariantsAndSelf() : collect([$original]);
+            $models->each(
+                function (Media $variant) {
+                    $variant->delete();
+                    $this->deleteExistingFile($variant);
+                }
+            );
+        }
     }
 
     /**

@@ -25,6 +25,7 @@ use Plank\Mediable\MediaUploader as Uploader;
  * @method static Uploader onDuplicateError()
  * @method static Uploader onDuplicateIncrement()
  * @method static Uploader onDuplicateReplace()
+ * @method static Uploader onDuplicateReplaceWithVariants()
  * @method static Uploader onDuplicateUpdate()
  * @method static Uploader setStrictTypeChecking($strict)
  * @method static Uploader setAllowUnrecognizedTypes($allow)

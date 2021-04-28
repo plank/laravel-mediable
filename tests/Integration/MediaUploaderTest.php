@@ -73,6 +73,12 @@ class MediaUploaderTest extends TestCase
             $uploader->getOnDuplicateBehavior()
         );
 
+        $uploader = Facade::onDuplicateReplaceWithVariants();
+        $this->assertEquals(
+            MediaUploader::ON_DUPLICATE_REPLACE_WITH_VARIANTS,
+            $uploader->getOnDuplicateBehavior()
+        );
+
         $uploader = Facade::onDuplicateUpdate();
         $this->assertEquals(
             MediaUploader::ON_DUPLICATE_UPDATE,
@@ -314,18 +320,66 @@ class MediaUploaderTest extends TestCase
 
         $media = $this->createMedia(
             [
+                'id' => 66,
                 'disk' => 'tmp',
                 'directory' => '',
                 'filename' => 'plank',
                 'extension' => 'png'
             ]
         );
+        $variant = $this->createMedia(
+            [
+                'id' => 77,
+                'disk' => 'tmp',
+                'directory' => '',
+                'filename' => 'plank-variant',
+                'extension' => 'png',
+                'original_media_id' => $media->getKey()
+            ]
+        );
         $this->seedFileForMedia($media, $this->sampleFilePath());
+        $this->seedFileForMedia($variant, $this->sampleFilePath());
+
+        $method->invoke($uploader, $media);
+
+        $this->assertEquals([77], Media::all()->modelKeys());
+        $this->assertFalse(file_exists($media->getAbsolutePath()));
+        $this->assertTrue(file_exists($variant->getAbsolutePath()));
+    }
+
+    public function test_it_can_replace_duplicate_files_and_variants()
+    {
+        $this->useDatabase();
+        $this->useFilesystem('tmp');
+
+        $uploader = $this->getUploader()->onDuplicateReplaceWithVariants();
+        $method = $this->getPrivateMethod($uploader, 'handleDuplicate');
+
+        $media = $this->createMedia(
+            [
+                'disk' => 'tmp',
+                'directory' => '',
+                'filename' => 'plank',
+                'extension' => 'png'
+            ]
+        );
+        $variant = $this->createMedia(
+            [
+                'disk' => 'tmp',
+                'directory' => '',
+                'filename' => 'plank-variant',
+                'extension' => 'png',
+                'original_media_id' => $media->getKey()
+            ]
+        );
+        $this->seedFileForMedia($media, $this->sampleFilePath());
+        $this->seedFileForMedia($variant, $this->sampleFilePath());
 
         $method->invoke($uploader, $media);
 
         $this->assertEquals(0, Media::all()->count());
         $this->assertFalse(file_exists($media->getAbsolutePath()));
+        $this->assertFalse(file_exists($variant->getAbsolutePath()));
     }
 
     public function test_it_can_update_duplicate_files()
