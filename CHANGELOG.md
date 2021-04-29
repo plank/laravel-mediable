@@ -2,6 +2,7 @@
 
 ## 5.1.0 - 2021-04-28
 - Added `MediaUploader::onDuplicateReplaceWithVariants()` which behaves similar to `onDuplicateReplace()` but will also delete any variants of the replaced Media record.
+- Fixed `onDuplicateUpdate()` failing if file exists but without a matching model.
 
 ## 5.0.7 - 2020-12-11
 - Fixed `MediaUploader` Facade returning the same instance

@@ -414,6 +414,33 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('image', $media->aggregate_type);
     }
 
+    public function test_it_can_update_duplicate_files_when_model_not_found()
+    {
+        $this->useDatabase();
+        $this->useFilesystem('tmp');
+
+        $media = $this->makeMedia(
+            [
+                'disk' => 'tmp',
+                'directory' => '',
+                'filename' => 'plank',
+                'extension' => 'png',
+                'aggregate_type' => 'bar'
+            ]
+        );
+
+        $this->seedFileForMedia($media, 'foo');
+
+        $result = Facade::fromSource($this->sampleFilePath())
+            ->onDuplicateUpdate()
+            ->toDestination('tmp', '')->upload();
+
+        $this->assertEquals(
+            file_get_contents($this->sampleFilePath()),
+            file_get_contents($result->getAbsolutePath())
+        );
+    }
+
     public function test_it_can_increment_filename_on_duplicate_files()
     {
         $uploader = $this->getUploader()->onDuplicateIncrement();
