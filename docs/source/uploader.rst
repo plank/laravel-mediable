@@ -87,6 +87,10 @@ Occasionally, a file with a matching name might already exist at the destination
     // replace old file and media record with new ones, break associations
     $uploader->onDuplicateReplace();
 
+    // replace old file and media record with new ones, break associations
+    // will also delete any existing variants of the replaced media record
+    $uploader->onDuplicateReplaceWithVariants();
+
     // cancel upload, throw an exception
     $uploader->onDuplicateError();
 

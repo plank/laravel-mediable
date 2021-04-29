@@ -1,5 +1,17 @@
 # Changelog
 
+## 5.1.0 - 2021-04-28
+- Added `MediaUploader::onDuplicateReplaceWithVariants()` which behaves similar to `onDuplicateReplace()` but will also delete any variants of the replaced Media record.
+
+## 5.0.7 - 2020-12-11
+- Fixed `MediaUploader` Facade returning the same instance
+
+## 5.0.6 - 2020-12-05
+- Resolve bugs with PHP 8.0
+
+## 5.0.5 - 2020-12-05
+- `ImageManipulator` now uses `$media->contents()` instead of `$media->stream()`, as Intervention Image loads the whole file into memory anyways, and the former seems to have fewer hiccups for various cloud filesystems.
+
 ## 5.0.4 - 2020-12-02
 - Fixed serialization of `CreateImageVariants` job.
 

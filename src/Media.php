@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Arr;
 use Plank\Mediable\Exceptions\MediaMoveException;
 use Plank\Mediable\Exceptions\MediaUrlException;
 use Plank\Mediable\Helpers\File;
