@@ -64,7 +64,7 @@ The package comes with a Facade for the image uploader, which you can optionally
 ]
 ```
 
-Publish the config file (`config/mediable.php`) and migration file (`database/migrations/####_##_##_######_create_mediable_tables.php`) of the package using artisan.
+Publish the config file (`config/mediable.php`) of the package using artisan.
 
 ```bash
 php artisan vendor:publish --provider="Plank\Mediable\MediableServiceProvider"
