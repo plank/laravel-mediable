@@ -991,7 +991,7 @@ class MediaUploader
     public function getOptions(): array
     {
         $options = $this->options;
-        if(!isset($options['visibility'])) {
+        if (!isset($options['visibility'])) {
             $options['visibility'] = $this->visibility;
         }
         return $options;
