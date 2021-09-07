@@ -15,7 +15,7 @@
         "illuminate/support": ">6.0",
         "illuminate/filesystem": ">6.0",
         "illuminate/database": ">6.0",
-        "league/flysystem": "^1.0.23",
+        "league/flysystem": "^1.1.4",
         "psr/http-message": "^1.0",
         "intervention/image": "^2.5",
         "guzzlehttp/guzzle": "^6.5|^7.1"
