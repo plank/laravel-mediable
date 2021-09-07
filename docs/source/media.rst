@@ -112,7 +112,7 @@ You can change the location of a media file on disk.
 Copying Media
 ---------------------
 
-You can duplicate a media file to a different location on disk with the ``copyTo()`` method. Doing so will create a new `Media` record for the new file. If a filename is not provided, the new file will copy the original filename.
+You can duplicate a media file to a different location on disk with the ``copyTo()`` method. Doing so will create a new ``Media`` record for the new file. If a filename is not provided, the new file will copy the original filename.
 
 ::
 
@@ -120,6 +120,8 @@ You can duplicate a media file to a different location on disk with the ``copyTo
     $newMedia = $media->copyTo('new/directory');
     $newMedia = $media->copyTo('new/directory', 'new-filename');
     $newMedia = $media->copyToDisk('uploads', 'new/directory', 'new-filename');
+
+:Note: Both ``moveToDisk()`` and ``copyToDisk()`` support passing an additional ``$options`` argument with flags to be passed to the underlying filesystem adapter of the destination disk.
 
 Deleting Media
 ---------------------

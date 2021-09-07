@@ -64,11 +64,17 @@ class MediaMover
      * @param  string $disk the disk to move the file to
      * @param  string $directory directory relative to disk root
      * @param  string $filename filename. Do not include extension
+     * @param  array $options additional options to pass to the disk driver when uploading the file
      * @return void
      * @throws MediaMoveException If attempting to change the file extension or a file with the same name already exists at the destination
      */
-    public function moveToDisk(Media $media, string $disk, string $directory, string $filename = null): void
-    {
+    public function moveToDisk(
+        Media $media,
+        string $disk,
+        string $directory,
+        string $filename = null,
+        array $options = []
+    ): void {
         if ($media->disk === $disk) {
             $this->move($media, $directory, $filename);
             return;
@@ -86,8 +92,11 @@ class MediaMover
         }
 
         try {
-            $targetStorage->put($targetPath, $currentStorage->readStream($media->getDiskPath()));
-            $targetStorage->setVisibility($targetPath, $currentStorage->getVisibility($media->getDiskPath()));
+            if (!isset($options['visibility'])) {
+                $options['visibility'] = $currentStorage->getVisibility($media->getDiskPath());
+            }
+
+            $targetStorage->put($targetPath, $currentStorage->readStream($media->getDiskPath()), $options);
             $currentStorage->delete($media->getDiskPath());
         } catch (FileNotFoundException $e) {
             throw MediaMoveException::fileNotFound($media->disk, $media->getDiskPath(), $e);
@@ -154,8 +163,13 @@ class MediaMover
      * @return Media
      * @throws MediaMoveException If a file with the same name already exists at the destination or it fails to copy the file
      */
-    public function copyToDisk(Media $media, string $disk, string $directory, string $filename = null): Media
-    {
+    public function copyToDisk(
+        Media $media,
+        string $disk,
+        string $directory,
+        string $filename = null,
+        array $options = []
+    ): Media {
         if ($media->disk === $disk) {
             return $this->copyTo($media, $directory, $filename);
         }
@@ -172,8 +186,10 @@ class MediaMover
         }
 
         try {
-            $targetStorage->put($targetPath, $currentStorage->readStream($media->getDiskPath()));
-            $targetStorage->setVisibility($targetPath, $currentStorage->getVisibility($media->getDiskPath()));
+            if (!isset($options['visibility'])) {
+                $options['visibility'] = $currentStorage->getVisibility($media->getDiskPath());
+            }
+            $targetStorage->put($targetPath, $currentStorage->readStream($media->getDiskPath()), $options);
         } catch (FileNotFoundException $e) {
             throw MediaMoveException::fileNotFound($media->disk, $media->getDiskPath(), $e);
         }
