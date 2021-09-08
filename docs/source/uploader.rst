@@ -186,6 +186,18 @@ In addition to setting visibility on :ref:`Disks as a whole <disk_visibility>`, 
         ->makePublic() // Default behaviour
         ->upload()
 
+Options
+--------------------
+
+You can also specify additional option flags to be passed to the underlying filesystem adapter. This is particularly useful when dealing with cloud storage such as S3.
+
+::
+
+    <?php
+    MediaUploader::fromSource($request->file('image'))
+        ->withOptions(['Cache-Control' => 'max-age=3600'])
+        ->upload();
+
 Handling Exceptions
 --------------------
 

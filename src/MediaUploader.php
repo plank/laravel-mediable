@@ -87,6 +87,12 @@ class MediaUploader
     private $before_save;
 
     /**
+     * Additional options to pass to the filesystem while uploading
+     * @var array
+     */
+    private $options = [];
+
+    /**
      * Constructor.
      * @param FilesystemManager $filesystem
      * @param SourceAdapterFactory $factory
@@ -408,6 +414,17 @@ class MediaUploader
     public function makePrivate(): self
     {
         $this->visibility = Filesystem::VISIBILITY_PRIVATE;
+        return $this;
+    }
+
+    /**
+     * Additional options to pass to the filesystem when uploading
+     * @param array $options
+     * @return $this
+     */
+    public function withOptions(array $options): self
+    {
+        $this->options = $options;
         return $this;
     }
 
@@ -963,11 +980,20 @@ class MediaUploader
             ->put(
                 $model->getDiskPath(),
                 $stream,
-                $this->visibility
+                $this->getOptions()
             );
 
         if (is_resource($stream)) {
             fclose($stream);
         }
+    }
+
+    public function getOptions(): array
+    {
+        $options = $this->options;
+        if (!isset($options['visibility'])) {
+            $options['visibility'] = $this->visibility;
+        }
+        return $options;
     }
 }

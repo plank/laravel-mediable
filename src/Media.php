@@ -502,9 +502,14 @@ class Media extends Model
      * @return void
      * @throws MediaMoveException If attempting to change the file extension or a file with the same name already exists at the destination
      */
-    public function moveToDisk(string $disk, string $destination, string $filename = null): void
-    {
-        $this->getMediaMover()->moveToDisk($this, $disk, $destination, $filename);
+    public function moveToDisk(
+        string $disk,
+        string $destination,
+        string $filename = null,
+        array $options = []
+    ): void {
+        $this->getMediaMover()
+            ->moveToDisk($this, $disk, $destination, $filename, $options);
     }
 
     /**
@@ -520,9 +525,14 @@ class Media extends Model
      * @return Media
      * @throws MediaMoveException If a file with the same name already exists at the destination or it fails to copy the file
      */
-    public function copyToDisk(string $disk, string $destination, string $filename = null): self
-    {
-        return $this->getMediaMover()->copyToDisk($this, $disk, $destination, $filename);
+    public function copyToDisk(
+        string $disk,
+        string $destination,
+        string $filename = null,
+        array $options = []
+    ): self {
+        return $this->getMediaMover()
+            ->copyToDisk($this, $disk, $destination, $filename, $options);
     }
 
     protected function getMediaMover(): MediaMover
