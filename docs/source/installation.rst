@@ -24,7 +24,7 @@ The package comes with a Facade for the image uploader, which you can optionally
 
     'aliases' => [
         //...
-        'MediaUploader' => Plank\Mediable\MediaUploaderFacade::class,
+        'MediaUploader' => Plank\Mediable\Facades\MediaUploader::class,
         //...
     ]
 
