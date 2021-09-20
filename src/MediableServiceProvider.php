@@ -35,8 +35,8 @@ class MediableServiceProvider extends ServiceProvider
         );
         
         $this->publishes([
-            __DIR__.'/../database/migrations' => $this->app->databasePath('migrations'),
-        ], 'migrations');
+            __DIR__.'/../migrations' => $this->app->databasePath('migrations'),
+        ], 'mediable-migrations');
 
         $this->loadMigrationsFrom($root . '/migrations');
     }
