@@ -256,12 +256,12 @@ Variants can also be eager loaded this way.
 
     <?php
     // lazy eager load from a collection of Mediables
-    $posts->loadMediaAndVariants($tags);
-    $posts->loadMediaAndVariantsMatchAll($tags);
+    $posts->loadMediaWithVariants($tags);
+    $posts->loadMediaWithVariantsMatchAll($tags);
 
     // lazy eager load from a single Mediable model
-    $post->loadMediaAndVariants($tags);
-    $post->loadMediaAndVariantsMatchAll($tags);
+    $post->loadMediaWithVariants($tags);
+    $post->loadMediaWithVariantsMatchAll($tags);
 
 Automatic Rehydration
 ----------------------
