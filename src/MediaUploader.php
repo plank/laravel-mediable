@@ -354,8 +354,8 @@ class MediaUploader
     public function setTypeDefinition(string $type, array $mimeTypes, array $extensions): self
     {
         $this->config['aggregate_types'][$type] = [
-            'mime_types' => $mimeTypes,
-            'extensions' => $extensions,
+            'mime_types' => array_map('strtolower', $mimeTypes),
+            'extensions' => array_map('strtolower', $extensions),
         ];
 
         return $this;
@@ -439,6 +439,8 @@ class MediaUploader
      */
     public function inferAggregateType(string $mimeType, string $extension): string
     {
+        $mimeType = strtolower($mimeType);
+        $extension = strtolower($extension);
         $allowedTypes = $this->config['allowed_aggregate_types'] ?? [];
         $typesForMime = $this->possibleAggregateTypesForMimeType($mimeType);
         $typesForExtension = $this->possibleAggregateTypesForExtension($extension);
@@ -782,9 +784,10 @@ class MediaUploader
      */
     private function verifyMimeType(string $mimeType): string
     {
+        $mimeType = strtolower($mimeType);
         $allowed = $this->config['allowed_mime_types'] ?? [];
-        if (!empty($allowed) && !in_array(strtolower($mimeType), $allowed)) {
-            throw FileNotSupportedException::mimeRestricted(strtolower($mimeType), $allowed);
+        if (!empty($allowed) && !in_array($mimeType, $allowed)) {
+            throw FileNotSupportedException::mimeRestricted($mimeType, $allowed);
         }
 
         return $mimeType;
@@ -798,9 +801,10 @@ class MediaUploader
      */
     private function verifyExtension(string $extension): string
     {
+        $extension = strtolower($extension);
         $allowed = $this->config['allowed_extensions'] ?? [];
-        if (!empty($allowed) && !in_array(strtolower($extension), $allowed)) {
-            throw FileNotSupportedException::extensionRestricted(strtolower($extension), $allowed);
+        if (!empty($allowed) && !in_array($extension, $allowed)) {
+            throw FileNotSupportedException::extensionRestricted($extension, $allowed);
         }
 
         return $extension;
