@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Plank\Mediable;
 
 use Carbon\Carbon;
+use GuzzleHttp\Psr7\Utils;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -397,9 +398,11 @@ class Media extends Model
      */
     public function stream()
     {
-        return \GuzzleHttp\Psr7\stream_for(
-            $this->storage()->readStream($this->getDiskPath())
-        );
+        $stream = $this->storage()->readStream($this->getDiskPath());
+        if (method_exists(Utils::class, 'streamFor')) {
+            return Utils::streamFor($stream);
+        }
+        return \GuzzleHttp\Psr7\stream_for($stream);
     }
 
     /**
