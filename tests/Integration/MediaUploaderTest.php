@@ -166,6 +166,17 @@ class MediaUploaderTest extends TestCase
         $uploader->inferAggregateType('text/foo', 'bar');
     }
 
+    public function test_it_infers_type_case_insensitive()
+    {
+        $uploader = $this->getUploader();
+        $uploader->setTypeDefinition('foo', ['TeXT/foo'], ['FOo']);
+
+        $this->assertEquals(
+            'foo',
+            $uploader->inferAggregateType('tExt/fOo', 'foO'),
+        );
+    }
+
     public function test_it_can_restrict_to_known_types()
     {
         $uploader = $this->getUploader();
