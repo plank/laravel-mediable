@@ -102,27 +102,39 @@ Output Destination
 
 By default, variants will be created in the same disk and directory as the original file, with a filename that includes the variant name as as suffix. You can choose to customize the output disk, directory and filename.
 
-..
+::
 
     <?php
-    $manipulator->toDisk('uploads');
-    $manipulator->toDirectory('files/variants');
+    $manipulation->toDisk('uploads');
+    $manipulation->toDirectory('files/variants');
 
     // shorthand for the above
-    $manipulator->toDestination('uploads', 'files/variants');
+    $manipulation->toDestination('uploads', 'files/variants');
 
-    $manipulator->useFilename('my-custom-filename');
-    $manipulator->useHashForFilename();
-    $manipulator->useOriginalFilename(); //restore default behaviour
+    $manipulation->useFilename('my-custom-filename');
+    $manipulation->useHashForFilename();
+    $manipulation->useOriginalFilename(); //restore default behaviour
 
 If another file exists at the output destination, the ImageManipulator will attempt to find a unique filename by appending an incrementing number. This can be configured to throw an exception instead if a conflict is discovered.
 
 ::
 
     <?php
-    $manipulator->onDuplicateIncrement(); // default behaviour
-    $manipulator->onDuplicateError();
+    $manipulation->onDuplicateIncrement(); // default behaviour
+    $manipulation->onDuplicateError();
 
+File Visibility
+^^^^^^^^^^^^^^^
+
+By default, newly created variants will use the default filesystem visibility of the destination filesystem disk. To modify this, you may use one of the following methods.
+
+::
+
+    <?php
+    $manipulation->makePrivate();
+    $manipulation->makePublic();
+    // to copy the visibility of the original media file
+    $manipulation->matchOriginalVisibility();
 
 Before Save Callback
 ^^^^^^^^^^^^^^^^^^^^

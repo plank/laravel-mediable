@@ -134,8 +134,21 @@ class ImageManipulator
                 ->delete($originalVariant->getDiskPath());
         }
 
+        $visibility = $manipulation->getVisibility();
+        if ($visibility == 'match') {
+            $visibility = ($media->isVisible() ? 'public' : 'private');
+        }
+        $options = [];
+        if ($visibility) {
+            $options = ['visibility' => $visibility];
+        }
+
         $this->filesystem->disk($variant->disk)
-            ->writeStream($variant->getDiskPath(), $outputStream->detach());
+            ->writeStream(
+                $variant->getDiskPath(),
+                $outputStream->detach(),
+                $options
+            );
 
         $variant->save();
 

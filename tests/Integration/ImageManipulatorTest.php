@@ -580,6 +580,54 @@ class ImageManipulatorTest extends TestCase
         $this->assertFalse($previousVariant->fileExists());
     }
 
+    public function visibilityProvider()
+    {
+        return [
+            ['uploads', 'public', null, true],
+            ['uploads', 'private', null, true],
+            ['tmp', 'public', null, false],
+            ['tmp', 'private', null, false],
+            ['tmp', 'public', 'match', true],
+            ['tmp', 'private', 'match', false],
+            ['tmp', 'public', 'private', false],
+            ['tmp', 'private', 'public', true]
+        ];
+    }
+
+    /** @dataProvider visibilityProvider */
+    public function test_variant_created_with_visibility(
+        string $disk,
+        string $originalVisibility,
+        ?string $manipulationVisibility,
+        bool $expectedVisibility
+    ) {
+        $this->useFilesystem($disk);
+        $this->useDatabase();
+
+        $media = $this->makeMedia(
+            [
+                'disk' => $disk,
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'extension' => 'png',
+                'mime_type' => 'image/png',
+                'aggregate_type' => 'image'
+            ]
+        );
+        $this->seedFileForMedia($media, $this->sampleFile());
+        $originalVisibility == 'public' ? $media->makePublic() : $media->makePrivate();
+
+        $manipulation = ImageManipulation::make($this->getMockCallable())
+            ->setVisibility($manipulationVisibility)
+            ->toDisk($disk);
+
+        $imageManipulator = $this->getManipulator();
+        $imageManipulator->defineVariant('test', $manipulation);
+
+        $result = $imageManipulator->createImageVariant($media, 'test', true);
+        $this->assertSame($expectedVisibility, $result->isVisible());
+    }
+
     public function getManipulator(): ImageManipulator
     {
         return new ImageManipulator(
