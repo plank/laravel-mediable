@@ -106,4 +106,31 @@ class ImageManipulationTest extends TestCase
             $manipulation->getOnDuplicateBehaviour()
         );
     }
+
+    public function test_visibility()
+    {
+        $manipulation = new ImageManipulation($this->getMockCallable());
+        $this->assertNull($manipulation->getVisibility());
+
+        $manipulation->makePublic();
+        $this->assertEquals('public', $manipulation->getVisibility());
+
+        $manipulation->makePrivate();
+        $this->assertEquals('private', $manipulation->getVisibility());
+
+        $manipulation->matchOriginalVisibility();
+        $this->assertEquals('match', $manipulation->getVisibility());
+
+        $manipulation->setVisibility('public');
+        $this->assertEquals('public', $manipulation->getVisibility());
+
+        $manipulation->setVisibility('private');
+        $this->assertEquals('private', $manipulation->getVisibility());
+
+        $manipulation->setVisibility('match');
+        $this->assertEquals('match', $manipulation->getVisibility());
+
+        $manipulation->setVisibility(null);
+        $this->assertNull($manipulation->getVisibility());
+    }
 }

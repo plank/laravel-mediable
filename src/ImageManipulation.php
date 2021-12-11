@@ -58,6 +58,9 @@ class ImageManipulation
     /** @var string */
     private $onDuplicateBehaviour = self::ON_DUPLICATE_INCREMENT;
 
+    /** @var string|null */
+    private $visibility;
+
     /** @var callable|null */
     private $beforeSave;
 
@@ -320,6 +323,35 @@ class ImageManipulation
     public function getOnDuplicateBehaviour(): string
     {
         return $this->onDuplicateBehaviour;
+    }
+
+    public function makePrivate(): self
+    {
+        $this->visibility = 'private';
+        return $this;
+    }
+
+    public function makePublic(): self
+    {
+        $this->visibility = 'public';
+        return $this;
+    }
+
+    public function matchOriginalVisibility(): self
+    {
+        $this->visibility = 'match';
+        return $this;
+    }
+
+    public function setVisibility(?string $visibility): self
+    {
+        $this->visibility = $visibility;
+        return $this;
+    }
+
+    public function getVisibility(): ?string
+    {
+        return $this->visibility;
     }
 
     /**
