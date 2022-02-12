@@ -126,7 +126,13 @@ class ImageManipulatorTest extends TestCase
         $this->assertEquals('png', $result->extension);
         $this->assertEquals('image/png', $result->mime_type);
         $this->assertEquals('image', $result->aggregate_type);
-        $this->assertEquals(449, $result->size);
+        $this->assertContains(
+            $result->size,
+            [
+                449, // Laravel <=8
+                438 // Laravel 9+
+            ]
+        );
         $this->assertEquals('test', $result->variant_name);
         $this->assertEquals(10, $result->original_media_id);
         $this->assertTrue($media->fileExists());

@@ -92,4 +92,20 @@ class File
 
         return null;
     }
+
+    public static function joinPathComponents(string ...$components): string
+    {
+        $path = '';
+        foreach ($components as $component) {
+            if (empty($component)) {
+                continue;
+            }
+            if (empty($path)) {
+                $path = $component;
+                continue;
+            }
+            $path = rtrim($path, '/') . '/' . ltrim($component, '/');
+        }
+        return $path;
+    }
 }

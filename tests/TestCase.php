@@ -3,6 +3,7 @@
 namespace Plank\Mediable\Tests;
 
 use Dotenv\Dotenv;
+use Faker\Factory;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Filesystem\Filesystem;
 use Orchestra\Testbench\TestCase as BaseTestCase;
@@ -76,7 +77,9 @@ class TestCase extends BaseTestCase
                 'region' => env('S3_REGION'),
                 'bucket' => env('S3_BUCKET'),
                 'version' => 'latest',
-                'visibility' => 'public'
+                'visibility' => 'public',
+                // set random root to avoid parallel test runs from deleting each other's files
+                'root' => Factory::create()->md5
             ]
         ]);
 

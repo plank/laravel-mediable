@@ -24,17 +24,17 @@ use Psr\Http\Message\StreamInterface;
 
 /**
  * Media Model.
- * @property int|string $id
- * @property string $disk
- * @property string $directory
- * @property string $filename
- * @property string $extension
- * @property string $basename
- * @property string $mime_type
- * @property string $aggregate_type
- * @property string $variant_name
- * @property int|string $original_media_id
- * @property int $size
+ * @property int|string|null $id
+ * @property string|null $disk
+ * @property string|null $directory
+ * @property string|null $filename
+ * @property string|null $extension
+ * @property string|null $basename
+ * @property string|null $mime_type
+ * @property string|null $aggregate_type
+ * @property string|null $variant_name
+ * @property int|string|null $original_media_id
+ * @property int|null $size
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Pivot $pivot
@@ -314,7 +314,7 @@ class Media extends Model
      */
     public function getDiskPath(): string
     {
-        return ltrim(rtrim((string)$this->directory, '/') . '/' . ltrim((string)$this->basename, '/'), '/');
+        return ltrim(File::joinPathComponents((string)$this->directory, (string)$this->basename), '/');
     }
 
     /**

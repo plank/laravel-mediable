@@ -43,4 +43,16 @@ class FileTest extends TestCase
             File::sanitizePath("/héllo/world! \\  \t whàt\'ς_new with.you??")
         );
     }
+
+    public function test_it_joins_path_components()
+    {
+        $this->assertEquals('', File::joinPathComponents('', ''));
+        $this->assertEquals('foo', File::joinPathComponents('foo', ''));
+        $this->assertEquals('foo/', File::joinPathComponents('foo/', ''));
+        $this->assertEquals('foo/bar', File::joinPathComponents('foo', 'bar'));
+        $this->assertEquals('foo/bar', File::joinPathComponents('foo/', 'bar'));
+        $this->assertEquals('foo/bar', File::joinPathComponents('foo/', '/bar'));
+        $this->assertEquals('foo/bar/baz', File::joinPathComponents('foo', '/bar/', '/baz'));
+        $this->assertEquals('foo/baz', File::joinPathComponents('foo', '', 'baz'));
+    }
 }
