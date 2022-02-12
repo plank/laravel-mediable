@@ -218,9 +218,10 @@ class MediaTest extends TestCase
         try {
             $this->assertEquals(
                 sprintf(
-                    'https://%s.s3.%s.amazonaws.com/foo/bar/baz.jpg',
+                    'https://%s.s3.%s.amazonaws.com/%s/foo/bar/baz.jpg',
                     env('S3_BUCKET'),
-                    env('S3_REGION')
+                    env('S3_REGION'),
+                    config('filesystems.disks.s3.root')
                 ),
                 $media->getUrl()
             );

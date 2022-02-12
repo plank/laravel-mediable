@@ -34,9 +34,10 @@ class S3UrlGeneratorTest extends TestCase
         $generator = $this->setupGenerator();
         $this->assertEquals(
             sprintf(
-                'https://%s.s3.%s.amazonaws.com/foo/bar.jpg',
+                'https://%s.s3.%s.amazonaws.com/%s/foo/bar.jpg',
                 env('S3_BUCKET'),
-                env('S3_REGION')
+                env('S3_REGION'),
+                config('filesystems.disks.s3.root')
             ),
             $generator->getAbsolutePath()
         );
@@ -47,9 +48,10 @@ class S3UrlGeneratorTest extends TestCase
         $generator = $this->setupGenerator();
         $this->assertEquals(
             sprintf(
-                'https://%s.s3.%s.amazonaws.com/foo/bar.jpg',
+                'https://%s.s3.%s.amazonaws.com/%s/foo/bar.jpg',
                 env('S3_BUCKET'),
-                env('S3_REGION')
+                env('S3_REGION'),
+                config('filesystems.disks.s3.root')
             ),
             $generator->getUrl()
         );
@@ -62,9 +64,10 @@ class S3UrlGeneratorTest extends TestCase
         [$uri, $queryString] = explode('?', $url);
         $this->assertEquals(
             sprintf(
-                'https://%s.s3.%s.amazonaws.com/foo/bar.jpg',
+                'https://%s.s3.%s.amazonaws.com/%s/foo/bar.jpg',
                 env('S3_BUCKET'),
-                env('S3_REGION')
+                env('S3_REGION'),
+                config('filesystems.disks.s3.root')
             ),
             $uri
         );

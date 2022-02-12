@@ -6,6 +6,7 @@ namespace Plank\Mediable\UrlGenerators;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Filesystem\Cloud;
 use Illuminate\Filesystem\FilesystemManager;
+use Plank\Mediable\Helpers\File;
 
 class S3UrlGenerator extends BaseUrlGenerator implements TemporaryUrlGeneratorInterface
 {
@@ -46,12 +47,13 @@ class S3UrlGenerator extends BaseUrlGenerator implements TemporaryUrlGeneratorIn
 
     public function getTemporaryUrl(\DateTimeInterface $expiry): string
     {
+        $root = config("filesystems.disks.{$this->media->disk}.root", '');
         $adapter = $this->filesystem->disk($this->media->disk)->getDriver()->getAdapter();
         $command = $adapter->getClient()->getCommand(
             'GetObject',
             [
                 'Bucket' => $adapter->getBucket(),
-                'Key' => $this->media->getDiskPath(),
+                'Key' => File::joinPathComponents($root, $this->media->getDiskPath()),
             ]
         );
 
