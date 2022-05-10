@@ -1,7 +1,8 @@
 # Changelog
 
 ## 5.5.0 - 2022-05-09
-- Filename and pathname sanitation will use the app locale when transliterating UTF-8 characters to ascii.
+- Filename and pathname sanitization will use the app locale when transliterating UTF-8 characters to ascii.
+- Restored original behaviour of treating unrecognized mime types as `application/octet-stream` (changed in recent version of Flysystem)
 
 ## 5.4.1 - 2022-04-06
 - Fixed S3 temporary URL generation for Laravel 9+ / Flysystem 3+

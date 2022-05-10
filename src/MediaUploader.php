@@ -5,6 +5,7 @@ namespace Plank\Mediable;
 
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemManager;
+use League\Flysystem\UnableToRetrieveMetadata;
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Plank\Mediable\Exceptions\MediaUpload\FileExistsException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException;
@@ -673,7 +674,10 @@ class MediaUploader
             throw FileNotFoundException::fileNotFound($model->getDiskPath());
         }
 
-        $model->mime_type = $this->verifyMimeType($storage->mimeType($model->getDiskPath()));
+
+        $model->mime_type = $this->verifyMimeType(
+            $this->inferMimeType($storage, $model->getDiskPath())
+        );
         $model->aggregate_type = $this->inferAggregateType($model->mime_type, $model->extension);
         $model->size = $this->verifyFileSize($storage->size($model->getDiskPath()));
 
@@ -702,7 +706,9 @@ class MediaUploader
         $storage = $this->filesystem->disk($media->disk);
 
         $media->size = $this->verifyFileSize($storage->size($media->getDiskPath()));
-        $media->mime_type = $this->verifyMimeType($storage->mimeType($media->getDiskPath()));
+        $media->mime_type = $this->verifyMimeType(
+            $this->inferMimeType($storage, $media->getDiskPath())
+        );
         $media->aggregate_type = $this->inferAggregateType($media->mime_type, $media->extension);
 
         if ($dirty = $media->isDirty()) {
@@ -773,6 +779,17 @@ class MediaUploader
         }
         if (!$this->source->valid()) {
             throw FileNotFoundException::fileNotFound($this->source->path());
+        }
+    }
+
+    private function inferMimeType(Filesystem $filesystem, string $path): string
+    {
+        try {
+            return $filesystem->mimeType($path);
+        } catch (UnableToRetrieveMetadata $e) {
+            // previous versions of flysystem would default to octet-stream when
+            // the file was unrecognized. Maintain the behaviour for now
+            return 'application/octet-stream';
         }
     }
 

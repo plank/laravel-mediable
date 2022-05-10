@@ -17,7 +17,6 @@ class File
      */
     public static function cleanDirname(string $path): string
     {
-
         $dirname = pathinfo($path, PATHINFO_DIRNAME);
         if ($dirname == '.') {
             return '';
