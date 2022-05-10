@@ -1,5 +1,30 @@
 # Changelog
 
+## 5.5.0 - 2022-05-09
+- Filename and pathname sanitation will use the app locale when transliterating UTF-8 characters to ascii.
+
+## 5.4.1 - 2022-04-06
+- Fixed S3 temporary URL generation for Laravel 9+ / Flysystem 3+
+
+## 5.4.0 - 2022-02-11
+- Added support for Laravel 9
+- Dropped support for PHP 7.3
+- Dropped support for Laravel 6.x and 7.x
+- Fixed S3 temporary URL generation not respecting disk root configuration.
+
+## 5.3.1 - 2021-12-11
+- Support specifying file visibility on variant creation
+
+## 5.2.1 - 2021-10-27
+- Fix aggregate type matching not properly handling case mismatches of mime types and/or extensions
+- Handle Guzzle stream_for()` deprecation
+
+## 5.2.0 - 2021-09-08
+- Allow passing filesystem options via uploader and mover
+
+## 5.1.1 - 2021-04-29
+- Fixed Facade PHPDOC typehints
+
 ## 5.1.0 - 2021-04-28
 - Added `MediaUploader::onDuplicateReplaceWithVariants()` which behaves similar to `onDuplicateReplace()` but will also delete any variants of the replaced Media record.
 - Fixed `onDuplicateUpdate()` failing if file exists but without a matching model.

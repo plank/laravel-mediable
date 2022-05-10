@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Plank\Mediable\Helpers;
 
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
 use Symfony\Component\Mime\MimeTypes;
@@ -16,6 +17,7 @@ class File
      */
     public static function cleanDirname(string $path): string
     {
+
         $dirname = pathinfo($path, PATHINFO_DIRNAME);
         if ($dirname == '.') {
             return '';
@@ -29,10 +31,15 @@ class File
      * @param  string $path
      * @return string
      */
-    public static function sanitizePath(string $path): string
+    public static function sanitizePath(string $path, string $language = null): string
     {
+        $language = $language ?: App::currentLocale();
         return trim(
-            preg_replace('/[^a-zA-Z0-9-_\/.%]+/', '-', Str::ascii($path)),
+            preg_replace(
+                '/[^a-zA-Z0-9-_\/.%]+/',
+                '-',
+                Str::ascii($path, $language)
+            ),
             DIRECTORY_SEPARATOR . '-'
         );
     }
@@ -42,10 +49,15 @@ class File
      * @param  string $file
      * @return string
      */
-    public static function sanitizeFileName(string $file): string
+    public static function sanitizeFileName(string $file, string $language = null): string
     {
+        $language = $language ?: App::currentLocale();
         return trim(
-            preg_replace('/[^a-zA-Z0-9-_.%]+/', '-', Str::ascii($file)),
+            preg_replace(
+                '/[^a-zA-Z0-9-_.%]+/',
+                '-',
+                Str::ascii($file, $language)
+            ),
             '-'
         );
     }
