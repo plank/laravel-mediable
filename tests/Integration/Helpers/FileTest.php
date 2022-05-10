@@ -31,8 +31,16 @@ class FileTest extends TestCase
     public function test_it_sanitizes_filenames()
     {
         $this->assertEquals(
-            'hello-world-what-s_new-with.you',
-            File::sanitizeFileName("héllo/world! \\  \t whàt\'ς_new with.you?")
+            'hello-world-what-ss_new-with.you',
+            File::sanitizeFileName("héllo/world! \\  \t whàt\'ß_new with.you?", 'en')
+        );
+    }
+
+    public function test_it_sanitizes_filenames_with_locale()
+    {
+        $this->assertEquals(
+            'hello-world-what-sz_new-with.you',
+            File::sanitizeFileName("héllo/world! \\  \t whàt\'ß_new with.you?", 'de_at')
         );
     }
 
