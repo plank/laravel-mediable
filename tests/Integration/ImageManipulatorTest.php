@@ -32,6 +32,66 @@ class ImageManipulatorTest extends TestCase
         $this->assertTrue($manipulator->hasVariantDefinition('foo'));
     }
 
+    public function test_it_retrieves_all_variants()
+    {
+        $manipulator = $this->getManipulator();
+        $variant = new ImageManipulation($this->getMockCallable());
+        $this->assertEquals(collect(), $manipulator->getAllVariantDefinitions());
+        $this->assertEquals([], $manipulator->getAllVariantNames());
+
+        $manipulator->defineVariant(
+            'foo',
+            $variant
+        );
+        $this->assertEquals(
+            collect(['foo' => $variant]),
+            $manipulator->getAllVariantDefinitions()
+        );
+        $this->assertEquals(['foo'], $manipulator->getAllVariantNames());
+
+        $manipulator->defineVariant(
+            'bar',
+            $variant
+        );
+        $this->assertEquals(
+            collect(['foo' => $variant, 'bar' => $variant]),
+            $manipulator->getAllVariantDefinitions()
+        );
+        $this->assertEquals(['foo', 'bar'], $manipulator->getAllVariantNames());
+    }
+
+    public function test_it_can_store_and_retrieve_by_tag()
+    {
+        $manipulator = $this->getManipulator();
+        $variant = new ImageManipulation($this->getMockCallable());
+        $manipulator->defineVariant(
+            'foo',
+            $variant,
+            ['a', 'b']
+        );
+        $manipulator->defineVariant(
+            'bar',
+            $variant,
+            ['b']
+        );
+
+        $this->assertEquals(
+            collect(['foo' => $variant]),
+            $manipulator->getVariantDefinitionsByTag('a')
+        );
+        $this->assertEquals(['foo'], $manipulator->getVariantNamesByTag('a'));
+        $this->assertEquals(
+            collect(['foo' => $variant, 'bar' => $variant]),
+            $manipulator->getVariantDefinitionsByTag('b')
+        );
+        $this->assertEquals(['foo', 'bar'], $manipulator->getVariantNamesByTag('b'));
+        $this->assertEquals(
+            collect([]),
+            $manipulator->getVariantDefinitionsByTag('c')
+        );
+        $this->assertEquals([], $manipulator->getVariantNamesByTag('c'));
+    }
+
     public function test_it_throws_for_non_image_media()
     {
         $this->expectException(ImageManipulationException::class);

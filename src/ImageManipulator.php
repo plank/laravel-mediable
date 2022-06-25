@@ -3,21 +3,21 @@
 namespace Plank\Mediable;
 
 use Illuminate\Filesystem\FilesystemManager;
+use Illuminate\Support\Collection;
 use Intervention\Image\ImageManager;
 use Plank\Mediable\Exceptions\ImageManipulationException;
 use Psr\Http\Message\StreamInterface;
 
 class ImageManipulator
 {
-    /**
-     * @var ImageManager
-     */
-    private $imageManager;
+    private ImageManager $imageManager;
 
     /**
      * @var ImageManipulation[]
      */
-    private $variantDefinitions = [];
+    private array $variantDefinitions = [];
+
+    private array $variantDefinitionGroups = [];
 
     /**
      * @var FilesystemManager
@@ -32,9 +32,13 @@ class ImageManipulator
 
     public function defineVariant(
         string $variantName,
-        ImageManipulation $manipulation
+        ImageManipulation $manipulation,
+        ?array $tags = []
     ) {
         $this->variantDefinitions[$variantName] = $manipulation;
+        foreach ($tags as $tag) {
+            $this->variantDefinitionGroups[$tag][] = $variantName;
+        }
     }
 
     public function hasVariantDefinition(string $variantName): bool
@@ -54,6 +58,27 @@ class ImageManipulator
         }
 
         throw ImageManipulationException::unknownVariant($variantName);
+    }
+
+    public function getAllVariantDefinitions(): Collection
+    {
+        return collect($this->variantDefinitions);
+    }
+
+    public function getAllVariantNames(): array
+    {
+        return array_keys($this->variantDefinitions);
+    }
+
+    public function getVariantDefinitionsByTag(string $tag): Collection
+    {
+        return $this->getAllVariantDefinitions()
+            ->intersectByKeys(array_flip($this->getVariantNamesByTag($tag)));
+    }
+
+    public function getVariantNamesByTag(string $tag): array
+    {
+        return $this->variantDefinitionGroups[$tag] ?? [];
     }
 
     /**
