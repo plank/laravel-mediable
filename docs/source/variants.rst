@@ -194,6 +194,35 @@ If a variant with the requested variant name already exists for the provided med
 
 Doing so will cause the original file to be deleted, and a new one created at the specified output destination. The variant record will retain its primary key and any associations, but its attributes will be updated as necessary.
 
+Tagging Variants
+^^^^^^^^^^^^^^^^
+
+When defining variants, it is possible to pass one or more "tags" to group the definitions in order to more easily retrieve all of the ones applicable to a specific purpose.
+
+::
+
+    <?php
+    use Plank\Mediable\Jobs\CreateImageVariants;
+
+    ImageManipulator::defineVariant(
+        'avatar-small',
+        ImageManipulation::make(/* ... */),
+        ['avatar']
+    );
+
+    ImageManipulator::defineVariant(
+        'avatar-large',
+        ImageManipulation::make(/* ... */),
+        ['avatar']
+    );
+
+    // generate all 'avatar' variants
+    CreateImageVariants::dispatch(
+        $mediaCollection,
+        ImageManipulator::getVariantNamesByTag('avatar')
+    );
+
+
 Using Variants
 --------------
 
