@@ -668,12 +668,11 @@ class MediaUploader
         $model->disk = $disk;
         $model->directory = $directory;
         $model->filename = $filename;
-        $model->extension = $this->verifyExtension($extension);
+        $model->extension = $this->verifyExtension($extension, false);
 
         if (!$storage->has($model->getDiskPath())) {
             throw FileNotFoundException::fileNotFound($model->getDiskPath());
         }
-
 
         $model->mime_type = $this->verifyMimeType(
             $this->inferMimeType($storage, $model->getDiskPath())
@@ -785,12 +784,13 @@ class MediaUploader
     private function inferMimeType(Filesystem $filesystem, string $path): string
     {
         try {
-            return $filesystem->mimeType($path);
+            $mime = $filesystem->mimeType($path);
         } catch (UnableToRetrieveMetadata $e) {
             // previous versions of flysystem would default to octet-stream when
             // the file was unrecognized. Maintain the behaviour for now
             return 'application/octet-stream';
         }
+        return $mime ?: 'application/octet-stream';
     }
 
     /**
@@ -816,15 +816,15 @@ class MediaUploader
      * @return string
      * @throws FileNotSupportedException If the file extension is not allowed
      */
-    private function verifyExtension(string $extension): string
+    private function verifyExtension(string $extension, bool $toLower = true): string
     {
-        $extension = strtolower($extension);
+        $extensionLower = strtolower($extension);
         $allowed = $this->config['allowed_extensions'] ?? [];
-        if (!empty($allowed) && !in_array($extension, $allowed)) {
-            throw FileNotSupportedException::extensionRestricted($extension, $allowed);
+        if (!empty($allowed) && !in_array($extensionLower, $allowed)) {
+            throw FileNotSupportedException::extensionRestricted($extensionLower, $allowed);
         }
 
-        return $extension;
+        return $toLower ? $extensionLower : $extension;
     }
 
     /**
