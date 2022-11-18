@@ -2,7 +2,9 @@
 
 return [
     /*
-     * The connection name to use
+     * The database connection name to use
+     *
+     * Set to `null` in order to use the default database connection
      */
     'connection_name' => null,
 

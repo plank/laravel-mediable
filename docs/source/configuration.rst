@@ -154,6 +154,7 @@ The ``config/mediable.php`` file lets you specify a number of classes to be use 
 ::
 
     <?php
+    //...
     /*
      * FQCN of the model to use for media
      *
@@ -185,3 +186,17 @@ The ``config/mediable.php`` file lets you specify a number of classes to be use 
         'local' => Plank\Mediable\UrlGenerators\LocalUrlGenerator::class,
         's3' => Plank\Mediable\UrlGenerators\S3UrlGenerator::class,
     ],
+
+It is also possible to define the connection name that Laravel-Mediable will use to access the database.
+
+::
+
+    <?php
+    //...
+    /*
+     * The database connection name to use
+     *
+     * Set to null in order to use the default database connection
+     */
+    'connection_name' => null,
+    //...
