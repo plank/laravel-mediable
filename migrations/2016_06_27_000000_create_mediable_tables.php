@@ -65,4 +65,12 @@ class CreateMediableTables extends Migration
         Schema::dropIfExists('mediables');
         Schema::dropIfExists('media');
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getConnection()
+    {
+        return config('mediable.connection_name', parent::getConnection());
+    }
 }

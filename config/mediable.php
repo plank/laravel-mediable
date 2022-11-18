@@ -2,6 +2,11 @@
 
 return [
     /*
+     * The connection name to use
+     */
+    'connection_name' => null,
+
+    /*
      * FQCN of the model to use for media
      *
      * Should extend `Plank\Mediable\Media`

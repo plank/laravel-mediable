@@ -22,7 +22,7 @@ class CreateMediableTestTables extends Migration
             $table->softDeletes();
         });
 
-        Schema::table('media', function (Blueprint $table) {
+        Schema::connection($this->getConnectionName())->table('media', function (Blueprint $table) {
             $table->softDeletes();
         });
 
@@ -49,10 +49,20 @@ class CreateMediableTestTables extends Migration
      */
     public function down()
     {
-        Schema::table('media', function (Blueprint $table) {
+        Schema::connection($this->getConnectionName())->table('media', function (Blueprint $table) {
             $table->dropColumn('deleted_at');
         });
         Schema::dropIfExists('sample_mediables');
         Schema::dropIfExists('prefixed_mediables');
+    }
+
+    /**
+     * Get the connection name that is used by the package.
+     *
+     * @return string|null
+     */
+    public function getConnectionName(): ?string
+    {
+        return config('mediable.connection_name', $this->getConnection());
     }
 }
