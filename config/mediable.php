@@ -2,6 +2,13 @@
 
 return [
     /*
+     * The database connection name to use
+     *
+     * Set to `null` in order to use the default database connection
+     */
+    'connection_name' => null,
+
+    /*
      * FQCN of the model to use for media
      *
      * Should extend `Plank\Mediable\Media`

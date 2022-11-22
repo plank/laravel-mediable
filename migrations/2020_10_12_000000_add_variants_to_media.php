@@ -55,4 +55,12 @@ class AddVariantsToMedia extends Migration
             }
         );
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getConnection()
+    {
+        return config('mediable.connection_name', parent::getConnection());
+    }
 }
