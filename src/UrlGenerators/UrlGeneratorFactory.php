@@ -70,6 +70,10 @@ class UrlGeneratorFactory
      */
     protected function getDriverForDisk(string $disk): string
     {
-        return (string) config("filesystems.disks.{$disk}.driver");
+        $driver = (string) config("filesystems.disks.{$disk}.driver");
+        if ($driver === 'scoped') {
+            return $this->getDriverForDisk(config("filesystems.disks.{$disk}.disk"));
+        }
+        return $driver;
     }
 }
