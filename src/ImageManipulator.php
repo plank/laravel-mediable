@@ -121,7 +121,7 @@ class ImageManipulator
         $image = $this->imageManager->make($media->contents());
 
         $callback = $manipulation->getCallback();
-        $callback($image);
+        $callback($image, $media);
 
         $outputStream = $image->stream(
             $outputFormat,

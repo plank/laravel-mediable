@@ -52,14 +52,14 @@ Before variants can be created, the manipulations to be applied to the images ne
         {
             ImageManipulator::defineVariant(
                 'thumb',
-                ImageManipulation::make(function (Image $image) {
+                ImageManipulation::make(function (Image $image, Media $originalMedia) {
                     $image->fit(32, 32);
                 })->toPngFormat()
             );
 
             ImageManipulator::defineVariant(
                 'bw-square',
-                ImageManipulation::make(function (Image $image) {
+                ImageManipulation::make(function (Image $image, Media $originalMedia) {
                     $image->fit(128, 128)->greyscale();
                 })
             );
@@ -68,7 +68,7 @@ Before variants can be created, the manipulations to be applied to the images ne
 
 Each variant definition must contain a name and an instance of the ``ImageManipulation`` class, which contains the instructions for converting the image into the desired derivative form.
 
-First and foremost, each manipulation requires a callback which contains instructions on how the image should be modified. The callback will be passed an instance of `Intervention\Image\Image` and may use any of the methods available to the library to change its form. See the `intervention/image documentation <http://image.intervention.io/>`_ for available methods.
+First and foremost, each manipulation requires a callback which contains instructions on how the image should be modified. The callback will be passed an instance of ``Intervention\Image\Image`` and the original ``Media`` record, and may use any of the methods available to the library to change its form. See the `intervention/image documentation <http://image.intervention.io/>`_ for available methods.
 
 Output Formats
 ^^^^^^^^^^^^^^
