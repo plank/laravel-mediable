@@ -80,7 +80,12 @@ class TestCase extends BaseTestCase
                 'visibility' => 'public',
                 // set random root to avoid parallel test runs from deleting each other's files
                 'root' => Factory::create()->md5
-            ]
+            ],
+            'scoped' => [
+                'driver' => 'scoped',
+                'disk' => 'tmp',
+                'prefix' => 'scoped'
+            ],
         ]);
 
         $app['config']->set('mediable.allowed_disks', [
