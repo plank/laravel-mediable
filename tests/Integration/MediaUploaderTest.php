@@ -621,6 +621,31 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('image', $media->aggregate_type);
     }
 
+    public function test_it_imports_existing_files_with_uppercase()
+    {
+        $this->useFilesystem('tmp');
+        $this->useDatabase();
+
+        $media = factory(Media::class)->make(
+            [
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'extension' => 'PNG',
+                'mime_type' => 'image/png'
+            ]
+        );
+        $this->seedFileForMedia($media, $this->sampleFile());
+
+        $media = Facade::importPath('tmp', 'foo/bar.PNG');
+        $this->assertInstanceOf(Media::class, $media);
+        $this->assertEquals('tmp', $media->disk);
+        $this->assertEquals('foo/bar.PNG', $media->getDiskPath());
+        $this->assertEquals('image/png', $media->mime_type);
+        $this->assertEquals(self::TEST_FILE_SIZE, $media->size);
+        $this->assertEquals('image', $media->aggregate_type);
+    }
+
     public function test_it_updates_existing_media()
     {
         $this->useDatabase();

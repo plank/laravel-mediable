@@ -52,14 +52,14 @@ Before variants can be created, the manipulations to be applied to the images ne
         {
             ImageManipulator::defineVariant(
                 'thumb',
-                ImageManipulation::make(function (Image $image) {
+                ImageManipulation::make(function (Image $image, Media $originalMedia) {
                     $image->fit(32, 32);
                 })->toPngFormat()
             );
 
             ImageManipulator::defineVariant(
                 'bw-square',
-                ImageManipulation::make(function (Image $image) {
+                ImageManipulation::make(function (Image $image, Media $originalMedia) {
                     $image->fit(128, 128)->greyscale();
                 })
             );
@@ -68,7 +68,7 @@ Before variants can be created, the manipulations to be applied to the images ne
 
 Each variant definition must contain a name and an instance of the ``ImageManipulation`` class, which contains the instructions for converting the image into the desired derivative form.
 
-First and foremost, each manipulation requires a callback which contains instructions on how the image should be modified. The callback will be passed an instance of `Intervention\Image\Image` and may use any of the methods available to the library to change its form. See the `intervention/image documentation <http://image.intervention.io/>`_ for available methods.
+First and foremost, each manipulation requires a callback which contains instructions on how the image should be modified. The callback will be passed an instance of ``Intervention\Image\Image`` and the original ``Media`` record, and may use any of the methods available to the library to change its form. See the `intervention/image documentation <http://image.intervention.io/>`_ for available methods.
 
 Output Formats
 ^^^^^^^^^^^^^^
@@ -193,6 +193,35 @@ If a variant with the requested variant name already exists for the provided med
     CreateImageVariants::dispatch($media, ['square', 'bw-square'], true);
 
 Doing so will cause the original file to be deleted, and a new one created at the specified output destination. The variant record will retain its primary key and any associations, but its attributes will be updated as necessary.
+
+Tagging Variants
+^^^^^^^^^^^^^^^^
+
+When defining variants, it is possible to pass one or more "tags" to group the definitions in order to more easily retrieve all of the ones applicable to a specific purpose.
+
+::
+
+    <?php
+    use Plank\Mediable\Jobs\CreateImageVariants;
+
+    ImageManipulator::defineVariant(
+        'avatar-small',
+        ImageManipulation::make(/* ... */),
+        ['avatar']
+    );
+
+    ImageManipulator::defineVariant(
+        'avatar-large',
+        ImageManipulation::make(/* ... */),
+        ['avatar']
+    );
+
+    // generate all 'avatar' variants
+    CreateImageVariants::dispatch(
+        $mediaCollection,
+        ImageManipulator::getVariantNamesByTag('avatar')
+    );
+
 
 Using Variants
 --------------

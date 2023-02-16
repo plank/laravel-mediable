@@ -576,4 +576,12 @@ class Media extends Model
     {
         return app('mediable.url.factory')->create($this);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getConnectionName()
+    {
+        return config('mediable.connection_name', parent::getConnectionName());
+    }
 }
