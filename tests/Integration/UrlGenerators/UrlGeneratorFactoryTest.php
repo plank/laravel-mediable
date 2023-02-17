@@ -16,19 +16,20 @@ class UrlGeneratorFactoryTest extends TestCase
     public function test_it_sets_generator_for_driver()
     {
         $factory = new UrlGeneratorFactory;
-        $generator = $this->getMockClass(UrlGeneratorInterface::class);
+        $generator = $this->createMock(UrlGeneratorInterface::class);
+        $class = get_class($generator);
 
         $media = factory(Media::class)->make(['disk' => 'uploads']);
 
-        $factory->setGeneratorForFilesystemDriver($generator, 'local');
+        $factory->setGeneratorForFilesystemDriver($class, 'local');
         $result = $factory->create($media);
-        $this->assertInstanceOf($generator, $result);
+        $this->assertInstanceOf($class, $result);
     }
 
     public function test_it_throws_exception_for_invalid_generator()
     {
         $factory = new UrlGeneratorFactory;
-        $class = $this->getMockClass(stdClass::class);
+        $class = get_class($this->createMock(stdClass::class));
         $this->expectException(MediaUrlException::class);
         $factory->setGeneratorForFilesystemDriver($class, 'foo');
     }

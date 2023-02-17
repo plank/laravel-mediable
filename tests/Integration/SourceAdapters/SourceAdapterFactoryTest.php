@@ -15,7 +15,7 @@ class SourceAdapterFactoryTest extends TestCase
         $factory = new SourceAdapterFactory;
         $source = $this->createMock(stdClass::class);
         $sourceClass = get_class($source);
-        $adapterClass = $this->getMockClass(SourceAdapterInterface::class);
+        $adapterClass = get_class($this->createMock(SourceAdapterInterface::class));
 
         $factory->setAdapterForClass($adapterClass, $sourceClass);
         $this->assertInstanceOf($adapterClass, $factory->create($source));
@@ -24,7 +24,7 @@ class SourceAdapterFactoryTest extends TestCase
     public function test_it_allows_setting_adapter_for_pattern()
     {
         $factory = new SourceAdapterFactory;
-        $adapterClass = $this->getMockClass(SourceAdapterInterface::class);
+        $adapterClass = get_class($this->createMock(SourceAdapterInterface::class));
 
         $factory->setAdapterForPattern($adapterClass, '[abc][123]');
         $this->assertInstanceOf($adapterClass, $factory->create('b1'));
