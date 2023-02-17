@@ -95,7 +95,7 @@ class ImageManipulatorTest extends TestCase
     public function test_it_throws_for_non_image_media()
     {
         $this->expectException(ImageManipulationException::class);
-        $this->expectErrorMessage(
+        $this->expectExceptionMessage(
             "Cannot manipulate media with an aggregate type other than 'image', got 'document'."
         );
         $this->getManipulator()->createImageVariant(
@@ -107,7 +107,7 @@ class ImageManipulatorTest extends TestCase
     public function test_it_throws_for_unknown_variants()
     {
         $this->expectException(ImageManipulationException::class);
-        $this->expectErrorMessage("Unknown variant 'invalid'.");
+        $this->expectExceptionMessage("Unknown variant 'invalid'.");
         $this->getManipulator()->createImageVariant(
             $this->makeMedia(['aggregate_type' => 'image']),
             'invalid'
@@ -118,7 +118,7 @@ class ImageManipulatorTest extends TestCase
     {
         $this->useFilesystem('tmp');
         $this->expectException(ImageManipulationException::class);
-        $this->expectErrorMessage("Unable to determine valid output format for file.");
+        $this->expectExceptionMessage("Unable to determine valid output format for file.");
         $manipulation = ImageManipulation::make(
             function (Image $image) {
             }
