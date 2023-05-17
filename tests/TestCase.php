@@ -5,6 +5,7 @@ namespace Plank\Mediable\Tests;
 use Dotenv\Dotenv;
 use Faker\Factory;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\Filesystem;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Plank\Mediable\Media;

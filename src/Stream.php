@@ -90,7 +90,7 @@ class Stream implements StreamInterface
     /**
      * {@inheritdoc}
      */
-    public function __toString()
+    public function __toString(): string
     {
         try {
             $this->seek(0);
@@ -103,7 +103,7 @@ class Stream implements StreamInterface
     /**
      * {@inheritdoc}
      */
-    public function getContents()
+    public function getContents(): string
     {
         $contents = stream_get_contents($this->resource);
 
@@ -117,7 +117,7 @@ class Stream implements StreamInterface
     /**
      * {@inheritdoc}
      */
-    public function close()
+    public function close(): void
     {
         if (!$this->resource) {
             return;
@@ -148,7 +148,7 @@ class Stream implements StreamInterface
     /**
      * {@inheritdoc}
      */
-    public function getSize()
+    public function getSize(): ?int
     {
         if ($this->size !== null) {
             return $this->size;
@@ -176,7 +176,7 @@ class Stream implements StreamInterface
     /**
      * {@inheritdoc}
      */
-    public function isReadable()
+    public function isReadable(): bool
     {
         return $this->readable;
     }
@@ -184,7 +184,7 @@ class Stream implements StreamInterface
     /**
      * {@inheritdoc}
      */
-    public function isWritable()
+    public function isWritable(): bool
     {
         return $this->writable;
     }
@@ -192,7 +192,7 @@ class Stream implements StreamInterface
     /**
      * {@inheritdoc}
      */
-    public function isSeekable()
+    public function isSeekable(): bool
     {
         return $this->seekable;
     }
@@ -200,7 +200,7 @@ class Stream implements StreamInterface
     /**
      * {@inheritdoc}
      */
-    public function eof()
+    public function eof(): bool
     {
         return !$this->resource || feof($this->resource);
     }
@@ -208,7 +208,7 @@ class Stream implements StreamInterface
     /**
      * {@inheritdoc}
      */
-    public function tell()
+    public function tell(): int
     {
         if (!$this->resource) {
             throw new \RuntimeException('No resource available; cannot tell position');
@@ -226,7 +226,7 @@ class Stream implements StreamInterface
     /**
      * {@inheritdoc}
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->seek(0);
     }
@@ -234,7 +234,7 @@ class Stream implements StreamInterface
     /**
      * {@inheritdoc}
      */
-    public function seek($offset, $whence = SEEK_SET)
+    public function seek(int $offset, int $whence = SEEK_SET): void
     {
         if (!$this->resource) {
             throw new \RuntimeException('No resource available; cannot seek position');
@@ -250,14 +250,12 @@ class Stream implements StreamInterface
             throw new \RuntimeException('Unable to seek to stream position '
                 . $offset . ' with whence ' . var_export($whence, true));
         }
-
-        return true;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function read($length)
+    public function read(int $length): string
     {
         if (!$this->resource) {
             throw new \RuntimeException('No resource available; cannot read');
@@ -279,7 +277,7 @@ class Stream implements StreamInterface
     /**
      * {@inheritdoc}
      */
-    public function write($string)
+    public function write(string $string): int
     {
         if (!$this->resource) {
             throw new \RuntimeException('No resource available; cannot write');
@@ -303,7 +301,7 @@ class Stream implements StreamInterface
     /**
      * {@inheritdoc}
      */
-    public function getMetadata($key = null)
+    public function getMetadata(?string $key = null)
     {
         $metadata = stream_get_meta_data($this->resource);
 
