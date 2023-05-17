@@ -553,7 +553,7 @@ class Media extends Model
                     ->where('media_id', $this->getKey())
                     ->delete();
             }
-            // unlink associated file on delete
+        // unlink associated file on delete
         } elseif ($this->storage()->has($this->getDiskPath())) {
             $this->storage()->delete($this->getDiskPath());
         }
