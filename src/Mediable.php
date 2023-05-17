@@ -569,7 +569,7 @@ trait Mediable
             if (config('mediable.detach_on_soft_delete')) {
                 $this->media()->detach();
             }
-            // always cascade for hard deletes
+        // always cascade for hard deletes
         } else {
             $this->media()->detach();
         }
