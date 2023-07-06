@@ -33,12 +33,17 @@ class MediableServiceProvider extends ServiceProvider
             ],
             'config'
         );
-        
-        $this->publishes([
-            __DIR__.'/../migrations' => $this->app->databasePath('migrations'),
-        ], 'mediable-migrations');
 
-        $this->loadMigrationsFrom($root . '/migrations');
+        if (empty(glob($this->app->databasePath('migrations/*_create_mediable_tables.php'))) && empty(glob($this->app->databasePath('migrations/*_add_variants_to_media.php')))) {
+            $this->publishes([
+                $root . '/migrations/2016_06_27_000000_create_mediable_tables.php' => $this->app->databasePath('migrations/'.date('Y_m_d_His', time()).'_create_mediable_tables.php'),
+            ], 'mediable-migrations');
+            $this->publishes([
+                $root . '/migrations/2020_10_12_000000_add_variants_to_media.php' => $this->app->databasePath('migrations/'.date('Y_m_d_His', time() + 1).'_add_variants_to_media.php'),
+            ], 'mediable-migrations');
+
+            $this->loadMigrationsFrom($root . '/migrations');
+        }
     }
 
     /**
