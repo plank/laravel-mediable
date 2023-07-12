@@ -26,6 +26,10 @@ class MediableServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (!$this->app->runningInConsole()) {
+            return;
+        }
+
         $root = dirname(__DIR__);
         $this->publishes(
             [
@@ -41,7 +45,9 @@ class MediableServiceProvider extends ServiceProvider
             $this->publishes([
                 $root . '/migrations/2020_10_12_000000_add_variants_to_media.php' => $this->app->databasePath('migrations/'.date('Y_m_d_His', time() + 1).'_add_variants_to_media.php'),
             ], 'mediable-migrations');
+        }
 
+        if (!config('mediable.ignore_migrations', false)) {
             $this->loadMigrationsFrom($root . '/migrations');
         }
     }
