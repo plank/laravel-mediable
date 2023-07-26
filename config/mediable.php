@@ -237,4 +237,11 @@ return [
      * Detach associated media when mediable model is soft deleted.
      */
     'detach_on_soft_delete' => false,
+
+    /**
+     * Prevents loading migrations from the package.
+     *
+     * Use this if you are renaming the published migrations and want to prevent them from being loaded twice.
+     */
+    'ignore_migrations' => false,
 ];
