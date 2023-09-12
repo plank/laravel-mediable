@@ -11,6 +11,10 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 /**
  * Collection of Mediable Models.
+ *
+ * @template TKey of array-key
+ * @template TModel of Model
+ * @extends Collection<TKey, TModel>
  */
 class MediableCollection extends Collection
 {
