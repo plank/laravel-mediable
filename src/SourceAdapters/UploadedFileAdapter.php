@@ -67,7 +67,8 @@ class UploadedFileAdapter implements SourceAdapterInterface
      */
     public function mimeType(): string
     {
-        return (string)$this->source->getClientMimeType();
+        return mime_content_type($this->path())
+            ?: (string)$this->source->getClientMimeType();
     }
 
     /**
