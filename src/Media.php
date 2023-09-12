@@ -76,7 +76,8 @@ class Media extends Model
         'mime_type',
         'aggregate_type',
         'variant_name',
-        'original_media_id'
+        'original_media_id',
+        'alt'
     ];
 
     protected $casts = [
