@@ -4,6 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Plank\Mediable\Media;
 
 class AddVariantsToMedia extends Migration
 {
@@ -20,12 +21,10 @@ class AddVariantsToMedia extends Migration
                 $table->string('variant_name', 255)
                     ->after('size')
                     ->nullable();
-                $table->unsignedInteger('original_media_id')
+                $table->foreignIdFor(Media::class, 'original_media_id')
+                    ->nullable()
                     ->after('variant_name')
-                    ->nullable();
-
-                $table->foreign('original_media_id', 'original_media_id')
-                    ->references('id')->on('media')
+                    ->constrained('media')
                     ->nullOnDelete();
             }
         );
