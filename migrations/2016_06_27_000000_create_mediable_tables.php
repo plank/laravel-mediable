@@ -39,6 +39,7 @@ class CreateMediableTables extends Migration
                     $table->foreignIdFor(Media::class)->constrained('media')->cascadeOnDelete();
                     $table->morphs('mediable');
                     $table->string('tag')->index();
+
                     $table->unsignedInteger('order')->index();
                     $table->primary(['media_id', 'mediable_type', 'mediable_id', 'tag']);
                     $table->index(['mediable_id', 'mediable_type']);
