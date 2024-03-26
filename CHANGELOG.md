@@ -1,5 +1,11 @@
 # Changelog
 
+## 6.0.0
+- Drop support for PHP 7.4 and 8.0
+- Drop Support for Laravel 8 and 9
+- Add Support for Laravel 11
+- Improved MediaCollection annotions to support generic types
+
 ## 5.5.0 - 2022-05-09
 - Filename and pathname sanitization will use the app locale when transliterating UTF-8 characters to ascii.
 - Restored original behaviour of treating unrecognized mime types as `application/octet-stream` (changed in recent version of Flysystem)
