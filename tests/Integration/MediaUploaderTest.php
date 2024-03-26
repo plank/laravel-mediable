@@ -328,18 +328,26 @@ class MediaUploaderTest extends TestCase
 
         $media1 = $this->getUploader()->fromSource(TestCase::sampleFilePath())
             ->toDestination('tmp', 'a')
-            ->makePrivate()
             ->upload();
+        $this->assertFalse($media1->isVisible());
 
         $media2 = $this->getUploader()->fromSource(TestCase::sampleFilePath())
             ->toDestination('tmp', 'b')
             ->makePrivate()
+            ->upload();
+        $this->assertFalse($media2->isVisible());
+
+        $media3 = $this->getUploader()->fromSource(TestCase::sampleFilePath())
+            ->toDestination('tmp', 'c')
+            ->makePrivate()
             ->makePublic()
             ->upload();
+        $this->assertTrue($media3->isVisible());
 
-        $this->assertFalse($media1->isVisible());
-
-        $this->assertTrue($media2->isVisible());
+        $media1 = $this->getUploader()->fromSource(TestCase::sampleFilePath())
+            ->toDestination('novisibility', 'a')
+            ->upload();
+        $this->assertTrue($media1->isVisible());
     }
 
     public function test_it_can_replace_duplicate_files()

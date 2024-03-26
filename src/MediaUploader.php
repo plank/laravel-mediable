@@ -77,9 +77,9 @@ class MediaUploader
 
     /**
      * Visibility for the new file
-     * @var string
+     * @var string|null
      */
-    private $visibility = Filesystem::VISIBILITY_PUBLIC;
+    private $visibility = null;
 
     /**
      * Callable allowing to alter the model before save.
@@ -418,6 +418,18 @@ class MediaUploader
         return $this;
     }
 
+    public function getVisibility(): string
+    {
+        if ($this->visibility) {
+            return $this->visibility;
+        }
+
+        return config(
+            'filesystems.disks.'.$this->disk.'.visibility',
+            Filesystem::VISIBILITY_PUBLIC
+        );
+    }
+
     /**
      * Additional options to pass to the filesystem when uploading
      * @param array $options
@@ -680,7 +692,7 @@ class MediaUploader
         $model->aggregate_type = $this->inferAggregateType($model->mime_type, $model->extension);
         $model->size = $this->verifyFileSize($storage->size($model->getDiskPath()));
 
-        $storage->setVisibility($model->getDiskPath(), $this->visibility);
+        $storage->setVisibility($model->getDiskPath(), $this->getVisibility());
 
         if (is_callable($this->before_save)) {
             call_user_func($this->before_save, $model, $this->source);
@@ -1013,10 +1025,7 @@ class MediaUploader
     {
         $options = $this->options;
         if (!isset($options['visibility'])) {
-            $options['visibility'] = config('filesystems.disks.'.$this->disk.'options.visibility') ?? null;
-        }
-        if (!isset($options['visibility'])) {
-            $options['visibility'] = $this->visibility;
+            $options['visibility'] = $this->getVisibility();
         }
         return $options;
     }

@@ -5,6 +5,7 @@
 - Drop Support for Laravel 8 and 9
 - Add Support for Laravel 11
 - Improved MediaCollection annotions to support generic types
+- MediaUploader will use the visibility defined on the filesystem disk config if the `makePublic()`/`makePrivate()` methods are not called.
 
 ## 5.5.0 - 2022-05-09
 - Filename and pathname sanitization will use the app locale when transliterating UTF-8 characters to ascii.

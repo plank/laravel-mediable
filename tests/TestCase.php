@@ -60,6 +60,10 @@ class TestCase extends BaseTestCase
                 'root' => storage_path('tmp'),
                 'visibility' => 'private'
             ],
+            'novisibility' => [
+                'driver' => 'local',
+                'root' => storage_path('tmp'),
+            ],
             //public local storage
             'uploads' => [
                 'driver' => 'local',
@@ -93,6 +97,7 @@ class TestCase extends BaseTestCase
 
         $app['config']->set('mediable.allowed_disks', [
             'tmp',
+            'novisibility',
             'uploads'
         ]);
     }
