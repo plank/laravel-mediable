@@ -4,5 +4,6 @@ coverage/
 .env
 .idea/
 .phpunit.result.cache
+.phpunit.cache/
 infection/
 docs/build/

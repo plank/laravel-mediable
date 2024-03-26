@@ -2,7 +2,9 @@
 
 namespace Plank\Mediable\Tests\Integration;
 
+use _PHPStan_5f1729e44\Nette\Utils\Paginator;
 use Illuminate\Filesystem\FilesystemManager;
+use Intervention\Image\Drivers\Gd\Driver as GdDriver;
 use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
 use Plank\Mediable\Exceptions\ImageManipulationException;
@@ -190,6 +192,7 @@ class ImageManipulatorTest extends TestCase
             $result->size,
             [
                 449, // Laravel <=8
+                442, // laravel 11
                 438 // Laravel 9+
             ]
         );
@@ -696,9 +699,18 @@ class ImageManipulatorTest extends TestCase
 
     public function getManipulator(): ImageManipulator
     {
-        return new ImageManipulator(
-            new ImageManager(['driver' => 'gd']),
-            app(FilesystemManager::class)
-        );
+        if (class_exists(GdDriver::class)) {
+            // Intervention Image >=3.0
+            return new ImageManipulator(
+                new ImageManager(new GdDriver()),
+                app(FilesystemManager::class)
+            );
+        } else {
+            // Intervention Image <3.0
+            return new ImageManipulator(
+                new ImageManager(['driver' => 'gd']),
+                app(FilesystemManager::class)
+            );
+        }
     }
 }

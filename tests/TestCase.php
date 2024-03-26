@@ -4,9 +4,9 @@ namespace Plank\Mediable\Tests;
 
 use Dotenv\Dotenv;
 use Faker\Factory;
-use Illuminate\Contracts\Console\Kernel;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\Filesystem;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\ImageManager;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Plank\Mediable\Media;
 use Plank\Mediable\MediableServiceProvider;
@@ -100,6 +100,10 @@ class TestCase extends BaseTestCase
             'novisibility',
             'uploads'
         ]);
+
+        if (class_exists(Driver::class)) {
+            $app->instance(ImageManager::class, new ImageManager(new Driver()));
+        }
     }
 
     protected function getPrivateProperty($class, $property_name)

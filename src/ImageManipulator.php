@@ -4,7 +4,10 @@ namespace Plank\Mediable;
 
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Support\Collection;
+use Intervention\Image\Commands\StreamCommand;
+use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
+use Intervention\Image\Interfaces\ImageInterface;
 use Plank\Mediable\Exceptions\ImageManipulationException;
 use Psr\Http\Message\StreamInterface;
 
@@ -118,15 +121,24 @@ class ImageManipulator
         $manipulation = $this->getVariantDefinition($variantName);
 
         $outputFormat = $this->determineOutputFormat($manipulation, $media);
-        $image = $this->imageManager->make($media->contents());
+        if (method_exists($this->imageManager, 'read')) {
+            // Intervention Image  >=3.0
+            $image = $this->imageManager->read($media->contents());
+        } else {
+            // Intervention Image <3.0
+            $image = $this->imageManager->make($media->contents());
+        }
 
         $callback = $manipulation->getCallback();
         $callback($image, $media);
 
-        $outputStream = $image->stream(
+        $outputStream = $this->imageToStream(
+            $image,
             $outputFormat,
             $manipulation->getOutputQuality()
         );
+
+
 
         $variant->variant_name = $variantName;
         $variant->original_media_id = $media->isOriginal()
@@ -305,5 +317,29 @@ class ImageManipulator
         } while ($storage->has($path));
 
         return $filename;
+    }
+
+    private function imageToStream(
+        Image $image,
+        string $outputFormat,
+        int $outputQuality
+    ) {
+        if (class_exists(StreamCommand::class)) {
+            // Intervention Image  <3.0
+            return $image->stream(
+                $outputFormat,
+                $outputQuality
+            );
+        }
+
+        $formatted = match ($outputFormat) {
+            ImageManipulation::FORMAT_JPG => $image->toJpeg($outputQuality),
+            ImageManipulation::FORMAT_PNG => $image->toPng(),
+            ImageManipulation::FORMAT_GIF => $image->toGif(),
+            ImageManipulation::FORMAT_WEBP => $image->toBitmap(),
+            ImageManipulation::FORMAT_TIFF => $image->toTiff($outputQuality),
+            default => throw ImageManipulationException::unknownOutputFormat(),
+        };
+        return new Stream($formatted->toFilePointer());
     }
 }

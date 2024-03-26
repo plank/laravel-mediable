@@ -138,7 +138,7 @@ class Stream implements StreamInterface
         }
 
         $resource = $this->resource;
-        unset($this->resource);
+        $this->resource = null;
         $this->size = $this->uri = null;
         $this->readable = $this->writable = $this->seekable = false;
 
