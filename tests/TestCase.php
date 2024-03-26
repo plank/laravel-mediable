@@ -12,6 +12,8 @@ use Plank\Mediable\Media;
 use Plank\Mediable\MediableServiceProvider;
 use Plank\Mediable\Tests\Mocks\MockCallable;
 use ReflectionClass;
+use PHPUnit\Framework\Constraint\Callback;
+use PHPUnit\Framework\Constraint\Constraint;
 
 class TestCase extends BaseTestCase
 {
@@ -156,24 +158,24 @@ class TestCase extends BaseTestCase
         }
     }
 
-    protected function sampleFilePath()
+    protected static function sampleFilePath()
     {
         return realpath(__DIR__ . '/_data/plank.png');
     }
 
-    protected function alternateFilePath()
+    protected static function alternateFilePath()
     {
         return realpath(__DIR__ . '/_data/plank2.png');
     }
 
-    protected function remoteFilePath()
+    protected static function remoteFilePath()
     {
         return 'https://raw.githubusercontent.com/plank/laravel-mediable/master/tests/_data/plank.png';
     }
 
     protected function sampleFile()
     {
-        return fopen($this->sampleFilePath(), 'r');
+        return fopen(TestCase::sampleFilePath(), 'r');
     }
 
     protected function makeMedia(array $attributes = []): Media
@@ -189,5 +191,47 @@ class TestCase extends BaseTestCase
     protected function getMockCallable()
     {
         return $this->createPartialMock(MockCallable::class, ['__invoke']);
+    }
+
+    /**
+     * @param array<mixed> $firstCallArguments
+     * @param array<mixed> ...$consecutiveCallsArguments
+     *
+     * @return \Generator<int,Callback<mixed>>
+     */
+    public static function withConsecutive(array $firstCallArguments, array ...$consecutiveCallsArguments): iterable
+    {
+        foreach ($consecutiveCallsArguments as $consecutiveCallArguments) {
+            self::assertSameSize($firstCallArguments, $consecutiveCallArguments, 'Each expected arguments list need to have the same size.');
+        }
+
+        $allConsecutiveCallsArguments = [$firstCallArguments, ...$consecutiveCallsArguments];
+
+        $numberOfArguments = count($firstCallArguments);
+        $argumentList      = [];
+        for ($argumentPosition = 0; $argumentPosition < $numberOfArguments; $argumentPosition++) {
+            $argumentList[$argumentPosition] = array_column($allConsecutiveCallsArguments, $argumentPosition);
+        }
+
+        $mockedMethodCall = 0;
+        $callbackCall     = 0;
+        foreach ($argumentList as $index => $argument) {
+            yield new Callback(
+                static function (mixed $actualArgument) use ($argumentList, &$mockedMethodCall, &$callbackCall, $index, $numberOfArguments): bool {
+                    $expected = $argumentList[$index][$mockedMethodCall] ?? null;
+
+                    $callbackCall++;
+                    $mockedMethodCall = (int) ($callbackCall / $numberOfArguments);
+
+                    if ($expected instanceof Constraint) {
+                        self::assertThat($actualArgument, $expected);
+                    } else {
+                        self::assertEquals($expected, $actualArgument);
+                    }
+
+                    return true;
+                },
+            );
+        }
     }
 }

@@ -326,12 +326,12 @@ class MediaUploaderTest extends TestCase
         $this->useDatabase();
         $this->useFilesystem('tmp');
 
-        $media1 = $this->getUploader()->fromSource($this->sampleFilePath())
+        $media1 = $this->getUploader()->fromSource(TestCase::sampleFilePath())
             ->toDestination('tmp', 'a')
             ->makePrivate()
             ->upload();
 
-        $media2 = $this->getUploader()->fromSource($this->sampleFilePath())
+        $media2 = $this->getUploader()->fromSource(TestCase::sampleFilePath())
             ->toDestination('tmp', 'b')
             ->makePrivate()
             ->makePublic()
@@ -369,8 +369,8 @@ class MediaUploaderTest extends TestCase
                 'original_media_id' => $media->getKey()
             ]
         );
-        $this->seedFileForMedia($media, $this->sampleFilePath());
-        $this->seedFileForMedia($variant, $this->sampleFilePath());
+        $this->seedFileForMedia($media, TestCase::sampleFilePath());
+        $this->seedFileForMedia($variant, TestCase::sampleFilePath());
 
         $method->invoke($uploader, $media);
 
@@ -404,8 +404,8 @@ class MediaUploaderTest extends TestCase
                 'original_media_id' => $media->getKey()
             ]
         );
-        $this->seedFileForMedia($media, $this->sampleFilePath());
-        $this->seedFileForMedia($variant, $this->sampleFilePath());
+        $this->seedFileForMedia($media, TestCase::sampleFilePath());
+        $this->seedFileForMedia($variant, TestCase::sampleFilePath());
 
         $method->invoke($uploader, $media);
 
@@ -429,13 +429,13 @@ class MediaUploaderTest extends TestCase
             ]
         );
 
-        $this->seedFileForMedia($media, fopen($this->sampleFilePath(), 'r'));
+        $this->seedFileForMedia($media, fopen(TestCase::sampleFilePath(), 'r'));
 
         $creaetdAt = $media->created_at;
         $updatedAt = $media->updated_at;
         sleep(1); // required to check the update time is different
 
-        $result = Facade::fromSource($this->sampleFilePath())
+        $result = Facade::fromSource(TestCase::sampleFilePath())
             ->onDuplicateUpdate()
             ->toDestination('tmp', '')->upload();
 
@@ -463,12 +463,12 @@ class MediaUploaderTest extends TestCase
 
         $this->seedFileForMedia($media, 'foo');
 
-        $result = Facade::fromSource($this->sampleFilePath())
+        $result = Facade::fromSource(TestCase::sampleFilePath())
             ->onDuplicateUpdate()
             ->toDestination('tmp', '')->upload();
 
         $this->assertEquals(
-            file_get_contents($this->sampleFilePath()),
+            file_get_contents(TestCase::sampleFilePath()),
             file_get_contents($result->getAbsolutePath())
         );
     }
@@ -498,7 +498,7 @@ class MediaUploaderTest extends TestCase
         $this->useDatabase();
         $this->useFilesystem('tmp');
 
-        $media = Facade::fromSource($this->sampleFilePath())
+        $media = Facade::fromSource(TestCase::sampleFilePath())
             ->toDestination('tmp', 'foo')
             ->useFilename('bar')
             ->upload();
@@ -517,7 +517,7 @@ class MediaUploaderTest extends TestCase
         $this->useDatabase();
         $this->useFilesystem('tmp');
 
-        $string = file_get_contents($this->sampleFilePath());
+        $string = file_get_contents(TestCase::sampleFilePath());
 
         $media = Facade::fromString($string)
             ->toDestination('tmp', 'foo')
@@ -538,7 +538,7 @@ class MediaUploaderTest extends TestCase
         $this->useDatabase();
         $this->useFilesystem('tmp');
 
-        $resource = fopen(realpath($this->sampleFilePath()), 'r');
+        $resource = fopen(realpath(TestCase::sampleFilePath()), 'r');
 
         $media = Facade::fromSource($resource)
             ->toDestination('tmp', 'foo')
@@ -559,7 +559,7 @@ class MediaUploaderTest extends TestCase
         $this->useDatabase();
         $this->useFilesystem('tmp');
 
-        $resource = fopen($this->remoteFilePath(), 'r');
+        $resource = fopen(TestCase::remoteFilePath(), 'r');
 
         $media = Facade::fromSource($resource)
             ->toDestination('tmp', 'foo')
@@ -580,7 +580,7 @@ class MediaUploaderTest extends TestCase
         $this->useDatabase();
         $this->useFilesystem('tmp');
 
-        $stream = new Stream(fopen($this->remoteFilePath(), 'r'));
+        $stream = new Stream(fopen(TestCase::remoteFilePath(), 'r'));
 
         $media = Facade::fromSource($stream)
             ->toDestination('tmp', 'foo')
@@ -684,7 +684,7 @@ class MediaUploaderTest extends TestCase
         );
         $this->seedFileForMedia($media, $this->sampleFile());
 
-        $result = Facade::fromSource($this->alternateFilePath())->replace($media);
+        $result = Facade::fromSource(TestCase::alternateFilePath())->replace($media);
         $media = $media->fresh();
 
         $this->assertEquals($result->getKey(), $media->getKey());
@@ -702,7 +702,7 @@ class MediaUploaderTest extends TestCase
         $this->useFilesystem('tmp');
         $this->useDatabase();
 
-        $media = Facade::fromSource($this->sampleFilePath())
+        $media = Facade::fromSource(TestCase::sampleFilePath())
             ->toDestination('tmp', 'foo')
             ->useHashForFilename()
             ->upload();
@@ -715,7 +715,7 @@ class MediaUploaderTest extends TestCase
         $this->useDatabase();
         $this->useFilesystem('tmp');
 
-        $media = Facade::fromSource($this->sampleFilePath())
+        $media = Facade::fromSource(TestCase::sampleFilePath())
             ->toDestination('tmp', 'foo')
             ->useFilename('bar')
             ->beforeSave(
@@ -749,9 +749,9 @@ class MediaUploaderTest extends TestCase
             ]
         );
 
-        $this->seedFileForMedia($media, fopen($this->alternateFilePath(), 'r'));
+        $this->seedFileForMedia($media, fopen(TestCase::alternateFilePath(), 'r'));
 
-        $media = Facade::fromSource($this->sampleFilePath())
+        $media = Facade::fromSource(TestCase::sampleFilePath())
             ->toDestination('tmp', 'foo')
             ->useFilename('bar')
             ->onDuplicateReplace()
@@ -771,7 +771,7 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals(self::TEST_FILE_SIZE, $media->size);
         $this->assertEquals('image', $media->aggregate_type);
         $this->assertEquals(
-            file_get_contents($this->sampleFilePath()),
+            file_get_contents(TestCase::sampleFilePath()),
             $media->contents()
         );
     }

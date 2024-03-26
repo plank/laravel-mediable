@@ -37,7 +37,7 @@ class LocalUrlGeneratorTest extends TestCase
         $this->assertEquals('http://localhost/storage/foo/bar.jpg', $generator->getUrl());
     }
 
-    public function public_visibility_provider()
+    public static function public_visibility_provider()
     {
         return [
             ['uploads', true, true],

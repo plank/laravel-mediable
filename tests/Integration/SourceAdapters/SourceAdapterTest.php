@@ -47,11 +47,11 @@ class SourceAdapterTest extends TestCase
         $app['filesystem']->disk('uploads')->put('plank.png', $this->sampleFile());
     }
 
-    public function adapterProvider()
+    public static function adapterProvider()
     {
-        $file = $this->sampleFilePath();
+        $file = TestCase::sampleFilePath();
         $string = file_get_contents($file);
-        $url = $this->remoteFilePath() . '?foo=bar.baz';
+        $url = TestCase::remoteFilePath() . '?foo=bar.baz';
 
         $uploadedFile = new UploadedFile(
             $file,
@@ -127,7 +127,7 @@ class SourceAdapterTest extends TestCase
         return $data;
     }
 
-    public function invalidAdapterProvider()
+    public static function invalidAdapterProvider()
     {
         $file = __DIR__ . '/../../_data/invalid.png';
         $url = 'https://raw.githubusercontent.com/plank/laravel-mediable/master/tests/_data/invalid.png';
@@ -146,7 +146,7 @@ class SourceAdapterTest extends TestCase
             [new RemoteUrlAdapter($url)],
             [new RemoteUrlAdapter('http://example.invalid')],
             [new UploadedFileAdapter($uploadedFile)],
-            [new StreamResourceAdapter(fopen($this->sampleFilePath(), 'a'))],
+            [new StreamResourceAdapter(fopen(TestCase::sampleFilePath(), 'a'))],
             [new StreamResourceAdapter(fopen('php://stdin', 'w'))],
         ];
     }

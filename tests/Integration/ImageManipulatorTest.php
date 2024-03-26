@@ -236,7 +236,7 @@ class ImageManipulatorTest extends TestCase
         $this->assertTrue($media->fileExists());
     }
 
-    public function formatProvider()
+    public static function formatProvider()
     {
         return [
             ['jpg', 'image/jpeg', 100],
@@ -646,7 +646,7 @@ class ImageManipulatorTest extends TestCase
         $this->assertFalse($previousVariant->fileExists());
     }
 
-    public function visibilityProvider()
+    public static function visibilityProvider()
     {
         return [
             ['uploads', 'public', null, true],

@@ -12,11 +12,11 @@ class SyncMediaCommandTest extends TestCase
         $this->withoutMockingConsoleOutput();
         /** @var SyncMediaCommand $command */
         $command = $this->getMockBuilder(SyncMediaCommand::class)
-            ->setMethods(['call', 'option', 'argument'])
+            ->onlyMethods(['call', 'option', 'argument'])
             ->getMock();
         $command->expects($this->exactly(2))
             ->method('call')
-            ->withConsecutive(
+            ->with(...$this->withConsecutive(
                 [
                     $this->equalTo('media:prune'),
                     [
@@ -34,7 +34,7 @@ class SyncMediaCommandTest extends TestCase
                         '--force' => false
                     ]
                 ]
-            );
+            ));
 
         $command->handle();
     }
