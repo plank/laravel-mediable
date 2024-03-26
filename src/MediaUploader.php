@@ -1013,6 +1013,9 @@ class MediaUploader
     {
         $options = $this->options;
         if (!isset($options['visibility'])) {
+            $options['visibility'] = config('filesystems.disks.'.$this->disk.'options.visibility') ?? null;
+        }
+        if (!isset($options['visibility'])) {
             $options['visibility'] = $this->visibility;
         }
         return $options;
