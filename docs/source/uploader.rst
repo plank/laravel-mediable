@@ -24,6 +24,7 @@ The ``fromSource()`` method will accept any of the following:
 - a stream resource handle.
 - a URL as a string, beginning with ``http://`` or ``https://``.
 - an absolute path as a string, beginning with ``/``.
+- a base64 or URL-encoded data URL.
 
 Specifying Destination
 ----------------------

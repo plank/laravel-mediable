@@ -1,5 +1,14 @@
 # Upgrading
 
+## 5.x to 6.x
+
+* Minimum PHP version moved to 8.1
+* Minimum Laravel version moved to 10
+* To add support for data URLs to the MediaUploader, the following entry should be added to the `source_adapters.pattern` field in `config/mediable.php`
+  ```php
+  '^data:[^,]*,' => Plank\Mediable\SourceAdapters\DataUrlAdapter::class,
+  ```
+
 ## 4.x to 5.x
 
 * Database migration files are now served from within the package. In your migrations table, rename the `XXXX_XX_XX_XXXXXX_create_mediable_tables.php` entry to `2016_06_27_000000_create_mediable_tables.php` and delete your local copy of the migration file from the /database/migrations directory. If any customizations were made to the tables, those should be defined as one or more separate ALTER table migrations.

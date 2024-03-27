@@ -1,12 +1,13 @@
 # Changelog
 
 ## 6.0.0
-- Drop support for PHP 7.4 and 8.0
-- Drop Support for Laravel 8 and 9
-- Add Support for PHP 8.3
-- Add Support for Laravel 11
-- Add support for intervention/image 3.0
+- Dropped support for PHP 7.4 and 8.0
+- Dropped Support for Laravel 8 and 9
+- Added Support for PHP 8.3
+- Added Support for Laravel 11
+- Added support for intervention/image 3.0
 - MediaUploader will use the visibility defined on the filesystem disk config if the `makePublic()`/`makePrivate()` methods are not called.
+- MediaUploader now supports base64 and URL-encoded data URLs as an input source.
 - Improved MediaCollection annotions to support generic types
 
 ## 5.5.0 - 2022-05-09

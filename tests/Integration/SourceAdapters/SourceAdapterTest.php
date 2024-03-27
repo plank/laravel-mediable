@@ -2,6 +2,7 @@
 
 namespace Plank\Mediable\Tests\Integration\SourceAdapters;
 
+use Plank\Mediable\SourceAdapters\DataUrlAdapter;
 use Plank\Mediable\SourceAdapters\FileAdapter;
 use Plank\Mediable\SourceAdapters\LocalPathAdapter;
 use Plank\Mediable\SourceAdapters\RawContentAdapter;
@@ -51,6 +52,8 @@ class SourceAdapterTest extends TestCase
     {
         $file = TestCase::sampleFilePath();
         $string = file_get_contents($file);
+        $base64DataUrl = 'data:image/png;base64,' . base64_encode($string);
+        $rawDataUrl = 'data:image/png,' . rawurlencode($string);
         $url = TestCase::remoteFilePath() . '?foo=bar.baz';
 
         $uploadedFile = new UploadedFile(
@@ -85,6 +88,8 @@ class SourceAdapterTest extends TestCase
             'LocalPathAdapter' => [LocalPathAdapter::class, $file, $file, 'plank'],
             'RemoteUrlAdapter' => [RemoteUrlAdapter::class, $url, $url, 'plank'],
             'RawContentAdapter' => [RawContentAdapter::class, $string, null, '', false],
+            'DataUrlAdapter_base64' => [DataUrlAdapter::class, $base64DataUrl, null, '', false],
+            'DataUrlAdapter_urlencode' => [DataUrlAdapter::class, $rawDataUrl, null, '', false],
             'StreamResourceAdapter_Local' => [
                 StreamResourceAdapter::class,
                 $fileResource,
