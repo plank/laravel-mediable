@@ -31,7 +31,7 @@ trait Mediable
      * List of media tags that have been modified since last load.
      * @var string[]
      */
-    private $mediaDirtyTags = [];
+    private array $mediaDirtyTags = [];
 
     /**
      * Boot the Mediable trait.

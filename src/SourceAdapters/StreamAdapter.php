@@ -15,17 +15,13 @@ class StreamAdapter implements SourceAdapterInterface
 {
     const BUFFER_SIZE = 1024;
 
-    /**
-     * The source object.
-     * @var StreamInterface
-     */
-    protected $source;
+    protected StreamInterface $source;
 
     /**
      * The contents of the stream.
-     * @var string|null
+     * @var string
      */
-    protected $contents;
+    protected string $contents;
 
     /**
      * Constructor.
@@ -39,7 +35,7 @@ class StreamAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function getSource()
+    public function getSource(): mixed
     {
         return $this->source;
     }
@@ -92,7 +88,7 @@ class StreamAdapter implements SourceAdapterInterface
      */
     public function contents(): string
     {
-        if (is_null($this->contents)) {
+        if (!isset($this->contents)) {
             if ($this->source->isSeekable()) {
                 $this->contents = (string)$this->source;
             } else {

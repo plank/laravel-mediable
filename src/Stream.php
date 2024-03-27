@@ -12,12 +12,16 @@ use Psr\Http\Message\StreamInterface;
  */
 class Stream implements StreamInterface
 {
+    /**
+     * @var resource
+     */
     private $resource;
-    private $size;
-    private $seekable;
-    private $readable;
-    private $writable;
-    private $uri;
+
+    private ?int $size;
+    private bool $seekable;
+    private bool $readable;
+    private bool $writable;
+    private ?string $uri;
 
     /** @var array Hash of readable and writable stream types */
     private static $readWriteHash = [
@@ -150,7 +154,7 @@ class Stream implements StreamInterface
      */
     public function getSize(): ?int
     {
-        if ($this->size !== null) {
+        if (isset($this->size)) {
             return $this->size;
         }
 

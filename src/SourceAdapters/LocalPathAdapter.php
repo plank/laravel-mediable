@@ -12,22 +12,14 @@ use Plank\Mediable\Helpers\File;
  */
 class LocalPathAdapter implements SourceAdapterInterface
 {
-    /**
-     * The source string.
-     * @var string
-     */
-    protected $source;
+    protected string $source;
 
-    /**
-     * Constructor.
-     * @param string $source
-     */
     public function __construct(string $source)
     {
         $this->source = $source;
     }
 
-    public function getSource()
+    public function getSource(): mixed
     {
         return $this->source;
     }

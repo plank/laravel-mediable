@@ -62,7 +62,7 @@ class File
     }
 
     /**
-     * Generate a human readable bytecount string.
+     * Generate a human-readable byte count string.
      * @param  int $bytes
      * @param  int $precision
      * @return string

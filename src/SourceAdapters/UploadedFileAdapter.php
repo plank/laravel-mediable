@@ -12,11 +12,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  */
 class UploadedFileAdapter implements SourceAdapterInterface
 {
-    /**
-     * The source object.
-     * @var UploadedFile
-     */
-    protected $source;
+    protected UploadedFile $source;
 
     /**
      * Constructor.
@@ -27,7 +23,7 @@ class UploadedFileAdapter implements SourceAdapterInterface
         $this->source = $source;
     }
 
-    public function getSource()
+    public function getSource(): mixed
     {
         return $this->source;
     }

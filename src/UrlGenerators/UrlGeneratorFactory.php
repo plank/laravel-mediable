@@ -12,7 +12,7 @@ class UrlGeneratorFactory
      * map of UrlGenerator classes to use for different filesystem drivers.
      * @var string[]
      */
-    protected $driver_generators = [];
+    protected array $driver_generators = [];
 
     /**
      * Get a UrlGenerator instance for a media.

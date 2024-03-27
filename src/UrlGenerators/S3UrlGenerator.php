@@ -13,11 +13,7 @@ use Plank\Mediable\Helpers\File;
 
 class S3UrlGenerator extends BaseUrlGenerator implements TemporaryUrlGeneratorInterface
 {
-    /**
-     * Filesystem Manager.
-     * @var FilesystemManager
-     */
-    protected $filesystem;
+    protected FilesystemManager $filesystem;
 
     /**
      * Constructor.

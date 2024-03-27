@@ -43,7 +43,7 @@ class DataUrlAdapter extends RawContentAdapter
     /**
      * {@inheritdoc}
      */
-    public function getSource()
+    public function getSource(): mixed
     {
         return $this->dataUrl;
     }

@@ -9,10 +9,7 @@ use Illuminate\Filesystem\FilesystemManager;
 
 class LocalUrlGenerator extends BaseUrlGenerator
 {
-    /**
-     * @var FilesystemManager
-     */
-    protected $filesystem;
+    protected FilesystemManager $filesystem;
 
     /**
      * Constructor.

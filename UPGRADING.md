@@ -8,6 +8,8 @@
   ```php
   '^data:[^,]*,' => Plank\Mediable\SourceAdapters\DataUrlAdapter::class,
   ```
+* All properties now declare their types if able. If extending any class or implementing any interface from this package, property types may need to be updated.
+* The return type of `SourceAdapterInterface::getSource()` has been changed to `mixed`. If you have implemented a custom SourceAdapter, you will need to update the return type of this method.
 
 ## 4.x to 5.x
 

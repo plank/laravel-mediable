@@ -12,16 +12,9 @@ use Plank\Mediable\Helpers\File;
  */
 class RawContentAdapter implements SourceAdapterInterface
 {
-    /**
-     * The source object.
-     * @var string
-     */
-    protected $source;
 
-    /**
-     * Constructor.
-     * @param string $source
-     */
+    protected string $source;
+
     public function __construct(string $source)
     {
         $this->source = $source;
@@ -30,7 +23,7 @@ class RawContentAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function getSource()
+    public function getSource(): mixed
     {
         return $this->source;
     }

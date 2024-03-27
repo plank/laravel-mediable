@@ -14,8 +14,7 @@ use Plank\Mediable\Stream;
 class StreamResourceAdapter extends StreamAdapter
 {
     /**
-     * The resource.
-     * @var resource|null
+     * @var resource
      */
     protected $resource;
 
@@ -38,7 +37,7 @@ class StreamResourceAdapter extends StreamAdapter
     /**
      * {@inheritdoc}
      */
-    public function getSource()
+    public function getSource(): mixed
     {
         return $this->resource;
     }

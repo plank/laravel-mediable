@@ -14,7 +14,7 @@ interface SourceAdapterInterface
      * Get the underlying source.
      * @return mixed
      */
-    public function getSource();
+    public function getSource(): mixed;
 
     /**
      * Get the absolute path to the file.

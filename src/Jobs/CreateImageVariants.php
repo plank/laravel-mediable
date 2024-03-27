@@ -19,16 +19,16 @@ class CreateImageVariants implements ShouldQueue
     /**
      * @var string[]
      */
-    private $variantNames;
+    private array $variantNames;
     /**
-     * @var Collection|Media[]
+     * @var Collection<Media>
      */
-    private $models;
+    private Collection $models;
 
     /**
      * @var bool
      */
-    private $forceRecreate;
+    private bool $forceRecreate;
 
     /**
      * CreateImageVariants constructor.

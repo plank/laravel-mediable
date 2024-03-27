@@ -37,29 +37,22 @@ class ImageManipulation
     /** @var callable */
     private $callback;
 
-    /** @var string|null */
-    private $outputFormat;
+    private ?string $outputFormat = null;
 
-    /** @var int */
-    private $outputQuality = 90;
+    private int $outputQuality = 90;
 
-    /** @var string|null */
-    private $disk;
+    private ?string $disk = null;
 
-    /** @var string|null */
-    private $directory;
+    private ?string $directory = null;
 
-    /** @var string|null */
-    private $filename;
+    private ?string $filename = null;
 
-    /** @var bool */
-    private $hashFilename = false;
+    private bool $hashFilename = false;
 
-    /** @var string */
-    private $onDuplicateBehaviour = self::ON_DUPLICATE_INCREMENT;
+    private string $onDuplicateBehaviour = self::ON_DUPLICATE_INCREMENT;
 
     /** @var string|null */
-    private $visibility;
+    private ?string $visibility = null;
 
     /** @var callable|null */
     private $beforeSave;

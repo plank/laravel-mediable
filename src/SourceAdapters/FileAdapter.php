@@ -13,16 +13,8 @@ use Symfony\Component\HttpFoundation\File\File;
  */
 class FileAdapter implements SourceAdapterInterface
 {
-    /**
-     * The source object.
-     * @var \Symfony\Component\HttpFoundation\File\File
-     */
-    protected $source;
+    protected File $source;
 
-    /**
-     * Constructor.
-     * @param \Symfony\Component\HttpFoundation\File\File $source
-     */
     public function __construct(File $source)
     {
         $this->source = $source;
@@ -31,7 +23,7 @@ class FileAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function getSource()
+    public function getSource(): mixed
     {
         return $this->source;
     }

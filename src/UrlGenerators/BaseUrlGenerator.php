@@ -8,17 +8,12 @@ use Plank\Mediable\Media;
 
 abstract class BaseUrlGenerator implements UrlGeneratorInterface
 {
-    /**
-     * Configuration Repository.
-     * @var \Illuminate\Contracts\Config\Repository
-     */
-    protected $config;
+    protected Config $config;
 
     /**
      * Media instance being linked.
-     * @var \Plank\Mediable\Media
      */
-    protected $media;
+    protected ?Media $media = null;
 
     /**
      * Constructor.

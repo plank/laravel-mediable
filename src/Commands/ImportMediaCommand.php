@@ -31,33 +31,19 @@ class ImportMediaCommand extends Command
      */
     protected $description = 'Create a media entity for each file on a disk';
 
-    /**
-     * Filesystem Manager instance.
-     * @var FilesystemManager
-     */
-    protected $filesystem;
+    protected FilesystemManager $filesystem;
 
-    /**
-     * Uploader instance.
-     * @var MediaUploader
-     */
-    protected $uploader;
+    protected MediaUploader $uploader;
 
     /**
      * Various counters of files being modified.
-     * @var array
      */
-    protected $counters = [
+    protected array $counters = [
         'created' => 0,
         'updated' => 0,
         'skipped' => 0,
     ];
 
-    /**
-     * Constructor.
-     * @param FilesystemManager $filesystem
-     * @param MediaUploader $uploader
-     */
     public function __construct(FileSystemManager $filesystem, MediaUploader $uploader)
     {
         parent::__construct();

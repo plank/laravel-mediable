@@ -16,6 +16,7 @@ use Plank\Mediable\Helpers\File;
 use Plank\Mediable\SourceAdapters\DataUrlAdapter;
 use Plank\Mediable\SourceAdapters\RawContentAdapter;
 use Plank\Mediable\SourceAdapters\SourceAdapterFactory;
+use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
 
 /**
  * Media Uploader.
@@ -30,57 +31,35 @@ class MediaUploader
     const ON_DUPLICATE_REPLACE = 'replace';
     const ON_DUPLICATE_REPLACE_WITH_VARIANTS = 'replace_with_variants';
 
-    /**
-     * @var FileSystemManager
-     */
-    private $filesystem;
+    private FileSystemManager $filesystem;
 
-    /**
-     * @var SourceAdapterFactory
-     */
-    private $factory;
+    private SourceAdapterFactory $factory;
 
-    /**
-     * Mediable configurations.
-     * @var array
-     */
-    private $config;
+    private array $config;
 
-    /**
-     * Source adapter.
-     * @var \Plank\Mediable\SourceAdapters\SourceAdapterInterface
-     */
-    private $source;
+    private SourceAdapterInterface $source;
 
-    /**
-     * Name of the filesystem disk.
-     * @var string
-     */
-    private $disk;
+    private ?string $disk = null;
 
     /**
      * Path relative to the filesystem disk root.
-     * @var string
      */
-    private $directory = '';
+    private ?string $directory = null;
 
     /**
      * Name of the new file.
-     * @var string|null
      */
-    private $filename = null;
+    private ?string $filename = null;
 
     /**
      * If true the contents hash of the source will be used as the filename.
-     * @var bool
      */
-    private $hashFilename = false;
+    private bool $hashFilename = false;
 
     /**
      * Visibility for the new file
-     * @var string|null
      */
-    private $visibility = null;
+    private ?string $visibility = null;
 
     /**
      * Callable allowing to alter the model before save.
@@ -90,9 +69,8 @@ class MediaUploader
 
     /**
      * Additional options to pass to the filesystem while uploading
-     * @var array
      */
-    private $options = [];
+    private array $options = [];
 
     /**
      * Constructor.

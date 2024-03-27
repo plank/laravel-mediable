@@ -16,13 +16,13 @@ class SourceAdapterFactory
      * Map of which adapters to use for a given source class.
      * @var string[]
      */
-    private $classAdapters = [];
+    private array $classAdapters = [];
 
     /**
      * Map of which adapters to use for a given string pattern.
      * @var string[]
      */
-    private $patternAdapters = [];
+    private array $patternAdapters = [];
 
     /**
      * Create a Source Adapter for the provided source.

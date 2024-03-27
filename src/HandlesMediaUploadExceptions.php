@@ -20,7 +20,7 @@ trait HandlesMediaUploadExceptions
      *
      * @var array
      */
-    private $status_codes = [
+    private array $status_codes = [
         // 403
         Response::HTTP_FORBIDDEN => [
             ForbiddenException::class,

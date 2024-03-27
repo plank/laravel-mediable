@@ -7,7 +7,6 @@ use Illuminate\Support\Collection;
 use Intervention\Image\Commands\StreamCommand;
 use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
-use Intervention\Image\Interfaces\ImageInterface;
 use Plank\Mediable\Exceptions\ImageManipulationException;
 use Psr\Http\Message\StreamInterface;
 
@@ -90,7 +89,6 @@ class ImageManipulator
      * @param bool $forceRecreate
      * @return Media
      * @throws ImageManipulationException
-     * @throws \Illuminate\Contracts\Filesystem\FileExistsException
      */
     public function createImageVariant(
         Media $media,

@@ -13,15 +13,8 @@ use Plank\Mediable\Helpers\File;
  */
 class MediaMover
 {
-    /**
-     * @var FilesystemManager
-     */
-    protected $filesystem;
+    protected FilesystemManager $filesystem;
 
-    /**
-     * Constructor.
-     * @param FilesystemManager $filesystem
-     */
     public function __construct(FilesystemManager $filesystem)
     {
         $this->filesystem = $filesystem;
