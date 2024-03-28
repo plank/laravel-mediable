@@ -10,7 +10,8 @@
   ```
 * All properties now declare their types if able. If extending any class or implementing any interface from this package, property types may need to be updated.
 * The return type of `SourceAdapterInterface::getSource()` has been changed to `mixed`. If you have implemented a custom SourceAdapter, you will need to update the return type of this method.
-* The `SourceAdapterInterface::getStreamResource(): resource` method has been replaced with the `getStream(): StreamInterface` method. If you have implemented a custom SourceAdapter, you will need to implement the getStream method instead. The `\PLank\Mediable\Stream` class is provided to wrap a resource in a PSR-7 `StreamInterface`.
+* The `SourceAdapterInterface::getStreamResource(): resource` method has been replaced with the `getStream(): StreamInterface` method. If you have implemented a custom SourceAdapter, you will need to implement the `getStream()` method instead.
+* The `Plank\Mediable\Stream` class has been removed in favor of the `guzzlehttp/psr7` implementation. If you were using this class directly, you will need use another PSR-7 compatible stream wrapper instead (such as Guzzle's).
 
 ## 4.x to 5.x
 

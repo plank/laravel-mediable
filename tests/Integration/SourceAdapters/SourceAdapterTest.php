@@ -2,6 +2,7 @@
 
 namespace Plank\Mediable\Tests\Integration\SourceAdapters;
 
+use GuzzleHttp\Psr7\Utils;
 use Plank\Mediable\SourceAdapters\DataUrlAdapter;
 use Plank\Mediable\SourceAdapters\FileAdapter;
 use Plank\Mediable\SourceAdapters\LocalPathAdapter;
@@ -11,8 +12,8 @@ use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
 use Plank\Mediable\SourceAdapters\StreamAdapter;
 use Plank\Mediable\SourceAdapters\StreamResourceAdapter;
 use Plank\Mediable\SourceAdapters\UploadedFileAdapter;
-use Plank\Mediable\Stream;
 use Plank\Mediable\Tests\TestCase;
+use Psr\Http\Message\StreamInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -65,16 +66,16 @@ class SourceAdapterTest extends TestCase
         );
 
         $fileResource = fopen($file, 'rb');
-        $fileStream = new Stream(fopen($file, 'rb'));
+        $fileStream = Utils::streamFor(fopen($file, 'rb'));
 
         $httpResource = fopen($url, 'rb');
-        $httpStream = new Stream(fopen($url, 'rb'));
+        $httpStream = Utils::streamFor(fopen($url, 'rb'));
 
         $memoryResource = fopen('php://memory', 'w+b');
         fwrite($memoryResource, $string);
         rewind($memoryResource);
 
-        $memoryStream = new Stream(fopen('php://memory', 'w+b'));
+        $memoryStream = Utils::streamFor(fopen('php://memory', 'w+b'));
         $memoryStream->write($string);
 
         $data = [
@@ -87,9 +88,9 @@ class SourceAdapterTest extends TestCase
             ],
             'LocalPathAdapter' => [LocalPathAdapter::class, $file, $file, 'plank'],
             'RemoteUrlAdapter' => [RemoteUrlAdapter::class, $url, $url, 'plank'],
-            'RawContentAdapter' => [RawContentAdapter::class, $string, null, '', false, false],
-            'DataUrlAdapter_base64' => [DataUrlAdapter::class, $base64DataUrl, null, '', false, false],
-            'DataUrlAdapter_urlencode' => [DataUrlAdapter::class, $rawDataUrl, null, '', false, false],
+            'RawContentAdapter' => [RawContentAdapter::class, $string, null, '', false],
+            'DataUrlAdapter_base64' => [DataUrlAdapter::class, $base64DataUrl, null, '', false],
+            'DataUrlAdapter_urlencode' => [DataUrlAdapter::class, $rawDataUrl, null, '', false],
             'StreamResourceAdapter_Local' => [
                 StreamResourceAdapter::class,
                 $fileResource,
@@ -221,21 +222,14 @@ class SourceAdapterTest extends TestCase
      */
     public function test_it_adapts_to_stream(
         $adapterClass,
-        $source,
-        $_1 = null,
-        $_2 = null,
-        $_3 = null,
-        $streamable = true
+        $source
     ) {
         /** @var SourceAdapterInterface $adapter */
         $adapter = new $adapterClass($source);
         $stream = $adapter->getStream();
-        if ($streamable) {
-            $this->assertInstanceOf(Stream::class, $stream);
-            $this->assertTrue($stream->isReadable());
-        } else {
-            $this->assertNull($stream);
-        }
+
+        $this->assertInstanceOf(StreamInterface::class, $stream);
+        $this->assertTrue($stream->isReadable());
     }
 
     /**

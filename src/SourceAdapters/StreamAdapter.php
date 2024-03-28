@@ -99,7 +99,7 @@ class StreamAdapter implements SourceAdapterInterface
         return $this->contents;
     }
 
-    public function getStream(): ?StreamInterface
+    public function getStream(): StreamInterface
     {
         return $this->source;
     }

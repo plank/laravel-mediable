@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Plank\Mediable\SourceAdapters;
 
+use GuzzleHttp\Psr7\Utils;
 use Plank\Mediable\Helpers\File;
-use Plank\Mediable\Stream;
 use Psr\Http\Message\StreamInterface;
 
 /**
@@ -80,9 +80,9 @@ class RemoteUrlAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function getStream(): ?StreamInterface
+    public function getStream(): StreamInterface
     {
-        return new Stream(fopen($this->source, 'rb'));
+        return Utils::streamFor(fopen($this->source, 'rb'));
     }
 
     /**

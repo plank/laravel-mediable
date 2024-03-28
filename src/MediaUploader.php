@@ -982,12 +982,10 @@ class MediaUploader
 
     private function writeToDisk(Media $model): void
     {
-        $stream = $this->source->getStream() ?? $this->source->contents();
-
         $this->filesystem->disk($model->disk)
             ->put(
                 $model->getDiskPath(),
-                $stream,
+                $this->source->getStream(),
                 $this->getOptions()
             );
     }

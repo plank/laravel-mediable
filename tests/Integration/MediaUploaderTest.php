@@ -2,6 +2,7 @@
 
 namespace Plank\Mediable\Tests\Integration;
 
+use GuzzleHttp\Psr7\Utils;
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Plank\Mediable\Exceptions\MediaUpload\FileExistsException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException;
@@ -12,7 +13,6 @@ use Plank\Mediable\Media;
 use Plank\Mediable\MediaUploader;
 use Plank\Mediable\Facades\MediaUploader as Facade;
 use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
-use Plank\Mediable\Stream;
 use Plank\Mediable\Tests\Mocks\MediaSubclass;
 use Plank\Mediable\Tests\TestCase;
 use stdClass;
@@ -588,7 +588,7 @@ class MediaUploaderTest extends TestCase
         $this->useDatabase();
         $this->useFilesystem('tmp');
 
-        $stream = new Stream(fopen(TestCase::remoteFilePath(), 'r'));
+        $stream = Utils::streamFor(fopen(TestCase::remoteFilePath(), 'r'));
 
         $media = Facade::fromSource($stream)
             ->toDestination('tmp', 'foo')

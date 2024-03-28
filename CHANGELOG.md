@@ -10,6 +10,7 @@
 - MediaUploader now supports base64 and URL-encoded data URLs as an input source.
 - Improved MediaCollection annotions to support generic types
 - Removed `SourceAdapterInterface::getStreamResource()` method. The method has been replaced with the `getStream()`, which returns a PSR-7 `StreamInterface` instead.
+- Removed the `\Plank\Mediable\Stream` class in favor of the `guzzlehttp/psr7` implementation. This removes the direct dependency on the `psr/http-message` library.
 
 ## 5.5.0 - 2022-05-09
 - Filename and pathname sanitization will use the app locale when transliterating UTF-8 characters to ascii.

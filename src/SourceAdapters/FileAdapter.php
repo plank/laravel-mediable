@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Plank\Mediable\SourceAdapters;
 
+use GuzzleHttp\Psr7\Utils;
 use Plank\Mediable\Helpers\File as FileHelper;
-use Plank\Mediable\Stream;
 use Psr\Http\Message\StreamInterface;
 use Symfony\Component\HttpFoundation\File\File;
 
@@ -79,9 +79,9 @@ class FileAdapter implements SourceAdapterInterface
     /**
      * @inheritdoc
      */
-    public function getStream(): ?StreamInterface
+    public function getStream(): StreamInterface
     {
-        return new Stream(fopen($this->path(), 'rb'));
+        return Utils::streamFor(fopen($this->path(), 'rb'));
     }
 
     /**

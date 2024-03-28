@@ -2,6 +2,7 @@
 
 namespace Plank\Mediable;
 
+use GuzzleHttp\Psr7\Utils;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Support\Collection;
 use Intervention\Image\Commands\StreamCommand;
@@ -338,6 +339,6 @@ class ImageManipulator
             ImageManipulation::FORMAT_TIFF => $image->toTiff($outputQuality),
             default => throw ImageManipulationException::unknownOutputFormat(),
         };
-        return new Stream($formatted->toFilePointer());
+        return Utils::streamFor($formatted->toFilePointer());
     }
 }

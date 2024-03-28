@@ -3,9 +3,8 @@ declare(strict_types=1);
 
 namespace Plank\Mediable\SourceAdapters;
 
+use GuzzleHttp\Psr7\Utils;
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
-use Plank\Mediable\Stream;
-use Psr\Http\Message\StreamInterface;
 
 /**
  * Stream resource Adapter.
@@ -30,7 +29,7 @@ class StreamResourceAdapter extends StreamAdapter
             throw ConfigurationException::unrecognizedSource($source);
         }
 
-        parent::__construct(new Stream($source));
+        parent::__construct(Utils::streamFor($source));
 
         $this->resource = $source;
     }
