@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Plank\Mediable\SourceAdapters;
 
-use Plank\Mediable\Helpers\File;
 
 /**
  * Raw content Adapter.
@@ -12,7 +11,6 @@ use Plank\Mediable\Helpers\File;
  */
 class DataUrlAdapter extends RawContentAdapter
 {
-
     protected ?string $originalMime;
 
     protected string $dataUrl;

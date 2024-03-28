@@ -5,6 +5,7 @@ namespace Plank\Mediable\SourceAdapters;
 
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Plank\Mediable\Stream;
+use Psr\Http\Message\StreamInterface;
 
 /**
  * Stream resource Adapter.
@@ -38,14 +39,6 @@ class StreamResourceAdapter extends StreamAdapter
      * {@inheritdoc}
      */
     public function getSource(): mixed
-    {
-        return $this->resource;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getStreamResource()
     {
         return $this->resource;
     }

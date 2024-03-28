@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace Plank\Mediable\SourceAdapters;
 
 use Plank\Mediable\Helpers\File;
+use Plank\Mediable\Stream;
+use Psr\Http\Message\StreamInterface;
 
 /**
  * URL Adapter.
@@ -76,11 +78,11 @@ class RemoteUrlAdapter implements SourceAdapterInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function getStreamResource()
+    public function getStream(): ?StreamInterface
     {
-        return fopen($this->source, 'rb');
+        return new Stream(fopen($this->source, 'rb'));
     }
 
     /**

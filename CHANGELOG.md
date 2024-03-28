@@ -9,6 +9,7 @@
 - MediaUploader will use the visibility defined on the filesystem disk config if the `makePublic()`/`makePrivate()` methods are not called.
 - MediaUploader now supports base64 and URL-encoded data URLs as an input source.
 - Improved MediaCollection annotions to support generic types
+- Removed `SourceAdapterInterface::getStreamResource()` method. The method has been replaced with the `getStream()`, which returns a PSR-7 `StreamInterface` instead.
 
 ## 5.5.0 - 2022-05-09
 - Filename and pathname sanitization will use the app locale when transliterating UTF-8 characters to ascii.

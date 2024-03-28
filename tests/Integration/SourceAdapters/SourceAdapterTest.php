@@ -87,9 +87,9 @@ class SourceAdapterTest extends TestCase
             ],
             'LocalPathAdapter' => [LocalPathAdapter::class, $file, $file, 'plank'],
             'RemoteUrlAdapter' => [RemoteUrlAdapter::class, $url, $url, 'plank'],
-            'RawContentAdapter' => [RawContentAdapter::class, $string, null, '', false],
-            'DataUrlAdapter_base64' => [DataUrlAdapter::class, $base64DataUrl, null, '', false],
-            'DataUrlAdapter_urlencode' => [DataUrlAdapter::class, $rawDataUrl, null, '', false],
+            'RawContentAdapter' => [RawContentAdapter::class, $string, null, '', false, false],
+            'DataUrlAdapter_base64' => [DataUrlAdapter::class, $base64DataUrl, null, '', false, false],
+            'DataUrlAdapter_urlencode' => [DataUrlAdapter::class, $rawDataUrl, null, '', false, false],
             'StreamResourceAdapter_Local' => [
                 StreamResourceAdapter::class,
                 $fileResource,
@@ -219,19 +219,22 @@ class SourceAdapterTest extends TestCase
     /**
      * @dataProvider adapterProvider
      */
-    public function test_it_adapts_to_stream($adapterClass, $source)
-    {
+    public function test_it_adapts_to_stream(
+        $adapterClass,
+        $source,
+        $_1 = null,
+        $_2 = null,
+        $_3 = null,
+        $streamable = true
+    ) {
         /** @var SourceAdapterInterface $adapter */
         $adapter = new $adapterClass($source);
-        $stream = $adapter->getStreamResource();
-        try {
-            $this->assertTrue(is_resource($stream));
-            $metadata = stream_get_meta_data($stream);
-            $this->assertArrayHasKey($metadata['mode'], self::READABLE_MODES);
-        } finally {
-            if (is_resource($stream)) {
-                fclose($stream);
-            }
+        $stream = $adapter->getStream();
+        if ($streamable) {
+            $this->assertInstanceOf(Stream::class, $stream);
+            $this->assertTrue($stream->isReadable());
+        } else {
+            $this->assertNull($stream);
         }
     }
 

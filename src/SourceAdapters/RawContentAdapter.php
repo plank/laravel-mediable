@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Plank\Mediable\SourceAdapters;
 
 use Plank\Mediable\Helpers\File;
+use Psr\Http\Message\StreamInterface;
 
 /**
  * Raw content Adapter.
@@ -71,13 +72,11 @@ class RawContentAdapter implements SourceAdapterInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function getStreamResource()
+    public function getStream(): ?StreamInterface
     {
-        $stream = fopen('php://memory', 'r+b');
-        fwrite($stream, $this->contents());
-        return $stream;
+        return null;
     }
 
     /**

@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Plank\Mediable\SourceAdapters;
 
+use Psr\Http\Message\StreamInterface;
+
 /**
  * Source Adapter Interface.
  *
@@ -41,13 +43,11 @@ interface SourceAdapterInterface
     public function mimeType(): string;
 
     /**
-     * Return a stream resource if the original source can be converted to a stream.
-     *
+     * Return a stream if the original source can be converted to a stream.
+     * If null is returned, the contents() method will be used instead.
      * Prevents needing to load the entire contents of the file into memory.
-     *
-     * @return resource
      */
-    public function getStreamResource();
+    public function getStream(): ?StreamInterface;
 
     /**
      * Get the body of the file.

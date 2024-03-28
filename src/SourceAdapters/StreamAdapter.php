@@ -99,29 +99,9 @@ class StreamAdapter implements SourceAdapterInterface
         return $this->contents;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getStreamResource()
+    public function getStream(): ?StreamInterface
     {
-        if ($this->source->isSeekable()) {
-            $this->source->rewind();
-        }
-
-        $stream = fopen('php://temp', 'r+b');
-
-        while (!$this->source->eof()) {
-            $writeResult = fwrite($stream, $this->source->read(self::BUFFER_SIZE));
-            if ($writeResult === false) {
-                throw new \RuntimeException("Could not read Stream");
-            }
-        }
-
-        if ($this->source->isSeekable()) {
-            $this->source->rewind();
-        }
-
-        return $stream;
+        return $this->source;
     }
 
     /**

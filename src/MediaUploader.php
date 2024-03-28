@@ -982,11 +982,7 @@ class MediaUploader
 
     private function writeToDisk(Media $model): void
     {
-        $stream = $this->source->getStreamResource();
-
-        if (!is_resource($stream)) {
-            $stream = $this->source->contents();
-        };
+        $stream = $this->source->getStream() ?? $this->source->contents();
 
         $this->filesystem->disk($model->disk)
             ->put(
@@ -994,10 +990,6 @@ class MediaUploader
                 $stream,
                 $this->getOptions()
             );
-
-        if (is_resource($stream)) {
-            fclose($stream);
-        }
     }
 
     public function getOptions(): array
