@@ -215,6 +215,15 @@ class Media extends Model
     }
 
     /**
+     * Retrieve the file url.
+     * @return string
+     */
+    public function getUrlAttribute(): string
+    {
+        return $this->getUrl();
+    }
+
+    /**
      * Query scope for to find media in a particular directory.
      * @param  Builder $q
      * @param  string $disk Filesystem disk to search in
