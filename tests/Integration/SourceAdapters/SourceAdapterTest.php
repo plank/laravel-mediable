@@ -78,56 +78,120 @@ class SourceAdapterTest extends TestCase
         $memoryStream = Utils::streamFor(fopen('php://memory', 'w+b'));
         $memoryStream->write($string);
 
+        $dataStream = Utils::streamFor(fopen('data://image/png,' . rawurlencode($string), 'rb'));
+        $mime = 'image/png';
         $data = [
-            'FileAdapter' => [FileAdapter::class, new File($file), $file, 'plank'],
-            'UploadedFileAdapter' => [
-                UploadedFileAdapter::class,
-                $uploadedFile,
-                $file,
-                'plank'
+            'FileAdapter' => [
+                'adapterClass' => FileAdapter::class,
+                'source' => new File($file),
+                'path' => $file,
+                'filename' => 'plank',
+                'inferredMime' => $mime,
+                'clientMime' => null
             ],
-            'LocalPathAdapter' => [LocalPathAdapter::class, $file, $file, 'plank'],
-            'RemoteUrlAdapter' => [RemoteUrlAdapter::class, $url, $url, 'plank'],
-            'RawContentAdapter' => [RawContentAdapter::class, $string, null, '', false],
-            'DataUrlAdapter_base64' => [DataUrlAdapter::class, $base64DataUrl, null, '', false],
-            'DataUrlAdapter_urlencode' => [DataUrlAdapter::class, $rawDataUrl, null, '', false],
+            'UploadedFileAdapter' => [
+                'adapterClass' => UploadedFileAdapter::class,
+                'source' => $uploadedFile,
+                'path' => $file,
+                'filename' => 'plank',
+                'inferredMime' => $mime,
+                'clientMime' => $mime
+            ],
+            'LocalPathAdapter' => [
+                'adapterClass' => LocalPathAdapter::class,
+                'source' => $file,
+                'path' => $file,
+                'filename' => 'plank',
+                'inferredMime' => $mime,
+                'clientMime' => null
+            ],
+            'RemoteUrlAdapter' => [
+                'adapterClass' => RemoteUrlAdapter::class,
+                'source' => $url,
+                'path' => $url,
+                'filename' => 'plank',
+                'inferredMime' => null,
+                'clientMime' => $mime
+            ],
+            'RawContentAdapter' => [
+                'adapterClass' => RawContentAdapter::class,
+                'source' => $string,
+                'path' => null,
+                'filename' => '',
+                'inferredMime' => $mime,
+                'clientMime' => null
+            ],
+            'DataUrlAdapter_base64' => [
+                'adapterClass' => DataUrlAdapter::class,
+                'source' => $base64DataUrl,
+                'path' => null,
+                'filename' => '',
+                'inferredMime' => $mime,
+                'clientMime' => $mime
+            ],
+            'DataUrlAdapter_urlencode' => [
+                'adapterClass' => DataUrlAdapter::class,
+                'source' => $rawDataUrl,
+                'path' => null,
+                'filename' => '',
+                'inferredMime' => $mime,
+                'clientMime' => $mime
+            ],
             'StreamResourceAdapter_Local' => [
-                StreamResourceAdapter::class,
-                $fileResource,
-                $file,
-                'plank'
+                'adapterClass' => StreamResourceAdapter::class,
+                'source' => $fileResource,
+                'path' => $file,
+                'filename' => 'plank',
+                'inferredMime' => $mime,
+                'clientMime' => null
             ],
             'StreamAdapter_Local' => [
-                StreamAdapter::class,
-                $fileStream,
-                $file,
-                'plank',
-                false
+                'adapterClass' => StreamAdapter::class,
+                'source' => $fileStream,
+                'path' => $file,
+                'filename' => 'plank',
+                'inferredMime' => $mime,
+                'clientMime' => null
             ],
             'StreamResourceAdapter_Remote' => [
-                StreamResourceAdapter::class,
-                $httpResource,
-                $url,
-                'plank'
+                'adapterClass' => StreamResourceAdapter::class,
+                'source' => $httpResource,
+                'path' => $url,
+                'filename' => 'plank',
+                'inferredMime' => null,
+                'clientMime' => $mime
             ],
             'StreamAdapter_Remote' => [
-                StreamAdapter::class,
-                $httpStream,
-                $url,
-                'plank',
-                false
+                'adapterClass' => StreamAdapter::class,
+                'source' => $httpStream,
+                'path' => $url,
+                'filename' => 'plank',
+                'inferredMime' => null,
+                'clientMime' => $mime
             ],
             'StreamResourceAdapter_Memory' => [
-                StreamResourceAdapter::class,
-                $memoryResource,
-                'php://memory',
-                ''
+                'adapterClass' => StreamResourceAdapter::class,
+                'source' => $memoryResource,
+                'path' => '',
+                'filename' => '',
+                'inferredMime' => $mime,
+                'clientMime' => null
             ],
             'StreamAdapter_Memory' => [
-                StreamAdapter::class,
-                $memoryStream,
-                'php://memory',
-                ''
+                'adapterClass' => StreamAdapter::class,
+                'source' => $memoryStream,
+                'path' => '',
+                'filename' => '',
+                'inferredMime' => $mime,
+                'clientMime' => null
+            ],
+            'StreamAdapter_Data' => [
+                'adapterClass' => StreamAdapter::class,
+                'source' => $dataStream,
+                'path' => '',
+                'filename' => '',
+                'inferredMime' => $mime,
+                'clientMime' => $mime
             ],
         ];
         return $data;
@@ -200,11 +264,12 @@ class SourceAdapterTest extends TestCase
     /**
      * @dataProvider adapterProvider
      */
-    public function test_it_adapts_mime_type($adapterClass, $source)
+    public function test_it_adapts_mime_type($adapterClass, $source, $path, $filename, $inferredMime, $clientMime)
     {
         /** @var SourceAdapterInterface $adapter */
         $adapter = new $adapterClass($source);
-        $this->assertEquals('image/png', $adapter->mimeType());
+        $this->assertEquals($inferredMime, $adapter->mimeType());
+        $this->assertEquals($clientMime, $adapter->clientMimeType());
     }
 
     /**

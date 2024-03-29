@@ -11,6 +11,8 @@
 - Improved MediaCollection annotions to support generic types
 - Removed `SourceAdapterInterface::getStreamResource()` method. The method has been replaced with the `getStream()`, which returns a PSR-7 `StreamInterface` instead.
 - Removed the `\Plank\Mediable\Stream` class in favor of the `guzzlehttp/psr7` implementation. This removes the direct dependency on the `psr/http-message` library.
+- The Media class now exposes a dynamic `url` attribute which will generate a URL for the file (equivalent to the getUrl() method).
+- Modernized the migration files to use more recent Laravel conventions.
 
 ## 5.5.0 - 2022-05-09
 - Filename and pathname sanitization will use the app locale when transliterating UTF-8 characters to ascii.

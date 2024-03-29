@@ -59,9 +59,14 @@ class LocalPathAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function mimeType(): string
+    public function mimeType(): ?string
     {
         return mime_content_type($this->source);
+    }
+
+    public function clientMimeType(): ?string
+    {
+        return null;
     }
 
     /**

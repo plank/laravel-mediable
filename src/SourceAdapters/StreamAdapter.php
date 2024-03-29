@@ -3,8 +3,10 @@ declare(strict_types=1);
 
 namespace Plank\Mediable\SourceAdapters;
 
+use GuzzleHttp\Psr7\MimeType;
 use Plank\Mediable\Helpers\File;
 use Psr\Http\Message\StreamInterface;
+use Symfony\Component\Mime\MimeTypes;
 
 /**
  * Stream Adapter.
@@ -14,6 +16,11 @@ use Psr\Http\Message\StreamInterface;
 class StreamAdapter implements SourceAdapterInterface
 {
     const BUFFER_SIZE = 1024;
+
+    private const TYPE_MEMORY = 'PHP';
+    private const TYPE_DATA_URL = 'RFC2397';
+    private const TYPE_HTTP = 'http';
+    private const TYPE_FILE = 'plainfile';
 
     protected StreamInterface $source;
 
@@ -45,6 +52,11 @@ class StreamAdapter implements SourceAdapterInterface
      */
     public function path(): string
     {
+        $type = $this->getStreamType();
+        if ($type == self::TYPE_DATA_URL || $type == self::TYPE_MEMORY) {
+            return '';
+        }
+
         return (string)$this->source->getMetadata('uri');
     }
 
@@ -70,17 +82,54 @@ class StreamAdapter implements SourceAdapterInterface
             return $extension;
         }
 
-        return (string)File::guessExtension($this->mimeType());
+        $mimeType = $this->mimeType() ?? $this->clientMimeType();
+        if ($mimeType) {
+            return (string)File::guessExtension($mimeType);
+        }
+        return '';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function mimeType(): string
+    public function mimeType(): ?string
     {
-        $fileInfo = new \finfo(FILEINFO_MIME_TYPE);
+        $type = $this->getStreamType();
+        if ($type == self::TYPE_FILE) {
+            return MimeTypes::getDefault()->guessMimeType(
+                $this->source->getMetadata('uri')
+            );
+        }
 
-        return (string)$fileInfo->buffer($this->contents());
+        if ($type == self::TYPE_MEMORY || $type == self::TYPE_DATA_URL) {
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mimeType = finfo_buffer($finfo, $this->contents());
+            finfo_close($finfo);
+            return $mimeType;
+        }
+
+        return null;
+    }
+
+    public function clientMimeType(): ?string
+    {
+        $type = $this->getStreamType();
+
+        // supported primarily by data URLs
+        if ($this->source->getMetadata('mediatype')) {
+            return $this->source->getMetadata('mediatype');
+        }
+
+        if ($type == self::TYPE_HTTP) {
+            $headers = $this->source->getMetadata('wrapper_data');
+            foreach ($headers as $header) {
+                if (preg_match('/Content-Type:\s?(\w+\/[\.+\-\w]+)/i',$header, $matches)) {
+                    return $matches[1];
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -88,14 +137,12 @@ class StreamAdapter implements SourceAdapterInterface
      */
     public function contents(): string
     {
-        if (!isset($this->contents)) {
-            if ($this->source->isSeekable()) {
-                $this->contents = (string)$this->source;
-            } else {
-                $this->contents = $this->source->getContents();
-            }
+        if ($this->source->isSeekable()) {
+            return (string)$this->source;
         }
-
+        if (!isset($this->contents)) {
+            $this->contents = $this->source->getContents();
+        }
         return $this->contents;
     }
 
@@ -123,6 +170,24 @@ class StreamAdapter implements SourceAdapterInterface
             return $size;
         }
 
+        if ($this->source->isSeekable()) {
+            $this->source->rewind();
+            $size = 0;
+            while (!$this->source->eof()) {
+                $size += (int)mb_strlen($this->source->read(self::BUFFER_SIZE), '8bit');
+            }
+            $this->source->rewind();
+            return $size;
+        }
+
         return (int)mb_strlen($this->contents(), '8bit');
+    }
+
+    /**
+     * @return array|mixed|null
+     */
+    public function getStreamType(): mixed
+    {
+        return $this->source->getMetadata('wrapper_type');
     }
 }

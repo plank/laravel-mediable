@@ -354,6 +354,30 @@ class MediaUploader
     }
 
     /**
+     * Prefer the MIME type provided by the client, if any, over the inferred MIME type.
+     * Depending on the source, this may not be accurate.
+     * @return $this
+     */
+    public function preferClientMimeType(): self
+    {
+        $this->config['mime_type_source'] = 'client';
+
+        return $this;
+    }
+
+    /**
+     * Prefer the MIME type inferred by the contents of the file, if available,
+     * over the MIME type provided by the client.
+     * @return $this
+     */
+    public function preferInferredMimeType(): self
+    {
+        $this->config['mime_type_source'] = 'inferred';
+
+        return $this;
+    }
+
+    /**
      * Set a list of file extensions that the source file must be restricted to.
      * @param string[] $allowedExtensions
      * @return $this
@@ -591,7 +615,10 @@ class MediaUploader
     private function populateModel(Media $model): Media
     {
         $model->size = $this->verifyFileSize($this->source->size());
-        $model->mime_type = $this->verifyMimeType($this->source->mimeType());
+        $model->mime_type = $this->verifyMimeType($this->selectMimeType(
+            $this->source->mimeType(),
+            $this->source->clientMimeType()
+        ));
         $model->extension = $this->verifyExtension($this->source->extension());
         $model->aggregate_type = $this->inferAggregateType($model->mime_type, $model->extension);
 
@@ -721,7 +748,12 @@ class MediaUploader
     {
         $this->verifySource();
         $this->verifyFileSize($this->source->size());
-        $this->verifyMimeType($this->source->mimeType());
+        $this->verifyMimeType(
+            $this->selectMimeType(
+                $this->source->mimeType(),
+                $this->source->clientMimeType()
+            )
+        );
         $this->verifyExtension($this->source->extension());
     }
 
@@ -782,6 +814,15 @@ class MediaUploader
             return 'application/octet-stream';
         }
         return $mime ?: 'application/octet-stream';
+    }
+
+    private function selectMimeType(?string $inferredMimeType, ?string $clientMimeType): string
+    {
+        $source = $this->config['mime_type_source'] ?? 'inferred';
+        if ($source === 'client') {
+            return $clientMimeType ?? $inferredMimeType ?? 'application/octet-stream';
+        }
+        return $inferredMimeType ?? $clientMimeType ?? 'application/octet-stream';
     }
 
     /**

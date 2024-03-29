@@ -33,9 +33,15 @@ interface SourceAdapterInterface
     public function extension(): string;
 
     /**
-     * Get the MIME type of the file.
+     * Get the MIME type inferred from the contents of the file.
      */
-    public function mimeType(): string;
+    public function mimeType(): ?string;
+
+    /**
+     * Get the MIME type of the file as provided by the client.
+     * This is not guaranteed to be accurate.
+     */
+    public function clientMimeType(): ?string;
 
     /**
      * Return a stream if the original source can be converted to a stream.

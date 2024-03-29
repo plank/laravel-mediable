@@ -63,9 +63,14 @@ class FileAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function mimeType(): string
+    public function mimeType(): ?string
     {
         return (string)$this->source->getMimeType();
+    }
+
+    public function clientMimeType(): ?string
+    {
+        return null;
     }
 
     /**

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Plank\Mediable\SourceAdapters;
 
+use GuzzleHttp\Psr7\MimeType;
 use GuzzleHttp\Psr7\Utils;
 use Plank\Mediable\Helpers\File;
 use Psr\Http\Message\StreamInterface;
@@ -64,9 +65,15 @@ class RemoteUrlAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function mimeType(): string
+    public function mimeType(): ?string
     {
-        return $this->getHeader('Content-Type');
+        return null;
+    }
+
+    public function clientMimeType(): ?string
+    {
+        return $this->getHeader('Content-Type')
+            ?? MimeType::fromExtension($this->extension());
     }
 
     /**
@@ -133,7 +140,7 @@ class RemoteUrlAdapter implements SourceAdapterInterface
     {
         $headers = @get_headers(
             $this->source,
-            version_compare(phpversion(), '8.0.0', '>=') ? true : 1
+            true
         );
 
         return $headers ?: [];

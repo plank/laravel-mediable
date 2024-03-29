@@ -11,7 +11,7 @@ namespace Plank\Mediable\SourceAdapters;
  */
 class DataUrlAdapter extends RawContentAdapter
 {
-    protected ?string $originalMime;
+    protected ?string $clientMimeType;
 
     protected string $dataUrl;
 
@@ -30,7 +30,7 @@ class DataUrlAdapter extends RawContentAdapter
         ) {
             throw new \InvalidArgumentException('Invalid Data URL format');
         }
-        $this->originalMime = $matches[1] ?? null;
+        $this->clientMimeType = $matches[1] ?? null;
         $content = substr($source, strlen($matches[0]));
         $decodedSource = ($matches[2] ?? '') === ';base64'
             ? base64_decode($content)
@@ -44,5 +44,10 @@ class DataUrlAdapter extends RawContentAdapter
     public function getSource(): mixed
     {
         return $this->dataUrl;
+    }
+
+    public function clientMimeType(): ?string
+    {
+        return $this->clientMimeType;
     }
 }
