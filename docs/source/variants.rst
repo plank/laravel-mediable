@@ -54,7 +54,7 @@ Before variants can be created, the manipulations to be applied to the images ne
                 'thumb',
                 ImageManipulation::make(function (Image $image, Media $originalMedia) {
                     $image->fit(32, 32);
-                })->toPngFormat()
+                })->outputPngFormat()
             );
 
             ImageManipulator::defineVariant(
