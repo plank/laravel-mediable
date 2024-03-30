@@ -705,7 +705,9 @@ class MediaUploader
         $model->aggregate_type = $this->inferAggregateType($model->mime_type, $model->extension);
         $model->size = $this->verifyFileSize($storage->size($model->getDiskPath()));
 
-        $storage->setVisibility($model->getDiskPath(), $this->getVisibility());
+        if ($this->visibility) {
+            $storage->setVisibility($model->getDiskPath(), $this->visibility);
+        }
 
         if (is_callable($this->before_save)) {
             call_user_func($this->before_save, $model, $this->source);
