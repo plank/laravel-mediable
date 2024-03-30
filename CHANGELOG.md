@@ -9,10 +9,19 @@
 - MediaUploader will use the visibility defined on the filesystem disk config if the `makePublic()`/`makePrivate()` methods are not called.
 - MediaUploader now supports base64 and URL-encoded data URLs as an input source.
 - Improved MediaCollection annotions to support generic types
-- Removed `SourceAdapterInterface::getStreamResource()` method. The method has been replaced with the `getStream()`, which returns a PSR-7 `StreamInterface` instead.
 - Removed the `\Plank\Mediable\Stream` class in favor of the `guzzlehttp/psr7` implementation. This removes the direct dependency on the `psr/http-message` library.
-- The Media class now exposes a dynamic `url` attribute which will generate a URL for the file (equivalent to the getUrl() method).
+- The Media class now exposes a dynamic `url` attribute which will generate a URL for the file (equivalent to the `getUrl()` method).
 - Modernized the migration files to use more recent Laravel conventions.
+- All SourceAdapter classes have been significantly refactored.
+   - All sourceAdapters will now never load the entire file contents into memory to determine metadata about the file, in order to avoid memory exhaustion when dealing with large files.
+   - If reading the file is necessary, the adapter will attempt use a single streamed scan of the file to load all metadata at once, to speed up to the precess.
+  - Removed `getStreamResource()` method. The method has been replaced with the `getStream()`, which returns a PSR-7 `StreamInterface` instead.
+  - Added `hash()` method which is expected to return an md5 hash of the file contents, if available.
+  - The return types of the `path()`, `filename()`, `extension()`, methods are now nullable. If the adapter cannot determine the value from the information available, it should return null.
+  - If the extension is not available from the source adapter (e.g. source is a raw content string), the MediaUploader will attempt to infer the extension based on the MIME type.
+  - If the filename is not available from the source adapter (e.g. source is a raw content string), the MediaUploader will throw an exception if the filename is not provided as a configuration.
+  - Removed the `getContents()` method.
+  - Removed the `getSource()` method
 
 ## 5.5.0 - 2022-05-09
 - Filename and pathname sanitization will use the app locale when transliterating UTF-8 characters to ascii.

@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Plank\Mediable\SourceAdapters;
 
 use GuzzleHttp\Psr7\Utils;
-use Plank\Mediable\Helpers\File as FileHelper;
 use Psr\Http\Message\StreamInterface;
 use Symfony\Component\HttpFoundation\File\File;
 
@@ -25,15 +24,7 @@ class FileAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function getSource(): mixed
-    {
-        return $this->source;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function path(): string
+    public function path(): ?string
     {
         return $this->source->getPath() . '/' . $this->source->getFilename();
     }
@@ -41,29 +32,23 @@ class FileAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function filename(): string
+    public function filename(): ?string
     {
-        return pathinfo($this->source->getFilename(), PATHINFO_FILENAME);
+        return pathinfo($this->source->getFilename(), PATHINFO_FILENAME) ?: null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function extension(): string
+    public function extension(): ?string
     {
-        $extension = pathinfo($this->path(), PATHINFO_EXTENSION);
-
-        if ($extension) {
-            return $extension;
-        }
-
-        return (string)FileHelper::guessExtension($this->mimeType());
+        return pathinfo($this->path(), PATHINFO_EXTENSION) ?: null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function mimeType(): ?string
+    public function mimeType(): string
     {
         return (string)$this->source->getMimeType();
     }
@@ -71,14 +56,6 @@ class FileAdapter implements SourceAdapterInterface
     public function clientMimeType(): ?string
     {
         return null;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function contents(): string
-    {
-        return (string)file_get_contents($this->path());
     }
 
     /**
@@ -102,6 +79,11 @@ class FileAdapter implements SourceAdapterInterface
      */
     public function size(): int
     {
-        return (int)filesize($this->path());
+        return filesize($this->path()) ?: 0;
+    }
+
+    public function hash(): string
+    {
+        return md5_file($this->path()) ?: '';
     }
 }

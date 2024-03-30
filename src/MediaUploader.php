@@ -6,6 +6,7 @@ namespace Plank\Mediable;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemManager;
 use League\Flysystem\UnableToRetrieveMetadata;
+use Mimey\MimeTypes;
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Plank\Mediable\Exceptions\MediaUpload\FileExistsException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException;
@@ -13,7 +14,6 @@ use Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException;
 use Plank\Mediable\Exceptions\MediaUpload\FileSizeException;
 use Plank\Mediable\Exceptions\MediaUpload\ForbiddenException;
 use Plank\Mediable\Helpers\File;
-use Plank\Mediable\SourceAdapters\DataUrlAdapter;
 use Plank\Mediable\SourceAdapters\RawContentAdapter;
 use Plank\Mediable\SourceAdapters\SourceAdapterFactory;
 use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
@@ -72,16 +72,23 @@ class MediaUploader
      */
     private array $options = [];
 
+    private MimeTypes $mimey;
+
     /**
      * Constructor.
      * @param FilesystemManager $filesystem
      * @param SourceAdapterFactory $factory
      * @param array|null $config
      */
-    public function __construct(FileSystemManager $filesystem, SourceAdapterFactory $factory, array $config = null)
-    {
+    public function __construct(
+        FileSystemManager $filesystem,
+        SourceAdapterFactory $factory,
+        MimeTypes $mimey,
+        array $config = null
+    ) {
         $this->filesystem = $filesystem;
         $this->factory = $factory;
+        $this->mimey = $mimey;
         $this->config = $config ?: config('mediable', []);
     }
 
@@ -93,7 +100,7 @@ class MediaUploader
      * @return $this
      * @throws ConfigurationException
      */
-    public function fromSource($source): self
+    public function fromSource(mixed $source): self
     {
         $this->source = $this->factory->create($source);
 
@@ -215,7 +222,7 @@ class MediaUploader
      */
     public function setMaximumSize(int $size): self
     {
-        $this->config['max_size'] = (int)$size;
+        $this->config['max_size'] = $size;
 
         return $this;
     }
@@ -227,7 +234,7 @@ class MediaUploader
      */
     public function setOnDuplicateBehavior(string $behavior): self
     {
-        $this->config['on_duplicate'] = (string)$behavior;
+        $this->config['on_duplicate'] = $behavior;
 
         return $this;
     }
@@ -360,7 +367,7 @@ class MediaUploader
      */
     public function preferClientMimeType(): self
     {
-        $this->config['mime_type_source'] = 'client';
+        $this->config['prefer_client_mime_type'] = true;
 
         return $this;
     }
@@ -372,7 +379,7 @@ class MediaUploader
      */
     public function preferInferredMimeType(): self
     {
-        $this->config['mime_type_source'] = 'inferred';
+        $this->config['prefer_client_mime_type'] = false;
 
         return $this;
     }
@@ -614,12 +621,12 @@ class MediaUploader
      */
     private function populateModel(Media $model): Media
     {
-        $model->size = $this->verifyFileSize($this->source->size());
-        $model->mime_type = $this->verifyMimeType($this->selectMimeType(
-            $this->source->mimeType(),
-            $this->source->clientMimeType()
-        ));
-        $model->extension = $this->verifyExtension($this->source->extension());
+        $model->size = $this->verifyFileSize($this->source->size() ?? 0);
+        $model->mime_type = $this->verifyMimeType($this->selectMimeType());
+        $model->extension = $this->verifyExtension(
+            $this->source->extension()
+                ?? $this->inferExtensionFromMime($model->mime_type)
+        );
         $model->aggregate_type = $this->inferAggregateType($model->mime_type, $model->extension);
 
         $model->disk = $this->disk ?: $this->config['default_disk'];
@@ -688,7 +695,7 @@ class MediaUploader
         $model->filename = $filename;
         $model->extension = $this->verifyExtension($extension, false);
 
-        if (!$storage->has($model->getDiskPath())) {
+        if (!$storage->exists($model->getDiskPath())) {
             throw FileNotFoundException::fileNotFound($model->getDiskPath());
         }
 
@@ -747,12 +754,9 @@ class MediaUploader
     public function verifyFile(): void
     {
         $this->verifySource();
-        $this->verifyFileSize($this->source->size());
+        $this->verifyFileSize($this->source->size() ?? 0);
         $this->verifyMimeType(
-            $this->selectMimeType(
-                $this->source->mimeType(),
-                $this->source->clientMimeType()
-            )
+            $this->selectMimeType()
         );
         $this->verifyExtension($this->source->extension());
     }
@@ -800,7 +804,7 @@ class MediaUploader
             throw ConfigurationException::noSourceProvided();
         }
         if (!$this->source->valid()) {
-            throw FileNotFoundException::fileNotFound($this->source->path());
+            throw FileNotFoundException::fileNotFound($this->source->path() ?? '');
         }
     }
 
@@ -816,13 +820,12 @@ class MediaUploader
         return $mime ?: 'application/octet-stream';
     }
 
-    private function selectMimeType(?string $inferredMimeType, ?string $clientMimeType): string
+    private function selectMimeType(): string
     {
-        $source = $this->config['mime_type_source'] ?? 'inferred';
-        if ($source === 'client') {
-            return $clientMimeType ?? $inferredMimeType ?? 'application/octet-stream';
+        if ($this->config['prefer_client_mime_type'] ?? false) {
+            return $this->source->clientMimeType() ?? $this->source->mimeType();
         }
-        return $inferredMimeType ?? $clientMimeType ?? 'application/octet-stream';
+        return $this->source->mimeType();
     }
 
     /**
@@ -845,6 +848,7 @@ class MediaUploader
     /**
      * Ensure that the file's extension is allowed.
      * @param  string $extension
+     * @param  bool $toLower
      * @return string
      * @throws FileNotSupportedException If the file extension is not allowed
      */
@@ -886,7 +890,7 @@ class MediaUploader
     {
         $storage = $this->filesystem->disk($model->disk);
 
-        if ($storage->has($model->getDiskPath())) {
+        if ($storage->exists($model->getDiskPath())) {
             $this->handleDuplicate($model);
         }
     }
@@ -932,6 +936,7 @@ class MediaUploader
     /**
      * Delete the media that previously existed at a destination.
      * @param  Media $model
+     * @param  bool $withVariants
      * @return void
      */
     private function deleteExistingMedia(Media $model, bool $withVariants = false): void
@@ -979,7 +984,7 @@ class MediaUploader
             }
             $path = "{$model->directory}/{$filename}.{$model->extension}";
             ++$counter;
-        } while ($storage->has($path));
+        } while ($storage->exists($path));
 
         return $filename;
     }
@@ -995,31 +1000,17 @@ class MediaUploader
         }
 
         if ($this->hashFilename) {
-            return $this->generateHash();
+            return $this->source->hash();
         }
 
-        return File::sanitizeFileName($this->source->filename());
-    }
+        $filename = $this->source->filename();
 
-    /**
-     * Calculate hash of source contents.
-     * @return string
-     */
-    private function generateHash(): string
-    {
-        $ctx = hash_init('md5');
-
-        // We don't need to read the file contents if the source has a path
-        if ($this->source->path()) {
-            hash_update_file($ctx, $this->source->path());
-        } else {
-            hash_update($ctx, $this->source->contents());
+        if ($filename === null) {
+            ConfigurationException::cannotInferFilename();
         }
 
-        return hash_final($ctx);
+        return File::sanitizeFileName($filename);
     }
-
-
 
     private function writeToDisk(Media $model): void
     {
@@ -1038,5 +1029,10 @@ class MediaUploader
             $options['visibility'] = $this->getVisibility();
         }
         return $options;
+    }
+
+    private function inferExtensionFromMime(?string $mime_type): string
+    {
+        return $this->mimey->getExtension($mime_type) ?: 'application/octet-stream';
     }
 }

@@ -26,7 +26,8 @@
         "guzzlehttp/guzzle": "^7.4.1",
         "symfony/http-foundation": "^6.0.3|^7.0",
         "guzzlehttp/psr7": "^2.6",
-        "symfony/mime": "^7.0"
+        "symfony/mime": "^7.0",
+        "ralouphie/mimey": "^1.0"
     },
     "require-dev": {
         "orchestra/testbench": "^8.0|^9.0",

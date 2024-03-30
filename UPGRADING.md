@@ -6,11 +6,13 @@
 * Minimum Laravel version moved to 10
 * To add support for data URLs to the MediaUploader, the following entry should be added to the `source_adapters.pattern` field in `config/mediable.php`
   ```php
-  '^data:[^,]*,' => Plank\Mediable\SourceAdapters\DataUrlAdapter::class,
+  '^data:/?/?[^,]*,' => Plank\Mediable\SourceAdapters\DataUrlAdapter::class,
   ```
 * All properties now declare their types if able. If extending any class or implementing any interface from this package, property types may need to be updated.
-* The return type of `SourceAdapterInterface::getSource()` has been changed to `mixed`. If you have implemented a custom SourceAdapter, you will need to update the return type of this method.
-* The `SourceAdapterInterface::getStreamResource(): resource` method has been replaced with the `getStream(): StreamInterface` method. If you have implemented a custom SourceAdapter, you will need to implement the `getStream()` method instead.
+* If you have implemented a custom SourceAdapter, you will need to apply the following changes from the `SourceAdapterInterface` interface:
+  * The `getSource()`, `getContents()`, `getStreamResource()` methods have been removed
+  * Implement the `getStream(): StreamInterface` method.
+  * Implement the `getHash(): string` method.
 * The `Plank\Mediable\Stream` class has been removed in favor of the `guzzlehttp/psr7` implementation. If you were using this class directly, you will need use another PSR-7 compatible stream wrapper instead (such as Guzzle's).
 
 ## 4.x to 5.x

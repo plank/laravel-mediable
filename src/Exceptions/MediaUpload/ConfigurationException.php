@@ -37,4 +37,9 @@ class ConfigurationException extends MediaUploadException
     {
         return new static("Cannot find disk named `{$disk}`.");
     }
+
+    public static function cannotInferFilename(): self
+    {
+        return new static('No filename is provided and cannot infer filename from the provided source.');
+    }
 }

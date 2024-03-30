@@ -25,15 +25,10 @@ class UploadedFileAdapter implements SourceAdapterInterface
         $this->source = $source;
     }
 
-    public function getSource(): mixed
-    {
-        return $this->source;
-    }
-
     /**
      * {@inheritdoc}
      */
-    public function path(): string
+    public function path(): ?string
     {
         return $this->source->getPath() . '/' . $this->source->getFilename();
     }
@@ -41,15 +36,15 @@ class UploadedFileAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function filename(): string
+    public function filename(): ?string
     {
-        return pathinfo((string)$this->source->getClientOriginalName(), PATHINFO_FILENAME);
+        return pathinfo($this->source->getClientOriginalName(), PATHINFO_FILENAME);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function extension(): string
+    public function extension(): ?string
     {
         $extension = $this->source->getClientOriginalExtension();
 
@@ -63,7 +58,7 @@ class UploadedFileAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function mimeType(): ?string
+    public function mimeType(): string
     {
         return $this->source->getMimeType();
     }
@@ -71,14 +66,6 @@ class UploadedFileAdapter implements SourceAdapterInterface
     public function clientMimeType(): ?string
     {
         return $this->source->getClientMimeType();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function contents(): string
-    {
-        return $this->getStream()->getContents();
     }
 
     /**
@@ -102,6 +89,22 @@ class UploadedFileAdapter implements SourceAdapterInterface
      */
     public function size(): int
     {
-        return (int)$this->source->getSize();
+        return $this->source->getSize() ?: 0;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isRemote(): bool
+    {
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hash(): string
+    {
+        return md5_file($this->path()) ?: '';
     }
 }

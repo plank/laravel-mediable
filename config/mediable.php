@@ -61,6 +61,12 @@ return [
      */
     'allow_unrecognized_types' => false,
 
+    /**
+     * Prefer the client-provided MIME type over the one inferred from the file contents, if provided
+     * May be slightly faster to compute, but is not guaranteed to be accurate if the source is untrusted
+     */
+    'prefer_client_mime_type' => false,
+
     /*
      * Only allow files with specific MIME type(s) to be uploaded
      */
@@ -214,7 +220,7 @@ return [
             '^https?://' => Plank\Mediable\SourceAdapters\RemoteUrlAdapter::class,
             '^/' => Plank\Mediable\SourceAdapters\LocalPathAdapter::class,
             '^[a-zA-Z]:\\\\' => Plank\Mediable\SourceAdapters\LocalPathAdapter::class,
-            '^data:[^,]*,' => Plank\Mediable\SourceAdapters\DataUrlAdapter::class,
+            '^data:/?/?[^,]*,' => Plank\Mediable\SourceAdapters\DataUrlAdapter::class,
         ],
     ],
 

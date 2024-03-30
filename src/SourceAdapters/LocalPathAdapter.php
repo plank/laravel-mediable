@@ -21,7 +21,10 @@ class LocalPathAdapter implements SourceAdapterInterface
         $this->source = $source;
     }
 
-    public function getSource(): mixed
+    /**
+     * {@inheritdoc}
+     */
+    public function path(): ?string
     {
         return $this->source;
     }
@@ -29,15 +32,7 @@ class LocalPathAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function path(): string
-    {
-        return $this->source;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function filename(): string
+    public function filename(): ?string
     {
         return pathinfo($this->source, PATHINFO_FILENAME);
     }
@@ -45,7 +40,7 @@ class LocalPathAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function extension(): string
+    public function extension(): ?string
     {
         $extension = pathinfo($this->source, PATHINFO_EXTENSION);
 
@@ -59,7 +54,7 @@ class LocalPathAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function mimeType(): ?string
+    public function mimeType(): string
     {
         return mime_content_type($this->source);
     }
@@ -67,14 +62,6 @@ class LocalPathAdapter implements SourceAdapterInterface
     public function clientMimeType(): ?string
     {
         return null;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function contents(): string
-    {
-        return (string)file_get_contents($this->source);
     }
 
     /**
@@ -98,6 +85,16 @@ class LocalPathAdapter implements SourceAdapterInterface
      */
     public function size(): int
     {
-        return (int)filesize($this->source);
+        return filesize($this->source) ?: 0;
+    }
+
+    public function isRemote(): bool
+    {
+        return false;
+    }
+
+    public function hash(): string
+    {
+        return md5_file($this->source) ?: '';
     }
 }

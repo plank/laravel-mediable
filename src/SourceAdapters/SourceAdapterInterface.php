@@ -13,33 +13,32 @@ use Psr\Http\Message\StreamInterface;
 interface SourceAdapterInterface
 {
     /**
-     * Get the underlying source.
-     */
-    public function getSource(): mixed;
-
-    /**
      * Get the absolute path to the file.
+     * @return string|null Returns null if the file is not currently on disk
      */
-    public function path(): string;
+    public function path(): ?string;
 
     /**
      * Get the name of the file.
+     * @return string|null Returns null if the file name cannot be determined.
      */
-    public function filename(): string;
+    public function filename(): ?string;
 
     /**
      * Get the extension of the file.
+     * @return string|null Returns null if the extension cannot be determined.
      */
-    public function extension(): string;
+    public function extension(): ?string;
 
     /**
      * Get the MIME type inferred from the contents of the file.
      */
-    public function mimeType(): ?string;
+    public function mimeType(): string;
 
     /**
      * Get the MIME type of the file as provided by the client.
      * This is not guaranteed to be accurate.
+     * @return string|null Returns null if no client MIME type is available.
      */
     public function clientMimeType(): ?string;
 
@@ -50,11 +49,6 @@ interface SourceAdapterInterface
     public function getStream(): StreamInterface;
 
     /**
-     * Get the body of the file.
-     */
-    public function contents(): string;
-
-    /**
      * Check if the file can be transferred.
      */
     public function valid(): bool;
@@ -63,4 +57,9 @@ interface SourceAdapterInterface
      * Determine the size of the file.
      */
     public function size(): int;
+
+    /**
+     * Retrieve the md5 hash of the file.
+     */
+    public function hash(): string;
 }

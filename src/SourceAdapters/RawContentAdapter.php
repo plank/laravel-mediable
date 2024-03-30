@@ -14,7 +14,6 @@ use Psr\Http\Message\StreamInterface;
  */
 class RawContentAdapter implements SourceAdapterInterface
 {
-
     protected string $source;
 
     public function __construct(string $source)
@@ -25,31 +24,23 @@ class RawContentAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function getSource(): mixed
+    public function path(): ?string
     {
-        return $this->source;
+        return null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function path(): string
+    public function filename(): ?string
     {
-        return '';
+        return null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function filename(): string
-    {
-        return '';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function extension(): string
+    public function extension(): ?string
     {
         return (string)File::guessExtension($this->mimeType());
     }
@@ -57,7 +48,7 @@ class RawContentAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function mimeType(): ?string
+    public function mimeType(): string
     {
         $fileInfo = new \finfo(FILEINFO_MIME_TYPE);
 
@@ -67,14 +58,6 @@ class RawContentAdapter implements SourceAdapterInterface
     public function clientMimeType(): ?string
     {
         return null;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function contents(): string
-    {
-        return $this->source;
     }
 
     /**
@@ -98,6 +81,16 @@ class RawContentAdapter implements SourceAdapterInterface
      */
     public function size(): int
     {
-        return (int)mb_strlen($this->source, '8bit');
+        return mb_strlen($this->source, '8bit') ?: 0;
+    }
+
+    public function isRemote(): bool
+    {
+        return false;
+    }
+
+    public function hash(): string
+    {
+        return md5($this->source) ?: '';
     }
 }
