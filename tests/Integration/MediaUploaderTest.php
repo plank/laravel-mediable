@@ -784,6 +784,20 @@ class MediaUploaderTest extends TestCase
         );
     }
 
+    public function test_it_applies_alt()
+    {
+        $this->useDatabase();
+        $this->useFilesystem('tmp');
+
+        $media = Facade::fromSource(TestCase::sampleFilePath())
+            ->toDestination('tmp', 'foo')
+            ->useFilename('bar')
+            ->withAltAttribute('This is an alt text')
+            ->upload();
+
+        $this->assertEquals('This is an alt text', $media->alt);
+    }
+
     protected function getUploader(): MediaUploader
     {
         return app('mediable.uploader');

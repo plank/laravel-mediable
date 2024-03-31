@@ -17,6 +17,7 @@ $factory->define(Plank\Mediable\Media::class, function (Faker\Generator $faker) 
         'mime_type' => $faker->randomElement($types[$type]['mime_types']),
         'aggregate_type' => $type,
         'size' => $faker->randomNumber(),
+        'alt' => $faker->sentence,
     ];
 });
 
