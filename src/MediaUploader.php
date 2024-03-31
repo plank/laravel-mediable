@@ -72,8 +72,6 @@ class MediaUploader
      */
     private array $options = [];
 
-    private MimeTypes $mimey;
-
     private ?string $alt = null;
 
     /**
@@ -85,12 +83,10 @@ class MediaUploader
     public function __construct(
         FileSystemManager $filesystem,
         SourceAdapterFactory $factory,
-        MimeTypes $mimey,
         array $config = null
     ) {
         $this->filesystem = $filesystem;
         $this->factory = $factory;
-        $this->mimey = $mimey;
         $this->config = $config ?: config('mediable', []);
     }
 
@@ -633,7 +629,7 @@ class MediaUploader
         $model->mime_type = $this->verifyMimeType($this->selectMimeType());
         $model->extension = $this->verifyExtension(
             $this->source->extension()
-                ?? $this->inferExtensionFromMime($model->mime_type)
+                ?? File::guessExtension($model->mime_type)
         );
         $model->aggregate_type = $this->inferAggregateType($model->mime_type, $model->extension);
 
@@ -1051,10 +1047,5 @@ class MediaUploader
             $options['visibility'] = $this->getVisibility();
         }
         return $options;
-    }
-
-    private function inferExtensionFromMime(?string $mime_type): string
-    {
-        return $this->mimey->getExtension($mime_type) ?: 'application/octet-stream';
     }
 }
