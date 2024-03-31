@@ -53,7 +53,7 @@ class File
         $language = $language ?: App::currentLocale();
         return trim(
             preg_replace(
-                '/[^a-zA-Z0-9-_.%]+/',
+                '/[^a-zA-Z0-9\-_.%]+/',
                 '-',
                 Str::ascii($file, $language)
             ),

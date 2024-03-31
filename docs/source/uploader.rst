@@ -70,6 +70,17 @@ You can also tell the uploader to generate a filename based on the MD5 hash of t
 
 You can restore the default behaviour with ``useOriginalFilename()``.
 
+Adding Alt Text
+--------------------
+
+You can record alt text attribute for the media record by calling the ``withAltAttribute()`` method.
+
+::
+    <?php
+    MediaUploader::fromSource(...)
+        ->withAltAttribute('This is the alt text')
+        ->upload();
+
 Handling Duplicates
 ----------------------
 
@@ -156,7 +167,7 @@ Alter Model before upload
 -------------------------
 
 You can manipulate the model before it's saved by passing a callable to the ``beforeSave`` method.
-The callback takes two params, ``$model`` an instance of ``Plank\Mediable\Media`` the current model and ``$source`` an instance of ``Plank\Mediable\SourceAdapters\SourceAdapterInterface`` the current source.
+The callback takes two params, ``$model``, an instance of ``Plank\Mediable\Media`` the current model and ``$source``, an instance of ``Plank\Mediable\SourceAdapters\SourceAdapterInterface`` the current source.
 
 ::
 

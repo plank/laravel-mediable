@@ -6,6 +6,7 @@
 - Added Support for PHP 8.3
 - Added Support for Laravel 11
 - Added support for intervention/image 3.0
+- New database migration to add `alt` attribute to the `Media` table
 - MediaUploader will use the visibility defined on the filesystem disk config if the `makePublic()`/`makePrivate()` methods are not called.
 - MediaUploader now supports base64 and URL-encoded data URLs as an input source.
 - Improved MediaCollection annotions to support generic types

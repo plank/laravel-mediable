@@ -74,6 +74,8 @@ class MediaUploader
 
     private MimeTypes $mimey;
 
+    private ?string $alt = null;
+
     /**
      * Constructor.
      * @param FilesystemManager $filesystem
@@ -172,6 +174,12 @@ class MediaUploader
         $this->filename = File::sanitizeFilename($filename);
         $this->hashFilename = false;
 
+        return $this;
+    }
+
+    public function withAltAttribute(string $alt): self
+    {
+        $this->alt = $alt;
         return $this;
     }
 
@@ -633,6 +641,10 @@ class MediaUploader
         $model->directory = $this->directory;
         $model->filename = $this->generateFilename();
 
+        if ($this->alt) {
+            $model->alt = $this->alt;
+        }
+
         return $model;
     }
 
@@ -709,6 +721,10 @@ class MediaUploader
             $storage->setVisibility($model->getDiskPath(), $this->visibility);
         }
 
+        if ($this->alt) {
+            $model->alt = $this->alt;
+        }
+
         if (is_callable($this->before_save)) {
             call_user_func($this->before_save, $model, $this->source);
         }
@@ -736,6 +752,10 @@ class MediaUploader
             $this->inferMimeType($storage, $media->getDiskPath())
         );
         $media->aggregate_type = $this->inferAggregateType($media->mime_type, $media->extension);
+
+        if ($this->alt) {
+            $media->alt = $this->alt;
+        }
 
         if ($dirty = $media->isDirty()) {
             $media->save();

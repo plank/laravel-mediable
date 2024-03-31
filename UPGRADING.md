@@ -4,9 +4,14 @@
 
 * Minimum PHP version moved to 8.1
 * Minimum Laravel version moved to 10
+* New database migration file is included with the package. Run `php artisan migrate` to apply the changes.
 * To add support for data URLs to the MediaUploader, the following entry should be added to the `source_adapters.pattern` field in `config/mediable.php`
   ```php
   '^data:/?/?[^,]*,' => Plank\Mediable\SourceAdapters\DataUrlAdapter::class,
+  ```
+* To specify default handling of inferred vs. client-provided MIME types, the following entry should be added to `config/mediable.php`. If `prefer_client_mime_type` is set to `true`, the MIME type provided by the client will be used when available. If set to `false`, the MIME type will be inferred from the file contents.
+  ```php
+  'prefer_client_mime_type' => false,
   ```
 * All properties now declare their types if able. If extending any class or implementing any interface from this package, property types may need to be updated.
 * If you have implemented a custom SourceAdapter, you will need to apply the following changes from the `SourceAdapterInterface` interface:
