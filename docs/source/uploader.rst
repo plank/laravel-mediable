@@ -141,6 +141,9 @@ You can override the most validation configuration values set in ``config/mediab
         // only allow files of specific aggregate types
         ->setAllowedAggregateTypes(['image'])
 
+        // ensure that the file contents match a provided md5 hash
+        ->validateMd5Hash('3ef5e70366086147c2695325d79a25cc')
+
         ->upload();
 
 You can also validate the file without uploading it by calling the ``verifyFile`` method.

@@ -10,6 +10,7 @@ use Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException;
 use Plank\Mediable\Exceptions\MediaUpload\FileSizeException;
 use Plank\Mediable\Exceptions\MediaUpload\ForbiddenException;
+use Plank\Mediable\Exceptions\MediaUpload\InvalidHashException;
 use Plank\Mediable\ImageManipulation;
 use Plank\Mediable\ImageManipulator;
 use Plank\Mediable\Media;
@@ -884,6 +885,37 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('text/plain', $media->mime_type);
         $this->assertEquals('document', $media->aggregate_type);
         $this->assertEquals(3, $media->size);
+    }
+
+    public function test_it_validates_md5_hash()
+    {
+        $this->useDatabase();
+        $this->useFilesystem('tmp');
+
+        $media = Facade::fromSource(TestCase::sampleFilePath())
+            ->toDestination('tmp', 'foo')
+            ->useFilename('bar')
+            ->validateMd5Hash('3ef5e70366086147c2695325d79a25cc')
+            ->upload();
+
+        $this->assertInstanceOf(Media::class, $media);
+        $this->assertTrue($media->fileExists());
+        $this->assertEquals('tmp', $media->disk);
+        $this->assertEquals('foo/bar.png', $media->getDiskPath());
+        $this->assertEquals('image/png', $media->mime_type);
+        $this->assertEquals(self::TEST_FILE_SIZE, $media->size);
+        $this->assertEquals('image', $media->aggregate_type);
+    }
+
+    public function test_it_validates_md5_hash_failure()
+    {
+        $this->expectException(InvalidHashException::class);
+
+        Facade::fromSource(TestCase::sampleFilePath())
+            ->toDestination('tmp', 'foo')
+            ->useFilename('bar')
+            ->validateMd5Hash('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+            ->upload();
     }
 
     protected function getUploader(): MediaUploader

@@ -12,6 +12,7 @@ use Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException;
 use Plank\Mediable\Exceptions\MediaUpload\FileSizeException;
 use Plank\Mediable\Exceptions\MediaUpload\ForbiddenException;
+use Plank\Mediable\Exceptions\MediaUpload\InvalidHashException;
 use Plank\Mediable\Helpers\File;
 use Plank\Mediable\SourceAdapters\RawContentAdapter;
 use Plank\Mediable\SourceAdapters\SourceAdapterFactory;
@@ -416,6 +417,19 @@ class MediaUploader
     }
 
     /**
+     * Verify the MD5 hash of the file contents matches an expected value.
+     * The upload process will throw an InvalidHashException if the hash of the
+     * uploaded file does not match the provided value.
+     * @param string|null $expectedHash set to null to disable hash validation
+     * @return $this
+     */
+    public function validateMd5Hash(?string $expectedHash): self
+    {
+        $this->config['validate_hash'] = $expectedHash;
+        return $this;
+    }
+
+    /**
      * Make the resulting file public (default behaviour)
      * @return $this
      */
@@ -568,6 +582,7 @@ class MediaUploader
      * @throws FileNotFoundException
      * @throws FileNotSupportedException
      * @throws FileSizeException
+     * @throws InvalidHashException
      */
     public function upload(): Media
     {
@@ -804,6 +819,8 @@ class MediaUploader
         $this->verifyExtension(
             $this->source->extension() ?? File::guessExtension($mimeType)
         );
+
+        $this->verifyMd5Hash();
     }
 
     /**
@@ -922,6 +939,22 @@ class MediaUploader
         }
 
         return $size;
+    }
+
+    private function verifyMd5Hash(): void
+    {
+        $expectedHash = $this->config['validate_hash'] ?? null;
+        if ($expectedHash === null) {
+            return;
+        }
+
+        $actualHash = $this->source->hash();
+        if ($actualHash !== $expectedHash) {
+            throw InvalidHashException::hashMismatch(
+                $expectedHash,
+                $actualHash
+            );
+        }
     }
 
     /**
