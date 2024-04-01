@@ -13,7 +13,6 @@ use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
  */
 class RemoteUrlAdapter extends StreamAdapter
 {
-
     protected string $url;
 
     public function __construct(string $source)

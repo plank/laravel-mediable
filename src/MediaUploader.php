@@ -56,7 +56,7 @@ class MediaUploader
     /**
      * If true the contents hash of the source will be used as the filename.
      */
-    private bool $hashFilename = false;
+    private ?string $hashFilenameAlgo = null;
 
     /**
      * Visibility for the new file
@@ -174,7 +174,7 @@ class MediaUploader
     public function useFilename(string $filename): self
     {
         $this->filename = File::sanitizeFilename($filename);
-        $this->hashFilename = false;
+        $this->hashFilenameAlgo = null;
 
         return $this;
     }
@@ -187,11 +187,12 @@ class MediaUploader
 
     /**
      * Indicates to the uploader to generate a filename using the file's MD5 hash.
+     * @param string $algo any hashing algorithm supported by PHP's hash() function
      * @return $this
      */
-    public function useHashForFilename(): self
+    public function useHashForFilename(string $algo = 'md5'): self
     {
-        $this->hashFilename = true;
+        $this->hashFilenameAlgo = $algo;
         $this->filename = null;
 
         return $this;
@@ -204,7 +205,7 @@ class MediaUploader
     public function useOriginalFilename(): self
     {
         $this->filename = null;
-        $this->hashFilename = false;
+        $this->hashFilenameAlgo = null;
 
         return $this;
     }
@@ -423,6 +424,7 @@ class MediaUploader
      * The upload process will throw an InvalidHashException if the hash of the
      * uploaded file does not match the provided value.
      * @param string|null $expectedHash set to null to disable hash validation
+     * @param string $algo any hashing algorithm supported by PHP's hash() function
      * @return $this
      */
     public function validateHash(?string $expectedHash, string $algo = 'md5'): self
@@ -1078,8 +1080,8 @@ class MediaUploader
             return $this->filename;
         }
 
-        if ($this->hashFilename) {
-            return $this->source->hash();
+        if ($this->hashFilenameAlgo) {
+            return $this->source->hash($this->hashFilenameAlgo);
         }
 
         $filename = $this->source->filename();

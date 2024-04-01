@@ -15,6 +15,7 @@
 - Added support for recording alt attributes on Media (database migration required). MediaUploader now exposes a `withAltAttribute()` method to set the alt attribute on the generated media record.
 - Added `MediaUploader::applyImageManipulation()` to make changes to the original uploaded image durin the upload process.
 - Added `MediaUploader::validateHash()` to ensure that the hash of the uploaded file matches a particular value during upload. Supports any hashing algorithm supported by PHP's `hash()` function.
+- The `MediaUploader::hashFilename()` method accepts an optional parameter to specify which hashing algorithm to use to generate the filename. Supports any hashing algorithm supported by PHP's `hash()` function.
 - MediaUploader will now use the visibility defined on the filesystem disk config if the `makePublic()`/`makePrivate()` methods are not called, instead of assuming public visibility.
 - MediaUploader now supports data URL strings as an input source, e.g. `data:image/jpeg;base64,...`.
 - If a filename is not provided to the MediaUploader, and none can be inferred from the source, the uploader will throw an exception.

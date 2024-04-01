@@ -695,6 +695,19 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('3ef5e70366086147c2695325d79a25cc', $media->filename);
     }
 
+    public function test_it_use_arbitrary_hash_algo_for_filename()
+    {
+        $this->useFilesystem('tmp');
+        $this->useDatabase();
+
+        $media = Facade::fromSource(TestCase::sampleFilePath())
+            ->toDestination('tmp', 'foo')
+            ->useHashForFilename('sha1')
+            ->upload();
+
+        $this->assertEquals('5e96e1fa58067853219c4cb6d3c1ce01cc5cc8ce', $media->filename);
+    }
+
     public function test_it_uploads_files_with_altered_model()
     {
         $this->useDatabase();
