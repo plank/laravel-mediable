@@ -3,6 +3,7 @@
 namespace Plank\Mediable\Tests\Integration\SourceAdapters;
 
 use GuzzleHttp\Psr7\Utils;
+use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Plank\Mediable\SourceAdapters\DataUrlAdapter;
 use Plank\Mediable\SourceAdapters\FileAdapter;
 use Plank\Mediable\SourceAdapters\LocalPathAdapter;
@@ -70,7 +71,6 @@ class SourceAdapterTest extends TestCase
             'FileAdapter' => [
                 'adapterClass' => FileAdapter::class,
                 'source' => new File($file),
-                'path' => $file,
                 'filename' => self::EXPECTED_FILENAME,
                 'extension' => self::EXPECTED_EXTENSION,
                 'inferredMime' => self::EXPECTED_MIME,
@@ -81,7 +81,6 @@ class SourceAdapterTest extends TestCase
             'UploadedFileAdapter' => [
                 'adapterClass' => UploadedFileAdapter::class,
                 'source' => $uploadedFile,
-                'path' => $file,
                 'filename' => self::EXPECTED_FILENAME,
                 'extension' => self::EXPECTED_EXTENSION,
                 'inferredMime' => self::EXPECTED_MIME,
@@ -92,7 +91,6 @@ class SourceAdapterTest extends TestCase
             'LocalPathAdapter' => [
                 'adapterClass' => LocalPathAdapter::class,
                 'source' => $file,
-                'path' => $file,
                 'filename' => self::EXPECTED_FILENAME,
                 'extension' => self::EXPECTED_EXTENSION,
                 'inferredMime' => self::EXPECTED_MIME,
@@ -103,7 +101,6 @@ class SourceAdapterTest extends TestCase
             'RemoteUrlAdapter' => [
                 'adapterClass' => RemoteUrlAdapter::class,
                 'source' => $url,
-                'path' => $url,
                 'filename' => self::EXPECTED_FILENAME,
                 'extension' => self::EXPECTED_EXTENSION,
                 'inferredMime' => self::EXPECTED_MIME,
@@ -114,9 +111,8 @@ class SourceAdapterTest extends TestCase
             'RawContentAdapter' => [
                 'adapterClass' => RawContentAdapter::class,
                 'source' => $string,
-                'path' => null,
                 'filename' => null,
-                'extension' => self::EXPECTED_EXTENSION,
+                'extension' => null,
                 'inferredMime' => self::EXPECTED_MIME,
                 'clientMime' => null,
                 'size' => self::EXPECTED_SIZE,
@@ -125,7 +121,6 @@ class SourceAdapterTest extends TestCase
             'DataUrlAdapter_base64' => [
                 'adapterClass' => DataUrlAdapter::class,
                 'source' => $base64DataUrl,
-                'path' => null,
                 'filename' => null,
                 'extension' => null,
                 'inferredMime' => self::EXPECTED_MIME,
@@ -136,7 +131,6 @@ class SourceAdapterTest extends TestCase
             'DataUrlAdapter_urlencode' => [
                 'adapterClass' => DataUrlAdapter::class,
                 'source' => $rawDataUrl,
-                'path' => null,
                 'filename' => null,
                 'extension' => null,
                 'inferredMime' => self::EXPECTED_MIME,
@@ -147,7 +141,6 @@ class SourceAdapterTest extends TestCase
             'StreamResourceAdapter_Local' => [
                 'adapterClass' => StreamResourceAdapter::class,
                 'source' => $fileResource,
-                'path' => $file,
                 'filename' => self::EXPECTED_FILENAME,
                 'extension' => self::EXPECTED_EXTENSION,
                 'inferredMime' => self::EXPECTED_MIME,
@@ -158,7 +151,6 @@ class SourceAdapterTest extends TestCase
             'StreamAdapter_Local' => [
                 'adapterClass' => StreamAdapter::class,
                 'source' => $fileStream,
-                'path' => $file,
                 'filename' => self::EXPECTED_FILENAME,
                 'extension' => self::EXPECTED_EXTENSION,
                 'inferredMime' => self::EXPECTED_MIME,
@@ -169,7 +161,6 @@ class SourceAdapterTest extends TestCase
             'StreamResourceAdapter_Remote' => [
                 'adapterClass' => StreamResourceAdapter::class,
                 'source' => $httpResource,
-                'path' => $url,
                 'filename' => self::EXPECTED_FILENAME,
                 'extension' => self::EXPECTED_EXTENSION,
                 'inferredMime' => self::EXPECTED_MIME,
@@ -180,7 +171,6 @@ class SourceAdapterTest extends TestCase
             'StreamAdapter_Remote' => [
                 'adapterClass' => StreamAdapter::class,
                 'source' => $httpStream,
-                'path' => $url,
                 'filename' => self::EXPECTED_FILENAME,
                 'extension' => self::EXPECTED_EXTENSION,
                 'inferredMime' => self::EXPECTED_MIME,
@@ -191,7 +181,6 @@ class SourceAdapterTest extends TestCase
             'StreamResourceAdapter_Memory' => [
                 'adapterClass' => StreamResourceAdapter::class,
                 'source' => $memoryResource,
-                'path' => null,
                 'filename' => null,
                 'extension' => null,
                 'inferredMime' => self::EXPECTED_MIME,
@@ -202,7 +191,6 @@ class SourceAdapterTest extends TestCase
             'StreamAdapter_Memory' => [
                 'adapterClass' => StreamAdapter::class,
                 'source' => $memoryStream,
-                'path' => null,
                 'filename' => null,
                 'extension' => null,
                 'inferredMime' => self::EXPECTED_MIME,
@@ -213,7 +201,6 @@ class SourceAdapterTest extends TestCase
             'StreamAdapter_Data' => [
                 'adapterClass' => StreamAdapter::class,
                 'source' => $dataStream,
-                'path' => null,
                 'filename' => null,
                 'extension' => null,
                 'inferredMime' => self::EXPECTED_MIME,
@@ -239,13 +226,13 @@ class SourceAdapterTest extends TestCase
         );
 
         return [
-            [new FileAdapter(new File($file, false))],
-            [new LocalPathAdapter($file)],
-            [new RemoteUrlAdapter($url)],
-            [new RemoteUrlAdapter('http://example.invalid')],
-            [new UploadedFileAdapter($uploadedFile)],
-            [new StreamResourceAdapter(fopen(TestCase::sampleFilePath(), 'a'))],
-            [new StreamResourceAdapter(fopen('php://stdin', 'w'))],
+            [FileAdapter::class, new File($file, false)],
+            [LocalPathAdapter::class, $file],
+            [RemoteUrlAdapter::class, $url],
+            [RemoteUrlAdapter::class, 'http://example.invalid'],
+            [UploadedFileAdapter::class, $uploadedFile],
+            [StreamResourceAdapter::class, fopen(TestCase::sampleFilePath(), 'a')],
+            [StreamResourceAdapter::class, fopen('php://stdin', 'w')],
         ];
     }
 
@@ -255,7 +242,6 @@ class SourceAdapterTest extends TestCase
     public function test_it_extracts_expected_information_from_source(
         string $adapterClass,
         mixed $source,
-        ?string $path,
         ?string $filename,
         ?string $extension,
         ?string $inferredMime,
@@ -265,13 +251,10 @@ class SourceAdapterTest extends TestCase
     ) {
         /** @var SourceAdapterInterface $adapter */
         $adapter = new $adapterClass($source);
-        $this->assertTrue($adapter->valid());
 
         $stream = $adapter->getStream();
         $this->assertInstanceOf(StreamInterface::class, $stream);
         $this->assertTrue($stream->isReadable());
-
-        $this->assertSame($path, $adapter->path());
         $this->assertSame($filename, $adapter->filename());
         $this->assertSame($extension, $adapter->extension());
         $this->assertSame($inferredMime, $adapter->mimeType());
@@ -284,8 +267,10 @@ class SourceAdapterTest extends TestCase
      * @dataProvider invalidAdapterProvider
      */
     public function test_it_verifies_file_validity_failure(
-        SourceAdapterInterface $adapter
+        string $adapterClass,
+        $args
     ) {
-        $this->assertFalse($adapter->valid());
+        $this->expectException(ConfigurationException::class);
+        new $adapterClass($args);
     }
 }

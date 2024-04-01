@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Plank\Mediable\SourceAdapters;
 
 use GuzzleHttp\Psr7\Utils;
-use Plank\Mediable\Helpers\File;
 use Psr\Http\Message\StreamInterface;
 
 /**
@@ -42,7 +41,7 @@ class RawContentAdapter implements SourceAdapterInterface
      */
     public function extension(): ?string
     {
-        return (string)File::guessExtension($this->mimeType());
+        return null;
     }
 
     /**
@@ -71,21 +70,15 @@ class RawContentAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function valid(): bool
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function size(): int
     {
         return mb_strlen($this->source, '8bit') ?: 0;
     }
 
-    public function hash(): string
+    public function hash(string $algo = 'md5'): string
     {
-        return md5($this->source) ?: '';
+        $hash = hash_init($algo);
+        hash_update($hash, $this->source);
+        return hash_final($hash);
     }
 }

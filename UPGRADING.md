@@ -9,15 +9,19 @@
   ```php
   '^data:/?/?[^,]*,' => Plank\Mediable\SourceAdapters\DataUrlAdapter::class,
   ```
-* To specify default handling of inferred vs. client-provided MIME types, the following entry should be added to `config/mediable.php`. If `prefer_client_mime_type` is set to `true`, the MIME type provided by the client will be used when available. If set to `false`, the MIME type will be inferred from the file contents.
+* To specify default handling of inferred vs. client-provided MIME types, the following entry should be added to `config/mediable.php`. If `prefer_client_mime_type` is set to `true`, the MIME type provided by the client will be used when available. If set to `false`, the MIME type will always be inferred from the file contents. Defaults to `false`.
   ```php
   'prefer_client_mime_type' => false,
   ```
 * All properties now declare their types if able. If extending any class or implementing any interface from this package, property types may need to be updated.
 * If you have implemented a custom SourceAdapter, you will need to apply the following changes from the `SourceAdapterInterface` interface:
-  * The `getSource()`, `getContents()`, `getStreamResource()` methods have been removed
   * Implement the `getStream(): StreamInterface` method.
-  * Implement the `getHash(): string` method.
+  * Implement the `getHash(string $algo): string` method.
+  * he return type of the `filename()` and `extension()` method is now nullable. If the adapter cannot determine the value from the information available, it should return null.
+  * Remove the `getContents()` method. The `getStream()->getContents()` method may be used instead.
+  * Remove the `getSource()` method. No replacement.
+  * Remove the `path()` method. No replacement.
+  * Remove the `valid()` method. SourceAdapters should now throw an exception with a more helpful message from the constructor if the source is not valid.
 * The `Plank\Mediable\Stream` class has been removed in favor of the `guzzlehttp/psr7` implementation. If you were using this class directly, you will need use another PSR-7 compatible stream wrapper instead (such as Guzzle's).
 
 ## 4.x to 5.x

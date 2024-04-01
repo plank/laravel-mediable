@@ -33,6 +33,11 @@ class ConfigurationException extends MediaUploadException
         return new static("Could not recognize source, `{$source}` provided.");
     }
 
+    public static function invalidSource(string $message, \Throwable $original = null): self
+    {
+        return new static("Invalid source provided. {$message}", 0, $original);
+    }
+
     public static function diskNotFound(string $disk): self
     {
         return new static("Cannot find disk named `{$disk}`.");

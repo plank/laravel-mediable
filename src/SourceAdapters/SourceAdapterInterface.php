@@ -13,12 +13,6 @@ use Psr\Http\Message\StreamInterface;
 interface SourceAdapterInterface
 {
     /**
-     * Get the absolute path to the file.
-     * @return string|null Returns null if the file is not currently on disk
-     */
-    public function path(): ?string;
-
-    /**
      * Get the name of the file.
      * @return string|null Returns null if the file name cannot be determined.
      */
@@ -49,17 +43,13 @@ interface SourceAdapterInterface
     public function getStream(): StreamInterface;
 
     /**
-     * Check if the file can be transferred.
-     */
-    public function valid(): bool;
-
-    /**
      * Determine the size of the file.
      */
     public function size(): int;
 
     /**
      * Retrieve the md5 hash of the file.
+     * @param string $algo
      */
-    public function hash(): string;
+    public function hash(string $algo = 'md5'): string;
 }

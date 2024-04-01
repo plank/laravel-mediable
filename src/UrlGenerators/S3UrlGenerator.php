@@ -47,26 +47,6 @@ class S3UrlGenerator extends BaseUrlGenerator implements TemporaryUrlGeneratorIn
     public function getTemporaryUrl(\DateTimeInterface $expiry): string
     {
         $filesystem = $this->filesystem->disk($this->media->disk);
-
-        // Laravel 9+ / Flysystem 2+
-        if (method_exists($filesystem, 'temporaryUrl')) {
-            return $filesystem->temporaryUrl($this->media->getDiskPath(), $expiry);
-        }
-
-        // Earlier versions
-        $root = config("filesystems.disks.{$this->media->disk}.root", '');
-        $adapter = $filesystem->getDriver()->getAdapter();
-        $command = $adapter->getClient()->getCommand(
-            'GetObject',
-            [
-                'Bucket' => $adapter->getBucket(),
-                'Key' => File::joinPathComponents($root, $this->media->getDiskPath()),
-            ]
-        );
-
-        return (string)$adapter->getClient()->createPresignedRequest(
-            $command,
-            $expiry
-        )->getUri();
+        return $filesystem->temporaryUrl($this->media->getDiskPath(), $expiry);
     }
 }

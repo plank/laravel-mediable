@@ -14,21 +14,23 @@
 
 - Added support for recording alt attributes on Media (database migration required). MediaUploader now exposes a `withAltAttribute()` method to set the alt attribute on the generated media record.
 - Added `MediaUploader::applyImageManipulation()` to make changes to the original uploaded image durin the upload process.
-- Added `MediaUploader::validateMd5Hash()` to ensure that the md5 hash of the uploaded file matches a particular value during upload.
+- Added `MediaUploader::validateHash()` to ensure that the hash of the uploaded file matches a particular value during upload. Supports any hashing algorithm supported by PHP's `hash()` function.
 - MediaUploader will now use the visibility defined on the filesystem disk config if the `makePublic()`/`makePrivate()` methods are not called, instead of assuming public visibility.
 - MediaUploader now supports data URL strings as an input source, e.g. `data:image/jpeg;base64,...`.
+- If a filename is not provided to the MediaUploader, and none can be inferred from the source, the uploader will throw an exception.
+- If the file extension is not available from the source, the uploader will infer it from the MIME type.
 
 ### SourceAdapters
 
 All SourceAdapter classes have been significantly refactored.
 - All sourceAdapters will now never load the entire file contents into memory to determine metadata about the file, in order to avoid memory exhaustion when dealing with large files. If reading the file is necessary, if applicable, the adapter will attempt use a single streamed scan of the file to load all metadata at once, to speed up to the precess.
-- Removed `getStreamResource()` method. The method has been replaced with the `getStream()`, which returns a PSR-7 `StreamInterface` instead.
-- Added `hash()` method which is expected to return an md5 hash of the file contents.
-- The return types of the `path()`, `filename()`, `extension()`, methods are now nullable. If the adapter cannot determine the value from the information available, it should return null.
-- If the extension is not available from the source adapter (e.g. source is a raw content string), the MediaUploader will attempt to infer the extension based on the MIME type.
-- If the filename is not available from the source adapter (e.g. source is a raw content string), the MediaUploader will throw an exception if the filename is not provided as a configuration to the uploader.
-- Removed the `getContents()` method.
-- Removed the `getSource()` method
+- Removed `getStreamResource()` method. The method has been replaced with the `getStream(): StreamInterface`, which returns a PSR-7 stream implementation instead.
+- Added `hash(string $algo): string` method which is expected to return the hash of the file contents using the specified algorithm.
+- The return type of the `filename()` and `extension()` method is now nullable. If the adapter cannot determine the value from the information available, it should return null.
+- Removed the `getContents()` method. The `getStream()->getContents()` method may be used instead.
+- Removed the `getSource()` method. No replacement.
+- Removed the `path()` method. No replacement.
+- Removed the `valid()` method. SourceAdapters should now throw an exception with a more helpful message from the constructor if the source is not valid.
 
 ### Media
 - Added `alt` attribute to the Media model.

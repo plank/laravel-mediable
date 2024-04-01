@@ -26,19 +26,11 @@ class StreamResourceAdapter extends StreamAdapter
     public function __construct($source)
     {
         if (!is_resource($source) || get_resource_type($source) !== 'stream') {
-            throw ConfigurationException::unrecognizedSource($source);
+            throw ConfigurationException::invalidSource("Invalid stream resource");
         }
 
         parent::__construct(Utils::streamFor($source));
 
         $this->resource = $source;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSource(): mixed
-    {
-        return $this->resource;
     }
 }

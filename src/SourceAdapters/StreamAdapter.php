@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Plank\Mediable\SourceAdapters;
 
 use GuzzleHttp\Psr7\CachingStream;
+use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Psr\Http\Message\StreamInterface;
 
 /**
@@ -33,7 +34,8 @@ class StreamAdapter implements SourceAdapterInterface
 
     protected int $size;
 
-    protected string $hash;
+    /** @var array<string, string> */
+    protected array $hash;
 
     protected string $mimeType;
 
@@ -43,16 +45,29 @@ class StreamAdapter implements SourceAdapterInterface
      */
     public function __construct(StreamInterface $source)
     {
+        if (!$source->isReadable()) {
+            throw ConfigurationException::invalidSource('Stream must be readable');
+        }
+
         $this->source = $this->originalSource = $source;
         if (!$this->source->isSeekable()) {
             $this->source = new CachingStream($this->source);
+        }
+
+        if ($this->getStreamType() === self::TYPE_HTTP) {
+            $code = $this->getHttpResponseCode();
+            if (!$code || $code < 200 || $code >= 300) {
+                throw ConfigurationException::unrecognizedSource(
+                    "Failed to fetch URL, received HTTP status code $code"
+                );
+            }
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function path(): ?string
+    private function path(): ?string
     {
         $type = $this->getStreamType();
         if (in_array($type, [self::TYPE_DATA_URL, self::TYPE_MEMORY])) {
@@ -131,20 +146,6 @@ class StreamAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function valid(): bool
-    {
-        if ($this->getStreamType() === self::TYPE_HTTP) {
-            $code = $this->getHttpResponseCode();
-            if (!$code || $code < 200 || $code >= 300) {
-                return false;
-            }
-        }
-        return $this->originalSource->isReadable();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function size(): int
     {
         $size = $this->source->getSize();
@@ -162,13 +163,14 @@ class StreamAdapter implements SourceAdapterInterface
 
     /**
      * {@inheritdoc}
+     * @param string $algo
      */
-    public function hash(): string
+    public function hash(string $algo = 'md5'): string
     {
-        if (!isset($this->hash)) {
-            $this->scanFile();
+        if (!isset($this->hash[$algo])) {
+            $this->scanFile($algo);
         }
-        return $this->hash;
+        return $this->hash[$algo];
     }
 
     /**
@@ -212,12 +214,12 @@ class StreamAdapter implements SourceAdapterInterface
         return null;
     }
 
-    private function scanFile(): void
+    private function scanFile(string $hashAlgorithm = 'md5'): void
     {
         $this->size = 0;
         $this->source->rewind();
         try {
-            $hash = hash_init('md5');
+            $hash = hash_init($hashAlgorithm);
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
             while (!$this->source->eof()) {
                 $buffer = $this->source->read(self::BUFFER_SIZE);
@@ -227,7 +229,7 @@ class StreamAdapter implements SourceAdapterInterface
                 hash_update($hash, $buffer);
                 $this->size += strlen($buffer);
             }
-            $this->hash = hash_final($hash);
+            $this->hash[$hashAlgorithm] = hash_final($hash);
             $this->source->rewind();
         } finally {
             if ($finfo) {

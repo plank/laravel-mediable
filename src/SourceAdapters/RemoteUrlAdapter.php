@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Plank\Mediable\SourceAdapters;
 
 use GuzzleHttp\Psr7\Utils;
+use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 
 /**
  * URL Adapter.
@@ -12,14 +13,8 @@ use GuzzleHttp\Psr7\Utils;
  */
 class RemoteUrlAdapter extends StreamAdapter
 {
-    /**
-     * Cache of headers loaded from the remote server.
-     */
-    private array $headers;
 
     protected string $url;
-
-    private bool $connected;
 
     public function __construct(string $source)
     {
@@ -27,12 +22,12 @@ class RemoteUrlAdapter extends StreamAdapter
         try {
             $resource = Utils::tryFopen($source, 'rb');
             $stream = Utils::streamFor($resource);
-            $this->connected = true;
         } catch (\RuntimeException $e) {
-            $stream = Utils::streamFor('');
-            $this->connected = false;
+            throw ConfigurationException::invalidSource(
+                "Failed to connect to URL: {$e->getMessage()}",
+                $e
+            );
         }
-
         parent::__construct(
             $stream
         );
@@ -66,10 +61,5 @@ class RemoteUrlAdapter extends StreamAdapter
             parse_url($this->url, PHP_URL_PATH),
             PATHINFO_EXTENSION
         ) ?: null;
-    }
-
-    public function valid(): bool
-    {
-        return $this->connected && parent::valid();
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Plank\Mediable\SourceAdapters;
 
 use GuzzleHttp\Psr7\Utils;
+use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Psr\Http\Message\StreamInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -14,7 +15,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  */
 class UploadedFileAdapter implements SourceAdapterInterface
 {
-    protected UploadedFile $source;
+    protected UploadedFile $uploadedFile;
 
     /**
      * Constructor.
@@ -22,15 +23,12 @@ class UploadedFileAdapter implements SourceAdapterInterface
      */
     public function __construct(UploadedFile $source)
     {
-        $this->source = $source;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function path(): ?string
-    {
-        return $this->source->getPath() . '/' . $this->source->getFilename();
+        if (!$source->isValid()) {
+            throw ConfigurationException::invalidSource(
+                "Uploaded file is not valid: {$source->getErrorMessage()}"
+            );
+        }
+        $this->uploadedFile = $source;
     }
 
     /**
@@ -38,7 +36,7 @@ class UploadedFileAdapter implements SourceAdapterInterface
      */
     public function filename(): ?string
     {
-        return pathinfo($this->source->getClientOriginalName(), PATHINFO_FILENAME) ?: null;
+        return pathinfo($this->uploadedFile->getClientOriginalName(), PATHINFO_FILENAME) ?: null;
     }
 
     /**
@@ -46,7 +44,7 @@ class UploadedFileAdapter implements SourceAdapterInterface
      */
     public function extension(): ?string
     {
-        return $this->source->getClientOriginalExtension() ?: null;
+        return $this->uploadedFile->getClientOriginalExtension() ?: null;
     }
 
     /**
@@ -54,12 +52,12 @@ class UploadedFileAdapter implements SourceAdapterInterface
      */
     public function mimeType(): string
     {
-        return $this->source->getMimeType();
+        return $this->uploadedFile->getMimeType();
     }
 
     public function clientMimeType(): ?string
     {
-        return $this->source->getClientMimeType();
+        return $this->uploadedFile->getClientMimeType();
     }
 
     /**
@@ -67,15 +65,7 @@ class UploadedFileAdapter implements SourceAdapterInterface
      */
     public function getStream(): StreamInterface
     {
-        return Utils::streamFor(fopen($this->path(), 'rb'));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function valid(): bool
-    {
-        return $this->source->isValid();
+        return Utils::streamFor(fopen($this->uploadedFile->getRealPath(), 'rb'));
     }
 
     /**
@@ -83,14 +73,15 @@ class UploadedFileAdapter implements SourceAdapterInterface
      */
     public function size(): int
     {
-        return $this->source->getSize() ?: 0;
+        return $this->uploadedFile->getSize() ?: 0;
     }
 
     /**
      * {@inheritdoc}
+     * @param string $algo
      */
-    public function hash(): string
+    public function hash(string $algo = 'md5'): string
     {
-        return md5_file($this->path()) ?: '';
+        return hash_file($algo, $this->uploadedFile->getRealPath());
     }
 }

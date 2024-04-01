@@ -76,6 +76,8 @@ class MediaUploader
 
     private ?string $alt = null;
 
+    private array $expectedHashes = [];
+
     /**
      * Constructor.
      * @param FilesystemManager $filesystem
@@ -423,9 +425,9 @@ class MediaUploader
      * @param string|null $expectedHash set to null to disable hash validation
      * @return $this
      */
-    public function validateMd5Hash(?string $expectedHash): self
+    public function validateHash(?string $expectedHash, string $algo = 'md5'): self
     {
-        $this->config['validate_hash'] = $expectedHash;
+        $this->expectedHashes[$algo] = $expectedHash;
         return $this;
     }
 
@@ -820,7 +822,7 @@ class MediaUploader
             $this->source->extension() ?? File::guessExtension($mimeType)
         );
 
-        $this->verifyMd5Hash();
+        $this->verifyHashes();
     }
 
     /**
@@ -864,9 +866,6 @@ class MediaUploader
     {
         if (empty($this->source)) {
             throw ConfigurationException::noSourceProvided();
-        }
-        if (!$this->source->valid()) {
-            throw FileNotFoundException::fileNotFound($this->source->path() ?? '');
         }
     }
 
@@ -941,19 +940,21 @@ class MediaUploader
         return $size;
     }
 
-    private function verifyMd5Hash(): void
+    private function verifyHashes(): void
     {
-        $expectedHash = $this->config['validate_hash'] ?? null;
-        if ($expectedHash === null) {
-            return;
-        }
+        foreach ($this->expectedHashes as $algo => $expectedHash) {
+            if ($expectedHash === null) {
+                return;
+            }
 
-        $actualHash = $this->source->hash();
-        if ($actualHash !== $expectedHash) {
-            throw InvalidHashException::hashMismatch(
-                $expectedHash,
-                $actualHash
-            );
+            $actualHash = $this->source->hash($algo);
+            if ($actualHash !== $expectedHash) {
+                throw InvalidHashException::hashMismatch(
+                    $algo,
+                    $expectedHash,
+                    $actualHash
+                );
+            }
         }
     }
 

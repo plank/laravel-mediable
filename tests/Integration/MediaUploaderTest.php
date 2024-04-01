@@ -234,33 +234,6 @@ class MediaUploaderTest extends TestCase
         $method->invoke($uploader);
     }
 
-    public function test_it_validates_source_is_valid()
-    {
-        $uploader = $this->getUploader();
-        $method = $this->getPrivateMethod($uploader, 'verifySource');
-
-        $source = $this->createMock(SourceAdapterInterface::class);
-        $source->method('valid')->willReturn(true);
-        $uploader->fromSource($source);
-        $method->invoke($uploader);
-
-        $this->assertTrue(true);
-    }
-
-    public function test_it_validates_source_is_invalid()
-    {
-        $uploader = $this->getUploader();
-        $method = $this->getPrivateMethod($uploader, 'verifySource');
-
-        $source = $this->createMock(SourceAdapterInterface::class);
-        $source->method('valid')->willReturn(false);
-        $source->method('path')->willReturn('');
-        $uploader->fromSource($source);
-
-        $this->expectException(FileNotFoundException::class);
-        $method->invoke($uploader);
-    }
-
     public function test_it_validates_allowed_mime_types()
     {
         $uploader = $this->getUploader();
@@ -887,7 +860,7 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals(3, $media->size);
     }
 
-    public function test_it_validates_md5_hash()
+    public function test_it_validates_hashes()
     {
         $this->useDatabase();
         $this->useFilesystem('tmp');
@@ -895,16 +868,12 @@ class MediaUploaderTest extends TestCase
         $media = Facade::fromSource(TestCase::sampleFilePath())
             ->toDestination('tmp', 'foo')
             ->useFilename('bar')
-            ->validateMd5Hash('3ef5e70366086147c2695325d79a25cc')
+            ->validateHash('3ef5e70366086147c2695325d79a25cc', 'md5')
+            ->validateHash('5e96e1fa58067853219c4cb6d3c1ce01cc5cc8ce', 'sha1')
             ->upload();
 
         $this->assertInstanceOf(Media::class, $media);
         $this->assertTrue($media->fileExists());
-        $this->assertEquals('tmp', $media->disk);
-        $this->assertEquals('foo/bar.png', $media->getDiskPath());
-        $this->assertEquals('image/png', $media->mime_type);
-        $this->assertEquals(self::TEST_FILE_SIZE, $media->size);
-        $this->assertEquals('image', $media->aggregate_type);
     }
 
     public function test_it_validates_md5_hash_failure()
@@ -914,7 +883,8 @@ class MediaUploaderTest extends TestCase
         Facade::fromSource(TestCase::sampleFilePath())
             ->toDestination('tmp', 'foo')
             ->useFilename('bar')
-            ->validateMd5Hash('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+            ->validateHash('3ef5e70366086147c2695325d79a25cc', 'md5')
+            ->validateHash('abcdefabcdef', 'sha1')
             ->upload();
     }
 
