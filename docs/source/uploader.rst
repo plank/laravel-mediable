@@ -162,8 +162,31 @@ If the file does not pass validation, an instance of ``Plank\Mediable\MediaUploa
 
         ->verifyFile()
 
+Manipulate images during upload
+-------------------------------
 
-Alter Model before upload
+It is possible to edit images during the upload process using the `intervention/image` library.
+
+::
+
+    <?php
+    $manipulation = ImageManipulation::make(function (Image $image, Media $originalMedia) {
+        $image->fit(100, 100);
+    })->outputPngFormat();
+    $media = MediaUploader::fromSource($request->file('image'))
+        ->applyImageManipulation($manipulation);
+        ->upload()
+
+    // alternatively you can reference a register variant name
+    $media = MediaUploader::fromSource($request->file('image'))
+        ->applyImageManipulation('thumbnail')
+        ->upload()
+
+If the aggregate type of the file is not `'image'`, the manipulation will be ignored.
+
+This will load the file contents and apply manipulations synchronously as part of the upload process, which add latency. The original file is not persisted. To apply manipulations asynchronously on copies of the original file, and for more information on manipulations, see the :ref:`Image Variants <variants>` sections.
+
+Alter Model before saving
 -------------------------
 
 You can manipulate the model before it's saved by passing a callable to the ``beforeSave`` method.

@@ -3,12 +3,15 @@
 namespace Plank\Mediable\Tests\Integration;
 
 use GuzzleHttp\Psr7\Utils;
+use Intervention\Image\Image;
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Plank\Mediable\Exceptions\MediaUpload\FileExistsException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException;
 use Plank\Mediable\Exceptions\MediaUpload\FileSizeException;
 use Plank\Mediable\Exceptions\MediaUpload\ForbiddenException;
+use Plank\Mediable\ImageManipulation;
+use Plank\Mediable\ImageManipulator;
 use Plank\Mediable\Media;
 use Plank\Mediable\MediaUploader;
 use Plank\Mediable\Facades\MediaUploader as Facade;
@@ -796,6 +799,91 @@ class MediaUploaderTest extends TestCase
             ->upload();
 
         $this->assertEquals('This is an alt text', $media->alt);
+    }
+
+    public function test_it_applies_alt_to_existing_media()
+    {
+        $this->useDatabase();
+        $this->useFilesystem('tmp');
+
+        $media = $this->createMedia(
+            [
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'extension' => 'png',
+                'mime_type' => 'image/png',
+                'size' => 999,
+            ]
+        );
+        $this->seedFileForMedia($media, $this->sampleFile());
+
+        $result = Facade::fromSource(TestCase::sampleFilePath())
+            ->toDestination('tmp', 'foo')
+            ->useFilename('bar')
+            ->withAltAttribute('This is an alt text')
+            ->replace($media);
+
+        $this->assertEquals('This is an alt text', $result->alt);
+    }
+
+    public function test_it_manipulates_images()
+    {
+        $this->useDatabase();
+        $this->useFilesystem('tmp');
+
+        $manipulation = ImageManipulation::make(
+            function (Image $image) {
+                $image->resize(16, 16);
+            }
+        )->outputJpegFormat();
+
+        app(ImageManipulator::class)->defineVariant(
+            'foo',
+            $manipulation
+        );
+
+        $media = Facade::fromSource(TestCase::sampleFilePath())
+            ->toDestination('tmp', 'foo')
+            ->useFilename('bar')
+            ->applyImageManipulation('foo')
+            ->upload();
+
+        $this->assertInstanceOf(Media::class, $media);
+        $this->assertTrue($media->fileExists());
+        $this->assertEquals('tmp', $media->disk);
+        $this->assertEquals('foo/bar.jpg', $media->getDiskPath());
+        $this->assertEquals('image/jpeg', $media->mime_type);
+        $this->assertEquals('image', $media->aggregate_type);
+        $this->assertTrue(
+            $media->size >= 933 // intervention/image <3.0
+            && $media->size <= 951 // intervention/image >=3.0
+        );
+    }
+
+    public function test_it_ignores_manipulations_for_non_images()
+    {
+        $this->useDatabase();
+        $this->useFilesystem('tmp');
+
+        $callback = $this->getMockCallable();
+        $callback->expects($this->never())->method('__invoke');
+
+        $manipulation = ImageManipulation::make($callback);
+
+        $media = Facade::fromSource("data:text/plain;base64," . base64_encode('foo'))
+            ->toDestination('tmp', 'foo')
+            ->useFilename('bar')
+            ->applyImageManipulation($manipulation)
+            ->upload();
+
+        $this->assertInstanceOf(Media::class, $media);
+        $this->assertTrue($media->fileExists());
+        $this->assertEquals('tmp', $media->disk);
+        $this->assertEquals('foo/bar.txt', $media->getDiskPath());
+        $this->assertEquals('text/plain', $media->mime_type);
+        $this->assertEquals('document', $media->aggregate_type);
+        $this->assertEquals(3, $media->size);
     }
 
     protected function getUploader(): MediaUploader

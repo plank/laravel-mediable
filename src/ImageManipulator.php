@@ -9,6 +9,8 @@ use Intervention\Image\Commands\StreamCommand;
 use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
 use Plank\Mediable\Exceptions\ImageManipulationException;
+use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
+use Plank\Mediable\SourceAdapters\StreamAdapter;
 use Psr\Http\Message\StreamInterface;
 
 class ImageManipulator
@@ -137,8 +139,6 @@ class ImageManipulator
             $manipulation->getOutputQuality()
         );
 
-
-
         $variant->variant_name = $variantName;
         $variant->original_media_id = $media->isOriginal()
             ? $media->getKey()
@@ -189,6 +189,44 @@ class ImageManipulator
         $variant->save();
 
         return $variant;
+    }
+
+    /**
+     * @param Media $media
+     * @param SourceAdapterInterface $source
+     * @param ImageManipulation $variantName
+     * @return StreamAdapter
+     * @throws ImageManipulationException
+     */
+    public function manipulateUpload(
+        Media $media,
+        SourceAdapterInterface $source,
+        ImageManipulation $manipulation
+    ): StreamAdapter {
+        $outputFormat = $this->determineOutputFormat($manipulation, $media);
+        if (method_exists($this->imageManager, 'read')) {
+            // Intervention Image  >=3.0
+            $image = $this->imageManager->read($source->getStream()->getContents());
+        } else {
+            // Intervention Image <3.0
+            $image = $this->imageManager->make($source->getStream()->getContents());
+        }
+
+        $callback = $manipulation->getCallback();
+        $callback($image, $media);
+
+        $outputStream = $this->imageToStream(
+            $image,
+            $outputFormat,
+            $manipulation->getOutputQuality()
+        );
+
+        $media->extension = $outputFormat;
+        $media->mime_type = $this->getMimeTypeForOutputFormat($outputFormat);
+        $media->aggregate_type = Media::TYPE_IMAGE;
+        $media->size = $outputStream->getSize();
+
+        return new StreamAdapter($outputStream);
     }
 
     private function getMimeTypeForOutputFormat(string $outputFormat): string

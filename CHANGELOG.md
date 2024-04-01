@@ -6,9 +6,10 @@
 - Added Support for PHP 8.3
 - Added Support for Laravel 11
 - Added support for intervention/image 3.0
-- New database migration to add `alt` attribute to the `Media` table
+- Added support for recording alt attributes on Media (database migration required). MediaUploader now exposes a `withAltAttribute()` method to set the alt attribute on the generated media record.
+- Added `MediaUploader::applyImageManipulation()` to make changes to the original uploaded image durin the upload process.
 - MediaUploader will use the visibility defined on the filesystem disk config if the `makePublic()`/`makePrivate()` methods are not called.
-- MediaUploader now supports base64 and URL-encoded data URLs as an input source.
+- MediaUploader now supports data URLs as an input source.
 - Improved MediaCollection annotions to support generic types
 - Removed the `\Plank\Mediable\Stream` class in favor of the `guzzlehttp/psr7` implementation. This removes the direct dependency on the `psr/http-message` library.
 - The Media class now exposes a dynamic `url` attribute which will generate a URL for the file (equivalent to the `getUrl()` method).

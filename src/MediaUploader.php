@@ -34,6 +34,8 @@ class MediaUploader
 
     private SourceAdapterFactory $factory;
 
+    private ImageManipulator $imageManipulator;
+
     private array $config;
 
     private SourceAdapterInterface $source;
@@ -82,10 +84,12 @@ class MediaUploader
     public function __construct(
         FileSystemManager $filesystem,
         SourceAdapterFactory $factory,
+        ImageManipulator $imageManipulator,
         array $config = null
     ) {
         $this->filesystem = $filesystem;
         $this->factory = $factory;
+        $this->imageManipulator = $imageManipulator;
         $this->config = $config ?: config('mediable', []);
     }
 
@@ -444,6 +448,26 @@ class MediaUploader
     }
 
     /**
+     * Apply an image manipulation to the uploaded image.
+     *
+     * This will modify the image before saving it to disk.
+     * The original image will not be preserved.
+     *
+     * Note this will manipulate the image as part of the upload process, which may be slow.
+     * @param string|ImageManipulation $variant Either a defined ImageManipulation variant name
+     *   or an ImageManipulation instance
+     * @return $this
+     */
+    public function applyImageManipulation($imageManipulation): self
+    {
+        if (is_string($imageManipulation)) {
+            $imageManipulation = $this->imageManipulator->getVariantDefinition($imageManipulation);
+        }
+        $this->config['image_manipulation'] = $imageManipulation;
+        return $this;
+    }
+
+    /**
      * Additional options to pass to the filesystem when uploading
      * @param array $options
      * @return $this
@@ -550,6 +574,8 @@ class MediaUploader
         $this->verifyFile();
 
         $model = $this->populateModel($this->makeModel());
+
+        $this->manipulateImage($model);
 
         if (is_callable($this->before_save)) {
             call_user_func($this->before_save, $model, $this->source);
@@ -772,10 +798,12 @@ class MediaUploader
     {
         $this->verifySource();
         $this->verifyFileSize($this->source->size() ?? 0);
-        $this->verifyMimeType(
+        $mimeType = $this->verifyMimeType(
             $this->selectMimeType()
         );
-        $this->verifyExtension($this->source->extension());
+        $this->verifyExtension(
+            $this->source->extension() ?? File::guessExtension($mimeType)
+        );
     }
 
     /**
@@ -1046,5 +1074,25 @@ class MediaUploader
             $options['visibility'] = $this->getVisibility();
         }
         return $options;
+    }
+
+    /**
+     * @param Media $model
+     * @return void
+     * @throws Exceptions\ImageManipulationException
+     */
+    public function manipulateImage(Media $model): void
+    {
+        if (empty($this->config['image_manipulation'])
+            || $model->aggregate_type !== Media::TYPE_IMAGE
+        ) {
+            return;
+        }
+        $manipulation = $this->config['image_manipulation'];
+        $this->source = $this->imageManipulator->manipulateUpload(
+            $model,
+            $this->source,
+            $manipulation
+        );
     }
 }
