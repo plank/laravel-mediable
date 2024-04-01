@@ -65,7 +65,7 @@ class RemoteUrlAdapter extends StreamAdapter
         return pathinfo(
             parse_url($this->url, PHP_URL_PATH),
             PATHINFO_EXTENSION
-        );
+        ) ?: null;
     }
 
     public function valid(): bool

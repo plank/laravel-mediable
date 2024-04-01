@@ -38,7 +38,7 @@ class UploadedFileAdapter implements SourceAdapterInterface
      */
     public function filename(): ?string
     {
-        return pathinfo($this->source->getClientOriginalName(), PATHINFO_FILENAME);
+        return pathinfo($this->source->getClientOriginalName(), PATHINFO_FILENAME) ?: null;
     }
 
     /**
@@ -46,13 +46,7 @@ class UploadedFileAdapter implements SourceAdapterInterface
      */
     public function extension(): ?string
     {
-        $extension = $this->source->getClientOriginalExtension();
-
-        if ($extension) {
-            return $extension;
-        }
-
-        return (string)$this->source->guessExtension();
+        return $this->source->getClientOriginalExtension() ?: null;
     }
 
     /**
@@ -90,14 +84,6 @@ class UploadedFileAdapter implements SourceAdapterInterface
     public function size(): int
     {
         return $this->source->getSize() ?: 0;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isRemote(): bool
-    {
-        return false;
     }
 
     /**

@@ -84,11 +84,6 @@ class RawContentAdapter implements SourceAdapterInterface
         return mb_strlen($this->source, '8bit') ?: 0;
     }
 
-    public function isRemote(): bool
-    {
-        return false;
-    }
-
     public function hash(): string
     {
         return md5($this->source) ?: '';

@@ -71,7 +71,10 @@ class StreamAdapter implements SourceAdapterInterface
         if (!$path) {
             return null;
         }
-        return pathinfo(parse_url($this->path(), PHP_URL_PATH) ?? '', PATHINFO_FILENAME);
+        return pathinfo(
+            parse_url($this->path(), PHP_URL_PATH) ?? '',
+            PATHINFO_FILENAME
+        ) ?: null;
     }
 
     /**

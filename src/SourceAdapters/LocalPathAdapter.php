@@ -34,7 +34,7 @@ class LocalPathAdapter implements SourceAdapterInterface
      */
     public function filename(): ?string
     {
-        return pathinfo($this->source, PATHINFO_FILENAME);
+        return pathinfo($this->source, PATHINFO_FILENAME) ?: null;
     }
 
     /**
@@ -42,13 +42,7 @@ class LocalPathAdapter implements SourceAdapterInterface
      */
     public function extension(): ?string
     {
-        $extension = pathinfo($this->source, PATHINFO_EXTENSION);
-
-        if ($extension) {
-            return $extension;
-        }
-
-        return (string)File::guessExtension($this->mimeType());
+        return pathinfo($this->source, PATHINFO_EXTENSION) ?: null;
     }
 
     /**
@@ -86,11 +80,6 @@ class LocalPathAdapter implements SourceAdapterInterface
     public function size(): int
     {
         return filesize($this->source) ?: 0;
-    }
-
-    public function isRemote(): bool
-    {
-        return false;
     }
 
     public function hash(): string
