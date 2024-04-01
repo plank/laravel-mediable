@@ -24,7 +24,7 @@
 ### SourceAdapters
 
 All SourceAdapter classes have been significantly refactored.
-- All sourceAdapters will now never load the entire file contents into memory to determine metadata about the file, in order to avoid memory exhaustion when dealing with large files. If reading the file is necessary, if applicable, the adapter will attempt use a single streamed scan of the file to load all metadata at once, to speed up to the precess.
+- All sourceAdapters will now never load the entire file contents into memory to determine metadata about the file, in order to avoid memory exhaustion when dealing with large files. If reading the file is necessary, most adapters will attempt use a single streamed scan of the file to load all metadata at once, to speed up to the precess. Remote files will be cached to temp to avoid repeated HTTP requests.
 - Removed `getStreamResource()` method. The method has been replaced with the `getStream(): StreamInterface`, which returns a PSR-7 stream implementation instead.
 - Added `hash(string $algo): string` method which is expected to return the hash of the file contents using the specified algorithm.
 - The return type of the `filename()` and `extension()` method is now nullable. If the adapter cannot determine the value from the information available, it should return null.
