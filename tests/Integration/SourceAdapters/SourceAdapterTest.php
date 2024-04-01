@@ -24,7 +24,8 @@ class SourceAdapterTest extends TestCase
     private const EXPECTED_EXTENSION = 'png';
     private const EXPECTED_MIME = 'image/png';
     private const EXPECTED_SIZE = 7173;
-    private const EXPECTED_HASH = '3ef5e70366086147c2695325d79a25cc';
+    private const EXPECTED_HASH_MD5 = '3ef5e70366086147c2695325d79a25cc';
+    private const EXPECTED_HASH_SHA1 = '5e96e1fa58067853219c4cb6d3c1ce01cc5cc8ce';
 
     public function setUp(): void
     {
@@ -76,7 +77,8 @@ class SourceAdapterTest extends TestCase
                 'inferredMime' => self::EXPECTED_MIME,
                 'clientMime' => null,
                 'size' => self::EXPECTED_SIZE,
-                'hash' => self::EXPECTED_HASH,
+                'hash_md5' => self::EXPECTED_HASH_MD5,
+                'hash_sha1' => self::EXPECTED_HASH_SHA1,
             ],
             'UploadedFileAdapter' => [
                 'adapterClass' => UploadedFileAdapter::class,
@@ -86,7 +88,8 @@ class SourceAdapterTest extends TestCase
                 'inferredMime' => self::EXPECTED_MIME,
                 'clientMime' => self::EXPECTED_MIME,
                 'size' => self::EXPECTED_SIZE,
-                'hash' => self::EXPECTED_HASH,
+                'hash_md5' => self::EXPECTED_HASH_MD5,
+                'hash_sha1' => self::EXPECTED_HASH_SHA1,
             ],
             'LocalPathAdapter' => [
                 'adapterClass' => LocalPathAdapter::class,
@@ -96,7 +99,8 @@ class SourceAdapterTest extends TestCase
                 'inferredMime' => self::EXPECTED_MIME,
                 'clientMime' => null,
                 'size' => self::EXPECTED_SIZE,
-                'hash' => self::EXPECTED_HASH,
+                'hash_md5' => self::EXPECTED_HASH_MD5,
+                'hash_sha1' => self::EXPECTED_HASH_SHA1,
             ],
             'RemoteUrlAdapter' => [
                 'adapterClass' => RemoteUrlAdapter::class,
@@ -106,7 +110,8 @@ class SourceAdapterTest extends TestCase
                 'inferredMime' => self::EXPECTED_MIME,
                 'clientMime' => self::EXPECTED_MIME,
                 'size' => self::EXPECTED_SIZE,
-                'hash' => self::EXPECTED_HASH,
+                'hash_md5' => self::EXPECTED_HASH_MD5,
+                'hash_sha1' => self::EXPECTED_HASH_SHA1,
             ],
             'RawContentAdapter' => [
                 'adapterClass' => RawContentAdapter::class,
@@ -116,7 +121,8 @@ class SourceAdapterTest extends TestCase
                 'inferredMime' => self::EXPECTED_MIME,
                 'clientMime' => null,
                 'size' => self::EXPECTED_SIZE,
-                'hash' => self::EXPECTED_HASH,
+                'hash_md5' => self::EXPECTED_HASH_MD5,
+                'hash_sha1' => self::EXPECTED_HASH_SHA1,
             ],
             'DataUrlAdapter_base64' => [
                 'adapterClass' => DataUrlAdapter::class,
@@ -126,7 +132,8 @@ class SourceAdapterTest extends TestCase
                 'inferredMime' => self::EXPECTED_MIME,
                 'clientMime' => self::EXPECTED_MIME,
                 'size' => self::EXPECTED_SIZE,
-                'hash' => self::EXPECTED_HASH,
+                'hash_md5' => self::EXPECTED_HASH_MD5,
+                'hash_sha1' => self::EXPECTED_HASH_SHA1,
             ],
             'DataUrlAdapter_urlencode' => [
                 'adapterClass' => DataUrlAdapter::class,
@@ -136,7 +143,8 @@ class SourceAdapterTest extends TestCase
                 'inferredMime' => self::EXPECTED_MIME,
                 'clientMime' => self::EXPECTED_MIME,
                 'size' => self::EXPECTED_SIZE,
-                'hash' => self::EXPECTED_HASH,
+                'hash_md5' => self::EXPECTED_HASH_MD5,
+                'hash_sha1' => self::EXPECTED_HASH_SHA1,
             ],
             'StreamResourceAdapter_Local' => [
                 'adapterClass' => StreamResourceAdapter::class,
@@ -146,7 +154,8 @@ class SourceAdapterTest extends TestCase
                 'inferredMime' => self::EXPECTED_MIME,
                 'clientMime' => null,
                 'size' => self::EXPECTED_SIZE,
-                'hash' => self::EXPECTED_HASH,
+                'hash_md5' => self::EXPECTED_HASH_MD5,
+                'hash_sha1' => self::EXPECTED_HASH_SHA1,
             ],
             'StreamAdapter_Local' => [
                 'adapterClass' => StreamAdapter::class,
@@ -156,7 +165,8 @@ class SourceAdapterTest extends TestCase
                 'inferredMime' => self::EXPECTED_MIME,
                 'clientMime' => null,
                 'size' => self::EXPECTED_SIZE,
-                'hash' => self::EXPECTED_HASH,
+                'hash_md5' => self::EXPECTED_HASH_MD5,
+                'hash_sha1' => self::EXPECTED_HASH_SHA1,
             ],
             'StreamResourceAdapter_Remote' => [
                 'adapterClass' => StreamResourceAdapter::class,
@@ -166,7 +176,8 @@ class SourceAdapterTest extends TestCase
                 'inferredMime' => self::EXPECTED_MIME,
                 'clientMime' => self::EXPECTED_MIME,
                 'size' => self::EXPECTED_SIZE,
-                'hash' => self::EXPECTED_HASH,
+                'hash_md5' => self::EXPECTED_HASH_MD5,
+                'hash_sha1' => self::EXPECTED_HASH_SHA1,
             ],
             'StreamAdapter_Remote' => [
                 'adapterClass' => StreamAdapter::class,
@@ -176,7 +187,8 @@ class SourceAdapterTest extends TestCase
                 'inferredMime' => self::EXPECTED_MIME,
                 'clientMime' => self::EXPECTED_MIME,
                 'size' => self::EXPECTED_SIZE,
-                'hash' => self::EXPECTED_HASH,
+                'hash_md5' => self::EXPECTED_HASH_MD5,
+                'hash_sha1' => self::EXPECTED_HASH_SHA1,
             ],
             'StreamResourceAdapter_Memory' => [
                 'adapterClass' => StreamResourceAdapter::class,
@@ -186,7 +198,8 @@ class SourceAdapterTest extends TestCase
                 'inferredMime' => self::EXPECTED_MIME,
                 'clientMime' => null,
                 'size' => self::EXPECTED_SIZE,
-                'hash' => self::EXPECTED_HASH,
+                'hash_md5' => self::EXPECTED_HASH_MD5,
+                'hash_sha1' => self::EXPECTED_HASH_SHA1,
             ],
             'StreamAdapter_Memory' => [
                 'adapterClass' => StreamAdapter::class,
@@ -196,7 +209,8 @@ class SourceAdapterTest extends TestCase
                 'inferredMime' => self::EXPECTED_MIME,
                 'clientMime' => null,
                 'size' => self::EXPECTED_SIZE,
-                'hash' => self::EXPECTED_HASH,
+                'hash_md5' => self::EXPECTED_HASH_MD5,
+                'hash_sha1' => self::EXPECTED_HASH_SHA1,
             ],
             'StreamAdapter_Data' => [
                 'adapterClass' => StreamAdapter::class,
@@ -206,7 +220,8 @@ class SourceAdapterTest extends TestCase
                 'inferredMime' => self::EXPECTED_MIME,
                 'clientMime' => self::EXPECTED_MIME,
                 'size' => self::EXPECTED_SIZE,
-                'hash' => self::EXPECTED_HASH,
+                'hash_md5' => self::EXPECTED_HASH_MD5,
+                'hash_sha1' => self::EXPECTED_HASH_SHA1,
             ],
         ];
         return $data;
@@ -244,10 +259,11 @@ class SourceAdapterTest extends TestCase
         mixed $source,
         ?string $filename,
         ?string $extension,
-        ?string $inferredMime,
+        string $inferredMime,
         ?string $clientMime,
-        ?int $size,
-        ?string $hash
+        int $size,
+        string $md5Hash,
+        string $sha1Hash
     ) {
         /** @var SourceAdapterInterface $adapter */
         $adapter = new $adapterClass($source);
@@ -260,7 +276,8 @@ class SourceAdapterTest extends TestCase
         $this->assertSame($inferredMime, $adapter->mimeType());
         $this->assertSame($clientMime, $adapter->clientMimeType());
         $this->assertSame($size, $adapter->size());
-        $this->assertSame($hash, $adapter->hash());
+        $this->assertSame($md5Hash, $adapter->hash());
+        $this->assertSame($sha1Hash, $adapter->hash('sha1'));
     }
 
     /**
