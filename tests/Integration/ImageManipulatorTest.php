@@ -347,7 +347,7 @@ class ImageManipulatorTest extends TestCase
             }
         )->toDisk('uploads')
             ->toDirectory('potato')
-            ->useHashForFilename();
+            ->useHashForFilename('sha1');
 
         $imageManipulator = $this->getManipulator();
         $imageManipulator->defineVariant('test', $manipulation);
@@ -355,7 +355,7 @@ class ImageManipulatorTest extends TestCase
 
         $this->assertEquals('uploads', $result->disk);
         $this->assertEquals('potato', $result->directory);
-        $this->assertSame(1, preg_match('/^[a-f0-9]{32}$/', $result->filename));
+        $this->assertSame(1, preg_match('/^[a-f0-9]{40}$/', $result->filename));
         $this->assertTrue($media->fileExists());
     }
 
@@ -724,7 +724,7 @@ class ImageManipulatorTest extends TestCase
         $this->seedFileForMedia($media, $this->sampleFile());
         $originalSize = filesize($this->sampleFilePath());
 
-        $manipulation = ImageManipulation::make(function (Image $image) {})
+        $manipulation = ImageManipulation::make($this->getMockCallable())
             ->outputPngFormat()
             ->optimize([
                 Pngquant::class => [

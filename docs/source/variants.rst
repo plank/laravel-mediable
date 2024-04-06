@@ -136,7 +136,8 @@ By default, variants will be created in the same disk and directory as the origi
     $manipulation->toDestination('uploads', 'files/variants');
 
     $manipulation->useFilename('my-custom-filename');
-    $manipulation->useHashForFilename();
+    $manipulation->useHashForFilename(); // defaults to md5
+    $manipulation->useHashForFilename('sha1');
     $manipulation->useOriginalFilename(); //restore default behaviour
 
 If another file exists at the output destination, the ImageManipulator will attempt to find a unique filename by appending an incrementing number. This can be configured to throw an exception instead if a conflict is discovered.

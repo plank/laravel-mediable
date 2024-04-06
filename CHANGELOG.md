@@ -38,6 +38,8 @@ All SourceAdapter classes have been significantly refactored.
 - Added support for optimizing manipulated images, using the [spatie/image-optimizer](https://github.com/spatie/image-optimizer/) package, which supports a variety of image optimization tools for different image formats (`jpegoptim`, `pngquant`, `optipng`, `gifsicle`, etc.)
 - Default image optimization behaviour can configured in the `config/mediable.php` file to specify the optimization tools to use and their arguments.
 - Added `ImageManipulation::noOptimization()` and `ImageManipulation::optimize(?array $optimizers = null)` methods to allow overriding the defaults set in the config file.
+- The `ImageManipulation::useHashForFilename()` method now accepts an optional parameter to specify which hashing algorithm to use to generate the filename. Supports any hashing algorithm supported by PHP's `hash()` function.
+- The `ImageManipulation::usingHashForFilename()` method has been renamed to `ImageManipulation::isUsingHashForFilename()` to avoid confusion with the `useHashForFilename()` method.
 
 ### Media
 - Added `alt` attribute to the Media model.

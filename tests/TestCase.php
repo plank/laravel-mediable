@@ -101,6 +101,8 @@ class TestCase extends BaseTestCase
             'uploads'
         ]);
 
+        $app['config']->set('mediable.image_optimization.enabled', false);
+
         if (class_exists(Driver::class)) {
             $app->instance(ImageManager::class, new ImageManager(new Driver()));
         }

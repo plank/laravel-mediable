@@ -49,7 +49,7 @@ class ImageManipulation
 
     private ?string $filename = null;
 
-    private bool $hashFilename = false;
+    private ?string $hashFilenameAlgo = null;
 
     private string $onDuplicateBehaviour = self::ON_DUPLICATE_INCREMENT;
 
@@ -256,7 +256,7 @@ class ImageManipulation
     public function useFilename(string $filename): self
     {
         $this->filename = File::sanitizeFilename($filename);
-        $this->hashFilename = false;
+        $this->hashFilenameAlgo = null;
 
         return $this;
     }
@@ -265,9 +265,9 @@ class ImageManipulation
      * Indicates to the uploader to generate a filename using the file's MD5 hash.
      * @return $this
      */
-    public function useHashForFilename(): self
+    public function useHashForFilename(string $algo = 'md5'): self
     {
-        $this->hashFilename = true;
+        $this->hashFilenameAlgo = $algo;
         $this->filename = null;
 
         return $this;
@@ -280,25 +280,24 @@ class ImageManipulation
     public function useOriginalFilename(): self
     {
         $this->filename = null;
-        $this->hashFilename = false;
+        $this->hashFilenameAlgo = null;
 
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getFilename(): ?string
     {
         return $this->filename;
     }
 
-    /**
-     * @return bool
-     */
-    public function usingHashForFilename(): bool
+    public function isUsingHashForFilename(): bool
     {
-        return $this->hashFilename;
+        return $this->hashFilenameAlgo !== null;
+    }
+
+    public function getHashFilenameAlgo(): ?string
+    {
+        return $this->hashFilenameAlgo;
     }
 
     /**

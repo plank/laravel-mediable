@@ -301,8 +301,11 @@ class ImageManipulator
             return $filename;
         }
 
-        if ($manipulation->usingHashForFilename()) {
-            return $this->getHashFromStream($stream);
+        if ($manipulation->isUsingHashForFilename()) {
+            return $this->getHashFromStream(
+                $stream,
+                $manipulation->getHashFilenameAlgo() ?? 'md5'
+            );
         }
         return sprintf('%s-%s', $originalMedia->filename, $variant->variant_name);
     }
@@ -314,10 +317,10 @@ class ImageManipulator
         }
     }
 
-    private function getHashFromStream(StreamInterface $stream): string
+    private function getHashFromStream(StreamInterface $stream, string $algo): string
     {
         $stream->rewind();
-        $hash = hash_init('md5');
+        $hash = hash_init($algo);
         while ($chunk = $stream->read(2048)) {
             hash_update($hash, $chunk);
         }

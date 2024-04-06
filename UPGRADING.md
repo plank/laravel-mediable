@@ -26,6 +26,7 @@
 * To make use of the image optimization feature:
   * Install the necessary command line tools for the types of images that you are working with. See [spatie/image-optimizer documentation](https://github.com/spatie/image-optimizer/blob/main/README.md#optimization-tools) for installation instructions on various operating systems.
   * add the `image_optimization.enabled` and `image_optimization.optimizers` configs to the `config/mediable.php` file. See the [sample configuration file](https://github.com/plank/laravel-mediable/blob/master/config/mediable.php) for a recommended baseline setup.
+* The `ImageManipulation::usingHashForFilename()` method has been renamed to `ImageManipulation::isUsingHashForFilename()` to avoid confusion with the `useHashForFilename()` method.
 
 ## 4.x to 5.x
 

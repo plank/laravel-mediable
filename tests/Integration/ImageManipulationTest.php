@@ -65,7 +65,7 @@ class ImageManipulationTest extends TestCase
         $this->assertNull($manipulation->getDisk());
         $this->assertNull($manipulation->getDirectory());
         $this->assertNull($manipulation->getFilename());
-        $this->assertFalse($manipulation->usingHashForFilename());
+        $this->assertFalse($manipulation->isUsingHashForFilename());
 
         $manipulation->toDisk('tmp');
         $this->assertEquals('tmp', $manipulation->getDisk());
@@ -79,15 +79,21 @@ class ImageManipulationTest extends TestCase
 
         $manipulation->useFilename('potato');
         $this->assertEquals('potato', $manipulation->getFilename());
-        $this->assertFalse($manipulation->usingHashForFilename());
+        $this->assertFalse($manipulation->isUsingHashForFilename());
 
         $manipulation->useHashForFilename();
         $this->assertNull($manipulation->getFilename());
-        $this->assertTrue($manipulation->usingHashForFilename());
+        $this->assertTrue($manipulation->isUsingHashForFilename());
+        $this->assertEquals('md5', $manipulation->getHashFilenameAlgo());
+
+        $manipulation->useHashForFilename('sha1');
+        $this->assertNull($manipulation->getFilename());
+        $this->assertTrue($manipulation->isUsingHashForFilename());
+        $this->assertEquals('sha1', $manipulation->getHashFilenameAlgo());
 
         $manipulation->useOriginalFilename();
         $this->assertNull($manipulation->getFilename());
-        $this->assertFalse($manipulation->usingHashForFilename());
+        $this->assertFalse($manipulation->isUsingHashForFilename());
     }
 
     public function test_get_duplicate_behaviours()
