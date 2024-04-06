@@ -59,13 +59,14 @@ By default, the uploader will copy the source file while maintaining its origina
         ->useFilename('profile')
         ->upload();
 
-You can also tell the uploader to generate a filename based on the MD5 hash of the file's contents.
+You can also tell the uploader to generate a filename using a specified hashing algorithm on the file's contents. Supports any algorithm supported by PHP's ``hash()`` function.
 
 ::
 
     <?php
     MediaUploader::fromSource(...)
-        ->useHashForFilename()
+        ->useHashForFilename() // default is 'md5'
+        ->useHashForFilename('sha1')
         ->upload();
 
 You can restore the default behaviour with ``useOriginalFilename()``.
@@ -143,6 +144,7 @@ You can override the most validation configuration values set in ``config/mediab
 
         // ensure that the file contents match a provided hash
         // second argument is the hash algorithm to use
+        // supports any algorithm supported by PHP's hash() function
         ->validateHash('3ef5e70366086147c2695325d79a25cc', 'md5')
         ->validateHash('5e96e1fa58067853219c4cb6d3c1ce01cc5cc8ce', 'sha1')
 
@@ -189,7 +191,7 @@ It is possible to edit images during the upload process using the `intervention/
 
 If the aggregate type of the file is not `'image'`, the manipulation will be ignored.
 
-This will load the file contents and apply manipulations synchronously as part of the upload process, which add latency. The original file is not persisted. To apply manipulations asynchronously on copies of the original file, and for more information on manipulations, see the :ref:`Image Variants <variants>` sections.
+This will load the file contents and apply manipulations synchronously as part of the upload process, which may add latency. The original file is not persisted. To apply manipulations asynchronously on copies of the original file, and for more information on manipulations, see the :ref:`Image Variants <variants>` sections.
 
 Alter Model before saving
 -------------------------

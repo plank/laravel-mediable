@@ -102,7 +102,7 @@ Image Optimizations
 
 The ImageManipulator is capable of automatically optimizing images after the manipulations have been applied in order to the reduce the file size.
 
-Before you can use this feature, you must install the command line packages for the image formats that you intend to work with. See the `spatie/image-optimizer documentation <https://github.com/spatie/image-optimizer/blob/main/README.md#optimization-tools>`_ for a list of supported packages and installation instructions on different operating systems.
+Before you can use this feature, you must install the optimizer binaries for the image formats that you intend to work with. See the `spatie/image-optimizer documentation <https://github.com/spatie/image-optimizer/blob/main/README.md#optimization-tools>`_ for a list of supported packages and installation instructions on different operating systems.
 
 The optimizers to be used and their arguments can be configured in the ``config/mediable.php`` file. By default, the ImageManipulator will attempt to optimize the image after each manipulation. You can override the default config settings by calling the following methods.
 

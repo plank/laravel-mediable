@@ -13,18 +13,19 @@
 ### MediaUploader
 
 - Added support for recording alt attributes on Media (database migration required). MediaUploader now exposes a `withAltAttribute()` method to set the alt attribute on the generated media record.
-- Added `MediaUploader::applyImageManipulation()` to make changes to the original uploaded image durin the upload process.
+- Added `MediaUploader::applyImageManipulation()` to make changes to the original uploaded image during the upload process.
 - Added `MediaUploader::validateHash()` to ensure that the hash of the uploaded file matches a particular value during upload. Supports any hashing algorithm supported by PHP's `hash()` function.
-- The `MediaUploader::hashFilename()` method accepts an optional parameter to specify which hashing algorithm to use to generate the filename. Supports any hashing algorithm supported by PHP's `hash()` function.
+- By default, the MediaUploader will always use the MIME type inferred from the file contents, regardless of the source. Added the `MediaUploader::preferClientMimeType()` to indicate that the MIME type provided by the source should be used instead, if provided. The default behaviour can be configured with the `'prefer_client_mime_type'` key in the `config/mediable.php` file.
+- The `MediaUploader::useHashForFilename()` method now accepts an optional parameter to specify which hashing algorithm to use to generate the filename. Supports any hashing algorithm supported by PHP's `hash()` function.
 - MediaUploader will now use the visibility defined on the filesystem disk config if the `makePublic()`/`makePrivate()` methods are not called, instead of assuming public visibility.
 - MediaUploader now supports data URL strings as an input source, e.g. `data:image/jpeg;base64,...`.
 - If a filename is not provided to the MediaUploader, and none can be inferred from the source, the uploader will throw an exception.
-- If the file extension is not available from the source, the uploader will infer it from the MIME type.
+- If the file extension is not available from the source, the uploader will now consistently infer it from the MIME type. Previously this behaviour was inconsistent across different source adapters.
 
 ### SourceAdapters
 
 All SourceAdapter classes have been significantly refactored.
-- All sourceAdapters will now never load the entire file contents into memory to determine metadata about the file, in order to avoid memory exhaustion when dealing with large files. If reading the file is necessary, most adapters will attempt use a single streamed scan of the file to load all metadata at once, to speed up to the precess. Remote files will be cached to temp to avoid repeated HTTP requests.
+- All sourceAdapters will now never load the entire file contents into memory (unless it is already in memory) to determine metadata about the file, in order to avoid memory exhaustion when dealing with large files. If reading the file is necessary, most adapters will attempt use a single streamed scan of the file to load all metadata at once, to speed up to the precess. Remote files will be cached to `temp://` to avoid repeated HTTP requests.
 - Removed `getStreamResource()` method. The method has been replaced with the `getStream(): StreamInterface`, which returns a PSR-7 stream implementation instead.
 - Added `hash(string $algo): string` method which is expected to return the hash of the file contents using the specified algorithm.
 - The return type of the `filename()` and `extension()` method is now nullable. If the adapter cannot determine the value from the information available, it should return null.
@@ -46,8 +47,8 @@ All SourceAdapter classes have been significantly refactored.
 - The Media class now exposes a dynamic `url` attribute which will generate a URL for the file (equivalent to the `getUrl()` method).
 
 ### Other
-- Improved MediableCollection annotions to support generic types
-- Added missing type declarations to most property and method signatures
+- Improved `MediableCollection` annotions to support generic types.
+- Added missing type declarations to most property and method signatures.
 - Removed the `\Plank\Mediable\Stream` class in favor of the `guzzlehttp/psr7` implementation. This removes the direct dependency on the `psr/http-message` library.
 - `\Plank\Mediable\HandlesMediaUploadExceptions::transformMediaUploadException()` parameter and return type changed from `\Exception` to `\Throwable`.
 
