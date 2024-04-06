@@ -23,6 +23,9 @@
   * Remove the `path()` method. No replacement.
   * Remove the `valid()` method. SourceAdapters should now throw an exception with a more helpful message from the constructor if the source is not valid.
 * The `Plank\Mediable\Stream` class has been removed in favor of the `guzzlehttp/psr7` implementation. If you were using this class directly, you will need use another PSR-7 compatible stream wrapper instead (such as Guzzle's).
+* To make use of the image optimization feature:
+  * Install the necessary command line tools for the types of images that you are working with. See [spatie/image-optimizer documentation](https://github.com/spatie/image-optimizer/blob/main/README.md#optimization-tools) for installation instructions on various operating systems.
+  * add the `image_optimization.enabled` and `image_optimization.optimizers` configs to the `config/mediable.php` file. See the [sample configuration file](https://github.com/plank/laravel-mediable/blob/master/config/mediable.php) for a recommended baseline setup.
 
 ## 4.x to 5.x
 

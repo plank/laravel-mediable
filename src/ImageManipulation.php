@@ -4,6 +4,8 @@ namespace Plank\Mediable;
 
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Plank\Mediable\Helpers\File;
+use Spatie\ImageOptimizer\Optimizer;
+use Spatie\ImageOptimizer\OptimizerChain;
 
 class ImageManipulation
 {
@@ -57,9 +59,16 @@ class ImageManipulation
     /** @var callable|null */
     private $beforeSave;
 
+    private bool $shouldOptimize;
+
+    /** @var array<class-string<Optimizer>,string[]> */
+    private array $optimizers;
+
     public function __construct(callable $callback)
     {
         $this->callback = $callback;
+        $this->shouldOptimize = config('mediable.image_optimization.enabled', true);
+        $this->setOptimizers(config('mediable.image_optimization.optimizers', []));
     }
 
     public static function make(callable $callback)
@@ -356,5 +365,60 @@ class ImageManipulation
         $this->beforeSave = $beforeSave;
 
         return $this;
+    }
+
+    /**
+     * Disable image optimization.
+     * @return $this
+     */
+    public function noOptimization(): self
+    {
+        $this->shouldOptimize = false;
+
+        return $this;
+    }
+
+    /**
+     * Enable image optimization.
+     * @param array<class-string<Optimizer>,string[]> $customOptimizers Override default optimizers.
+     *     The array keys should be the fully qualified class names of the optimizers to use.
+     *     The array values should be arrays of command line arguments to pass to the optimizer.
+     *     DO NOT PASS UNTRUSTED USER INPUT AS COMMAND LINE ARGUMENTS
+     * @return $this
+     * @throws ConfigurationException
+     */
+    public function optimize(?array $customOptimizers = null): self
+    {
+        if ($customOptimizers !== null) {
+            $this->setOptimizers($customOptimizers);
+        }
+        $this->shouldOptimize = true;
+
+        return $this;
+    }
+
+    public function shouldOptimize(): bool
+    {
+        return $this->shouldOptimize && !empty($this->optimizers);
+    }
+
+    public function getOptimizerChain(): OptimizerChain
+    {
+        $chain = new OptimizerChain();
+        foreach ($this->optimizers as $optimizerClass => $args) {
+            $optimizer = new $optimizerClass($args);
+            $chain->addOptimizer($optimizer);
+        }
+        return $chain;
+    }
+
+    private function setOptimizers(array $customOptimizers)
+    {
+        foreach ($customOptimizers as $optimizerClass => $args) {
+            if (!is_a($optimizerClass, Optimizer::class, true)) {
+                throw ConfigurationException::invalidOptimizer($optimizerClass);
+            }
+        }
+        $this->optimizers = $customOptimizers;
     }
 }

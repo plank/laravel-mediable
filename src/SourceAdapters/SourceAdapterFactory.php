@@ -120,9 +120,7 @@ class SourceAdapterFactory
      */
     private function validateAdapterClass(string $class): void
     {
-        $implements = class_implements($class, true);
-
-        if (!in_array(SourceAdapterInterface::class, $implements)) {
+        if (!is_a($class, SourceAdapterInterface::class, true)) {
             throw ConfigurationException::cannotSetAdapter($class);
         }
     }

@@ -4,6 +4,8 @@ namespace Plank\Mediable\Tests\Integration;
 
 use Plank\Mediable\ImageManipulation;
 use Plank\Mediable\Tests\TestCase;
+use Spatie\ImageOptimizer\Optimizers\Jpegoptim;
+use Spatie\ImageOptimizer\Optimizers\Pngquant;
 
 class ImageManipulationTest extends TestCase
 {
@@ -132,5 +134,39 @@ class ImageManipulationTest extends TestCase
 
         $manipulation->setVisibility(null);
         $this->assertNull($manipulation->getVisibility());
+    }
+
+    public function test_it_can_configure_image_optimization(): void
+    {
+        config(['mediable.image_optimization.enabled' => true]);
+        config(['mediable.image_optimization.optimizers' => [Pngquant::class => ['--arg']]]);
+
+        $manipulation = new ImageManipulation($this->getMockCallable());
+        $this->assertTrue($manipulation->shouldOptimize());
+        $optimizerChain = $manipulation->getOptimizerChain();
+        $optimizers = $optimizerChain->getOptimizers();
+        $this->assertCount(1, $optimizers);
+        $this->assertInstanceOf(Pngquant::class, $optimizers[0]);
+
+        $manipulation->noOptimization();
+        $this->assertFalse($manipulation->shouldOptimize());
+
+        config(['mediable.image_optimization.enabled' => false]);
+        $manipulation = new ImageManipulation($this->getMockCallable());
+        $this->assertFalse($manipulation->shouldOptimize());
+
+        $manipulation->optimize();
+        $this->assertTrue($manipulation->shouldOptimize());
+        $optimizerChain = $manipulation->getOptimizerChain();
+        $optimizers = $optimizerChain->getOptimizers();
+        $this->assertCount(1, $optimizers);
+        $this->assertInstanceOf(Pngquant::class, $optimizers[0]);
+
+        $manipulation->optimize([Jpegoptim::class => ['--arg']]);
+        $this->assertTrue($manipulation->shouldOptimize());
+        $optimizerChain = $manipulation->getOptimizerChain();
+        $optimizers = $optimizerChain->getOptimizers();
+        $this->assertCount(1, $optimizers);
+        $this->assertInstanceOf(Jpegoptim::class, $optimizers[0]);
     }
 }

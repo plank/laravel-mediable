@@ -12,6 +12,7 @@ use Plank\Mediable\Exceptions\ImageManipulationException;
 use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
 use Plank\Mediable\SourceAdapters\StreamAdapter;
 use Psr\Http\Message\StreamInterface;
+use Spatie\ImageOptimizer\OptimizerChain;
 
 class ImageManipulator
 {
@@ -29,10 +30,16 @@ class ImageManipulator
      */
     private $filesystem;
 
-    public function __construct(ImageManager $imageManager, FilesystemManager $filesystem)
-    {
+    private ImageOptimizer $imageOptimizer;
+
+    public function __construct(
+        ImageManager $imageManager,
+        FilesystemManager $filesystem,
+        ImageOptimizer $imageOptimizer
+    ) {
         $this->imageManager = $imageManager;
         $this->filesystem = $filesystem;
+        $this->imageOptimizer = $imageOptimizer;
     }
 
     public function defineVariant(
@@ -139,6 +146,13 @@ class ImageManipulator
             $manipulation->getOutputQuality()
         );
 
+        if ($manipulation->shouldOptimize()) {
+            $outputStream = $this->imageOptimizer->optimizeImage(
+                $outputStream,
+                $manipulation->getOptimizerChain()
+            );
+        }
+
         $variant->variant_name = $variantName;
         $variant->original_media_id = $media->isOriginal()
             ? $media->getKey()
@@ -221,6 +235,13 @@ class ImageManipulator
             $manipulation->getOutputQuality()
         );
 
+        if ($manipulation->shouldOptimize()) {
+            $outputStream = $this->imageOptimizer->optimizeImage(
+                $outputStream,
+                $manipulation->getOptimizerChain()
+            );
+        }
+
         $media->extension = $outputFormat;
         $media->mime_type = $this->getMimeTypeForOutputFormat($outputFormat);
         $media->aggregate_type = Media::TYPE_IMAGE;
@@ -297,7 +318,7 @@ class ImageManipulator
     {
         $stream->rewind();
         $hash = hash_init('md5');
-        while ($chunk = $stream->read(64)) {
+        while ($chunk = $stream->read(2048)) {
             hash_update($hash, $chunk);
         }
         $filename = hash_final($hash);

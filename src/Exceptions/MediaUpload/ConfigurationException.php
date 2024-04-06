@@ -47,4 +47,9 @@ class ConfigurationException extends MediaUploadException
     {
         return new static('No filename is provided and cannot infer filename from the provided source.');
     }
+
+    public static function invalidOptimizer(string $optimizerClass): self
+    {
+        return new static("Invalid optimizer class `{$optimizerClass}`. Must implement `\Spatie\ImageOptimizer\Optimizer`.");
+    }
 }

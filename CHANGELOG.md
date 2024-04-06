@@ -33,6 +33,12 @@ All SourceAdapter classes have been significantly refactored.
 - Removed the `path()` method. No replacement.
 - Removed the `valid()` method. SourceAdapters should now throw an exception with a more helpful message from the constructor if the source is not valid.
 
+### ImageManipulation
+
+- Added support for optimizing manipulated images, using the [spatie/image-optimizer](https://github.com/spatie/image-optimizer/) package, which supports a variety of image optimization tools for different image formats (`jpegoptim`, `pngquant`, `optipng`, `gifsicle`, etc.)
+- Default image optimization behaviour can configured in the `config/mediable.php` file to specify the optimization tools to use and their arguments.
+- Added `ImageManipulation::noOptimization()` and `ImageManipulation::optimize(?array $optimizers = null)` methods to allow overriding the defaults set in the config file.
+
 ### Media
 - Added `alt` attribute to the Media model.
 - The Media class now exposes a dynamic `url` attribute which will generate a URL for the file (equivalent to the `getUrl()` method).
