@@ -10,7 +10,7 @@ use Plank\Mediable\UrlGenerators\LocalUrlGenerator;
 
 class LocalUrlGeneratorTest extends TestCase
 {
-    public function test_it_generates_absolute_path()
+    public function test_it_generates_absolute_path(): void
     {
         $generator = $this->setupGenerator();
         $this->assertEquals(
@@ -19,25 +19,25 @@ class LocalUrlGeneratorTest extends TestCase
         );
     }
 
-    public function test_it_generates_url()
+    public function test_it_generates_url(): void
     {
         $generator = $this->setupGenerator();
         $this->assertEquals('http://localhost/uploads/foo/bar.jpg', $generator->getUrl());
     }
 
-    public function test_it_attempts_to_generate_url_for_non_public_disk()
+    public function test_it_attempts_to_generate_url_for_non_public_disk(): void
     {
         $generator = $this->setupGenerator('tmp');
         $this->assertEquals('/storage/foo/bar.jpg', $generator->getUrl());
     }
 
-    public function test_it_accepts_public_visibility()
+    public function test_it_accepts_public_visibility(): void
     {
         $generator = $this->setupGenerator('public_storage');
         $this->assertEquals('http://localhost/storage/foo/bar.jpg', $generator->getUrl());
     }
 
-    public static function public_visibility_provider()
+    public static function public_visibility_provider(): array
     {
         return [
             ['uploads', true, true],
@@ -56,12 +56,12 @@ class LocalUrlGeneratorTest extends TestCase
         string $disk,
         bool $public,
         bool $expectedAccessibility
-    ) {
+    ): void {
         $generator = $this->setupGenerator($disk, $public);
         $this->assertSame($expectedAccessibility, $generator->isPubliclyAccessible());
     }
 
-    public function test_it_checks_public_visibility_mock_disk()
+    public function test_it_checks_public_visibility_mock_disk(): void
     {
         $filesystem = $this->createConfiguredMock(
             FilesystemManager::class,

@@ -13,7 +13,7 @@
   ```php
   'prefer_client_mime_type' => false,
   ```
-* All properties now declare their types if able. If extending any class or implementing any interface from this package, property types may need to be updated.
+* All properties now declare their types if able, and a handful of missing method return types have been added. If extending any class or implementing any interface from this package, property types may need to be updated.
 * If you have implemented a custom SourceAdapter, you will need to apply the following changes from the `SourceAdapterInterface` interface:
   * Implement the `getStream(): StreamInterface` method.
   * Implement the `getHash(string $algo): string` method.
@@ -27,6 +27,7 @@
   * Install the necessary command line tools for the types of images that you are working with. See [spatie/image-optimizer documentation](https://github.com/spatie/image-optimizer/blob/main/README.md#optimization-tools) for installation instructions on various operating systems.
   * add the `image_optimization.enabled` and `image_optimization.optimizers` configs to the `config/mediable.php` file. See the [sample configuration file](https://github.com/plank/laravel-mediable/blob/master/config/mediable.php) for a recommended baseline setup.
 * The `ImageManipulation::usingHashForFilename()` method has been renamed to `ImageManipulation::isUsingHashForFilename()` to avoid confusion with the `useHashForFilename()` method.
+* `\Plank\Mediable\HandlesMediaUploadExceptions::transformMediaUploadException()` parameter and return type changed from `\Exception` to `\Throwable`.
 
 ## 4.x to 5.x
 

@@ -16,7 +16,7 @@ class PruneMediaCommandTest extends TestCase
         $this->withoutMockingConsoleOutput();
     }
 
-    public function test_it_deletes_media_without_files()
+    public function test_it_deletes_media_without_files(): void
     {
         $artisan = $this->getArtisan();
         $media1 = factory(Media::class)->create(['id' => 1, 'disk' => 'tmp']);
@@ -29,7 +29,7 @@ class PruneMediaCommandTest extends TestCase
         $this->assertEquals("Pruned 1 record(s).\n", $artisan->output());
     }
 
-    public function test_it_prunes_directory()
+    public function test_it_prunes_directory(): void
     {
         $artisan = $this->getArtisan();
         $media1 = factory(Media::class)->create(
@@ -45,7 +45,7 @@ class PruneMediaCommandTest extends TestCase
         $this->assertEquals("Pruned 1 record(s).\n", $artisan->output());
     }
 
-    public function test_it_prunes_non_recursively()
+    public function test_it_prunes_non_recursively(): void
     {
         $artisan = $this->getArtisan();
         $media1 = factory(Media::class)->create(
@@ -61,7 +61,7 @@ class PruneMediaCommandTest extends TestCase
         $this->assertEquals("Pruned 1 record(s).\n", $artisan->output());
     }
 
-    public function getArtisan()
+    public function getArtisan(): Artisan
     {
         return app(Artisan::class);
     }

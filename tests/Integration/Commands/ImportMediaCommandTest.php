@@ -25,7 +25,7 @@ class ImportMediaCommandTest extends TestCase
         $app['config']->set('mediable.strict_type_checking', false);
     }
 
-    public function test_it_creates_media_for_unmatched_files()
+    public function test_it_creates_media_for_unmatched_files(): void
     {
         $artisan = $this->getArtisan();
         $media1 = factory(Media::class)->make(['disk' => 'tmp', 'filename' => 'foo']);
@@ -42,7 +42,7 @@ class ImportMediaCommandTest extends TestCase
         );
     }
 
-    public function test_it_creates_media_for_unmatched_files_in_directory()
+    public function test_it_creates_media_for_unmatched_files_in_directory(): void
     {
         $artisan = $this->getArtisan();
         $media1 = factory(Media::class)->make(
@@ -60,7 +60,7 @@ class ImportMediaCommandTest extends TestCase
         $this->assertEquals(['bar'], Media::pluck('filename')->toArray());
     }
 
-    public function test_it_creates_media_for_unmatched_files_non_recursively()
+    public function test_it_creates_media_for_unmatched_files_non_recursively(): void
     {
         $artisan = $this->getArtisan();
         $media1 = factory(Media::class)->make(
@@ -81,7 +81,7 @@ class ImportMediaCommandTest extends TestCase
         $this->assertEquals(['foo'], Media::pluck('filename')->toArray());
     }
 
-    public function test_it_skips_files_of_unmatched_aggregate_type()
+    public function test_it_skips_files_of_unmatched_aggregate_type(): void
     {
         $artisan = $this->getArtisan();
         $filesystem = app(FilesystemManager::class);
@@ -105,7 +105,7 @@ class ImportMediaCommandTest extends TestCase
         );
     }
 
-    public function test_it_updates_existing_media()
+    public function test_it_updates_existing_media(): void
     {
         $artisan = $this->getArtisan();
         $media1 = factory(Media::class)->create(
@@ -141,7 +141,7 @@ class ImportMediaCommandTest extends TestCase
         );
     }
 
-    protected function getArtisan()
+    protected function getArtisan(): Artisan
     {
         return app(Artisan::class);
     }

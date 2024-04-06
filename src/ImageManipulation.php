@@ -71,7 +71,7 @@ class ImageManipulation
         $this->setOptimizers(config('mediable.image_optimization.optimizers', []));
     }
 
-    public static function make(callable $callback)
+    public static function make(callable $callback): self
     {
         return new self($callback);
     }
@@ -411,7 +411,7 @@ class ImageManipulation
         return $chain;
     }
 
-    private function setOptimizers(array $customOptimizers)
+    private function setOptimizers(array $customOptimizers): void
     {
         foreach ($customOptimizers as $optimizerClass => $args) {
             if (!is_a($optimizerClass, Optimizer::class, true)) {

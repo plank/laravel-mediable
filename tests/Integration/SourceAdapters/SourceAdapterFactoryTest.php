@@ -10,7 +10,7 @@ use stdClass;
 
 class SourceAdapterFactoryTest extends TestCase
 {
-    public function test_it_allows_setting_adapter_for_class()
+    public function test_it_allows_setting_adapter_for_class(): void
     {
         $factory = new SourceAdapterFactory;
         $source = $this->createMock(stdClass::class);
@@ -21,7 +21,7 @@ class SourceAdapterFactoryTest extends TestCase
         $this->assertInstanceOf($adapterClass, $factory->create($source));
     }
 
-    public function test_it_allows_setting_adapter_for_pattern()
+    public function test_it_allows_setting_adapter_for_pattern(): void
     {
         $factory = new SourceAdapterFactory;
         $adapterClass = get_class($this->createMock(SourceAdapterInterface::class));
@@ -30,35 +30,35 @@ class SourceAdapterFactoryTest extends TestCase
         $this->assertInstanceOf($adapterClass, $factory->create('b1'));
     }
 
-    public function test_it_throws_exception_if_invalid_adapter_for_class()
+    public function test_it_throws_exception_if_invalid_adapter_for_class(): void
     {
         $factory = new SourceAdapterFactory;
         $this->expectException(ConfigurationException::class);
         $factory->setAdapterForClass(stdClass::class, stdClass::class);
     }
 
-    public function test_it_throws_exception_if_invalid_adapter_for_pattern()
+    public function test_it_throws_exception_if_invalid_adapter_for_pattern(): void
     {
         $factory = new SourceAdapterFactory;
         $this->expectException(ConfigurationException::class);
         $factory->setAdapterForPattern(stdClass::class, 'foo');
     }
 
-    public function test_it_throws_exception_if_no_match_for_class()
+    public function test_it_throws_exception_if_no_match_for_class(): void
     {
         $factory = new SourceAdapterFactory;
         $this->expectException(ConfigurationException::class);
         $factory->create(new stdClass);
     }
 
-    public function test_it_throws_exception_if_no_match_for_pattern()
+    public function test_it_throws_exception_if_no_match_for_pattern(): void
     {
         $factory = new SourceAdapterFactory;
         $this->expectException(ConfigurationException::class);
         $factory->create('foo');
     }
 
-    public function test_it_returns_adapters_unmodified()
+    public function test_it_returns_adapters_unmodified(): void
     {
         $factory = new SourceAdapterFactory;
         $adapter = $this->createMock(SourceAdapterInterface::class);
@@ -66,7 +66,7 @@ class SourceAdapterFactoryTest extends TestCase
         $this->assertEquals($adapter, $factory->create($adapter));
     }
 
-    public function test_it_is_accessible_via_the_container()
+    public function test_it_is_accessible_via_the_container(): void
     {
         $this->assertInstanceOf(
             SourceAdapterFactory::class,

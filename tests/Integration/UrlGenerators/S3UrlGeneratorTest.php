@@ -29,7 +29,7 @@ class S3UrlGeneratorTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_it_generates_absolute_path()
+    public function test_it_generates_absolute_path(): void
     {
         $generator = $this->setupGenerator();
         $this->assertEquals(
@@ -43,7 +43,7 @@ class S3UrlGeneratorTest extends TestCase
         );
     }
 
-    public function test_it_generates_url()
+    public function test_it_generates_url(): void
     {
         $generator = $this->setupGenerator();
         $this->assertEquals(
@@ -57,7 +57,7 @@ class S3UrlGeneratorTest extends TestCase
         );
     }
 
-    public function test_it_generates_temporary_url()
+    public function test_it_generates_temporary_url(): void
     {
         $generator = $this->setupGenerator();
         $url = $generator->getTemporaryUrl(Carbon::now()->addDay());
@@ -90,7 +90,7 @@ class S3UrlGeneratorTest extends TestCase
         );
     }
 
-    protected function setupGenerator()
+    protected function setupGenerator(): S3UrlGenerator
     {
         $media = $this->getMedia();
         $this->useFilesystem('s3');

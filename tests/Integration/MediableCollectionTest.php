@@ -16,7 +16,7 @@ class MediableCollectionTest extends TestCase
         $this->useDatabase();
     }
 
-    public function test_it_can_lazy_eager_load_media()
+    public function test_it_can_lazy_eager_load_media(): void
     {
         $mediable = factory(SampleMediable::class)->create();
         $media = factory(Media::class)->create();
@@ -29,7 +29,7 @@ class MediableCollectionTest extends TestCase
         $this->assertFalse($collection[0]->media[0]->relationLoaded('variants'));
     }
 
-    public function test_it_can_lazy_eager_load_media_by_tag()
+    public function test_it_can_lazy_eager_load_media_by_tag(): void
     {
         $mediable = factory(SampleMediable::class)->create();
         $media1 = factory(Media::class)->create(['id' => 1]);
@@ -47,7 +47,7 @@ class MediableCollectionTest extends TestCase
         $this->assertFalse($collection[0]->media[0]->relationLoaded('variants'));
     }
 
-    public function test_it_can_lazy_eager_load_media_by_tag_match_all()
+    public function test_it_can_lazy_eager_load_media_by_tag_match_all(): void
     {
         $mediable = factory(SampleMediable::class)->create();
         $media1 = factory(Media::class)->create(['id' => 1]);
@@ -70,7 +70,7 @@ class MediableCollectionTest extends TestCase
         $this->assertFalse($collection[0]->media[0]->relationLoaded('variants'));
     }
 
-    public function test_it_can_lazy_eager_load_media_with_variants()
+    public function test_it_can_lazy_eager_load_media_with_variants(): void
     {
         $mediable = factory(SampleMediable::class)->create();
         $media = factory(Media::class)->create();
@@ -89,7 +89,7 @@ class MediableCollectionTest extends TestCase
         $this->assertTrue($collection[0]->media[0]->relationLoaded('variants'));
     }
 
-    public function test_it_can_lazy_eager_load_media_with_variants_by_tag()
+    public function test_it_can_lazy_eager_load_media_with_variants_by_tag(): void
     {
         $mediable = factory(SampleMediable::class)->create();
         $media1 = factory(Media::class)->create(['id' => 1]);
@@ -111,7 +111,7 @@ class MediableCollectionTest extends TestCase
         $this->assertTrue($collection[0]->media[0]->relationLoaded('variants'));
     }
 
-    public function test_it_can_lazy_eager_load_media_with_relations_by_tag_match_all()
+    public function test_it_can_lazy_eager_load_media_with_relations_by_tag_match_all(): void
     {
         $mediable = factory(SampleMediable::class)->create();
         $media1 = factory(Media::class)->create(['id' => 1]);
@@ -148,7 +148,7 @@ class MediableCollectionTest extends TestCase
         $this->assertTrue($collection[0]->media[0]->relationLoaded('variants'));
     }
 
-    public function testDelete()
+    public function testDelete(): void
     {
         $mediable1 = factory(SampleMediable::class)->create(['id' => 1]);
         $mediable2 = factory(SampleMediable::class)->create(['id' => 2]);

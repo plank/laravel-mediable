@@ -7,7 +7,7 @@ use Plank\Mediable\Tests\TestCase;
 
 class SyncMediaCommandTest extends TestCase
 {
-    public function test_it_calls_prune_and_install()
+    public function test_it_calls_prune_and_install(): void
     {
         $this->withoutMockingConsoleOutput();
         /** @var SyncMediaCommand $command */

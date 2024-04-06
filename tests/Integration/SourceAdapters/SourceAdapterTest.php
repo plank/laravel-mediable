@@ -38,7 +38,7 @@ class SourceAdapterTest extends TestCase
         $app['filesystem']->disk('uploads')->put('plank.png', $this->sampleFile());
     }
 
-    public static function adapterProvider()
+    public static function adapterProvider(): array
     {
         $file = TestCase::sampleFilePath();
         $string = file_get_contents($file);
@@ -227,7 +227,7 @@ class SourceAdapterTest extends TestCase
         return $data;
     }
 
-    public static function invalidAdapterProvider()
+    public static function invalidAdapterProvider(): array
     {
         $file = __DIR__ . '/../../_data/invalid.png';
         $url = 'https://raw.githubusercontent.com/plank/laravel-mediable/master/tests/_data/invalid.png';

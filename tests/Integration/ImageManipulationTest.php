@@ -9,14 +9,14 @@ use Spatie\ImageOptimizer\Optimizers\Pngquant;
 
 class ImageManipulationTest extends TestCase
 {
-    public function test_can_get_set_manipulation_callback()
+    public function test_can_get_set_manipulation_callback(): void
     {
         $callback = $this->getMockCallable();
         $manipulation = new ImageManipulation($callback);
         $this->assertSame($callback, $manipulation->getCallback());
     }
 
-    public function test_can_get_set_output_quality()
+    public function test_can_get_set_output_quality(): void
     {
         $manipulation = new ImageManipulation($this->getMockCallable());
         $this->assertEquals(90, $manipulation->getOutputQuality());
@@ -28,7 +28,7 @@ class ImageManipulationTest extends TestCase
         $this->assertEquals(50, $manipulation->getOutputQuality());
     }
 
-    public function test_can_get_set_output_format()
+    public function test_can_get_set_output_format(): void
     {
         $manipulation = new ImageManipulation($this->getMockCallable());
         $this->assertNull($manipulation->getOutputFormat());
@@ -48,7 +48,7 @@ class ImageManipulationTest extends TestCase
         $this->assertEquals('jpg', $manipulation->getOutputFormat());
     }
 
-    public function test_can_get_set_before_save_callback()
+    public function test_can_get_set_before_save_callback(): void
     {
         $callback = $this->getMockCallable();
         $manipulation = new ImageManipulation($this->getMockCallable());
@@ -58,7 +58,7 @@ class ImageManipulationTest extends TestCase
         $this->assertSame($callback, $manipulation->getBeforeSave());
     }
 
-    public function test_destination_setters()
+    public function test_destination_setters(): void
     {
         $manipulation = new ImageManipulation($this->getMockCallable());
 
@@ -96,7 +96,7 @@ class ImageManipulationTest extends TestCase
         $this->assertFalse($manipulation->isUsingHashForFilename());
     }
 
-    public function test_get_duplicate_behaviours()
+    public function test_get_duplicate_behaviours(): void
     {
         $manipulation = new ImageManipulation($this->getMockCallable());
         $this->assertEquals(
@@ -115,7 +115,7 @@ class ImageManipulationTest extends TestCase
         );
     }
 
-    public function test_visibility()
+    public function test_visibility(): void
     {
         $manipulation = new ImageManipulation($this->getMockCallable());
         $this->assertNull($manipulation->getVisibility());

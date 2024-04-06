@@ -310,7 +310,7 @@ class ImageManipulator
         return sprintf('%s-%s', $originalMedia->filename, $variant->variant_name);
     }
 
-    public function validateMedia(Media $media)
+    public function validateMedia(Media $media): void
     {
         if ($media->aggregate_type != Media::TYPE_IMAGE) {
             throw ImageManipulationException::invalidMediaType($media->aggregate_type);

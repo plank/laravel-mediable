@@ -4,10 +4,12 @@ namespace Plank\Mediable\Tests;
 
 use Dotenv\Dotenv;
 use Faker\Factory;
+use GuzzleHttp\Psr7\Utils;
 use Illuminate\Filesystem\Filesystem;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\ImageManager;
 use Orchestra\Testbench\TestCase as BaseTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Plank\Mediable\Media;
 use Plank\Mediable\MediableServiceProvider;
 use Plank\Mediable\Tests\Mocks\MockCallable;
@@ -108,7 +110,7 @@ class TestCase extends BaseTestCase
         }
     }
 
-    protected function getPrivateProperty($class, $property_name)
+    protected function getPrivateProperty($class, $property_name): \ReflectionProperty
     {
         $reflector = new ReflectionClass($class);
         $property = $reflector->getProperty($property_name);
@@ -116,7 +118,7 @@ class TestCase extends BaseTestCase
         return $property;
     }
 
-    protected function getPrivateMethod($class, $method_name)
+    protected function getPrivateMethod($class, $method_name): \ReflectionMethod
     {
         $reflector = new ReflectionClass($class);
         $method = $reflector->getMethod($method_name);
@@ -124,7 +126,7 @@ class TestCase extends BaseTestCase
         return $method;
     }
 
-    protected function seedFileForMedia(Media $media, $contents = '')
+    protected function seedFileForMedia(Media $media, $contents = ''): void
     {
         app('filesystem')->disk($media->disk)->put(
             $media->getDiskPath(),
@@ -133,12 +135,12 @@ class TestCase extends BaseTestCase
         );
     }
 
-    protected function s3ConfigLoaded()
+    protected function s3ConfigLoaded(): bool
     {
         return env('S3_KEY') && env('S3_SECRET') && env('S3_REGION') && env('S3_BUCKET');
     }
 
-    protected function useDatabase()
+    protected function useDatabase(): void
     {
         $this->app->useDatabasePath(dirname(__DIR__));
         $this->loadMigrationsFrom(
@@ -151,7 +153,7 @@ class TestCase extends BaseTestCase
         );
     }
 
-    protected function useFilesystem($disk)
+    protected function useFilesystem($disk): void
     {
         if (!$this->app['config']->has('filesystems.disks.' . $disk)) {
             return;
@@ -161,7 +163,7 @@ class TestCase extends BaseTestCase
         $filesystem->cleanDirectory($root);
     }
 
-    protected function useFilesystems()
+    protected function useFilesystems(): void
     {
         $disks = $this->app['config']->get('filesystems.disks');
         foreach ($disks as $disk) {
@@ -169,24 +171,24 @@ class TestCase extends BaseTestCase
         }
     }
 
-    protected static function sampleFilePath()
+    protected static function sampleFilePath(): string
     {
         return realpath(__DIR__ . '/_data/plank.png');
     }
 
-    protected static function alternateFilePath()
+    protected static function alternateFilePath(): string
     {
         return realpath(__DIR__ . '/_data/plank2.png');
     }
 
-    protected static function remoteFilePath()
+    protected static function remoteFilePath(): string
     {
         return 'https://raw.githubusercontent.com/plank/laravel-mediable/master/tests/_data/plank.png';
     }
 
     protected function sampleFile()
     {
-        return fopen(TestCase::sampleFilePath(), 'r');
+        return Utils::tryFopen(TestCase::sampleFilePath(), 'r');
     }
 
     protected function makeMedia(array $attributes = []): Media
@@ -199,7 +201,10 @@ class TestCase extends BaseTestCase
         return factory(Media::class)->create($attributes);
     }
 
-    protected function getMockCallable()
+    /**
+     * @return callable&MockObject
+     */
+    protected function getMockCallable(): callable
     {
         return $this->createPartialMock(MockCallable::class, ['__invoke']);
     }
@@ -210,7 +215,7 @@ class TestCase extends BaseTestCase
      *
      * @return \Generator<int,Callback<mixed>>
      */
-    public static function withConsecutive(array $firstCallArguments, array ...$consecutiveCallsArguments): iterable
+    public static function withConsecutive(array $firstCallArguments, array ...$consecutiveCallsArguments): \Generator
     {
         foreach ($consecutiveCallsArguments as $consecutiveCallArguments) {
             self::assertSameSize($firstCallArguments, $consecutiveCallArguments, 'Each expected arguments list need to have the same size.');

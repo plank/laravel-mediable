@@ -47,7 +47,7 @@ class CreateImageVariants implements ShouldQueue
         $this->forceRecreate = $forceRecreate;
     }
 
-    public function handle()
+    public function handle(): void
     {
         foreach ($this->getModels() as $model) {
             foreach ($this->getVariantNames() as $variantName) {

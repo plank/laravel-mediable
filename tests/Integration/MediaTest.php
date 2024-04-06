@@ -19,7 +19,7 @@ use Plank\Mediable\UrlGenerators\UrlGeneratorInterface;
 
 class MediaTest extends TestCase
 {
-    public function test_it_has_path_accessors()
+    public function test_it_has_path_accessors(): void
     {
         $media = $this->makeMedia(
             [
@@ -41,7 +41,7 @@ class MediaTest extends TestCase
         $this->assertEquals('jpg', $media->extension);
     }
 
-    public function test_it_can_be_queried_by_directory()
+    public function test_it_can_be_queried_by_directory(): void
     {
         $this->useDatabase();
 
@@ -54,7 +54,7 @@ class MediaTest extends TestCase
         $this->assertEquals(1, Media::inDirectory('tmp', 'foo/baz')->count());
     }
 
-    public function test_it_can_be_queried_by_directory_recursively()
+    public function test_it_can_be_queried_by_directory_recursively(): void
     {
         $this->useDatabase();
 
@@ -68,7 +68,7 @@ class MediaTest extends TestCase
         $this->assertEquals(1, Media::inDirectory('tmp', 'foo/bar/baz', true)->count());
     }
 
-    public function test_it_can_be_queried_by_basename()
+    public function test_it_can_be_queried_by_basename(): void
     {
         $this->useDatabase();
 
@@ -79,7 +79,7 @@ class MediaTest extends TestCase
         $this->assertEquals(99, Media::whereBasename('baz.bat')->first()->id);
     }
 
-    public function test_it_can_be_queried_by_path_on_disk()
+    public function test_it_can_be_queried_by_path_on_disk(): void
     {
         $this->useDatabase();
 
@@ -98,7 +98,7 @@ class MediaTest extends TestCase
         );
     }
 
-    public function test_it_can_be_queried_by_path_on_disk_when_directory_is_empty()
+    public function test_it_can_be_queried_by_path_on_disk_when_directory_is_empty(): void
     {
         $this->useDatabase();
 
@@ -114,7 +114,7 @@ class MediaTest extends TestCase
         $this->assertEquals(4, Media::forPathOnDisk('tmp', 'bat.jpg')->first()->id);
     }
 
-    public function test_it_can_view_human_readable_file_size()
+    public function test_it_can_view_human_readable_file_size(): void
     {
         $media = $this->makeMedia(['size' => 0]);
 
@@ -127,7 +127,7 @@ class MediaTest extends TestCase
         $this->assertEquals('1.1 MB', $media->readableSize(2));
     }
 
-    public function test_it_can_be_checked_for_public_visibility()
+    public function test_it_can_be_checked_for_public_visibility(): void
     {
         $this->useFilesystem('tmp');
         $this->useFilesystem('uploads');
@@ -146,7 +146,7 @@ class MediaTest extends TestCase
         $this->assertTrue($media->isPubliclyAccessible());
     }
 
-    public function test_it_can_be_checked_for_public_visibility_s3()
+    public function test_it_can_be_checked_for_public_visibility_s3(): void
     {
         if (!$this->s3ConfigLoaded()) {
             $this->markTestSkipped('S3 Credentials not available.');
@@ -172,7 +172,7 @@ class MediaTest extends TestCase
         }
     }
 
-    public function test_it_can_generate_a_url_to_the_local_file()
+    public function test_it_can_generate_a_url_to_the_local_file(): void
     {
         $media = $this->makeMedia(
             [
@@ -186,7 +186,7 @@ class MediaTest extends TestCase
         $this->assertEquals('http://localhost/uploads/foo/bar/baz.jpg', $media->getUrl());
     }
 
-    public function test_it_can_generate_a_custom_url_to_the_local_file()
+    public function test_it_can_generate_a_custom_url_to_the_local_file(): void
     {
         $this->app['config']->set('filesystems.disks.uploads.url', 'http://example.com');
         $media = $this->makeMedia(
@@ -201,7 +201,7 @@ class MediaTest extends TestCase
         $this->assertEquals('http://example.com/foo/bar/baz.jpg', $media->getUrl());
     }
 
-    public function test_it_can_generate_a_url_to_the_file_on_s3()
+    public function test_it_can_generate_a_url_to_the_file_on_s3(): void
     {
         if (!$this->s3ConfigLoaded()) {
             $this->markTestSkipped('S3 Credentials not available.');
@@ -230,7 +230,7 @@ class MediaTest extends TestCase
         }
     }
 
-    public function test_it_can_check_if_its_file_exists()
+    public function test_it_can_check_if_its_file_exists(): void
     {
         $this->useFilesystem('tmp');
 
@@ -240,7 +240,7 @@ class MediaTest extends TestCase
         $this->assertTrue($media->fileExists());
     }
 
-    public function test_it_can_be_moved_on_disk()
+    public function test_it_can_be_moved_on_disk(): void
     {
         $this->useFilesystem('tmp');
         $this->useDatabase();
@@ -265,7 +265,7 @@ class MediaTest extends TestCase
         $this->assertTrue($media->fileExists());
     }
 
-    public function test_it_can_be_copied_on_disk()
+    public function test_it_can_be_copied_on_disk(): void
     {
         $this->useFilesystem('tmp');
         $this->useDatabase();
@@ -299,7 +299,7 @@ class MediaTest extends TestCase
         $media->copyTo('alpha', 'test');
     }
 
-    public function test_it_throws_an_exception_if_moving_to_existing_file()
+    public function test_it_throws_an_exception_if_moving_to_existing_file(): void
     {
         $this->useFilesystem('tmp');
 
@@ -326,7 +326,7 @@ class MediaTest extends TestCase
         $media1->move('', 'bar.baz');
     }
 
-    public function test_it_can_be_moved_to_another_disk_public()
+    public function test_it_can_be_moved_to_another_disk_public(): void
     {
         $this->useFilesystem('tmp');
         $this->useFilesystem('uploads');
@@ -353,7 +353,7 @@ class MediaTest extends TestCase
         $this->assertTrue($media->isVisible());
     }
 
-    public function test_it_can_be_moved_to_another_disk_private()
+    public function test_it_can_be_moved_to_another_disk_private(): void
     {
         $this->useFilesystem('tmp');
         $this->useFilesystem('uploads');
@@ -380,7 +380,7 @@ class MediaTest extends TestCase
         $this->assertFalse($media->isVisible());
     }
 
-    public function test_it_can_be_copied_to_another_disk_public()
+    public function test_it_can_be_copied_to_another_disk_public(): void
     {
         $this->useFilesystem('tmp');
         $this->useFilesystem('uploads');
@@ -411,7 +411,7 @@ class MediaTest extends TestCase
         $this->assertTrue($media->isVisible());
     }
 
-    public function test_it_can_be_copied_to_another_disk_private()
+    public function test_it_can_be_copied_to_another_disk_private(): void
     {
         $this->useFilesystem('tmp');
         $this->useFilesystem('uploads');
@@ -442,7 +442,7 @@ class MediaTest extends TestCase
         $this->assertFalse($media->isVisible());
     }
 
-    public function test_it_can_access_file_contents()
+    public function test_it_can_access_file_contents(): void
     {
         $this->useFilesystem('tmp');
 
@@ -456,7 +456,7 @@ class MediaTest extends TestCase
         $this->assertEquals('<h1>Hello World</h1>', $media->contents());
     }
 
-    public function test_it_deletes_its_file_on_deletion()
+    public function test_it_deletes_its_file_on_deletion(): void
     {
         $this->useDatabase();
         $this->useFilesystem('tmp');
@@ -477,7 +477,7 @@ class MediaTest extends TestCase
         $this->assertFalse(file_exists($path));
     }
 
-    public function test_it_cascades_relationship_on_delete()
+    public function test_it_cascades_relationship_on_delete(): void
     {
         $this->useDatabase();
 
@@ -489,7 +489,7 @@ class MediaTest extends TestCase
         $this->assertEquals(0, $mediable->getMedia('foo')->count());
     }
 
-    public function test_it_doesnt_cascade_relationship_on_soft_delete()
+    public function test_it_doesnt_cascade_relationship_on_soft_delete(): void
     {
         $this->useDatabase();
 
@@ -501,7 +501,7 @@ class MediaTest extends TestCase
         $this->assertEquals(1, $mediable->getMedia('foo')->count());
     }
 
-    public function test_it_cascades_relationships_on_soft_delete_with_config()
+    public function test_it_cascades_relationships_on_soft_delete_with_config(): void
     {
         $this->useDatabase();
 
@@ -515,7 +515,7 @@ class MediaTest extends TestCase
         $this->assertEquals(0, $mediable->getMedia('foo')->count());
     }
 
-    public function test_it_cascades_relationship_on_force_delete()
+    public function test_it_cascades_relationship_on_force_delete(): void
     {
         $this->useDatabase();
 
@@ -527,7 +527,7 @@ class MediaTest extends TestCase
         $this->assertEquals(0, $mediable->getMedia('foo')->count());
     }
 
-    public function test_it_retrieves_models_via_custom_mediables_table()
+    public function test_it_retrieves_models_via_custom_mediables_table(): void
     {
         $this->useDatabase();
 
@@ -542,7 +542,7 @@ class MediaTest extends TestCase
     }
 
     public function test_it_cascades_relationships_on_soft_delete_with_config_via_custom_mediables_table(
-    ) {
+    ): void {
         $this->useDatabase();
 
         config()->set('mediable.mediables_table', 'prefixed_mediables');
@@ -557,7 +557,7 @@ class MediaTest extends TestCase
         $this->assertEmpty(DB::table('prefixed_mediables')->get());
     }
 
-    public function test_it_can_stream_contents()
+    public function test_it_can_stream_contents(): void
     {
         $this->useFilesystem('tmp');
 
@@ -576,7 +576,7 @@ class MediaTest extends TestCase
         $this->assertEquals('test', $stream->getContents());
     }
 
-    public function test_it_can_detect_variant_status()
+    public function test_it_can_detect_variant_status(): void
     {
         $media = $this->makeMedia(
             [
@@ -607,7 +607,7 @@ class MediaTest extends TestCase
         $this->assertFalse($media->isVariant('foo'));
     }
 
-    public function test_it_can_be_made_a_variant_of_another()
+    public function test_it_can_be_made_a_variant_of_another(): void
     {
         $this->useDatabase();
 
@@ -639,7 +639,7 @@ class MediaTest extends TestCase
         $this->assertEquals('foo', $media2->variant_name);
     }
 
-    public function test_it_throws_if_cant_find_new_original()
+    public function test_it_throws_if_cant_find_new_original(): void
     {
         $this->expectException(ModelNotFoundException::class);
         $this->useDatabase();
@@ -654,7 +654,7 @@ class MediaTest extends TestCase
         $media->makeVariantOf(9999, 'not_found');
     }
 
-    public function test_it_can_be_queried_by_variant_status()
+    public function test_it_can_be_queried_by_variant_status(): void
     {
         $this->useDatabase();
         $media1 = $this->createMedia(
@@ -694,7 +694,7 @@ class MediaTest extends TestCase
         );
     }
 
-    public function test_it_can_find_other_variants()
+    public function test_it_can_find_other_variants(): void
     {
         $media1 = $this->makeMedia(
             [
@@ -768,7 +768,7 @@ class MediaTest extends TestCase
         $this->assertEquals($all, $media3->getAllVariantsAndSelf());
     }
 
-    public function test_it_generates_temporary_urls()
+    public function test_it_generates_temporary_urls(): void
     {
         $media = $this->makeMedia();
         $expiry = Carbon::now();
@@ -789,7 +789,7 @@ class MediaTest extends TestCase
         $this->assertEquals($url, $media->getTemporaryUrl($expiry));
     }
 
-    public function test_it_throws_for_unsupported_temporary_urls()
+    public function test_it_throws_for_unsupported_temporary_urls(): void
     {
         $this->expectException(MediaUrlException::class);
         $media = $this->makeMedia();

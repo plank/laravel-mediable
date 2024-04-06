@@ -301,7 +301,7 @@ class Media extends Model
         $q->whereNull('original_media_id');
     }
 
-    public function scopeWhereIsVariant(Builder $q, string $variant_name = null)
+    public function scopeWhereIsVariant(Builder $q, string $variant_name = null): void
     {
         $q->whereNotNull('original_media_id');
         if ($variant_name) {
@@ -407,7 +407,7 @@ class Media extends Model
      * Get a read stream to the file
      * @return StreamInterface
      */
-    public function stream()
+    public function stream(): StreamInterface
     {
         $stream = $this->storage()->readStream($this->getDiskPath());
         if (method_exists(Utils::class, 'streamFor')) {

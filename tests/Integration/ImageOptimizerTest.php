@@ -9,7 +9,7 @@ use Spatie\ImageOptimizer\OptimizerChain;
 
 class ImageOptimizerTest extends TestCase
 {
-    public function test_it_can_optimize_an_image()
+    public function test_it_can_optimize_an_image(): void
     {
         $imageStream = Utils::streamFor(file_get_contents($this->sampleFilePath()));
 
