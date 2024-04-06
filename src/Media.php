@@ -410,10 +410,7 @@ class Media extends Model
     public function stream(): StreamInterface
     {
         $stream = $this->storage()->readStream($this->getDiskPath());
-        if (method_exists(Utils::class, 'streamFor')) {
-            return Utils::streamFor($stream);
-        }
-        return \GuzzleHttp\Psr7\stream_for($stream);
+        return Utils::streamFor($stream);
     }
 
     /**

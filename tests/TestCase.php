@@ -45,7 +45,7 @@ class TestCase extends BaseTestCase
     protected function getEnvironmentSetUp($app)
     {
         if (file_exists(dirname(__DIR__) . '/.env')) {
-            Dotenv::create(dirname(__DIR__))->load();
+            Dotenv::createImmutable(dirname(__DIR__))->load();
         }
         //use in-memory database
         $app['config']->set('database.connections.testing', [

@@ -8,8 +8,6 @@ use Plank\Mediable\Media;
 use Plank\Mediable\Tests\TestCase;
 use Plank\Mediable\UrlGenerators\S3UrlGenerator;
 
-use function GuzzleHttp\Psr7\parse_query;
-
 class S3UrlGeneratorTest extends TestCase
 {
     public function setUp(): void

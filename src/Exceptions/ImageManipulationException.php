@@ -28,6 +28,6 @@ class ImageManipulationException extends \Exception
 
     public static function fileExists(string $path): self
     {
-        return new static("A file already exists at `{$path}`.");
+        return new self("A file already exists at `{$path}`.");
     }
 }
