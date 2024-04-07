@@ -10,6 +10,10 @@
 - Added support for intervention/image 3.0
 - Modernized the database migration files to use more recent Laravel conventions.
 
+### Mediable
+
+- Added `MediableInterface`
+
 ### MediaUploader
 
 - Added support for recording alt attributes on Media (database migration required). MediaUploader now exposes a `withAltAttribute()` method to set the alt attribute on the generated media record.

@@ -3,7 +3,7 @@ Handling Media
 
 .. highlight:: php
 
-Add the ``Mediable`` trait to any Eloquent models that you would like to be able to attach media to.
+Add the ``Mediable`` trait and the `MediableInterface` interface to any Eloquent models that you would like to be able to attach media to.
 
 ::
 
@@ -13,8 +13,9 @@ Add the ``Mediable`` trait to any Eloquent models that you would like to be able
 
     use Illuminate\Database\Eloquent\Model;
     use Plank\Mediable\Mediable;
+    use Plank\Mediable\MediableInterface;
 
-    class Post extends Model
+    class Post extends Model implements MediableInterface
     {
         use Mediable;
 

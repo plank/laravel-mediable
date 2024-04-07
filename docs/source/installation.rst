@@ -45,7 +45,7 @@ Run the migrations to add the required tables to your database.
 Quickstart
 -----------
 
-Add the `Mediable` trait to your eloquent models
+Add the `Mediable` trait and `MediableInterface` interface to your eloquent models
 
 ::
 
@@ -55,8 +55,9 @@ Add the `Mediable` trait to your eloquent models
 
     use Illuminate\Database\Eloquent\Model;
     use Plank\Mediable\Mediable;
+    use Plank\Mediable\MediableInterface;
 
-    class Post extends Model
+    class Post extends Model implements MediableInterface
     {
         use Mediable;
 
