@@ -246,7 +246,7 @@ class Media extends Model
 
     /**
      * Query scope for finding media in a particular directory or one of its subdirectories.
-     * @param  Builder|Media $q
+     * @param  Builder $q
      * @param  string $disk Filesystem disk to search in
      * @param  string $directory Path relative to disk
      * @return void
@@ -372,7 +372,7 @@ class Media extends Model
      */
     public function fileExists(): bool
     {
-        return $this->storage()->has($this->getDiskPath());
+        return $this->storage()->exists($this->getDiskPath());
     }
 
     /**
@@ -450,12 +450,17 @@ class Media extends Model
         return $this;
     }
 
+    /**
+     * @param Media|string|int $media
+     * @param string $variantName
+     * @return $this
+     */
     public function makeVariantOf($media, string $variantName): self
     {
-        if (!$media instanceof static) {
+        if (!$media instanceof self) {
             $media = $this->newQuery()->findOrFail($media);
         }
-
+        /** @var Media $media */
         $this->variant_name = $variantName;
         $this->original_media_id = $media->isOriginal()
             ? $media->getKey()
@@ -508,7 +513,7 @@ class Media extends Model
      *
      * Will invoke the `save()` method on the model after the associated file has been moved to prevent synchronization errors
      * @param  string $disk the disk to move the file to
-     * @param  string $directory directory relative to disk root
+     * @param  string $destination directory relative to disk root
      * @param  string $filename filename. Do not include extension
      * @return void
      * @throws MediaMoveException If attempting to change the file extension or a file with the same name already exists at the destination
@@ -528,9 +533,8 @@ class Media extends Model
      *
      * This method creates a new Media object as well as duplicates the associated file on the disk.
      *
-     * @param  Media $media The media to copy from
      * @param  string $disk the disk to copy the file to
-     * @param  string $directory directory relative to disk root
+     * @param  string $destination directory relative to disk root
      * @param  string $filename optional filename. Do not include extension
      *
      * @return Media
@@ -554,14 +558,16 @@ class Media extends Model
     protected function handleMediaDeletion(): void
     {
         // optionally detach mediable relationships on soft delete
-        if (static::hasGlobalScope(SoftDeletingScope::class) && !$this->forceDeleting) {
+        if (static::hasGlobalScope(SoftDeletingScope::class)
+            && (!property_exists($this, 'forceDeleting') || !$this->forceDeleting)
+        ) {
             if (config('mediable.detach_on_soft_delete')) {
                 $this->newBaseQueryBuilder()
                     ->from(config('mediable.mediables_table', 'mediables'))
                     ->where('media_id', $this->getKey())
                     ->delete();
             }
-        } elseif ($this->storage()->has($this->getDiskPath())) {
+        } elseif ($this->storage()->exists($this->getDiskPath())) {
             // unlink associated file on delete
             $this->storage()->delete($this->getDiskPath());
         }

@@ -472,7 +472,7 @@ class MediaUploader
      * The original image will not be preserved.
      *
      * Note this will manipulate the image as part of the upload process, which may be slow.
-     * @param string|ImageManipulation $variant Either a defined ImageManipulation variant name
+     * @param string|ImageManipulation $imageManipulation Either a defined ImageManipulation variant name
      *   or an ImageManipulation instance
      * @return $this
      */
@@ -873,14 +873,17 @@ class MediaUploader
 
     private function inferMimeType(Filesystem $filesystem, string $path): string
     {
+        $mimeType = null;
         try {
-            $mime = $filesystem->mimeType($path);
+            if (method_exists($filesystem, 'mimeType')) {
+                $mimeType = $filesystem->mimeType($path);
+            }
         } catch (UnableToRetrieveMetadata $e) {
             // previous versions of flysystem would default to octet-stream when
             // the file was unrecognized. Maintain the behaviour for now
             return 'application/octet-stream';
         }
-        return $mime ?: 'application/octet-stream';
+        return $mimeType ?: 'application/octet-stream';
     }
 
     private function selectMimeType(): string

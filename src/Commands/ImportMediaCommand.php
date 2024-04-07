@@ -67,7 +67,6 @@ class ImportMediaCommand extends Command
 
         $files = $this->listFiles($disk, $directory, $recursive);
         $existing_media = $this->makeModel()
-            ->newQuery()
             ->inDirectory($disk, $directory, $recursive)
             ->get();
 

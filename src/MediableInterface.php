@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 /**
+ * @property Collection<Media> $media
  * @method static Builder withMedia($tags = [], bool $matchAll = false, bool $withVariants = false)
  * @method static Builder withMediaAndVariants($tags = [], bool $matchAll = false)
  * @method static Builder withMediaMatchAll($tags = [], bool $withVariants = false)

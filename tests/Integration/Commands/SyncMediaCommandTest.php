@@ -2,6 +2,7 @@
 
 namespace Plank\Mediable\Tests\Integration\Commands;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Plank\Mediable\Commands\SyncMediaCommand;
 use Plank\Mediable\Tests\TestCase;
 
@@ -10,7 +11,7 @@ class SyncMediaCommandTest extends TestCase
     public function test_it_calls_prune_and_install(): void
     {
         $this->withoutMockingConsoleOutput();
-        /** @var SyncMediaCommand $command */
+        /** @var SyncMediaCommand|MockObject $command */
         $command = $this->getMockBuilder(SyncMediaCommand::class)
             ->onlyMethods(['call', 'option', 'argument'])
             ->getMock();

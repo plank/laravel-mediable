@@ -100,7 +100,7 @@ trait Mediable
      * @param  string|string[] $tags
      * @return void
      */
-    public function scopeWhereHasMediaMatchAll(Builder $q, array $tags): void
+    public function scopeWhereHasMediaMatchAll(Builder $q, $tags): void
     {
         $this->scopeWhereHasMedia($q, $tags, true);
     }
@@ -108,7 +108,7 @@ trait Mediable
     /**
      * Query scope to eager load attached media.
      *
-     * @param Builder|Mediable $q
+     * @param Builder $q
      * @param string|string[] $tags If one or more tags are specified, only media attached to those tags will be loaded.
      * @param bool $matchAll Only load media matching all provided tags
      * @param bool $withVariants If true, also load the variants and/or originalMedia relation of each Media
@@ -434,7 +434,7 @@ trait Mediable
      * @see \Plank\Mediable\Mediable::getMedia()
      * @return Media|null
      */
-    public function lastMedia($tags, $matchAll = false): ?Media
+    public function lastMedia($tags, bool $matchAll = false): ?Media
     {
         return $this->getMedia($tags, $matchAll)->last();
     }
@@ -565,7 +565,9 @@ trait Mediable
     protected function handleMediableDeletion(): void
     {
         // only cascade soft deletes when configured
-        if (static::hasGlobalScope(SoftDeletingScope::class) && !$this->forceDeleting) {
+        if (static::hasGlobalScope(SoftDeletingScope::class)
+            && (!property_exists($this, 'forceDeleting') || !$this->forceDeleting)
+        ) {
             if (config('mediable.detach_on_soft_delete')) {
                 $this->media()->detach();
             }

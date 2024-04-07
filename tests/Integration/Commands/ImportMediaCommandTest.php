@@ -38,7 +38,7 @@ class ImportMediaCommandTest extends TestCase
         $this->assertEquals("Imported 1 file(s).\n", $artisan->output());
         $this->assertEquals(
             ['bar', 'foo'],
-            Media::orderBy('filename')->pluck('filename')->toArray()
+            Media::query()->orderBy('filename')->pluck('filename')->toArray()
         );
     }
 
@@ -57,7 +57,7 @@ class ImportMediaCommandTest extends TestCase
         $artisan->call('media:import', ['disk' => 'tmp', '--directory' => 'a/b']);
 
         $this->assertEquals("Imported 1 file(s).\n", $artisan->output());
-        $this->assertEquals(['bar'], Media::pluck('filename')->toArray());
+        $this->assertEquals(['bar'], Media::query()->pluck('filename')->toArray());
     }
 
     public function test_it_creates_media_for_unmatched_files_non_recursively(): void
@@ -78,7 +78,7 @@ class ImportMediaCommandTest extends TestCase
         );
 
         $this->assertEquals("Imported 1 file(s).\n", $artisan->output());
-        $this->assertEquals(['foo'], Media::pluck('filename')->toArray());
+        $this->assertEquals(['foo'], Media::query()->pluck('filename')->toArray());
     }
 
     public function test_it_skips_files_of_unmatched_aggregate_type(): void
@@ -133,7 +133,7 @@ class ImportMediaCommandTest extends TestCase
         $artisan->call('media:import', ['disk' => 'tmp', '--force' => true]);
         $this->assertEquals(
             ['image', 'image'],
-            Media::pluck('aggregate_type')->toArray()
+            Media::query()->pluck('aggregate_type')->toArray()
         );
         $this->assertEquals(
             "Imported 0 file(s).\nUpdated 1 record(s).\nSkipped 1 file(s).\n",

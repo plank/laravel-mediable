@@ -232,7 +232,7 @@ class StreamAdapter implements SourceAdapterInterface
             $this->hash[$hashAlgorithm] = hash_final($hash);
             $this->source->rewind();
         } finally {
-            if ($finfo) {
+            if (!empty($finfo)) {
                 finfo_close($finfo);
             }
         }

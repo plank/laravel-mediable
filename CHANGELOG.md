@@ -55,6 +55,7 @@ All SourceAdapter classes have been significantly refactored.
 - Added missing type declarations to most property and method signatures.
 - Removed the `\Plank\Mediable\Stream` class in favor of the `guzzlehttp/psr7` implementation. This removes the direct dependency on the `psr/http-message` library.
 - `\Plank\Mediable\HandlesMediaUploadExceptions::transformMediaUploadException()` parameter and return type changed from `\Exception` to `\Throwable`.
+- Added PHPStan static analysis to the test suite.
 
 ## 5.5.0 - 2022-05-09
 - Filename and pathname sanitization will use the app locale when transliterating UTF-8 characters to ascii.

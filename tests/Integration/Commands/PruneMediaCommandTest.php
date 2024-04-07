@@ -25,7 +25,7 @@ class PruneMediaCommandTest extends TestCase
 
         $artisan->call('media:prune', ['disk' => 'tmp']);
 
-        $this->assertEquals([2], Media::pluck('id')->toArray());
+        $this->assertEquals([2], Media::query()->pluck('id')->toArray());
         $this->assertEquals("Pruned 1 record(s).\n", $artisan->output());
     }
 
@@ -41,7 +41,7 @@ class PruneMediaCommandTest extends TestCase
 
         $artisan->call('media:prune', ['disk' => 'tmp', '--directory' => 'foo']);
 
-        $this->assertEquals([1], Media::pluck('id')->toArray());
+        $this->assertEquals([1], Media::query()->pluck('id')->toArray());
         $this->assertEquals("Pruned 1 record(s).\n", $artisan->output());
     }
 
@@ -57,7 +57,7 @@ class PruneMediaCommandTest extends TestCase
 
         $artisan->call('media:prune', ['disk' => 'tmp', '--non-recursive' => true]);
 
-        $this->assertEquals([2], Media::pluck('id')->toArray());
+        $this->assertEquals([2], Media::query()->pluck('id')->toArray());
         $this->assertEquals("Pruned 1 record(s).\n", $artisan->output());
     }
 

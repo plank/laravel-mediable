@@ -58,8 +58,8 @@ class MediableTest extends TestCase
         );
     }
 
-    public function test_it_can_attach_multiple_media_to_multiple_tags_simultaneously(): void
-    {
+    public function test_it_can_attach_multiple_media_to_multiple_tags_simultaneously(
+    ): void {
         $mediable = factory(SampleMediable::class)->create();
         $media1 = factory(Media::class)->create();
         $media2 = factory(Media::class)->create();
@@ -297,7 +297,7 @@ class MediableTest extends TestCase
         $mediable->rehydrates_media = false;
         $media = factory(Media::class)->create();
 
-        $mediable->media;
+        $mediable->media = new MediableCollection();
         $mediable->attachMedia($media, 'foo');
         $this->assertEquals(0, $mediable->getMedia('foo')->count());
     }
@@ -516,8 +516,8 @@ class MediableTest extends TestCase
         $this->assertTrue($result->media[0]->relationLoaded('variants'));
     }
 
-    public function test_it_can_lazy_eager_load_media_with_variants_by_tag_matching_all(): void
-    {
+    public function test_it_can_lazy_eager_load_media_with_variants_by_tag_matching_all(
+    ): void {
         $mediable = factory(SampleMediable::class)->create();
         $media1 = factory(Media::class)->create(['id' => 1]);
         $media2 = factory(Media::class)->create(['id' => 2]);
@@ -546,7 +546,10 @@ class MediableTest extends TestCase
         $this->assertTrue($result->media[0]->relationLoaded('variants'));
 
         $result = SampleMediable::first();
-        $this->assertSame($result, $result->loadMediaWithVariantsMatchAll(['bar', 'foo']));
+        $this->assertSame(
+            $result,
+            $result->loadMediaWithVariantsMatchAll(['bar', 'foo'])
+        );
         $this->assertTrue($result->relationLoaded('media'));
         $this->assertEquals([2, 2], $result->media->pluck('id')->toArray());
         $this->assertTrue($result->media[0]->relationLoaded('originalMedia'));

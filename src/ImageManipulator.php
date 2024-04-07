@@ -208,7 +208,7 @@ class ImageManipulator
     /**
      * @param Media $media
      * @param SourceAdapterInterface $source
-     * @param ImageManipulation $variantName
+     * @param ImageManipulation $manipulation
      * @return StreamAdapter
      * @throws ImageManipulationException
      */
@@ -343,7 +343,7 @@ class ImageManipulator
             return;
         }
 
-        if (!$this->filesystem->disk($variant->disk)->has($variant->getDiskPath())) {
+        if (!$this->filesystem->disk($variant->disk)->exists($variant->getDiskPath())) {
             // no conflict, carry on
             return;
         }
@@ -375,7 +375,7 @@ class ImageManipulator
             }
             $path = "{$model->directory}/{$filename}.{$model->extension}";
             ++$counter;
-        } while ($storage->has($path));
+        } while ($storage->exists($path));
 
         return $filename;
     }
