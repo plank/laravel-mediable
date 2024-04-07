@@ -1,5 +1,35 @@
 # Upgrading
 
+## 5.x to 6.x
+
+* Minimum PHP version moved to 8.1
+* Minimum Laravel version moved to 10
+* New database migration file is included with the package. Run `php artisan migrate` to apply the changes.
+* Add the `MediableInterface` to all models using the `Mediable` trait.
+* To add support for data URLs to the MediaUploader, the following entry should be added to the `source_adapters.pattern` field in `config/mediable.php`
+  ```php
+  '^data:/?/?[^,]*,' => Plank\Mediable\SourceAdapters\DataUrlAdapter::class,
+  ```
+* To specify default handling of inferred vs. client-provided MIME types, the following entry should be added to `config/mediable.php`. If `prefer_client_mime_type` is set to `true`, the MIME type provided by the client will be used when available. If set to `false`, the MIME type will always be inferred from the file contents. Defaults to `false`.
+  ```php
+  'prefer_client_mime_type' => false,
+  ```
+* All properties now declare their types if able, and a handful of missing method return types have been added. If extending any class or implementing any interface from this package, property types may need to be updated.
+* If you have implemented a custom SourceAdapter, you will need to apply the following changes from the `SourceAdapterInterface` interface:
+  * Implement the `getStream(): StreamInterface` method.
+  * Implement the `getHash(string $algo): string` method.
+  * he return type of the `filename()` and `extension()` method is now nullable. If the adapter cannot determine the value from the information available, it should return null.
+  * Remove the `getContents()` method. The `getStream()->getContents()` method may be used instead.
+  * Remove the `getSource()` method. No replacement.
+  * Remove the `path()` method. No replacement.
+  * Remove the `valid()` method. SourceAdapters should now throw an exception with a more helpful message from the constructor if the source is not valid.
+* The `Plank\Mediable\Stream` class has been removed in favor of the `guzzlehttp/psr7` implementation. If you were using this class directly, you will need use another PSR-7 compatible stream wrapper instead (such as Guzzle's).
+* To make use of the image optimization feature:
+  * Install the necessary binaries for the types of images that you are working with. See [spatie/image-optimizer documentation](https://github.com/spatie/image-optimizer/blob/main/README.md#optimization-tools) for installation instructions on various operating systems.
+  * add the `image_optimization.enabled` and `image_optimization.optimizers` configs to the `config/mediable.php` file. See the [sample configuration file](https://github.com/plank/laravel-mediable/blob/master/config/mediable.php) for a recommended baseline setup.
+* The `ImageManipulation::usingHashForFilename()` method has been renamed to `ImageManipulation::isUsingHashForFilename()` to avoid confusion with the `useHashForFilename()` method.
+* `\Plank\Mediable\HandlesMediaUploadExceptions::transformMediaUploadException()` parameter and return type changed from `\Exception` to `\Throwable`.
+
 ## 4.x to 5.x
 
 * Database migration files are now served from within the package. In your migrations table, rename the `XXXX_XX_XX_XXXXXX_create_mediable_tables.php` entry to `2016_06_27_000000_create_mediable_tables.php` and delete your local copy of the migration file from the /database/migrations directory. If any customizations were made to the tables, those should be defined as one or more separate ALTER table migrations.

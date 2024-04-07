@@ -4,18 +4,20 @@ use Plank\Mediable\Tests\Mocks\MediaSoftDelete;
 use Plank\Mediable\Tests\Mocks\SampleMediable;
 use Plank\Mediable\Tests\Mocks\SampleMediableSoftDelete;
 
+$factory = app(Illuminate\Database\Eloquent\Factory::class);
 $factory->define(Plank\Mediable\Media::class, function (Faker\Generator $faker) {
     $types = config('mediable.aggregate_types');
     $type = $faker->randomElement(array_keys($types));
 
     return [
         'disk' => 'tmp',
-        'directory' => implode('/', $faker->words($faker->randomDigit)),
+        'directory' => implode('/', $faker->words($faker->randomDigit())),
         'filename' => $faker->word,
         'extension' => $faker->randomElement($types[$type]['extensions']),
         'mime_type' => $faker->randomElement($types[$type]['mime_types']),
         'aggregate_type' => $type,
         'size' => $faker->randomNumber(),
+        'alt' => $faker->sentence,
     ];
 });
 
@@ -25,7 +27,7 @@ $factory->define(MediaSoftDelete::class, function (Faker\Generator $faker) {
 
     return [
         'disk' => 'tmp',
-        'directory' => implode('/', $faker->words($faker->randomDigit)),
+        'directory' => implode('/', $faker->words($faker->randomDigit())),
         'filename' => $faker->word,
         'extension' => $faker->randomElement($types[$type]['extensions']),
         'mime_type' => $faker->randomElement($types[$type]['mime_types']),

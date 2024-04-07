@@ -19,20 +19,20 @@ class CreateImageVariants implements ShouldQueue
     /**
      * @var string[]
      */
-    private $variantNames;
+    private array $variantNames;
     /**
-     * @var Collection|Media[]
+     * @var Collection<Media>
      */
-    private $models;
+    private Collection $models;
 
     /**
      * @var bool
      */
-    private $forceRecreate;
+    private bool $forceRecreate;
 
     /**
      * CreateImageVariants constructor.
-     * @param Media|Collection|Media[] $model
+     * @param Media|Collection|Media[] $models
      * @param string|string[] $variantNames
      * @throws ImageManipulationException
      */
@@ -47,7 +47,7 @@ class CreateImageVariants implements ShouldQueue
         $this->forceRecreate = $forceRecreate;
     }
 
-    public function handle()
+    public function handle(): void
     {
         foreach ($this->getModels() as $model) {
             foreach ($this->getVariantNames() as $variantName) {
@@ -77,7 +77,7 @@ class CreateImageVariants implements ShouldQueue
     }
 
     /**
-     * @param Media $model
+     * @param Collection<Media> $models
      * @param array $variantNames
      * @throws ImageManipulationException
      */
@@ -107,7 +107,7 @@ class CreateImageVariants implements ShouldQueue
 
     /**
      * @param Media|Collection|Media[] $models
-     * @return bool
+     * @return Collection
      */
     private function collect($models): Collection
     {

@@ -5,12 +5,17 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-versions: ['7.4', '8.0', '8.1']
+        php-versions: ['8.1', '8.2', '8.3']
         prefer-lowest: ['','--prefer-lowest']
     name: PHP ${{ matrix.php-versions }} ${{ matrix.prefer-lowest }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: pngquant optipng
+          version: 1.0
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -23,10 +28,10 @@ jobs:
 
       - name: Get composer cache directory
         id: composer-cache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-${{ matrix.php-version }}${{ matrix.prefer-lowest }}-composer-${{ hashFiles('**/composer.json') }}
@@ -38,12 +43,15 @@ jobs:
           COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run phpunit
-        run: vendor/bin/phpunit --coverage-clover build/logs/clover.xml -v
+        run: vendor/bin/phpunit --coverage-clover build/logs/clover.xml
         env:
           S3_KEY: ${{ secrets.S3_KEY }}
           S3_SECRET: ${{ secrets.S3_SECRET }}
           S3_REGION: ${{ secrets.S3_REGION }}
           S3_BUCKET: ${{ secrets.S3_BUCKET }}
+
+      - name: Run PHPStan
+        run: vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=1G
 
       - name: Upload coverage results to Coveralls
         env:

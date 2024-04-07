@@ -4,6 +4,8 @@ namespace Plank\Mediable;
 
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Plank\Mediable\Helpers\File;
+use Spatie\ImageOptimizer\Optimizer;
+use Spatie\ImageOptimizer\OptimizerChain;
 
 class ImageManipulation
 {
@@ -37,39 +39,39 @@ class ImageManipulation
     /** @var callable */
     private $callback;
 
-    /** @var string|null */
-    private $outputFormat;
+    private ?string $outputFormat = null;
 
-    /** @var int */
-    private $outputQuality = 90;
+    private int $outputQuality = 90;
 
-    /** @var string|null */
-    private $disk;
+    private ?string $disk = null;
 
-    /** @var string|null */
-    private $directory;
+    private ?string $directory = null;
 
-    /** @var string|null */
-    private $filename;
+    private ?string $filename = null;
 
-    /** @var bool */
-    private $hashFilename = false;
+    private ?string $hashFilenameAlgo = null;
 
-    /** @var string */
-    private $onDuplicateBehaviour = self::ON_DUPLICATE_INCREMENT;
+    private string $onDuplicateBehaviour = self::ON_DUPLICATE_INCREMENT;
 
     /** @var string|null */
-    private $visibility;
+    private ?string $visibility = null;
 
     /** @var callable|null */
     private $beforeSave;
 
+    private bool $shouldOptimize;
+
+    /** @var array<class-string<Optimizer>,string[]> */
+    private array $optimizers;
+
     public function __construct(callable $callback)
     {
         $this->callback = $callback;
+        $this->shouldOptimize = config('mediable.image_optimization.enabled', true);
+        $this->setOptimizers(config('mediable.image_optimization.optimizers', []));
     }
 
-    public static function make(callable $callback)
+    public static function make(callable $callback): self
     {
         return new self($callback);
     }
@@ -254,7 +256,7 @@ class ImageManipulation
     public function useFilename(string $filename): self
     {
         $this->filename = File::sanitizeFilename($filename);
-        $this->hashFilename = false;
+        $this->hashFilenameAlgo = null;
 
         return $this;
     }
@@ -263,9 +265,9 @@ class ImageManipulation
      * Indicates to the uploader to generate a filename using the file's MD5 hash.
      * @return $this
      */
-    public function useHashForFilename(): self
+    public function useHashForFilename(string $algo = 'md5'): self
     {
-        $this->hashFilename = true;
+        $this->hashFilenameAlgo = $algo;
         $this->filename = null;
 
         return $this;
@@ -278,25 +280,24 @@ class ImageManipulation
     public function useOriginalFilename(): self
     {
         $this->filename = null;
-        $this->hashFilename = false;
+        $this->hashFilenameAlgo = null;
 
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getFilename(): ?string
     {
         return $this->filename;
     }
 
-    /**
-     * @return bool
-     */
-    public function usingHashForFilename(): bool
+    public function isUsingHashForFilename(): bool
     {
-        return $this->hashFilename;
+        return $this->hashFilenameAlgo !== null;
+    }
+
+    public function getHashFilenameAlgo(): ?string
+    {
+        return $this->hashFilenameAlgo;
     }
 
     /**
@@ -363,5 +364,60 @@ class ImageManipulation
         $this->beforeSave = $beforeSave;
 
         return $this;
+    }
+
+    /**
+     * Disable image optimization.
+     * @return $this
+     */
+    public function noOptimization(): self
+    {
+        $this->shouldOptimize = false;
+
+        return $this;
+    }
+
+    /**
+     * Enable image optimization.
+     * @param array<class-string<Optimizer>,string[]> $customOptimizers Override default optimizers.
+     *     The array keys should be the fully qualified class names of the optimizers to use.
+     *     The array values should be arrays of command line arguments to pass to the optimizer.
+     *     DO NOT PASS UNTRUSTED USER INPUT AS COMMAND LINE ARGUMENTS
+     * @return $this
+     * @throws ConfigurationException
+     */
+    public function optimize(?array $customOptimizers = null): self
+    {
+        if ($customOptimizers !== null) {
+            $this->setOptimizers($customOptimizers);
+        }
+        $this->shouldOptimize = true;
+
+        return $this;
+    }
+
+    public function shouldOptimize(): bool
+    {
+        return $this->shouldOptimize && !empty($this->optimizers);
+    }
+
+    public function getOptimizerChain(): OptimizerChain
+    {
+        $chain = new OptimizerChain();
+        foreach ($this->optimizers as $optimizerClass => $args) {
+            $optimizer = new $optimizerClass($args);
+            $chain->addOptimizer($optimizer);
+        }
+        return $chain;
+    }
+
+    private function setOptimizers(array $customOptimizers): void
+    {
+        foreach ($customOptimizers as $optimizerClass => $args) {
+            if (!is_a($optimizerClass, Optimizer::class, true)) {
+                throw ConfigurationException::invalidOptimizer($optimizerClass);
+            }
+        }
+        $this->optimizers = $customOptimizers;
     }
 }

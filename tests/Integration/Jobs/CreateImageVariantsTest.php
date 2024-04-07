@@ -11,7 +11,7 @@ use Plank\Mediable\Tests\TestCase;
 
 class CreateImageVariantsTest extends TestCase
 {
-    public function test_it_will_trigger_image_manipulation()
+    public function test_it_will_trigger_image_manipulation(): void
     {
         $model = $this->makeMedia(['aggregate_type' => 'image']);
         $variant = 'foo';
@@ -26,14 +26,14 @@ class CreateImageVariantsTest extends TestCase
             ->willReturn($this->createMock(ImageManipulation::class));
         $manipulator->expects($this->once())
             ->method('createImageVariant')
-            ->withConsecutive([$model, $variant, false]);
+            ->with(...$this->withConsecutive([$model, $variant, false]));
         app()->instance(ImageManipulator::class, $manipulator);
 
         $job = new CreateImageVariants($model, $variant);
         $job->handle();
     }
 
-    public function test_it_will_trigger_image_manipulation_multiple()
+    public function test_it_will_trigger_image_manipulation_multiple(): void
     {
         $model1 = $this->makeMedia(['aggregate_type' => 'image']);
         $model2 = $this->makeMedia(['aggregate_type' => 'image']);
@@ -43,19 +43,19 @@ class CreateImageVariantsTest extends TestCase
         $manipulator = $this->createMock(ImageManipulator::class);
         $manipulator->expects($this->exactly(2))
             ->method('validateMedia')
-            ->withConsecutive([$model1], [$model2]);
+            ->with(...$this->withConsecutive([$model1], [$model2]));
         $manipulator->expects($this->exactly(2))
             ->method('getVariantDefinition')
-            ->withConsecutive([$variant1], [$variant2])
+            ->with(...$this->withConsecutive([$variant1], [$variant2]))
             ->willReturn($this->createMock(ImageManipulation::class));
         $manipulator->expects($this->exactly(4))
             ->method('createImageVariant')
-            ->withConsecutive(
+            ->with(...$this->withConsecutive(
                 [$model1, $variant1, false],
                 [$model1, $variant2, false],
                 [$model2, $variant1, false],
                 [$model2, $variant2, false]
-            );
+            ));
         app()->instance(ImageManipulator::class, $manipulator);
 
         $job = new CreateImageVariants(
@@ -65,7 +65,7 @@ class CreateImageVariantsTest extends TestCase
         $job->handle();
     }
 
-    public function test_it_will_trigger_image_manipulation_recreate()
+    public function test_it_will_trigger_image_manipulation_recreate(): void
     {
         $model = $this->makeMedia(['aggregate_type' => 'image']);
         $variant1 = 'foo';
@@ -77,21 +77,21 @@ class CreateImageVariantsTest extends TestCase
             ->with($model);
         $manipulator->expects($this->exactly(2))
             ->method('getVariantDefinition')
-            ->withConsecutive([$variant1], [$variant2])
+            ->with(...$this->withConsecutive([$variant1], [$variant2]))
             ->willReturn($this->createMock(ImageManipulation::class));
         $manipulator->expects($this->exactly(2))
             ->method('createImageVariant')
-            ->withConsecutive(
+            ->with(...$this->withConsecutive(
                 [$model, $variant1, true],
                 [$model, $variant2, true]
-            );
+            ));
         app()->instance(ImageManipulator::class, $manipulator);
 
         $job = new CreateImageVariants($model, [$variant1, $variant2], true);
         $job->handle();
     }
 
-    public function test_it_will_serialize_models()
+    public function test_it_will_serialize_models(): void
     {
         $this->useDatabase();
         $model = $this->createMedia(['aggregate_type' => 'image']);
@@ -103,7 +103,7 @@ class CreateImageVariantsTest extends TestCase
             ->with($model);
         $manipulator->expects($this->any())
             ->method('getVariantDefinition')
-            ->withConsecutive([$variant])
+            ->with(...$this->withConsecutive([$variant]))
             ->willReturn($this->createMock(ImageManipulation::class));
         app()->instance(ImageManipulator::class, $manipulator);
 

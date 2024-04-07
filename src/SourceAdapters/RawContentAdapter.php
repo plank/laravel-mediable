@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 namespace Plank\Mediable\SourceAdapters;
 
-use Plank\Mediable\Helpers\File;
+use GuzzleHttp\Psr7\Utils;
+use Psr\Http\Message\StreamInterface;
 
 /**
  * Raw content Adapter.
@@ -12,16 +13,8 @@ use Plank\Mediable\Helpers\File;
  */
 class RawContentAdapter implements SourceAdapterInterface
 {
-    /**
-     * The source object.
-     * @var string
-     */
-    protected $source;
+    protected string $source;
 
-    /**
-     * Constructor.
-     * @param string $source
-     */
     public function __construct(string $source)
     {
         $this->source = $source;
@@ -30,33 +23,25 @@ class RawContentAdapter implements SourceAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function getSource()
+    public function path(): ?string
     {
-        return $this->source;
+        return null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function path(): string
+    public function filename(): ?string
     {
-        return '';
+        return null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function filename(): string
+    public function extension(): ?string
     {
-        return '';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function extension(): string
-    {
-        return (string)File::guessExtension($this->mimeType());
+        return null;
     }
 
     /**
@@ -69,30 +54,17 @@ class RawContentAdapter implements SourceAdapterInterface
         return (string)$fileInfo->buffer($this->source);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function contents(): string
+    public function clientMimeType(): ?string
     {
-        return $this->source;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getStreamResource()
-    {
-        $stream = fopen('php://memory', 'r+b');
-        fwrite($stream, $this->contents());
-        return $stream;
+        return null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function valid(): bool
+    public function getStream(): StreamInterface
     {
-        return true;
+        return Utils::streamFor($this->source);
     }
 
     /**
@@ -100,6 +72,13 @@ class RawContentAdapter implements SourceAdapterInterface
      */
     public function size(): int
     {
-        return (int)mb_strlen($this->source, '8bit');
+        return mb_strlen($this->source, '8bit') ?: 0;
+    }
+
+    public function hash(string $algo = 'md5'): string
+    {
+        $hash = hash_init($algo);
+        hash_update($hash, $this->source);
+        return hash_final($hash);
     }
 }

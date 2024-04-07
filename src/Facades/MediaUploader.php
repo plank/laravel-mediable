@@ -33,6 +33,8 @@ use Plank\Mediable\MediaUploader as Uploader;
  * @method static Uploader setAllowedMimeTypes(array $allowed_mimes)
  * @method static Uploader setAllowedExtensions(array $allowed_extensions)
  * @method static Uploader setAllowedAggregateTypes(array $allowed_types)
+ * @method static Uploader preferClientMimeType()
+ * @method static Uploader preferInferredMimeType()
  * @method static Uploader makePublic()
  * @method static Uploader makePrivate()
  * @method static string inferAggregateType(string $mime_type, string $extension)

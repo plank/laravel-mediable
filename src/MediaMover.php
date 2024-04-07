@@ -13,15 +13,8 @@ use Plank\Mediable\Helpers\File;
  */
 class MediaMover
 {
-    /**
-     * @var FilesystemManager
-     */
-    protected $filesystem;
+    protected FilesystemManager $filesystem;
 
-    /**
-     * Constructor.
-     * @param FilesystemManager $filesystem
-     */
     public function __construct(FilesystemManager $filesystem)
     {
         $this->filesystem = $filesystem;
@@ -45,7 +38,7 @@ class MediaMover
         $directory = File::sanitizePath($directory);
         $targetPath = $directory . '/' . $filename . '.' . $media->extension;
 
-        if ($storage->has($targetPath)) {
+        if ($storage->exists($targetPath)) {
             throw MediaMoveException::destinationExists($targetPath);
         }
 
@@ -87,7 +80,7 @@ class MediaMover
         $directory = File::sanitizePath($directory);
         $targetPath = $directory . '/' . $filename . '.' . $media->extension;
 
-        if ($targetStorage->has($targetPath)) {
+        if ($targetStorage->exists($targetPath)) {
             throw MediaMoveException::destinationExistsOnDisk($disk, $targetPath);
         }
 
@@ -129,7 +122,7 @@ class MediaMover
 
         $targetPath = $directory . '/' . $filename . '.' . $media->extension;
 
-        if ($storage->has($targetPath)) {
+        if ($storage->exists($targetPath)) {
             throw MediaMoveException::destinationExists($targetPath);
         }
 
@@ -181,7 +174,7 @@ class MediaMover
         $directory = File::sanitizePath($directory);
         $targetPath = $directory . '/' . $filename . '.' . $media->extension;
 
-        if ($targetStorage->has($targetPath)) {
+        if ($targetStorage->exists($targetPath)) {
             throw MediaMoveException::destinationExistsOnDisk($disk, $targetPath);
         }
 

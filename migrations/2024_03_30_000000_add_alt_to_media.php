@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Plank\Mediable\Media;
 
-class AddVariantsToMedia extends Migration
+class AddAltToMedia extends Migration
 {
     /**
      * Run the migrations.
@@ -18,14 +18,7 @@ class AddVariantsToMedia extends Migration
         Schema::table(
             'media',
             function (Blueprint $table) {
-                $table->string('variant_name', 255)
-                    ->after('size')
-                    ->nullable();
-                $table->foreignIdFor(Media::class, 'original_media_id')
-                    ->nullable()
-                    ->after('variant_name')
-                    ->constrained('media')
-                    ->nullOnDelete();
+                $table->text('alt')->default('');
             }
         );
     }
@@ -40,16 +33,7 @@ class AddVariantsToMedia extends Migration
         Schema::table(
             'media',
             function (Blueprint $table) {
-                if (DB::getDriverName() !== 'sqlite') {
-                    $table->dropForeign('original_media_id');
-                }
-                $table->dropColumn('original_media_id');
-            }
-        );
-        Schema::table(
-            'media',
-            function (Blueprint $table) {
-                $table->dropColumn('variant_name');
+                $table->dropColumn('alt');
             }
         );
     }

@@ -2,11 +2,17 @@
 
 namespace Plank\Mediable;
 
+use GuzzleHttp\Psr7\Utils;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Support\Collection;
+use Intervention\Image\Commands\StreamCommand;
+use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
 use Plank\Mediable\Exceptions\ImageManipulationException;
+use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
+use Plank\Mediable\SourceAdapters\StreamAdapter;
 use Psr\Http\Message\StreamInterface;
+use Spatie\ImageOptimizer\OptimizerChain;
 
 class ImageManipulator
 {
@@ -24,10 +30,16 @@ class ImageManipulator
      */
     private $filesystem;
 
-    public function __construct(ImageManager $imageManager, FilesystemManager $filesystem)
-    {
+    private ImageOptimizer $imageOptimizer;
+
+    public function __construct(
+        ImageManager $imageManager,
+        FilesystemManager $filesystem,
+        ImageOptimizer $imageOptimizer
+    ) {
         $this->imageManager = $imageManager;
         $this->filesystem = $filesystem;
+        $this->imageOptimizer = $imageOptimizer;
     }
 
     public function defineVariant(
@@ -87,7 +99,6 @@ class ImageManipulator
      * @param bool $forceRecreate
      * @return Media
      * @throws ImageManipulationException
-     * @throws \Illuminate\Contracts\Filesystem\FileExistsException
      */
     public function createImageVariant(
         Media $media,
@@ -118,15 +129,29 @@ class ImageManipulator
         $manipulation = $this->getVariantDefinition($variantName);
 
         $outputFormat = $this->determineOutputFormat($manipulation, $media);
-        $image = $this->imageManager->make($media->contents());
+        if (method_exists($this->imageManager, 'read')) {
+            // Intervention Image  >=3.0
+            $image = $this->imageManager->read($media->contents());
+        } else {
+            // Intervention Image <3.0
+            $image = $this->imageManager->make($media->contents());
+        }
 
         $callback = $manipulation->getCallback();
         $callback($image, $media);
 
-        $outputStream = $image->stream(
+        $outputStream = $this->imageToStream(
+            $image,
             $outputFormat,
             $manipulation->getOutputQuality()
         );
+
+        if ($manipulation->shouldOptimize()) {
+            $outputStream = $this->imageOptimizer->optimizeImage(
+                $outputStream,
+                $manipulation->getOptimizerChain()
+            );
+        }
 
         $variant->variant_name = $variantName;
         $variant->original_media_id = $media->isOriginal()
@@ -180,6 +205,51 @@ class ImageManipulator
         return $variant;
     }
 
+    /**
+     * @param Media $media
+     * @param SourceAdapterInterface $source
+     * @param ImageManipulation $manipulation
+     * @return StreamAdapter
+     * @throws ImageManipulationException
+     */
+    public function manipulateUpload(
+        Media $media,
+        SourceAdapterInterface $source,
+        ImageManipulation $manipulation
+    ): StreamAdapter {
+        $outputFormat = $this->determineOutputFormat($manipulation, $media);
+        if (method_exists($this->imageManager, 'read')) {
+            // Intervention Image  >=3.0
+            $image = $this->imageManager->read($source->getStream()->getContents());
+        } else {
+            // Intervention Image <3.0
+            $image = $this->imageManager->make($source->getStream()->getContents());
+        }
+
+        $callback = $manipulation->getCallback();
+        $callback($image, $media);
+
+        $outputStream = $this->imageToStream(
+            $image,
+            $outputFormat,
+            $manipulation->getOutputQuality()
+        );
+
+        if ($manipulation->shouldOptimize()) {
+            $outputStream = $this->imageOptimizer->optimizeImage(
+                $outputStream,
+                $manipulation->getOptimizerChain()
+            );
+        }
+
+        $media->extension = $outputFormat;
+        $media->mime_type = $this->getMimeTypeForOutputFormat($outputFormat);
+        $media->aggregate_type = Media::TYPE_IMAGE;
+        $media->size = $outputStream->getSize();
+
+        return new StreamAdapter($outputStream);
+    }
+
     private function getMimeTypeForOutputFormat(string $outputFormat): string
     {
         return ImageManipulation::MIME_TYPE_MAP[$outputFormat];
@@ -231,24 +301,27 @@ class ImageManipulator
             return $filename;
         }
 
-        if ($manipulation->usingHashForFilename()) {
-            return $this->getHashFromStream($stream);
+        if ($manipulation->isUsingHashForFilename()) {
+            return $this->getHashFromStream(
+                $stream,
+                $manipulation->getHashFilenameAlgo() ?? 'md5'
+            );
         }
         return sprintf('%s-%s', $originalMedia->filename, $variant->variant_name);
     }
 
-    public function validateMedia(Media $media)
+    public function validateMedia(Media $media): void
     {
         if ($media->aggregate_type != Media::TYPE_IMAGE) {
             throw ImageManipulationException::invalidMediaType($media->aggregate_type);
         }
     }
 
-    private function getHashFromStream(StreamInterface $stream): string
+    private function getHashFromStream(StreamInterface $stream, string $algo): string
     {
         $stream->rewind();
-        $hash = hash_init('md5');
-        while ($chunk = $stream->read(64)) {
+        $hash = hash_init($algo);
+        while ($chunk = $stream->read(2048)) {
             hash_update($hash, $chunk);
         }
         $filename = hash_final($hash);
@@ -270,7 +343,7 @@ class ImageManipulator
             return;
         }
 
-        if (!$this->filesystem->disk($variant->disk)->has($variant->getDiskPath())) {
+        if (!$this->filesystem->disk($variant->disk)->exists($variant->getDiskPath())) {
             // no conflict, carry on
             return;
         }
@@ -302,8 +375,32 @@ class ImageManipulator
             }
             $path = "{$model->directory}/{$filename}.{$model->extension}";
             ++$counter;
-        } while ($storage->has($path));
+        } while ($storage->exists($path));
 
         return $filename;
+    }
+
+    private function imageToStream(
+        Image $image,
+        string $outputFormat,
+        int $outputQuality
+    ) {
+        if (class_exists(StreamCommand::class)) {
+            // Intervention Image  <3.0
+            return $image->stream(
+                $outputFormat,
+                $outputQuality
+            );
+        }
+
+        $formatted = match ($outputFormat) {
+            ImageManipulation::FORMAT_JPG => $image->toJpeg($outputQuality),
+            ImageManipulation::FORMAT_PNG => $image->toPng(),
+            ImageManipulation::FORMAT_GIF => $image->toGif(),
+            ImageManipulation::FORMAT_WEBP => $image->toBitmap(),
+            ImageManipulation::FORMAT_TIFF => $image->toTiff($outputQuality),
+            default => throw ImageManipulationException::unknownOutputFormat(),
+        };
+        return Utils::streamFor($formatted->toFilePointer());
     }
 }

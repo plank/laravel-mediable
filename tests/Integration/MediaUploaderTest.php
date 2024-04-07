@@ -2,34 +2,38 @@
 
 namespace Plank\Mediable\Tests\Integration;
 
+use GuzzleHttp\Psr7\Utils;
+use Intervention\Image\Image;
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Plank\Mediable\Exceptions\MediaUpload\FileExistsException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException;
 use Plank\Mediable\Exceptions\MediaUpload\FileSizeException;
 use Plank\Mediable\Exceptions\MediaUpload\ForbiddenException;
+use Plank\Mediable\Exceptions\MediaUpload\InvalidHashException;
+use Plank\Mediable\ImageManipulation;
+use Plank\Mediable\ImageManipulator;
 use Plank\Mediable\Media;
 use Plank\Mediable\MediaUploader;
 use Plank\Mediable\Facades\MediaUploader as Facade;
 use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
-use Plank\Mediable\Stream;
 use Plank\Mediable\Tests\Mocks\MediaSubclass;
 use Plank\Mediable\Tests\TestCase;
 use stdClass;
 
 class MediaUploaderTest extends TestCase
 {
-    public function test_it_can_be_instantiated_via_the_container()
+    public function test_it_can_be_instantiated_via_the_container(): void
     {
         $this->assertInstanceOf(MediaUploader::class, app('mediable.uploader'));
     }
 
-    public function test_it_can_be_instantiated_via_facade()
+    public function test_it_can_be_instantiated_via_facade(): void
     {
         $this->assertInstanceOf(MediaUploader::class, Facade::getFacadeRoot());
     }
 
-    public function test_facade_instantiates_unique_instances()
+    public function test_facade_instantiates_unique_instances(): void
     {
         /** @var MediaUploader $uploader1 */
         $uploader1 = Facade::getFacadeRoot();
@@ -47,13 +51,13 @@ class MediaUploaderTest extends TestCase
         );
     }
 
-    public function test_facade_is_mockable()
+    public function test_facade_is_mockable(): void
     {
         Facade::shouldReceive('upload')->once();
         Facade::upload();
     }
 
-    public function test_it_can_set_on_duplicate_behavior_via_facade()
+    public function test_it_can_set_on_duplicate_behavior_via_facade(): void
     {
         $uploader = Facade::onDuplicateError();
         $this->assertEquals(
@@ -86,7 +90,7 @@ class MediaUploaderTest extends TestCase
         );
     }
 
-    public function test_it_sets_options()
+    public function test_it_sets_options(): void
     {
         $uploader = $this->getUploader();
         $this->assertEquals(
@@ -107,7 +111,7 @@ class MediaUploaderTest extends TestCase
         );
     }
 
-    public function test_it_can_determine_media_type_by_extension_and_mime()
+    public function test_it_can_determine_media_type_by_extension_and_mime(): void
     {
         $uploader = $this->getUploader();
         $uploader->setTypeDefinition('foo', ['text/foo'], ['foo']);
@@ -133,7 +137,7 @@ class MediaUploaderTest extends TestCase
         );
     }
 
-    public function test_it_throws_exception_for_type_mismatch()
+    public function test_it_throws_exception_for_type_mismatch(): void
     {
         $uploader = $this->getUploader();
         $uploader->setTypeDefinition('foo', ['text/foo'], ['foo']);
@@ -143,7 +147,7 @@ class MediaUploaderTest extends TestCase
         $uploader->inferAggregateType('text/foo', 'bar');
     }
 
-    public function test_it_validates_allowed_types()
+    public function test_it_validates_allowed_types(): void
     {
         $uploader = $this->getUploader();
         $uploader->setTypeDefinition('foo', ['text/foo'], ['foo']);
@@ -166,7 +170,7 @@ class MediaUploaderTest extends TestCase
         $uploader->inferAggregateType('text/foo', 'bar');
     }
 
-    public function test_it_infers_type_case_insensitive()
+    public function test_it_infers_type_case_insensitive(): void
     {
         $uploader = $this->getUploader();
         $uploader->setTypeDefinition('foo', ['TeXT/foo'], ['FOo']);
@@ -177,7 +181,7 @@ class MediaUploaderTest extends TestCase
         );
     }
 
-    public function test_it_can_restrict_to_known_types()
+    public function test_it_can_restrict_to_known_types(): void
     {
         $uploader = $this->getUploader();
 
@@ -191,14 +195,14 @@ class MediaUploaderTest extends TestCase
         $uploader->inferAggregateType('text/foo', 'bar');
     }
 
-    public function test_it_throws_exception_for_non_existent_disk()
+    public function test_it_throws_exception_for_non_existent_disk(): void
     {
         $uploader = $this->getUploader();
         $this->expectException(ConfigurationException::class);
         $uploader->toDisk('abc');
     }
 
-    public function test_it_throws_exception_for_disallowed_disk()
+    public function test_it_throws_exception_for_disallowed_disk(): void
     {
         $uploader = $this->getUploader();
         config()->set('filesystems.disks.foo', []);
@@ -206,7 +210,7 @@ class MediaUploaderTest extends TestCase
         $uploader->toDisk('foo');
     }
 
-    public function test_it_can_change_model_class()
+    public function test_it_can_change_model_class(): void
     {
         $uploader = $this->getUploader();
         $method = $this->getPrivateMethod($uploader, 'makeModel');
@@ -214,14 +218,14 @@ class MediaUploaderTest extends TestCase
         $this->assertInstanceOf(MediaSubclass::class, $method->invoke($uploader));
     }
 
-    public function test_it_throw_exception_for_invalid_model()
+    public function test_it_throw_exception_for_invalid_model(): void
     {
         $uploader = $this->getUploader();
         $this->expectException(ConfigurationException::class);
         $uploader->setModelClass(stdClass::class);
     }
 
-    public function test_it_validates_source_is_set()
+    public function test_it_validates_source_is_set(): void
     {
         $uploader = $this->getUploader();
         $method = $this->getPrivateMethod($uploader, 'verifySource');
@@ -230,34 +234,7 @@ class MediaUploaderTest extends TestCase
         $method->invoke($uploader);
     }
 
-    public function test_it_validates_source_is_valid()
-    {
-        $uploader = $this->getUploader();
-        $method = $this->getPrivateMethod($uploader, 'verifySource');
-
-        $source = $this->createMock(SourceAdapterInterface::class);
-        $source->method('valid')->willReturn(true);
-        $uploader->fromSource($source);
-        $method->invoke($uploader);
-
-        $this->assertTrue(true);
-    }
-
-    public function test_it_validates_source_is_invalid()
-    {
-        $uploader = $this->getUploader();
-        $method = $this->getPrivateMethod($uploader, 'verifySource');
-
-        $source = $this->createMock(SourceAdapterInterface::class);
-        $source->method('valid')->willReturn(false);
-        $source->method('path')->willReturn('');
-        $uploader->fromSource($source);
-
-        $this->expectException(FileNotFoundException::class);
-        $method->invoke($uploader);
-    }
-
-    public function test_it_validates_allowed_mime_types()
+    public function test_it_validates_allowed_mime_types(): void
     {
         $uploader = $this->getUploader();
         $method = $this->getPrivateMethod($uploader, 'verifyMimeType');
@@ -279,7 +256,7 @@ class MediaUploaderTest extends TestCase
         $method->invoke($uploader, 'text/foo');
     }
 
-    public function test_it_validates_allowed_extensions()
+    public function test_it_validates_allowed_extensions(): void
     {
         $uploader = $this->getUploader();
         $method = $this->getPrivateMethod($uploader, 'verifyExtension');
@@ -293,7 +270,7 @@ class MediaUploaderTest extends TestCase
         $method->invoke($uploader, 'foo');
     }
 
-    public function test_it_validates_file_size()
+    public function test_it_validates_file_size(): void
     {
         $uploader = $this->getUploader();
         $uploader->setMaximumSize(2);
@@ -304,7 +281,7 @@ class MediaUploaderTest extends TestCase
         $method->invoke($uploader, 3);
     }
 
-    public function test_it_can_disable_file_size_limits()
+    public function test_it_can_disable_file_size_limits(): void
     {
         $uploader = $this->getUploader();
         $uploader->setMaximumSize(0);
@@ -312,7 +289,7 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals(99999, $method->invoke($uploader, 99999));
     }
 
-    public function test_it_can_error_on_duplicate_files()
+    public function test_it_can_error_on_duplicate_files(): void
     {
         $uploader = $this->getUploader();
         $uploader->setOnDuplicateBehavior(MediaUploader::ON_DUPLICATE_ERROR);
@@ -321,28 +298,36 @@ class MediaUploaderTest extends TestCase
         $method->invoke($uploader, new Media);
     }
 
-    public function test_it_sets_file_visibility()
+    public function test_it_sets_file_visibility(): void
     {
         $this->useDatabase();
         $this->useFilesystem('tmp');
 
-        $media1 = $this->getUploader()->fromSource($this->sampleFilePath())
+        $media1 = $this->getUploader()->fromSource(TestCase::sampleFilePath())
             ->toDestination('tmp', 'a')
+            ->upload();
+        $this->assertFalse($media1->isVisible());
+
+        $media2 = $this->getUploader()->fromSource(TestCase::sampleFilePath())
+            ->toDestination('tmp', 'b')
             ->makePrivate()
             ->upload();
+        $this->assertFalse($media2->isVisible());
 
-        $media2 = $this->getUploader()->fromSource($this->sampleFilePath())
-            ->toDestination('tmp', 'b')
+        $media3 = $this->getUploader()->fromSource(TestCase::sampleFilePath())
+            ->toDestination('tmp', 'c')
             ->makePrivate()
             ->makePublic()
             ->upload();
+        $this->assertTrue($media3->isVisible());
 
-        $this->assertFalse($media1->isVisible());
-
-        $this->assertTrue($media2->isVisible());
+        $media1 = $this->getUploader()->fromSource(TestCase::sampleFilePath())
+            ->toDestination('novisibility', 'a')
+            ->upload();
+        $this->assertTrue($media1->isVisible());
     }
 
-    public function test_it_can_replace_duplicate_files()
+    public function test_it_can_replace_duplicate_files(): void
     {
         $this->useDatabase();
         $this->useFilesystem('tmp');
@@ -369,8 +354,8 @@ class MediaUploaderTest extends TestCase
                 'original_media_id' => $media->getKey()
             ]
         );
-        $this->seedFileForMedia($media, $this->sampleFilePath());
-        $this->seedFileForMedia($variant, $this->sampleFilePath());
+        $this->seedFileForMedia($media, TestCase::sampleFilePath());
+        $this->seedFileForMedia($variant, TestCase::sampleFilePath());
 
         $method->invoke($uploader, $media);
 
@@ -379,7 +364,7 @@ class MediaUploaderTest extends TestCase
         $this->assertTrue(file_exists($variant->getAbsolutePath()));
     }
 
-    public function test_it_can_replace_duplicate_files_and_variants()
+    public function test_it_can_replace_duplicate_files_and_variants(): void
     {
         $this->useDatabase();
         $this->useFilesystem('tmp');
@@ -404,8 +389,8 @@ class MediaUploaderTest extends TestCase
                 'original_media_id' => $media->getKey()
             ]
         );
-        $this->seedFileForMedia($media, $this->sampleFilePath());
-        $this->seedFileForMedia($variant, $this->sampleFilePath());
+        $this->seedFileForMedia($media, TestCase::sampleFilePath());
+        $this->seedFileForMedia($variant, TestCase::sampleFilePath());
 
         $method->invoke($uploader, $media);
 
@@ -414,7 +399,7 @@ class MediaUploaderTest extends TestCase
         $this->assertFalse(file_exists($variant->getAbsolutePath()));
     }
 
-    public function test_it_can_update_duplicate_files()
+    public function test_it_can_update_duplicate_files(): void
     {
         $this->useDatabase();
         $this->useFilesystem('tmp');
@@ -429,13 +414,13 @@ class MediaUploaderTest extends TestCase
             ]
         );
 
-        $this->seedFileForMedia($media, fopen($this->sampleFilePath(), 'r'));
+        $this->seedFileForMedia($media, fopen(TestCase::sampleFilePath(), 'r'));
 
         $creaetdAt = $media->created_at;
         $updatedAt = $media->updated_at;
         sleep(1); // required to check the update time is different
 
-        $result = Facade::fromSource($this->sampleFilePath())
+        $result = Facade::fromSource(TestCase::sampleFilePath())
             ->onDuplicateUpdate()
             ->toDestination('tmp', '')->upload();
 
@@ -446,7 +431,7 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('image', $media->aggregate_type);
     }
 
-    public function test_it_can_update_duplicate_files_when_model_not_found()
+    public function test_it_can_update_duplicate_files_when_model_not_found(): void
     {
         $this->useDatabase();
         $this->useFilesystem('tmp');
@@ -463,17 +448,17 @@ class MediaUploaderTest extends TestCase
 
         $this->seedFileForMedia($media, 'foo');
 
-        $result = Facade::fromSource($this->sampleFilePath())
+        $result = Facade::fromSource(TestCase::sampleFilePath())
             ->onDuplicateUpdate()
             ->toDestination('tmp', '')->upload();
 
         $this->assertEquals(
-            file_get_contents($this->sampleFilePath()),
+            file_get_contents(TestCase::sampleFilePath()),
             file_get_contents($result->getAbsolutePath())
         );
     }
 
-    public function test_it_can_increment_filename_on_duplicate_files()
+    public function test_it_can_increment_filename_on_duplicate_files(): void
     {
         $uploader = $this->getUploader()->onDuplicateIncrement();
         $method = $this->getPrivateMethod($uploader, 'handleDuplicate');
@@ -493,12 +478,12 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('duplicate-1', $media->filename);
     }
 
-    public function test_it_uploads_files()
+    public function test_it_uploads_files(): void
     {
         $this->useDatabase();
         $this->useFilesystem('tmp');
 
-        $media = Facade::fromSource($this->sampleFilePath())
+        $media = Facade::fromSource(TestCase::sampleFilePath())
             ->toDestination('tmp', 'foo')
             ->useFilename('bar')
             ->upload();
@@ -512,12 +497,12 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('image', $media->aggregate_type);
     }
 
-    public function test_it_imports_string_contents()
+    public function test_it_imports_string_contents(): void
     {
         $this->useDatabase();
         $this->useFilesystem('tmp');
 
-        $string = file_get_contents($this->sampleFilePath());
+        $string = file_get_contents(TestCase::sampleFilePath());
 
         $media = Facade::fromString($string)
             ->toDestination('tmp', 'foo')
@@ -533,12 +518,12 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('image', $media->aggregate_type);
     }
 
-    public function test_it_imports_file_stream_contents()
+    public function test_it_imports_file_stream_contents(): void
     {
         $this->useDatabase();
         $this->useFilesystem('tmp');
 
-        $resource = fopen(realpath($this->sampleFilePath()), 'r');
+        $resource = fopen(realpath(TestCase::sampleFilePath()), 'r');
 
         $media = Facade::fromSource($resource)
             ->toDestination('tmp', 'foo')
@@ -554,12 +539,12 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('image', $media->aggregate_type);
     }
 
-    public function test_it_imports_http_stream_contents()
+    public function test_it_imports_http_stream_contents(): void
     {
         $this->useDatabase();
         $this->useFilesystem('tmp');
 
-        $resource = fopen($this->remoteFilePath(), 'r');
+        $resource = fopen(TestCase::remoteFilePath(), 'r');
 
         $media = Facade::fromSource($resource)
             ->toDestination('tmp', 'foo')
@@ -575,12 +560,12 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('image', $media->aggregate_type);
     }
 
-    public function test_it_imports_stream_objects()
+    public function test_it_imports_stream_objects(): void
     {
         $this->useDatabase();
         $this->useFilesystem('tmp');
 
-        $stream = new Stream(fopen($this->remoteFilePath(), 'r'));
+        $stream = Utils::streamFor(fopen(TestCase::remoteFilePath(), 'r'));
 
         $media = Facade::fromSource($stream)
             ->toDestination('tmp', 'foo')
@@ -596,7 +581,7 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('image', $media->aggregate_type);
     }
 
-    public function test_it_imports_existing_files()
+    public function test_it_imports_existing_files(): void
     {
         $this->useFilesystem('tmp');
         $this->useDatabase();
@@ -621,7 +606,7 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('image', $media->aggregate_type);
     }
 
-    public function test_it_imports_existing_files_with_uppercase()
+    public function test_it_imports_existing_files_with_uppercase(): void
     {
         $this->useFilesystem('tmp');
         $this->useDatabase();
@@ -646,7 +631,7 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('image', $media->aggregate_type);
     }
 
-    public function test_it_updates_existing_media()
+    public function test_it_updates_existing_media(): void
     {
         $this->useDatabase();
         $this->useFilesystem('tmp');
@@ -670,7 +655,7 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals(self::TEST_FILE_SIZE, $media->size);
     }
 
-    public function test_it_replaces_existing_media()
+    public function test_it_replaces_existing_media(): void
     {
         $this->useDatabase();
         $this->useFilesystem('tmp');
@@ -684,25 +669,25 @@ class MediaUploaderTest extends TestCase
         );
         $this->seedFileForMedia($media, $this->sampleFile());
 
-        $result = Facade::fromSource($this->alternateFilePath())->replace($media);
+        $result = Facade::fromSource(TestCase::alternateFilePath())->replace($media);
         $media = $media->fresh();
 
         $this->assertEquals($result->getKey(), $media->getKey());
         $this->assertEquals(4181, $media->size);
     }
 
-    public function test_it_throws_exception_when_importing_missing_file()
+    public function test_it_throws_exception_when_importing_missing_file(): void
     {
         $this->expectException(FileNotFoundException::class);
         Facade::import('tmp', 'non', 'existing', 'jpg');
     }
 
-    public function test_it_use_hash_for_filename()
+    public function test_it_use_hash_for_filename(): void
     {
         $this->useFilesystem('tmp');
         $this->useDatabase();
 
-        $media = Facade::fromSource($this->sampleFilePath())
+        $media = Facade::fromSource(TestCase::sampleFilePath())
             ->toDestination('tmp', 'foo')
             ->useHashForFilename()
             ->upload();
@@ -710,12 +695,25 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('3ef5e70366086147c2695325d79a25cc', $media->filename);
     }
 
-    public function test_it_uploads_files_with_altered_model()
+    public function test_it_use_arbitrary_hash_algo_for_filename(): void
+    {
+        $this->useFilesystem('tmp');
+        $this->useDatabase();
+
+        $media = Facade::fromSource(TestCase::sampleFilePath())
+            ->toDestination('tmp', 'foo')
+            ->useHashForFilename('sha1')
+            ->upload();
+
+        $this->assertEquals('5e96e1fa58067853219c4cb6d3c1ce01cc5cc8ce', $media->filename);
+    }
+
+    public function test_it_uploads_files_with_altered_model(): void
     {
         $this->useDatabase();
         $this->useFilesystem('tmp');
 
-        $media = Facade::fromSource($this->sampleFilePath())
+        $media = Facade::fromSource(TestCase::sampleFilePath())
             ->toDestination('tmp', 'foo')
             ->useFilename('bar')
             ->beforeSave(
@@ -735,7 +733,7 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals(9876, $media->id);
     }
 
-    public function test_it_uploads_files_with_altered_destination()
+    public function test_it_uploads_files_with_altered_destination(): void
     {
         $this->useDatabase();
         $this->useFilesystem('tmp');
@@ -749,9 +747,9 @@ class MediaUploaderTest extends TestCase
             ]
         );
 
-        $this->seedFileForMedia($media, fopen($this->alternateFilePath(), 'r'));
+        $this->seedFileForMedia($media, fopen(TestCase::alternateFilePath(), 'r'));
 
-        $media = Facade::fromSource($this->sampleFilePath())
+        $media = Facade::fromSource(TestCase::sampleFilePath())
             ->toDestination('tmp', 'foo')
             ->useFilename('bar')
             ->onDuplicateReplace()
@@ -771,9 +769,136 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals(self::TEST_FILE_SIZE, $media->size);
         $this->assertEquals('image', $media->aggregate_type);
         $this->assertEquals(
-            file_get_contents($this->sampleFilePath()),
+            file_get_contents(TestCase::sampleFilePath()),
             $media->contents()
         );
+    }
+
+    public function test_it_applies_alt(): void
+    {
+        $this->useDatabase();
+        $this->useFilesystem('tmp');
+
+        $media = Facade::fromSource(TestCase::sampleFilePath())
+            ->toDestination('tmp', 'foo')
+            ->useFilename('bar')
+            ->withAltAttribute('This is an alt text')
+            ->upload();
+
+        $this->assertEquals('This is an alt text', $media->alt);
+    }
+
+    public function test_it_applies_alt_to_existing_media(): void
+    {
+        $this->useDatabase();
+        $this->useFilesystem('tmp');
+
+        $media = $this->createMedia(
+            [
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'extension' => 'png',
+                'mime_type' => 'image/png',
+                'size' => 999,
+            ]
+        );
+        $this->seedFileForMedia($media, $this->sampleFile());
+
+        $result = Facade::fromSource(TestCase::sampleFilePath())
+            ->toDestination('tmp', 'foo')
+            ->useFilename('bar')
+            ->withAltAttribute('This is an alt text')
+            ->replace($media);
+
+        $this->assertEquals('This is an alt text', $result->alt);
+    }
+
+    public function test_it_manipulates_images(): void
+    {
+        $this->useDatabase();
+        $this->useFilesystem('tmp');
+
+        $manipulation = ImageManipulation::make(
+            function (Image $image) {
+                $image->resize(16, 16);
+            }
+        )->outputJpegFormat();
+
+        app(ImageManipulator::class)->defineVariant(
+            'foo',
+            $manipulation
+        );
+
+        $media = Facade::fromSource(TestCase::sampleFilePath())
+            ->toDestination('tmp', 'foo')
+            ->useFilename('bar')
+            ->applyImageManipulation('foo')
+            ->upload();
+
+        $this->assertInstanceOf(Media::class, $media);
+        $this->assertTrue($media->fileExists());
+        $this->assertEquals('tmp', $media->disk);
+        $this->assertEquals('foo/bar.jpg', $media->getDiskPath());
+        $this->assertEquals('image/jpeg', $media->mime_type);
+        $this->assertEquals('image', $media->aggregate_type);
+        $this->assertTrue(
+            $media->size >= 933 // intervention/image <3.0
+            && $media->size <= 951 // intervention/image >=3.0
+        );
+    }
+
+    public function test_it_ignores_manipulations_for_non_images(): void
+    {
+        $this->useDatabase();
+        $this->useFilesystem('tmp');
+
+        $callback = $this->getMockCallable();
+        $callback->expects($this->never())->method('__invoke');
+
+        $manipulation = ImageManipulation::make($callback);
+
+        $media = Facade::fromSource("data:text/plain;base64," . base64_encode('foo'))
+            ->toDestination('tmp', 'foo')
+            ->useFilename('bar')
+            ->applyImageManipulation($manipulation)
+            ->upload();
+
+        $this->assertInstanceOf(Media::class, $media);
+        $this->assertTrue($media->fileExists());
+        $this->assertEquals('tmp', $media->disk);
+        $this->assertEquals('foo/bar.txt', $media->getDiskPath());
+        $this->assertEquals('text/plain', $media->mime_type);
+        $this->assertEquals('document', $media->aggregate_type);
+        $this->assertEquals(3, $media->size);
+    }
+
+    public function test_it_validates_hashes(): void
+    {
+        $this->useDatabase();
+        $this->useFilesystem('tmp');
+
+        $media = Facade::fromSource(TestCase::sampleFilePath())
+            ->toDestination('tmp', 'foo')
+            ->useFilename('bar')
+            ->validateHash('3ef5e70366086147c2695325d79a25cc', 'md5')
+            ->validateHash('5e96e1fa58067853219c4cb6d3c1ce01cc5cc8ce', 'sha1')
+            ->upload();
+
+        $this->assertInstanceOf(Media::class, $media);
+        $this->assertTrue($media->fileExists());
+    }
+
+    public function test_it_validates_md5_hash_failure(): void
+    {
+        $this->expectException(InvalidHashException::class);
+
+        Facade::fromSource(TestCase::sampleFilePath())
+            ->toDestination('tmp', 'foo')
+            ->useFilename('bar')
+            ->validateHash('3ef5e70366086147c2695325d79a25cc', 'md5')
+            ->validateHash('abcdefabcdef', 'sha1')
+            ->upload();
     }
 
     protected function getUploader(): MediaUploader

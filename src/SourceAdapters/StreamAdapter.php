@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 namespace Plank\Mediable\SourceAdapters;
 
-use Plank\Mediable\Helpers\File;
+use GuzzleHttp\Psr7\CachingStream;
+use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Psr\Http\Message\StreamInterface;
 
 /**
@@ -13,19 +14,30 @@ use Psr\Http\Message\StreamInterface;
  */
 class StreamAdapter implements SourceAdapterInterface
 {
-    const BUFFER_SIZE = 1024;
+    const BUFFER_SIZE = 2048;
 
-    /**
-     * The source object.
-     * @var StreamInterface
-     */
-    protected $source;
+    private const TYPE_MEMORY = 'php';
+    private const TYPE_DATA_URL = 'rfc2397';
+    private const TYPE_HTTP = 'http';
+    private const TYPE_FILE = 'plainfile';
+    private const TYPE_FTP = 'ftp';
+
+    protected StreamInterface $source;
+
+    protected StreamInterface $originalSource;
 
     /**
      * The contents of the stream.
-     * @var string|null
+     * @var string
      */
-    protected $contents;
+    protected string $contents;
+
+    protected int $size;
+
+    /** @var array<string, string> */
+    protected array $hash;
+
+    protected string $mimeType;
 
     /**
      * Constructor.
@@ -33,48 +45,69 @@ class StreamAdapter implements SourceAdapterInterface
      */
     public function __construct(StreamInterface $source)
     {
-        $this->source = $source;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSource()
-    {
-        return $this->source;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function path(): string
-    {
-        return (string)$this->source->getMetadata('uri');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function filename(): string
-    {
-        return pathinfo(parse_url($this->path(), PHP_URL_PATH) ?? '', PATHINFO_FILENAME);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function extension(): string
-    {
-        $extension = pathinfo(
-            parse_url($this->path(), PHP_URL_PATH) ?? '',
-            PATHINFO_EXTENSION
-        );
-
-        if ($extension) {
-            return $extension;
+        if (!$source->isReadable()) {
+            throw ConfigurationException::invalidSource('Stream must be readable');
         }
 
-        return (string)File::guessExtension($this->mimeType());
+        $this->source = $this->originalSource = $source;
+        if (!$this->source->isSeekable()) {
+            $this->source = new CachingStream($this->source);
+        }
+
+        if ($this->getStreamType() === self::TYPE_HTTP) {
+            $code = $this->getHttpResponseCode();
+            if (!$code || $code < 200 || $code >= 300) {
+                throw ConfigurationException::unrecognizedSource(
+                    "Failed to fetch URL, received HTTP status code $code"
+                );
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    private function path(): ?string
+    {
+        $type = $this->getStreamType();
+        if (in_array($type, [self::TYPE_DATA_URL, self::TYPE_MEMORY])) {
+            return null;
+        }
+
+        return $this->originalSource->getMetadata('uri');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function filename(): ?string
+    {
+        $path = $this->path();
+        if (!$path) {
+            return null;
+        }
+        return pathinfo(
+            parse_url($this->path(), PHP_URL_PATH) ?? '',
+            PATHINFO_FILENAME
+        ) ?: null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function extension(): ?string
+    {
+        if ($path = $this->path()) {
+            $extension = pathinfo(
+                parse_url($path, PHP_URL_PATH) ?? '',
+                PATHINFO_EXTENSION
+            );
+            if ($extension) {
+                return $extension;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -82,58 +115,32 @@ class StreamAdapter implements SourceAdapterInterface
      */
     public function mimeType(): string
     {
-        $fileInfo = new \finfo(FILEINFO_MIME_TYPE);
+        if (!isset($this->mimeType)) {
+            $this->scanFile();
+        }
 
-        return (string)$fileInfo->buffer($this->contents());
+        return $this->mimeType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function contents(): string
+    public function clientMimeType(): ?string
     {
-        if (is_null($this->contents)) {
-            if ($this->source->isSeekable()) {
-                $this->contents = (string)$this->source;
-            } else {
-                $this->contents = $this->source->getContents();
-            }
+        // supported primarily by data URLs
+        if ($mime = $this->originalSource->getMetadata('mediatype')) {
+            return $mime;
         }
 
-        return $this->contents;
+        if ($contentType = $this->getHttpHeader('Content-Type')) {
+            $mime = explode(';', $contentType)[0];
+
+            return $mime;
+        }
+
+        return null;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getStreamResource()
+    public function getStream(): StreamInterface
     {
-        if ($this->source->isSeekable()) {
-            $this->source->rewind();
-        }
-
-        $stream = fopen('php://temp', 'r+b');
-
-        while (!$this->source->eof()) {
-            $writeResult = fwrite($stream, $this->source->read(self::BUFFER_SIZE));
-            if ($writeResult === false) {
-                throw new \RuntimeException("Could not read Stream");
-            }
-        }
-
-        if ($this->source->isSeekable()) {
-            $this->source->rewind();
-        }
-
-        return $stream;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function valid(): bool
-    {
-        return $this->source->isReadable();
+        return $this->source;
     }
 
     /**
@@ -147,6 +154,87 @@ class StreamAdapter implements SourceAdapterInterface
             return $size;
         }
 
-        return (int)mb_strlen($this->contents(), '8bit');
+        if (!isset($this->size)) {
+            $this->scanFile();
+        }
+
+        return $this->size;
+    }
+
+    /**
+     * {@inheritdoc}
+     * @param string $algo
+     */
+    public function hash(string $algo = 'md5'): string
+    {
+        if (!isset($this->hash[$algo])) {
+            $this->scanFile($algo);
+        }
+        return $this->hash[$algo];
+    }
+
+    /**
+     * @return array|mixed|null
+     */
+    private function getStreamType(): mixed
+    {
+        return strtolower($this->originalSource->getMetadata('wrapper_type'));
+    }
+
+    private function getHttpHeader($headerName): ?string
+    {
+        if ($this->getStreamType() !== self::TYPE_HTTP) {
+            return null;
+        }
+
+        $headers = $this->originalSource->getMetadata('wrapper_data');
+        if ($headers) {
+            foreach ($headers as $header) {
+                if (stripos($header, "$headerName: ") === 0) {
+                    return substr($header, strlen($headerName) + 2);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private function getHttpResponseCode(): ?int
+    {
+        if ($this->getStreamType() !== self::TYPE_HTTP) {
+            return null;
+        }
+        $headers = $this->originalSource->getMetadata('wrapper_data');
+        if (!empty($headers)
+            && preg_match('/HTTP\/\d+\.\d+\s+(\d+)/i', $headers[0], $matches)
+        ) {
+            return (int)$matches[1];
+        }
+
+        return null;
+    }
+
+    private function scanFile(string $hashAlgorithm = 'md5'): void
+    {
+        $this->size = 0;
+        $this->source->rewind();
+        try {
+            $hash = hash_init($hashAlgorithm);
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            while (!$this->source->eof()) {
+                $buffer = $this->source->read(self::BUFFER_SIZE);
+                if (!isset($this->mimeType)) {
+                    $this->mimeType = finfo_buffer($finfo, $buffer);
+                }
+                hash_update($hash, $buffer);
+                $this->size += strlen($buffer);
+            }
+            $this->hash[$hashAlgorithm] = hash_final($hash);
+            $this->source->rewind();
+        } finally {
+            if (!empty($finfo)) {
+                finfo_close($finfo);
+            }
+        }
     }
 }

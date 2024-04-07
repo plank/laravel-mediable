@@ -2,6 +2,9 @@
 
 namespace Plank\Mediable\Tests\Integration\SourceAdapters;
 
+use GuzzleHttp\Psr7\Utils;
+use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
+use Plank\Mediable\SourceAdapters\DataUrlAdapter;
 use Plank\Mediable\SourceAdapters\FileAdapter;
 use Plank\Mediable\SourceAdapters\LocalPathAdapter;
 use Plank\Mediable\SourceAdapters\RawContentAdapter;
@@ -10,31 +13,19 @@ use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
 use Plank\Mediable\SourceAdapters\StreamAdapter;
 use Plank\Mediable\SourceAdapters\StreamResourceAdapter;
 use Plank\Mediable\SourceAdapters\UploadedFileAdapter;
-use Plank\Mediable\Stream;
 use Plank\Mediable\Tests\TestCase;
+use Psr\Http\Message\StreamInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class SourceAdapterTest extends TestCase
 {
-    private const READABLE_MODES = [
-        'r' => true,
-        'w+' => true,
-        'r+' => true,
-        'x+' => true,
-        'c+' => true,
-        'rb' => true,
-        'w+b' => true,
-        'r+b' => true,
-        'x+b' => true,
-        'c+b' => true,
-        'rt' => true,
-        'w+t' => true,
-        'r+t' => true,
-        'x+t' => true,
-        'c+t' => true,
-        'a+' => true
-    ];
+    private const EXPECTED_FILENAME = 'plank';
+    private const EXPECTED_EXTENSION = 'png';
+    private const EXPECTED_MIME = 'image/png';
+    private const EXPECTED_SIZE = 7173;
+    private const EXPECTED_HASH_MD5 = '3ef5e70366086147c2695325d79a25cc';
+    private const EXPECTED_HASH_SHA1 = '5e96e1fa58067853219c4cb6d3c1ce01cc5cc8ce';
 
     public function setUp(): void
     {
@@ -47,11 +38,13 @@ class SourceAdapterTest extends TestCase
         $app['filesystem']->disk('uploads')->put('plank.png', $this->sampleFile());
     }
 
-    public function adapterProvider()
+    public static function adapterProvider(): array
     {
-        $file = $this->sampleFilePath();
+        $file = TestCase::sampleFilePath();
         $string = file_get_contents($file);
-        $url = $this->remoteFilePath() . '?foo=bar.baz';
+        $base64DataUrl = 'data:image/png;base64,' . base64_encode($string);
+        $rawDataUrl = 'data:image/png,' . rawurlencode($string);
+        $url = TestCase::remoteFilePath() . '?foo=bar.baz';
 
         $uploadedFile = new UploadedFile(
             $file,
@@ -62,72 +55,179 @@ class SourceAdapterTest extends TestCase
         );
 
         $fileResource = fopen($file, 'rb');
-        $fileStream = new Stream(fopen($file, 'rb'));
+        $fileStream = Utils::streamFor(fopen($file, 'rb'));
 
         $httpResource = fopen($url, 'rb');
-        $httpStream = new Stream(fopen($url, 'rb'));
+        $httpStream = Utils::streamFor(fopen($url, 'rb'));
 
         $memoryResource = fopen('php://memory', 'w+b');
         fwrite($memoryResource, $string);
         rewind($memoryResource);
 
-        $memoryStream = new Stream(fopen('php://memory', 'w+b'));
+        $memoryStream = Utils::streamFor(fopen('php://memory', 'w+b'));
         $memoryStream->write($string);
 
+        $dataStream = Utils::streamFor(fopen('data://image/png,' . rawurlencode($string), 'rb'));
         $data = [
-            'FileAdapter' => [FileAdapter::class, new File($file), $file, 'plank'],
-            'UploadedFileAdapter' => [
-                UploadedFileAdapter::class,
-                $uploadedFile,
-                $file,
-                'plank'
+            'FileAdapter' => [
+                'adapterClass' => FileAdapter::class,
+                'source' => new File($file),
+                'filename' => self::EXPECTED_FILENAME,
+                'extension' => self::EXPECTED_EXTENSION,
+                'inferredMime' => self::EXPECTED_MIME,
+                'clientMime' => null,
+                'size' => self::EXPECTED_SIZE,
+                'hash_md5' => self::EXPECTED_HASH_MD5,
+                'hash_sha1' => self::EXPECTED_HASH_SHA1,
             ],
-            'LocalPathAdapter' => [LocalPathAdapter::class, $file, $file, 'plank'],
-            'RemoteUrlAdapter' => [RemoteUrlAdapter::class, $url, $url, 'plank'],
-            'RawContentAdapter' => [RawContentAdapter::class, $string, null, '', false],
+            'UploadedFileAdapter' => [
+                'adapterClass' => UploadedFileAdapter::class,
+                'source' => $uploadedFile,
+                'filename' => self::EXPECTED_FILENAME,
+                'extension' => self::EXPECTED_EXTENSION,
+                'inferredMime' => self::EXPECTED_MIME,
+                'clientMime' => self::EXPECTED_MIME,
+                'size' => self::EXPECTED_SIZE,
+                'hash_md5' => self::EXPECTED_HASH_MD5,
+                'hash_sha1' => self::EXPECTED_HASH_SHA1,
+            ],
+            'LocalPathAdapter' => [
+                'adapterClass' => LocalPathAdapter::class,
+                'source' => $file,
+                'filename' => self::EXPECTED_FILENAME,
+                'extension' => self::EXPECTED_EXTENSION,
+                'inferredMime' => self::EXPECTED_MIME,
+                'clientMime' => null,
+                'size' => self::EXPECTED_SIZE,
+                'hash_md5' => self::EXPECTED_HASH_MD5,
+                'hash_sha1' => self::EXPECTED_HASH_SHA1,
+            ],
+            'RemoteUrlAdapter' => [
+                'adapterClass' => RemoteUrlAdapter::class,
+                'source' => $url,
+                'filename' => self::EXPECTED_FILENAME,
+                'extension' => self::EXPECTED_EXTENSION,
+                'inferredMime' => self::EXPECTED_MIME,
+                'clientMime' => self::EXPECTED_MIME,
+                'size' => self::EXPECTED_SIZE,
+                'hash_md5' => self::EXPECTED_HASH_MD5,
+                'hash_sha1' => self::EXPECTED_HASH_SHA1,
+            ],
+            'RawContentAdapter' => [
+                'adapterClass' => RawContentAdapter::class,
+                'source' => $string,
+                'filename' => null,
+                'extension' => null,
+                'inferredMime' => self::EXPECTED_MIME,
+                'clientMime' => null,
+                'size' => self::EXPECTED_SIZE,
+                'hash_md5' => self::EXPECTED_HASH_MD5,
+                'hash_sha1' => self::EXPECTED_HASH_SHA1,
+            ],
+            'DataUrlAdapter_base64' => [
+                'adapterClass' => DataUrlAdapter::class,
+                'source' => $base64DataUrl,
+                'filename' => null,
+                'extension' => null,
+                'inferredMime' => self::EXPECTED_MIME,
+                'clientMime' => self::EXPECTED_MIME,
+                'size' => self::EXPECTED_SIZE,
+                'hash_md5' => self::EXPECTED_HASH_MD5,
+                'hash_sha1' => self::EXPECTED_HASH_SHA1,
+            ],
+            'DataUrlAdapter_urlencode' => [
+                'adapterClass' => DataUrlAdapter::class,
+                'source' => $rawDataUrl,
+                'filename' => null,
+                'extension' => null,
+                'inferredMime' => self::EXPECTED_MIME,
+                'clientMime' => self::EXPECTED_MIME,
+                'size' => self::EXPECTED_SIZE,
+                'hash_md5' => self::EXPECTED_HASH_MD5,
+                'hash_sha1' => self::EXPECTED_HASH_SHA1,
+            ],
             'StreamResourceAdapter_Local' => [
-                StreamResourceAdapter::class,
-                $fileResource,
-                $file,
-                'plank'
+                'adapterClass' => StreamResourceAdapter::class,
+                'source' => $fileResource,
+                'filename' => self::EXPECTED_FILENAME,
+                'extension' => self::EXPECTED_EXTENSION,
+                'inferredMime' => self::EXPECTED_MIME,
+                'clientMime' => null,
+                'size' => self::EXPECTED_SIZE,
+                'hash_md5' => self::EXPECTED_HASH_MD5,
+                'hash_sha1' => self::EXPECTED_HASH_SHA1,
             ],
             'StreamAdapter_Local' => [
-                StreamAdapter::class,
-                $fileStream,
-                $file,
-                'plank',
-                false
+                'adapterClass' => StreamAdapter::class,
+                'source' => $fileStream,
+                'filename' => self::EXPECTED_FILENAME,
+                'extension' => self::EXPECTED_EXTENSION,
+                'inferredMime' => self::EXPECTED_MIME,
+                'clientMime' => null,
+                'size' => self::EXPECTED_SIZE,
+                'hash_md5' => self::EXPECTED_HASH_MD5,
+                'hash_sha1' => self::EXPECTED_HASH_SHA1,
             ],
             'StreamResourceAdapter_Remote' => [
-                StreamResourceAdapter::class,
-                $httpResource,
-                $url,
-                'plank'
+                'adapterClass' => StreamResourceAdapter::class,
+                'source' => $httpResource,
+                'filename' => self::EXPECTED_FILENAME,
+                'extension' => self::EXPECTED_EXTENSION,
+                'inferredMime' => self::EXPECTED_MIME,
+                'clientMime' => self::EXPECTED_MIME,
+                'size' => self::EXPECTED_SIZE,
+                'hash_md5' => self::EXPECTED_HASH_MD5,
+                'hash_sha1' => self::EXPECTED_HASH_SHA1,
             ],
             'StreamAdapter_Remote' => [
-                StreamAdapter::class,
-                $httpStream,
-                $url,
-                'plank',
-                false
+                'adapterClass' => StreamAdapter::class,
+                'source' => $httpStream,
+                'filename' => self::EXPECTED_FILENAME,
+                'extension' => self::EXPECTED_EXTENSION,
+                'inferredMime' => self::EXPECTED_MIME,
+                'clientMime' => self::EXPECTED_MIME,
+                'size' => self::EXPECTED_SIZE,
+                'hash_md5' => self::EXPECTED_HASH_MD5,
+                'hash_sha1' => self::EXPECTED_HASH_SHA1,
             ],
             'StreamResourceAdapter_Memory' => [
-                StreamResourceAdapter::class,
-                $memoryResource,
-                'php://memory',
-                ''
+                'adapterClass' => StreamResourceAdapter::class,
+                'source' => $memoryResource,
+                'filename' => null,
+                'extension' => null,
+                'inferredMime' => self::EXPECTED_MIME,
+                'clientMime' => null,
+                'size' => self::EXPECTED_SIZE,
+                'hash_md5' => self::EXPECTED_HASH_MD5,
+                'hash_sha1' => self::EXPECTED_HASH_SHA1,
             ],
             'StreamAdapter_Memory' => [
-                StreamAdapter::class,
-                $memoryStream,
-                'php://memory',
-                ''
+                'adapterClass' => StreamAdapter::class,
+                'source' => $memoryStream,
+                'filename' => null,
+                'extension' => null,
+                'inferredMime' => self::EXPECTED_MIME,
+                'clientMime' => null,
+                'size' => self::EXPECTED_SIZE,
+                'hash_md5' => self::EXPECTED_HASH_MD5,
+                'hash_sha1' => self::EXPECTED_HASH_SHA1,
+            ],
+            'StreamAdapter_Data' => [
+                'adapterClass' => StreamAdapter::class,
+                'source' => $dataStream,
+                'filename' => null,
+                'extension' => null,
+                'inferredMime' => self::EXPECTED_MIME,
+                'clientMime' => self::EXPECTED_MIME,
+                'size' => self::EXPECTED_SIZE,
+                'hash_md5' => self::EXPECTED_HASH_MD5,
+                'hash_sha1' => self::EXPECTED_HASH_SHA1,
             ],
         ];
         return $data;
     }
 
-    public function invalidAdapterProvider()
+    public static function invalidAdapterProvider(): array
     {
         $file = __DIR__ . '/../../_data/invalid.png';
         $url = 'https://raw.githubusercontent.com/plank/laravel-mediable/master/tests/_data/invalid.png';
@@ -141,121 +241,53 @@ class SourceAdapterTest extends TestCase
         );
 
         return [
-            [new FileAdapter(new File($file, false))],
-            [new LocalPathAdapter($file)],
-            [new RemoteUrlAdapter($url)],
-            [new RemoteUrlAdapter('http://example.invalid')],
-            [new UploadedFileAdapter($uploadedFile)],
-            [new StreamResourceAdapter(fopen($this->sampleFilePath(), 'a'))],
-            [new StreamResourceAdapter(fopen('php://stdin', 'w'))],
+            [FileAdapter::class, new File($file, false)],
+            [LocalPathAdapter::class, $file],
+            [RemoteUrlAdapter::class, $url],
+            [RemoteUrlAdapter::class, 'http://example.invalid'],
+            [UploadedFileAdapter::class, $uploadedFile],
+            [StreamResourceAdapter::class, fopen(TestCase::sampleFilePath(), 'a')],
+            [StreamResourceAdapter::class, fopen('php://stdin', 'w')],
         ];
     }
 
     /**
      * @dataProvider adapterProvider
      */
-    public function test_it_can_return_source($adapterClass, $source)
-    {
+    public function test_it_extracts_expected_information_from_source(
+        string $adapterClass,
+        mixed $source,
+        ?string $filename,
+        ?string $extension,
+        string $inferredMime,
+        ?string $clientMime,
+        int $size,
+        string $md5Hash,
+        string $sha1Hash
+    ) {
         /** @var SourceAdapterInterface $adapter */
         $adapter = new $adapterClass($source);
-        $this->assertEquals($source, $adapter->getSource());
-    }
 
-    /**
-     * @dataProvider adapterProvider
-     */
-    public function test_it_adapts_absolute_path($adapterClass, $source, $path)
-    {
-        /** @var SourceAdapterInterface $adapter */
-        $adapter = new $adapterClass($source);
-        $this->assertEquals($path, $adapter->path());
-    }
-
-    /**
-     * @dataProvider adapterProvider
-     */
-    public function test_it_adapts_filename($adapterClass, $source, $path, $filename)
-    {
-        /** @var SourceAdapterInterface $adapter */
-        $adapter = new $adapterClass($source);
+        $stream = $adapter->getStream();
+        $this->assertInstanceOf(StreamInterface::class, $stream);
+        $this->assertTrue($stream->isReadable());
         $this->assertSame($filename, $adapter->filename());
-    }
-
-    /**
-     * @dataProvider adapterProvider
-     */
-    public function test_it_adapts_extension($adapterClass, $source)
-    {
-        /** @var SourceAdapterInterface $adapter */
-        $adapter = new $adapterClass($source);
-        $this->assertEquals('png', $adapter->extension());
-    }
-
-    /**
-     * @dataProvider adapterProvider
-     */
-    public function test_it_adapts_mime_type($adapterClass, $source)
-    {
-        /** @var SourceAdapterInterface $adapter */
-        $adapter = new $adapterClass($source);
-        $this->assertEquals('image/png', $adapter->mimeType());
-    }
-
-    /**
-     * @dataProvider adapterProvider
-     */
-    public function test_it_adapts_file_contents($adapterClass, $source)
-    {
-        /** @var SourceAdapterInterface $adapter */
-        $adapter = new $adapterClass($source);
-        $this->assertIsString($adapter->contents());
-    }
-
-    /**
-     * @dataProvider adapterProvider
-     */
-    public function test_it_adapts_to_stream($adapterClass, $source)
-    {
-        /** @var SourceAdapterInterface $adapter */
-        $adapter = new $adapterClass($source);
-        $stream = $adapter->getStreamResource();
-        try {
-            $this->assertTrue(is_resource($stream));
-            $metadata = stream_get_meta_data($stream);
-            $this->assertArrayHasKey($metadata['mode'], self::READABLE_MODES);
-        } finally {
-            if (is_resource($stream)) {
-                fclose($stream);
-            }
-        }
-    }
-
-    /**
-     * @dataProvider adapterProvider
-     */
-    public function test_it_adapts_file_size($adapterClass, $source)
-    {
-        /** @var SourceAdapterInterface $adapter */
-        $adapter = new $adapterClass($source);
-        $this->assertEquals(7173, $adapter->size());
-    }
-
-    /**
-     * @dataProvider adapterProvider
-     */
-    public function test_it_verifies_file_validity($adapterClass, $source)
-    {
-        /** @var SourceAdapterInterface $adapter */
-        $adapter = new $adapterClass($source);
-        $this->assertTrue($adapter->valid());
+        $this->assertSame($extension, $adapter->extension());
+        $this->assertSame($inferredMime, $adapter->mimeType());
+        $this->assertSame($clientMime, $adapter->clientMimeType());
+        $this->assertSame($size, $adapter->size());
+        $this->assertSame($md5Hash, $adapter->hash());
+        $this->assertSame($sha1Hash, $adapter->hash('sha1'));
     }
 
     /**
      * @dataProvider invalidAdapterProvider
      */
     public function test_it_verifies_file_validity_failure(
-        SourceAdapterInterface $adapter
+        string $adapterClass,
+        $args
     ) {
-        $this->assertFalse($adapter->valid());
+        $this->expectException(ConfigurationException::class);
+        new $adapterClass($args);
     }
 }

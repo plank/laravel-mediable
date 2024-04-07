@@ -54,7 +54,7 @@ Before variants can be created, the manipulations to be applied to the images ne
                 'thumb',
                 ImageManipulation::make(function (Image $image, Media $originalMedia) {
                     $image->fit(32, 32);
-                })->toPngFormat()
+                })->outputPngFormat()
             );
 
             ImageManipulator::defineVariant(
@@ -97,6 +97,30 @@ If outputting to JPEG format, it is also possible to set the desired level of lo
 .. note::
     Intervention/image requires different dependency libraries to be installed in order to output different format. Review the `intervention image documentation <http://image.intervention.io/getting_started/formats>`_ for more details.
 
+Image Optimizations
+^^^^^^^^^^^^^^^^^^^
+
+The ImageManipulator is capable of automatically optimizing images after the manipulations have been applied in order to the reduce the file size.
+
+Before you can use this feature, you must install the optimizer binaries for the image formats that you intend to work with. See the `spatie/image-optimizer documentation <https://github.com/spatie/image-optimizer/blob/main/README.md#optimization-tools>`_ for a list of supported packages and installation instructions on different operating systems.
+
+The optimizers to be used and their arguments can be configured in the ``config/mediable.php`` file. By default, the ImageManipulator will attempt to optimize the image after each manipulation. You can override the default config settings by calling the following methods.
+
+::
+
+    <?php
+    // disable optimization for this manipulation
+    $manipulation->noOptimization();
+
+    // enable optimization for this manipulation
+    $manipulation->optimize();
+
+    // enable optimization but override the optimizers to be applied
+    $manipulation->optimize([Pngquant::class => ['--quality=65']]);
+
+.. warning::
+    Never pass untrusted user input to the optimizer arguments as they will be executed as shell commands!
+
 Output Destination
 ^^^^^^^^^^^^^^^^^^
 
@@ -112,7 +136,8 @@ By default, variants will be created in the same disk and directory as the origi
     $manipulation->toDestination('uploads', 'files/variants');
 
     $manipulation->useFilename('my-custom-filename');
-    $manipulation->useHashForFilename();
+    $manipulation->useHashForFilename(); // defaults to md5
+    $manipulation->useHashForFilename('sha1');
     $manipulation->useOriginalFilename(); //restore default behaviour
 
 If another file exists at the output destination, the ImageManipulator will attempt to find a unique filename by appending an incrementing number. This can be configured to throw an exception instead if a conflict is discovered.

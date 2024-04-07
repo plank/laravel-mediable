@@ -1,5 +1,62 @@
 # Changelog
 
+## 6.0.0
+
+### Compatibility
+- Dropped support for PHP 7.4 and 8.0
+- Dropped Support for Laravel 8 and 9
+- Added Support for PHP 8.3
+- Added Support for Laravel 11
+- Added support for intervention/image 3.0
+- Modernized the database migration files to use more recent Laravel conventions.
+
+### Mediable
+
+- Added `MediableInterface`
+
+### MediaUploader
+
+- Added support for recording alt attributes on Media (database migration required). MediaUploader now exposes a `withAltAttribute()` method to set the alt attribute on the generated media record.
+- Added `MediaUploader::applyImageManipulation()` to make changes to the original uploaded image during the upload process.
+- Added `MediaUploader::validateHash()` to ensure that the hash of the uploaded file matches a particular value during upload. Supports any hashing algorithm supported by PHP's `hash()` function.
+- By default, the MediaUploader will always use the MIME type inferred from the file contents, regardless of the source. Added the `MediaUploader::preferClientMimeType()` to indicate that the MIME type provided by the source should be used instead, if provided. The default behaviour can be configured with the `'prefer_client_mime_type'` key in the `config/mediable.php` file.
+- The `MediaUploader::useHashForFilename()` method now accepts an optional parameter to specify which hashing algorithm to use to generate the filename. Supports any hashing algorithm supported by PHP's `hash()` function.
+- MediaUploader will now use the visibility defined on the filesystem disk config if the `makePublic()`/`makePrivate()` methods are not called, instead of assuming public visibility.
+- MediaUploader now supports data URL strings as an input source, e.g. `data:image/jpeg;base64,...`.
+- If a filename is not provided to the MediaUploader, and none can be inferred from the source, the uploader will throw an exception.
+- If the file extension is not available from the source, the uploader will now consistently infer it from the MIME type. Previously this behaviour was inconsistent across different source adapters.
+
+### SourceAdapters
+
+All SourceAdapter classes have been significantly refactored.
+- All sourceAdapters will now never load the entire file contents into memory (unless it is already in memory) to determine metadata about the file, in order to avoid memory exhaustion when dealing with large files. If reading the file is necessary, most adapters will attempt use a single streamed scan of the file to load all metadata at once, to speed up to the precess. Remote files will be cached to `temp://` to avoid repeated HTTP requests.
+- Removed `getStreamResource()` method. The method has been replaced with the `getStream(): StreamInterface`, which returns a PSR-7 stream implementation instead.
+- Added `hash(string $algo): string` method which is expected to return the hash of the file contents using the specified algorithm.
+- The return type of the `filename()` and `extension()` method is now nullable. If the adapter cannot determine the value from the information available, it should return null.
+- Removed the `getContents()` method. The `getStream()->getContents()` method may be used instead.
+- Removed the `getSource()` method. No replacement.
+- Removed the `path()` method. No replacement.
+- Removed the `valid()` method. SourceAdapters should now throw an exception with a more helpful message from the constructor if the source is not valid.
+
+### ImageManipulation
+
+- Added support for optimizing manipulated images, using the [spatie/image-optimizer](https://github.com/spatie/image-optimizer/) package, which supports a variety of image optimization tools for different image formats (`jpegoptim`, `pngquant`, `optipng`, `gifsicle`, etc.)
+- Default image optimization behaviour can configured in the `config/mediable.php` file to specify the optimization tools to use and their arguments.
+- Added `ImageManipulation::noOptimization()` and `ImageManipulation::optimize(?array $optimizers = null)` methods to allow overriding the defaults set in the config file.
+- The `ImageManipulation::useHashForFilename()` method now accepts an optional parameter to specify which hashing algorithm to use to generate the filename. Supports any hashing algorithm supported by PHP's `hash()` function.
+- The `ImageManipulation::usingHashForFilename()` method has been renamed to `ImageManipulation::isUsingHashForFilename()` to avoid confusion with the `useHashForFilename()` method.
+
+### Media
+- Added `alt` attribute to the Media model.
+- The Media class now exposes a dynamic `url` attribute which will generate a URL for the file (equivalent to the `getUrl()` method).
+
+### Other
+- Improved `MediableCollection` annotions to support generic types.
+- Added missing type declarations to most property and method signatures.
+- Removed the `\Plank\Mediable\Stream` class in favor of the `guzzlehttp/psr7` implementation. This removes the direct dependency on the `psr/http-message` library.
+- `\Plank\Mediable\HandlesMediaUploadExceptions::transformMediaUploadException()` parameter and return type changed from `\Exception` to `\Throwable`.
+- Added PHPStan static analysis to the test suite.
+
 ## 5.5.0 - 2022-05-09
 - Filename and pathname sanitization will use the app locale when transliterating UTF-8 characters to ascii.
 - Restored original behaviour of treating unrecognized mime types as `application/octet-stream` (changed in recent version of Flysystem)

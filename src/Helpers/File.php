@@ -53,7 +53,7 @@ class File
         $language = $language ?: App::currentLocale();
         return trim(
             preg_replace(
-                '/[^a-zA-Z0-9-_.%]+/',
+                '/[^a-zA-Z0-9\-_.%]+/',
                 '-',
                 Str::ascii($file, $language)
             ),
@@ -62,7 +62,7 @@ class File
     }
 
     /**
-     * Generate a human readable bytecount string.
+     * Generate a human-readable byte count string.
      * @param  int $bytes
      * @param  int $precision
      * @return string
@@ -91,17 +91,7 @@ class File
      */
     public static function guessExtension(string $mimeType): ?string
     {
-        // use Symfony MimeTypes component if available (symfony/http-foundation v4.3+)
-        if (class_exists(MimeTypes::class)) {
-            return MimeTypes::getDefault()->getExtensions($mimeType)[0] ?? null;
-        }
-
-        // fall back to the older ExtensionGuesser class (deprecated since Symfony 4.3)
-        if (class_exists(ExtensionGuesser::class)) {
-            return ExtensionGuesser::getInstance()->guess($mimeType);
-        }
-
-        return null;
+        return MimeTypes::getDefault()->getExtensions($mimeType)[0] ?? null;
     }
 
     public static function joinPathComponents(string ...$components): string

@@ -6,6 +6,7 @@ namespace Plank\Mediable;
 use CreateMediableTables;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\ServiceProvider;
+use Mimey\MimeTypes;
 use Plank\Mediable\Commands\ImportMediaCommand;
 use Plank\Mediable\Commands\PruneMediaCommand;
 use Plank\Mediable\Commands\SyncMediaCommand;
@@ -108,6 +109,7 @@ class MediableServiceProvider extends ServiceProvider
             return new MediaUploader(
                 $app['filesystem'],
                 $app['mediable.source.factory'],
+                $app[ImageManipulator::class],
                 $app['config']->get('mediable')
             );
         });

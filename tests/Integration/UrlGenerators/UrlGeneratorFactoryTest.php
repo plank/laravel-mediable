@@ -13,7 +13,7 @@ use stdClass;
 
 class UrlGeneratorFactoryTest extends TestCase
 {
-    public function test_it_sets_generator_for_driver()
+    public function test_it_sets_generator_for_driver(): void
     {
         $factory = new UrlGeneratorFactory;
         $generator = $this->createMock(UrlGeneratorInterface::class);
@@ -26,7 +26,7 @@ class UrlGeneratorFactoryTest extends TestCase
         $this->assertInstanceOf($class, $result);
     }
 
-    public function test_it_throws_exception_for_invalid_generator()
+    public function test_it_throws_exception_for_invalid_generator(): void
     {
         $factory = new UrlGeneratorFactory;
         $class = get_class($this->createMock(stdClass::class));
@@ -34,7 +34,7 @@ class UrlGeneratorFactoryTest extends TestCase
         $factory->setGeneratorForFilesystemDriver($class, 'foo');
     }
 
-    public function test_it_throws_exception_if_cant_map_to_driver()
+    public function test_it_throws_exception_if_cant_map_to_driver(): void
     {
         $factory = new UrlGeneratorFactory;
         $media = factory(Media::class)->make();
@@ -42,7 +42,7 @@ class UrlGeneratorFactoryTest extends TestCase
         $factory->create($media);
     }
 
-    public function test_it_follows_scoped_prefix()
+    public function test_it_follows_scoped_prefix(): void
     {
         if (version_compare($this->app->version(), '9.30.0', '<')) {
             $this->markTestSkipped("scoped disk prefixes are only supported in laravel 9.30.0+");

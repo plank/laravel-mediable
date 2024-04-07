@@ -35,6 +35,7 @@ use Psr\Http\Message\StreamInterface;
  * @property string|null $variant_name
  * @property int|string|null $original_media_id
  * @property int|null $size
+ * @property string|null $alt
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Pivot $pivot
@@ -76,7 +77,8 @@ class Media extends Model
         'mime_type',
         'aggregate_type',
         'variant_name',
-        'original_media_id'
+        'original_media_id',
+        'alt',
     ];
 
     protected $casts = [
@@ -215,6 +217,15 @@ class Media extends Model
     }
 
     /**
+     * Retrieve the file url.
+     * @return string
+     */
+    public function getUrlAttribute(): string
+    {
+        return $this->getUrl();
+    }
+
+    /**
      * Query scope for to find media in a particular directory.
      * @param  Builder $q
      * @param  string $disk Filesystem disk to search in
@@ -235,7 +246,7 @@ class Media extends Model
 
     /**
      * Query scope for finding media in a particular directory or one of its subdirectories.
-     * @param  Builder|Media $q
+     * @param  Builder $q
      * @param  string $disk Filesystem disk to search in
      * @param  string $directory Path relative to disk
      * @return void
@@ -290,7 +301,7 @@ class Media extends Model
         $q->whereNull('original_media_id');
     }
 
-    public function scopeWhereIsVariant(Builder $q, string $variant_name = null)
+    public function scopeWhereIsVariant(Builder $q, string $variant_name = null): void
     {
         $q->whereNotNull('original_media_id');
         if ($variant_name) {
@@ -361,7 +372,7 @@ class Media extends Model
      */
     public function fileExists(): bool
     {
-        return $this->storage()->has($this->getDiskPath());
+        return $this->storage()->exists($this->getDiskPath());
     }
 
     /**
@@ -396,13 +407,10 @@ class Media extends Model
      * Get a read stream to the file
      * @return StreamInterface
      */
-    public function stream()
+    public function stream(): StreamInterface
     {
         $stream = $this->storage()->readStream($this->getDiskPath());
-        if (method_exists(Utils::class, 'streamFor')) {
-            return Utils::streamFor($stream);
-        }
-        return \GuzzleHttp\Psr7\stream_for($stream);
+        return Utils::streamFor($stream);
     }
 
     /**
@@ -442,12 +450,17 @@ class Media extends Model
         return $this;
     }
 
+    /**
+     * @param Media|string|int $media
+     * @param string $variantName
+     * @return $this
+     */
     public function makeVariantOf($media, string $variantName): self
     {
-        if (!$media instanceof static) {
+        if (!$media instanceof self) {
             $media = $this->newQuery()->findOrFail($media);
         }
-
+        /** @var Media $media */
         $this->variant_name = $variantName;
         $this->original_media_id = $media->isOriginal()
             ? $media->getKey()
@@ -500,7 +513,7 @@ class Media extends Model
      *
      * Will invoke the `save()` method on the model after the associated file has been moved to prevent synchronization errors
      * @param  string $disk the disk to move the file to
-     * @param  string $directory directory relative to disk root
+     * @param  string $destination directory relative to disk root
      * @param  string $filename filename. Do not include extension
      * @return void
      * @throws MediaMoveException If attempting to change the file extension or a file with the same name already exists at the destination
@@ -520,9 +533,8 @@ class Media extends Model
      *
      * This method creates a new Media object as well as duplicates the associated file on the disk.
      *
-     * @param  Media $media The media to copy from
      * @param  string $disk the disk to copy the file to
-     * @param  string $directory directory relative to disk root
+     * @param  string $destination directory relative to disk root
      * @param  string $filename optional filename. Do not include extension
      *
      * @return Media
@@ -546,14 +558,16 @@ class Media extends Model
     protected function handleMediaDeletion(): void
     {
         // optionally detach mediable relationships on soft delete
-        if (static::hasGlobalScope(SoftDeletingScope::class) && !$this->forceDeleting) {
+        if (static::hasGlobalScope(SoftDeletingScope::class)
+            && (!property_exists($this, 'forceDeleting') || !$this->forceDeleting)
+        ) {
             if (config('mediable.detach_on_soft_delete')) {
                 $this->newBaseQueryBuilder()
                     ->from(config('mediable.mediables_table', 'mediables'))
                     ->where('media_id', $this->getKey())
                     ->delete();
             }
-        } elseif ($this->storage()->has($this->getDiskPath())) {
+        } elseif ($this->storage()->exists($this->getDiskPath())) {
             // unlink associated file on delete
             $this->storage()->delete($this->getDiskPath());
         }

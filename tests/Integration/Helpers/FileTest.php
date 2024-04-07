@@ -7,7 +7,7 @@ use Plank\Mediable\Tests\TestCase;
 
 class FileTest extends TestCase
 {
-    public function test_it_provides_a_cleaned_dirname()
+    public function test_it_provides_a_cleaned_dirname(): void
     {
         $this->assertEquals('', File::cleanDirname(''));
         $this->assertEquals('', File::cleanDirname('/'));
@@ -16,19 +16,19 @@ class FileTest extends TestCase
         $this->assertEquals('foo/bar', File::cleanDirname('/foo/bar/baz.jpg'));
     }
 
-    public function test_it_converts_bytes_to_readable_strings()
+    public function test_it_converts_bytes_to_readable_strings(): void
     {
         $this->assertEquals('0 B', File::readableSize(0));
         $this->assertEquals('1 KB', File::readableSize(1025, 0));
         $this->assertEquals('1.1 MB', File::readableSize(1024 * 1024 + 1024 * 100, 2));
     }
 
-    public function test_it_guesses_the_extension_given_a_mime_type()
+    public function test_it_guesses_the_extension_given_a_mime_type(): void
     {
         $this->assertEquals('png', File::guessExtension('image/png'));
     }
 
-    public function test_it_sanitizes_filenames()
+    public function test_it_sanitizes_filenames(): void
     {
         $this->assertEquals(
             'hello-world-what-ss_new-with.you',
@@ -36,7 +36,7 @@ class FileTest extends TestCase
         );
     }
 
-    public function test_it_sanitizes_filenames_with_locale()
+    public function test_it_sanitizes_filenames_with_locale(): void
     {
         $this->assertEquals(
             'hello-world-what-sz_new-with.you',
@@ -44,7 +44,7 @@ class FileTest extends TestCase
         );
     }
 
-    public function test_it_sanitizes_paths()
+    public function test_it_sanitizes_paths(): void
     {
         $this->assertEquals(
             'hello/world-what-s_new-with.you',
@@ -52,7 +52,7 @@ class FileTest extends TestCase
         );
     }
 
-    public function test_it_joins_path_components()
+    public function test_it_joins_path_components(): void
     {
         $this->assertEquals('', File::joinPathComponents('', ''));
         $this->assertEquals('foo', File::joinPathComponents('foo', ''));

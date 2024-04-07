@@ -16,9 +16,9 @@ class SampleExceptionHandler
      * we would pass it to the parent::render().
      *
      * @param  \Exception $e
-     * @return \Symfony\Component\HttpKernel\Exception\HttpException|\Exception
+     * @return \Symfony\Component\HttpKernel\Exception\HttpException|\Throwable
      */
-    public function render(\Exception $e)
+    public function render(\Throwable $e): \Throwable
     {
         return $this->transformMediaUploadException($e);
     }

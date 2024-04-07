@@ -11,6 +11,10 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 /**
  * Collection of Mediable Models.
+ *
+ * @template TKey of array-key
+ * @template TMedia of Model&MediableInterface
+ * @extends Collection<TKey, TMedia>
  */
 class MediableCollection extends Collection
 {
@@ -43,7 +47,9 @@ class MediableCollection extends Collection
 
         if ($matchAll) {
             $closure = function (MorphToMany $q) use ($tags, $withVariants) {
-                $this->addMatchAllToEagerLoadQuery($q, $tags);
+                if (method_exists($this, 'addMatchAllToEagerLoadQuery')) {
+                    $this->addMatchAllToEagerLoadQuery($q, $tags);
+                }
 
                 if ($withVariants) {
                     $q->with(['originalMedia.variants', 'variants']);
@@ -117,7 +123,7 @@ class MediableCollection extends Collection
         $classes = [];
 
         $this->each(
-            function (Model $item) use ($query, $relation, &$classes) {
+            function (Model $item) use (&$classes) {
                 // collect list of ids of each class in case not all
                 // items belong to the same class
                 $classes[get_class($item)][] = $item->getKey();
@@ -126,6 +132,10 @@ class MediableCollection extends Collection
 
         // delete each item by class
         collect($classes)->each(
+            /**
+             * @param array<int> $ids
+             * @param class-string<Model> $class
+             */
             function (array $ids, string $class) use ($query, $relation) {
                 // select pivots matching each item for deletion
                 $query->orWhere(
@@ -138,7 +148,7 @@ class MediableCollection extends Collection
                     }
                 );
 
-                $class::whereIn((new $class)->getKeyName(), $ids)->delete();
+                $class::query()->whereIn((new $class)->getKeyName(), $ids)->delete();
             }
         );
 

@@ -40,3 +40,51 @@ Run the migrations to add the required tables to your database.
 ::
 
     $ php artisan migrate
+
+
+Quickstart
+-----------
+
+Add the `Mediable` trait and `MediableInterface` interface to your eloquent models
+
+::
+
+    <?php
+
+    namespace App;
+
+    use Illuminate\Database\Eloquent\Model;
+    use Plank\Mediable\Mediable;
+    use Plank\Mediable\MediableInterface;
+
+    class Post extends Model implements MediableInterface
+    {
+        use Mediable;
+
+        // ...
+    }
+
+Upload files and convert them into `Media` records.
+
+::
+
+    <?php
+    $media = MediaUploader::fromSource($request->file('thumbnail'))
+        ->toDestination('s3', 'posts/thumbnails')
+        ->upload();
+
+Attach the records to your models.
+
+::
+
+    <?php
+    $post = Post::find($postId);
+    $post->attachMedia($media, 'thumbnail');
+
+Load and display your files
+
+::
+
+    <?php
+    $post = Post::withMedia()->find($postId);
+    echo $post->getMedia('thumbnail')->first()->getUrl();

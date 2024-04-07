@@ -3,17 +3,21 @@
 namespace Plank\Mediable\Tests\Integration;
 
 use Illuminate\Filesystem\FilesystemManager;
+use Intervention\Image\Drivers\Gd\Driver as GdDriver;
 use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
 use Plank\Mediable\Exceptions\ImageManipulationException;
 use Plank\Mediable\ImageManipulation;
 use Plank\Mediable\ImageManipulator;
+use Plank\Mediable\ImageOptimizer;
 use Plank\Mediable\Media;
 use Plank\Mediable\Tests\TestCase;
+use Spatie\ImageOptimizer\Optimizers\Optipng;
+use Spatie\ImageOptimizer\Optimizers\Pngquant;
 
 class ImageManipulatorTest extends TestCase
 {
-    public function test_it_can_be_accessed_via_facade()
+    public function test_it_can_be_accessed_via_facade(): void
     {
         $this->assertInstanceOf(
             ImageManipulator::class,
@@ -21,7 +25,7 @@ class ImageManipulatorTest extends TestCase
         );
     }
 
-    public function test_it_sets_and_has_variants()
+    public function test_it_sets_and_has_variants(): void
     {
         $manipulator = $this->getManipulator();
         $this->assertFalse($manipulator->hasVariantDefinition('foo'));
@@ -32,7 +36,7 @@ class ImageManipulatorTest extends TestCase
         $this->assertTrue($manipulator->hasVariantDefinition('foo'));
     }
 
-    public function test_it_retrieves_all_variants()
+    public function test_it_retrieves_all_variants(): void
     {
         $manipulator = $this->getManipulator();
         $variant = new ImageManipulation($this->getMockCallable());
@@ -60,7 +64,7 @@ class ImageManipulatorTest extends TestCase
         $this->assertEquals(['foo', 'bar'], $manipulator->getAllVariantNames());
     }
 
-    public function test_it_can_store_and_retrieve_by_tag()
+    public function test_it_can_store_and_retrieve_by_tag(): void
     {
         $manipulator = $this->getManipulator();
         $variant = new ImageManipulation($this->getMockCallable());
@@ -92,7 +96,7 @@ class ImageManipulatorTest extends TestCase
         $this->assertEquals([], $manipulator->getVariantNamesByTag('c'));
     }
 
-    public function test_it_throws_for_non_image_media()
+    public function test_it_throws_for_non_image_media(): void
     {
         $this->expectException(ImageManipulationException::class);
         $this->expectExceptionMessage(
@@ -104,7 +108,7 @@ class ImageManipulatorTest extends TestCase
         );
     }
 
-    public function test_it_throws_for_unknown_variants()
+    public function test_it_throws_for_unknown_variants(): void
     {
         $this->expectException(ImageManipulationException::class);
         $this->expectExceptionMessage("Unknown variant 'invalid'.");
@@ -114,7 +118,7 @@ class ImageManipulatorTest extends TestCase
         );
     }
 
-    public function test_it_throws_for_indeterminate_output_format()
+    public function test_it_throws_for_indeterminate_output_format(): void
     {
         $this->useFilesystem('tmp');
         $this->expectException(ImageManipulationException::class);
@@ -138,7 +142,7 @@ class ImageManipulatorTest extends TestCase
         $manipulator->createImageVariant($media, 'foo');
     }
 
-    public function test_it_can_create_a_variant()
+    public function test_it_can_create_a_variant(): void
     {
         $this->useFilesystem('tmp');
         $this->useDatabase();
@@ -190,6 +194,7 @@ class ImageManipulatorTest extends TestCase
             $result->size,
             [
                 449, // Laravel <=8
+                442, // laravel 11
                 438 // Laravel 9+
             ]
         );
@@ -198,7 +203,7 @@ class ImageManipulatorTest extends TestCase
         $this->assertTrue($media->fileExists());
     }
 
-    public function test_it_can_create_a_variant_of_a_variant()
+    public function test_it_can_create_a_variant_of_a_variant(): void
     {
         $this->useFilesystem('tmp');
         $this->useDatabase();
@@ -236,7 +241,7 @@ class ImageManipulatorTest extends TestCase
         $this->assertTrue($media->fileExists());
     }
 
-    public function formatProvider()
+    public static function formatProvider(): array
     {
         return [
             ['jpg', 'image/jpeg', 100],
@@ -252,7 +257,7 @@ class ImageManipulatorTest extends TestCase
         string $format,
         string $mime,
         int $quality
-    ) {
+    ): void {
         $this->useFilesystem('tmp');
         $this->useDatabase();
 
@@ -284,7 +289,7 @@ class ImageManipulatorTest extends TestCase
         $this->assertTrue($media->fileExists());
     }
 
-    public function test_it_can_output_to_custom_destination()
+    public function test_it_can_output_to_custom_destination(): void
     {
         $this->useFilesystem('tmp');
         $this->useFilesystem('uploads');
@@ -318,7 +323,7 @@ class ImageManipulatorTest extends TestCase
         $this->assertTrue($media->fileExists());
     }
 
-    public function test_it_can_output_to_hash_filename()
+    public function test_it_can_output_to_hash_filename(): void
     {
         $this->useFilesystem('tmp');
         $this->useFilesystem('uploads');
@@ -342,7 +347,7 @@ class ImageManipulatorTest extends TestCase
             }
         )->toDisk('uploads')
             ->toDirectory('potato')
-            ->useHashForFilename();
+            ->useHashForFilename('sha1');
 
         $imageManipulator = $this->getManipulator();
         $imageManipulator->defineVariant('test', $manipulation);
@@ -350,11 +355,11 @@ class ImageManipulatorTest extends TestCase
 
         $this->assertEquals('uploads', $result->disk);
         $this->assertEquals('potato', $result->directory);
-        $this->assertSame(1, preg_match('/^[a-f0-9]{32}$/', $result->filename));
+        $this->assertSame(1, preg_match('/^[a-f0-9]{40}$/', $result->filename));
         $this->assertTrue($media->fileExists());
     }
 
-    public function test_it_errors_on_duplicate()
+    public function test_it_errors_on_duplicate(): void
     {
         $this->expectException(ImageManipulationException::class);
         $this->useFilesystem('tmp');
@@ -385,7 +390,7 @@ class ImageManipulatorTest extends TestCase
         $imageManipulator->createImageVariant($media, 'test');
     }
 
-    public function test_it_errors_on_duplicate_after_before_save()
+    public function test_it_errors_on_duplicate_after_before_save(): void
     {
         $this->expectException(ImageManipulationException::class);
         $this->useFilesystem('tmp');
@@ -419,7 +424,7 @@ class ImageManipulatorTest extends TestCase
         $imageManipulator->createImageVariant($media, 'test');
     }
 
-    public function test_it_increments_on_duplicate()
+    public function test_it_increments_on_duplicate(): void
     {
         $this->useFilesystem('tmp');
         $this->useDatabase();
@@ -453,7 +458,7 @@ class ImageManipulatorTest extends TestCase
         $this->assertEquals('bar-test-2', $result->filename);
     }
 
-    public function test_it_increments_on_duplicate_after_before_save()
+    public function test_it_increments_on_duplicate_after_before_save(): void
     {
         $this->useFilesystem('tmp');
         $this->useDatabase();
@@ -488,7 +493,7 @@ class ImageManipulatorTest extends TestCase
         $this->assertEquals('bar-1', $result->filename);
     }
 
-    public function test_it_skips_existing_variants()
+    public function test_it_skips_existing_variants(): void
     {
         $this->useFilesystem('tmp');
         $this->useDatabase();
@@ -542,7 +547,7 @@ class ImageManipulatorTest extends TestCase
         );
     }
 
-    public function test_it_can_recreate_an_existing_variant()
+    public function test_it_can_recreate_an_existing_variant(): void
     {
         $this->useFilesystem('tmp');
         $this->useDatabase();
@@ -594,7 +599,7 @@ class ImageManipulatorTest extends TestCase
         $this->assertEquals($result->size, $result2->size);
     }
 
-    public function test_it_can_recreate_existing_variant_to_a_new_destination()
+    public function test_it_can_recreate_existing_variant_to_a_new_destination(): void
     {
         $this->useFilesystem('tmp');
         $this->useFilesystem('uploads');
@@ -646,7 +651,7 @@ class ImageManipulatorTest extends TestCase
         $this->assertFalse($previousVariant->fileExists());
     }
 
-    public function visibilityProvider()
+    public static function visibilityProvider(): array
     {
         return [
             ['uploads', 'public', null, true],
@@ -666,7 +671,7 @@ class ImageManipulatorTest extends TestCase
         string $originalVisibility,
         ?string $manipulationVisibility,
         bool $expectedVisibility
-    ) {
+    ): void {
         $this->useFilesystem($disk);
         $this->useDatabase();
 
@@ -694,11 +699,70 @@ class ImageManipulatorTest extends TestCase
         $this->assertSame($expectedVisibility, $result->isVisible());
     }
 
+    public function test_it_can_optimize_images_after_manipulation(): void
+    {
+        if (shell_exec('command -v pngquant') === null) {
+            $this->markTestSkipped('pngquant is not installed.');
+        }
+        if (shell_exec('command -v optipng') === null) {
+            $this->markTestSkipped('optipng is not installed.');
+        }
+
+        $this->useFilesystem('tmp');
+        $this->useDatabase();
+
+        $media = $this->makeMedia(
+            [
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'extension' => 'png',
+                'mime_type' => 'image/png',
+                'aggregate_type' => 'image'
+            ]
+        );
+        $this->seedFileForMedia($media, $this->sampleFile());
+        $originalSize = filesize($this->sampleFilePath());
+
+        $manipulation = ImageManipulation::make($this->getMockCallable())
+            ->outputPngFormat()
+            ->optimize([
+                Pngquant::class => [
+                    '--quality=85',
+                    '--force',
+                    '--skip-if-larger'
+                ],
+                Optipng::class => [
+                    '-i0',
+                    '-o2',
+                    '-quiet',
+                ]
+            ]);
+
+        $imageManipulator = $this->getManipulator();
+        $imageManipulator->defineVariant('test', $manipulation);
+        $result = $imageManipulator->createImageVariant($media, 'test');
+
+        $this->assertTrue($result->exists);
+        $this->assertLessThan($originalSize, $result->size);
+    }
+
     public function getManipulator(): ImageManipulator
     {
-        return new ImageManipulator(
-            new ImageManager(['driver' => 'gd']),
-            app(FilesystemManager::class)
-        );
+        if (class_exists(GdDriver::class)) {
+            // Intervention Image >=3.0
+            return new ImageManipulator(
+                new ImageManager(new GdDriver()),
+                app(FilesystemManager::class),
+                app(ImageOptimizer::class)
+            );
+        } else {
+            // Intervention Image <3.0
+            return new ImageManipulator(
+                new ImageManager(['driver' => 'gd']),
+                app(FilesystemManager::class),
+                app(ImageOptimizer::class)
+            );
+        }
     }
 }

@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 namespace Plank\Mediable\SourceAdapters;
 
-use Plank\Mediable\Helpers\File as FileHelper;
+use GuzzleHttp\Psr7\Utils;
+use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Symfony\Component\HttpFoundation\File\File;
 
 /**
@@ -11,98 +12,44 @@ use Symfony\Component\HttpFoundation\File\File;
  *
  * Adapts the File class from Symfony Components
  */
-class FileAdapter implements SourceAdapterInterface
+class FileAdapter extends StreamAdapter
 {
-    /**
-     * The source object.
-     * @var \Symfony\Component\HttpFoundation\File\File
-     */
-    protected $source;
+    protected File $file;
 
-    /**
-     * Constructor.
-     * @param \Symfony\Component\HttpFoundation\File\File $source
-     */
     public function __construct(File $source)
     {
-        $this->source = $source;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSource()
-    {
-        return $this->source;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function path(): string
-    {
-        return $this->source->getPath() . '/' . $this->source->getFilename();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function filename(): string
-    {
-        return pathinfo($this->source->getFilename(), PATHINFO_FILENAME);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function extension(): string
-    {
-        $extension = pathinfo($this->path(), PATHINFO_EXTENSION);
-
-        if ($extension) {
-            return $extension;
+        $this->file = $source;
+        $path = $source->getRealPath();
+        if ($path === false) {
+            throw ConfigurationException::invalidSource(
+                "File not found {$source->getPathname()}"
+            );
         }
-
-        return (string)FileHelper::guessExtension($this->mimeType());
+        parent::__construct(
+            Utils::streamFor(
+                Utils::tryFopen($path, 'rb')
+            )
+        );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function mimeType(): string
+    public function filename(): ?string
     {
-        return (string)$this->source->getMimeType();
+        return pathinfo($this->file->getRealPath(), PATHINFO_FILENAME) ?: null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function contents(): string
+    public function extension(): ?string
     {
-        return (string)file_get_contents($this->path());
+        return pathinfo($this->file->getRealPath(), PATHINFO_EXTENSION) ?: null;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getStreamResource()
+    public function clientMimeType(): ?string
     {
-        return fopen($this->path(), 'rb');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function valid(): bool
-    {
-        return file_exists($this->path());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function size(): int
-    {
-        return (int)filesize($this->path());
+        return null;
     }
 }

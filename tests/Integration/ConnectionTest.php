@@ -16,7 +16,7 @@ class ConnectionTest extends TestCase
         $this->useDatabase();
     }
 
-    public function test_it_can_use_different_connection()
+    public function test_it_can_use_different_connection(): void
     {
         $media = factory(Media::class)->create(['id' => 1]);
         $mediable = factory(SampleMediable::class)->create();
@@ -32,7 +32,7 @@ class ConnectionTest extends TestCase
         $this->assertEquals(1, $mediable->firstMedia('foo')->id);
     }
 
-    protected function setupConnection()
+    protected function setupConnection(): void
     {
         $this->app['config']->set('database.connections.my_connection', [
             'driver' => 'sqlite',

@@ -4,17 +4,19 @@ namespace Plank\Mediable\Tests\Integration;
 
 use Plank\Mediable\ImageManipulation;
 use Plank\Mediable\Tests\TestCase;
+use Spatie\ImageOptimizer\Optimizers\Jpegoptim;
+use Spatie\ImageOptimizer\Optimizers\Pngquant;
 
 class ImageManipulationTest extends TestCase
 {
-    public function test_can_get_set_manipulation_callback()
+    public function test_can_get_set_manipulation_callback(): void
     {
         $callback = $this->getMockCallable();
         $manipulation = new ImageManipulation($callback);
         $this->assertSame($callback, $manipulation->getCallback());
     }
 
-    public function test_can_get_set_output_quality()
+    public function test_can_get_set_output_quality(): void
     {
         $manipulation = new ImageManipulation($this->getMockCallable());
         $this->assertEquals(90, $manipulation->getOutputQuality());
@@ -26,7 +28,7 @@ class ImageManipulationTest extends TestCase
         $this->assertEquals(50, $manipulation->getOutputQuality());
     }
 
-    public function test_can_get_set_output_format()
+    public function test_can_get_set_output_format(): void
     {
         $manipulation = new ImageManipulation($this->getMockCallable());
         $this->assertNull($manipulation->getOutputFormat());
@@ -46,7 +48,7 @@ class ImageManipulationTest extends TestCase
         $this->assertEquals('jpg', $manipulation->getOutputFormat());
     }
 
-    public function test_can_get_set_before_save_callback()
+    public function test_can_get_set_before_save_callback(): void
     {
         $callback = $this->getMockCallable();
         $manipulation = new ImageManipulation($this->getMockCallable());
@@ -56,14 +58,14 @@ class ImageManipulationTest extends TestCase
         $this->assertSame($callback, $manipulation->getBeforeSave());
     }
 
-    public function test_destination_setters()
+    public function test_destination_setters(): void
     {
         $manipulation = new ImageManipulation($this->getMockCallable());
 
         $this->assertNull($manipulation->getDisk());
         $this->assertNull($manipulation->getDirectory());
         $this->assertNull($manipulation->getFilename());
-        $this->assertFalse($manipulation->usingHashForFilename());
+        $this->assertFalse($manipulation->isUsingHashForFilename());
 
         $manipulation->toDisk('tmp');
         $this->assertEquals('tmp', $manipulation->getDisk());
@@ -77,18 +79,24 @@ class ImageManipulationTest extends TestCase
 
         $manipulation->useFilename('potato');
         $this->assertEquals('potato', $manipulation->getFilename());
-        $this->assertFalse($manipulation->usingHashForFilename());
+        $this->assertFalse($manipulation->isUsingHashForFilename());
 
         $manipulation->useHashForFilename();
         $this->assertNull($manipulation->getFilename());
-        $this->assertTrue($manipulation->usingHashForFilename());
+        $this->assertTrue($manipulation->isUsingHashForFilename());
+        $this->assertEquals('md5', $manipulation->getHashFilenameAlgo());
+
+        $manipulation->useHashForFilename('sha1');
+        $this->assertNull($manipulation->getFilename());
+        $this->assertTrue($manipulation->isUsingHashForFilename());
+        $this->assertEquals('sha1', $manipulation->getHashFilenameAlgo());
 
         $manipulation->useOriginalFilename();
         $this->assertNull($manipulation->getFilename());
-        $this->assertFalse($manipulation->usingHashForFilename());
+        $this->assertFalse($manipulation->isUsingHashForFilename());
     }
 
-    public function test_get_duplicate_behaviours()
+    public function test_get_duplicate_behaviours(): void
     {
         $manipulation = new ImageManipulation($this->getMockCallable());
         $this->assertEquals(
@@ -107,7 +115,7 @@ class ImageManipulationTest extends TestCase
         );
     }
 
-    public function test_visibility()
+    public function test_visibility(): void
     {
         $manipulation = new ImageManipulation($this->getMockCallable());
         $this->assertNull($manipulation->getVisibility());
@@ -132,5 +140,39 @@ class ImageManipulationTest extends TestCase
 
         $manipulation->setVisibility(null);
         $this->assertNull($manipulation->getVisibility());
+    }
+
+    public function test_it_can_configure_image_optimization(): void
+    {
+        config(['mediable.image_optimization.enabled' => true]);
+        config(['mediable.image_optimization.optimizers' => [Pngquant::class => ['--arg']]]);
+
+        $manipulation = new ImageManipulation($this->getMockCallable());
+        $this->assertTrue($manipulation->shouldOptimize());
+        $optimizerChain = $manipulation->getOptimizerChain();
+        $optimizers = $optimizerChain->getOptimizers();
+        $this->assertCount(1, $optimizers);
+        $this->assertInstanceOf(Pngquant::class, $optimizers[0]);
+
+        $manipulation->noOptimization();
+        $this->assertFalse($manipulation->shouldOptimize());
+
+        config(['mediable.image_optimization.enabled' => false]);
+        $manipulation = new ImageManipulation($this->getMockCallable());
+        $this->assertFalse($manipulation->shouldOptimize());
+
+        $manipulation->optimize();
+        $this->assertTrue($manipulation->shouldOptimize());
+        $optimizerChain = $manipulation->getOptimizerChain();
+        $optimizers = $optimizerChain->getOptimizers();
+        $this->assertCount(1, $optimizers);
+        $this->assertInstanceOf(Pngquant::class, $optimizers[0]);
+
+        $manipulation->optimize([Jpegoptim::class => ['--arg']]);
+        $this->assertTrue($manipulation->shouldOptimize());
+        $optimizerChain = $manipulation->getOptimizerChain();
+        $optimizers = $optimizerChain->getOptimizers();
+        $this->assertCount(1, $optimizers);
+        $this->assertInstanceOf(Jpegoptim::class, $optimizers[0]);
     }
 }

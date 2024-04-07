@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class HandlesMediaExceptionsTest extends TestCase
 {
-    public function test_it_returns_a_403_for_disallowed_disk()
+    public function test_it_returns_a_403_for_disallowed_disk(): void
     {
         $e = (new SampleExceptionHandler())->render(
             ForbiddenException::diskNotAllowed('foo')
@@ -24,7 +24,7 @@ class HandlesMediaExceptionsTest extends TestCase
         $this->assertHttpException($e, 403);
     }
 
-    public function test_it_returns_a_404_for_missing_file()
+    public function test_it_returns_a_404_for_missing_file(): void
     {
         $e = (new SampleExceptionHandler())->render(
             FileNotFoundException::fileNotFound('non/existing.jpg')
@@ -33,7 +33,7 @@ class HandlesMediaExceptionsTest extends TestCase
         $this->assertHttpException($e, 404);
     }
 
-    public function test_it_returns_a_409_on_duplicate_file()
+    public function test_it_returns_a_409_on_duplicate_file(): void
     {
         $e = (new SampleExceptionHandler())->render(
             FileExistsException::fileExists('already/existing.jpg')
@@ -42,7 +42,7 @@ class HandlesMediaExceptionsTest extends TestCase
         $this->assertHttpException($e, 409);
     }
 
-    public function test_it_returns_a_413_for_too_big_file()
+    public function test_it_returns_a_413_for_too_big_file(): void
     {
         $e = (new SampleExceptionHandler())->render(
             FileSizeException::fileIsTooBig(3, 2)
@@ -51,7 +51,7 @@ class HandlesMediaExceptionsTest extends TestCase
         $this->assertHttpException($e, 413);
     }
 
-    public function test_it_returns_a_415_for_type_mismatch()
+    public function test_it_returns_a_415_for_type_mismatch(): void
     {
         $e = (new SampleExceptionHandler())->render(
             FileNotSupportedException::strictTypeMismatch('text/foo', 'bar')
@@ -60,7 +60,7 @@ class HandlesMediaExceptionsTest extends TestCase
         $this->assertHttpException($e, 415);
     }
 
-    public function test_it_returns_a_415_for_unknown_type()
+    public function test_it_returns_a_415_for_unknown_type(): void
     {
         $e = (new SampleExceptionHandler())->render(
             FileNotSupportedException::unrecognizedFileType('text/foo', 'bar')
@@ -69,7 +69,7 @@ class HandlesMediaExceptionsTest extends TestCase
         $this->assertHttpException($e, 415);
     }
 
-    public function test_it_returns_a_415_for_restricted_type()
+    public function test_it_returns_a_415_for_restricted_type(): void
     {
         $e = (new SampleExceptionHandler())->render(
             FileNotSupportedException::mimeRestricted('text/foo', ['text/bar'])
@@ -78,7 +78,7 @@ class HandlesMediaExceptionsTest extends TestCase
         $this->assertHttpException($e, 415);
     }
 
-    public function test_it_returns_a_415_for_restricted_extension()
+    public function test_it_returns_a_415_for_restricted_extension(): void
     {
         $e = (new SampleExceptionHandler())->render(
             FileNotSupportedException::extensionRestricted('foo', ['bar'])
@@ -87,7 +87,7 @@ class HandlesMediaExceptionsTest extends TestCase
         $this->assertHttpException($e, 415);
     }
 
-    public function test_it_returns_a_415_for_restricted_aggregate_type()
+    public function test_it_returns_a_415_for_restricted_aggregate_type(): void
     {
         $e = (new SampleExceptionHandler())->render(
             FileNotSupportedException::aggregateTypeRestricted('foo', ['bar'])
@@ -96,7 +96,7 @@ class HandlesMediaExceptionsTest extends TestCase
         $this->assertHttpException($e, 415);
     }
 
-    public function test_it_returns_a_500_for_other_exception_types()
+    public function test_it_returns_a_500_for_other_exception_types(): void
     {
         $e = (new SampleExceptionHandler())->render(
             new ConfigurationException()
@@ -105,7 +105,7 @@ class HandlesMediaExceptionsTest extends TestCase
         $this->assertHttpException($e, 500);
     }
 
-    public function test_it_skips_any_other_exception()
+    public function test_it_skips_any_other_exception(): void
     {
         $e = (new SampleExceptionHandler())->render(
             new Exception()
@@ -114,7 +114,7 @@ class HandlesMediaExceptionsTest extends TestCase
         $this->assertFalse($e instanceof HttpException);
     }
 
-    protected function assertHttpException($e, $code)
+    protected function assertHttpException($e, $code): void
     {
         $this->assertInstanceOf(HttpException::class, $e);
         /** @var HttpException $e */

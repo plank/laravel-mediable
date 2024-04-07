@@ -26,16 +26,8 @@ class PruneMediaCommand extends Command
      */
     protected $description = 'Delete media records that do not correspond to a file on disk';
 
-    /**
-     * Filesystem Manager instance.
-     * @var FilesystemManager
-     */
-    protected $filesystem;
+    protected FilesystemManager $filesystem;
 
-    /**
-     * Constructor.
-     * @param FilesystemManager $filesystem
-     */
     public function __construct(FileSystemManager $filesystem)
     {
         parent::__construct();

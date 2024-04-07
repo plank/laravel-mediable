@@ -20,7 +20,7 @@ trait HandlesMediaUploadExceptions
      *
      * @var array
      */
-    private $status_codes = [
+    private array $status_codes = [
         // 403
         Response::HTTP_FORBIDDEN => [
             ForbiddenException::class,
@@ -50,10 +50,10 @@ trait HandlesMediaUploadExceptions
     /**
      * Transform a MediaUploadException into an HttpException.
      *
-     * @param  \Exception $e
-     * @return \Exception
+     * @param  \Throwable $e
+     * @return \Throwable
      */
-    protected function transformMediaUploadException(Exception $e): Exception
+    protected function transformMediaUploadException(\Throwable $e): \Throwable
     {
         if ($e instanceof MediaUploadException) {
             $status_code = $this->getStatusCodeForMediaUploadException($e);

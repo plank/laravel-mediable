@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Plank\Mediable\SourceAdapters;
 
+use GuzzleHttp\Psr7\Utils;
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
-use Plank\Mediable\Stream;
 
 /**
  * Stream resource Adapter.
@@ -14,8 +14,7 @@ use Plank\Mediable\Stream;
 class StreamResourceAdapter extends StreamAdapter
 {
     /**
-     * The resource.
-     * @var resource|null
+     * @var resource
      */
     protected $resource;
 
@@ -27,27 +26,11 @@ class StreamResourceAdapter extends StreamAdapter
     public function __construct($source)
     {
         if (!is_resource($source) || get_resource_type($source) !== 'stream') {
-            throw ConfigurationException::unrecognizedSource($source);
+            throw ConfigurationException::invalidSource("Invalid stream resource");
         }
 
-        parent::__construct(new Stream($source));
+        parent::__construct(Utils::streamFor($source));
 
         $this->resource = $source;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSource()
-    {
-        return $this->resource;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getStreamResource()
-    {
-        return $this->resource;
     }
 }

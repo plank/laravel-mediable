@@ -61,6 +61,12 @@ return [
      */
     'allow_unrecognized_types' => false,
 
+    /**
+     * Prefer the client-provided MIME type over the one inferred from the file contents, if provided
+     * May be slightly faster to compute, but is not guaranteed to be accurate if the source is untrusted
+     */
+    'prefer_client_mime_type' => false,
+
     /*
      * Only allow files with specific MIME type(s) to be uploaded
      */
@@ -213,7 +219,8 @@ return [
         'pattern' => [
             '^https?://' => Plank\Mediable\SourceAdapters\RemoteUrlAdapter::class,
             '^/' => Plank\Mediable\SourceAdapters\LocalPathAdapter::class,
-            '^[a-zA-Z]:\\\\' => Plank\Mediable\SourceAdapters\LocalPathAdapter::class
+            '^[a-zA-Z]:\\\\' => Plank\Mediable\SourceAdapters\LocalPathAdapter::class,
+            '^data:/?/?[^,]*,' => Plank\Mediable\SourceAdapters\DataUrlAdapter::class,
         ],
     ],
 
@@ -244,4 +251,55 @@ return [
      * Use this if you are renaming the published migrations and want to prevent them from being loaded twice.
      */
     'ignore_migrations' => false,
+
+    /**
+     * Configuration for image optimization
+     */
+    'image_optimization' => [
+        /**
+         * Whether to apply image optimization after performing image manipulations by default
+         */
+        'enabled' => true,
+        /**
+         * array of optimizers to use, which should implement \Spatie\ImageOptimizer\Optimizer
+         * Each can be passed an array of command line arguments to be passed to the optimizer
+         */
+        'optimizers' => [
+            \Spatie\ImageOptimizer\Optimizers\Jpegoptim::class => [
+                '--max=85',
+                '--strip-all',
+                '--all-progressive',
+            ],
+            \Spatie\ImageOptimizer\Optimizers\Pngquant::class => [
+                '--quality=85',
+                '--force',
+                '--skip-if-larger',
+            ],
+            \Spatie\ImageOptimizer\Optimizers\Optipng::class => [
+                '-i0',
+                '-o2',
+                '-quiet',
+            ],
+            \Spatie\ImageOptimizer\Optimizers\Gifsicle::class => [
+                '-b',
+                '-O3',
+            ],
+            \Spatie\ImageOptimizer\Optimizers\Cwebp::class => [
+                '-q 80',
+                '-m 6',
+                '-pass 10',
+                '-mt',
+            ],
+            \Spatie\ImageOptimizer\Optimizers\Avifenc::class => [
+                '-a cq-level=23',
+                '-j all',
+                '--min 0',
+                '--max 63',
+                '--minalpha 0',
+                '--maxalpha 63',
+                '-a end-usage=q',
+                '-a tune=ssim',
+            ],
+        ],
+    ]
 ];

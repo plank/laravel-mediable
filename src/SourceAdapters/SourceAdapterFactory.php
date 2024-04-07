@@ -14,15 +14,15 @@ class SourceAdapterFactory
 {
     /**
      * Map of which adapters to use for a given source class.
-     * @var string[]
+     * @var class-string<SourceAdapterInterface>[]
      */
-    private $classAdapters = [];
+    private array $classAdapters = [];
 
     /**
      * Map of which adapters to use for a given string pattern.
-     * @var string[]
+     * @var class-string<SourceAdapterInterface>[]
      */
-    private $patternAdapters = [];
+    private array $patternAdapters = [];
 
     /**
      * Create a Source Adapter for the provided source.
@@ -53,7 +53,7 @@ class SourceAdapterFactory
 
     /**
      * Specify the FQCN of a SourceAdapter class to use when the source inherits from a given class.
-     * @param string $adapterClass
+     * @param class-string<SourceAdapterInterface> $adapterClass
      * @param string $sourceClass
      * @return void
      *
@@ -67,7 +67,7 @@ class SourceAdapterFactory
 
     /**
      * Specify the FQCN of a SourceAdapter class to use when the source is a string matching the given pattern.
-     * @param string $adapterClass
+     * @param class-string<SourceAdapterInterface> $adapterClass
      * @param string $sourcePattern
      * @return void
      *
@@ -82,7 +82,7 @@ class SourceAdapterFactory
     /**
      * Choose an adapter class for the class of the provided object.
      * @param  object $source
-     * @return string|null
+     * @return class-string<SourceAdapterInterface>|null
      */
     private function adaptClass(object $source): ?string
     {
@@ -98,7 +98,7 @@ class SourceAdapterFactory
     /**
      * Choose an adapter class for the provided string.
      * @param  string $source
-     * @return string|null
+     * @return class-string<SourceAdapterInterface>|null
      */
     private function adaptString(string $source): ?string
     {
@@ -114,15 +114,13 @@ class SourceAdapterFactory
 
     /**
      * Verify that the provided class implements the SourceAdapter interface.
-     * @param  string $class
+     * @param  class-string<SourceAdapterInterface> $class
      * @throws ConfigurationException If class is not valid
      * @return void
      */
     private function validateAdapterClass(string $class): void
     {
-        $implements = class_implements($class, true);
-
-        if (!in_array(SourceAdapterInterface::class, $implements)) {
+        if (!is_a($class, SourceAdapterInterface::class, true)) {
             throw ConfigurationException::cannotSetAdapter($class);
         }
     }

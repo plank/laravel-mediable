@@ -8,17 +8,12 @@ use Plank\Mediable\Media;
 
 abstract class BaseUrlGenerator implements UrlGeneratorInterface
 {
-    /**
-     * Configuration Repository.
-     * @var \Illuminate\Contracts\Config\Repository
-     */
-    protected $config;
+    protected Config $config;
 
     /**
      * Media instance being linked.
-     * @var \Plank\Mediable\Media
      */
-    protected $media;
+    protected ?Media $media = null;
 
     /**
      * Constructor.
@@ -52,7 +47,7 @@ abstract class BaseUrlGenerator implements UrlGeneratorInterface
      * @param  mixed $default
      * @return mixed
      */
-    protected function getDiskConfig(string $key, $default = null)
+    protected function getDiskConfig(string $key, $default = null): mixed
     {
         return $this->config->get("filesystems.disks.{$this->media->disk}.{$key}", $default);
     }

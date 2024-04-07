@@ -24,6 +24,7 @@ The ``fromSource()`` method will accept any of the following:
 - a stream resource handle.
 - a URL as a string, beginning with ``http://`` or ``https://``.
 - an absolute path as a string, beginning with ``/``.
+- a base64 or URL-encoded data URL.
 
 Specifying Destination
 ----------------------
@@ -58,16 +59,28 @@ By default, the uploader will copy the source file while maintaining its origina
         ->useFilename('profile')
         ->upload();
 
-You can also tell the uploader to generate a filename based on the MD5 hash of the file's contents.
+You can also tell the uploader to generate a filename using a specified hashing algorithm on the file's contents. Supports any algorithm supported by PHP's ``hash()`` function.
 
 ::
 
     <?php
     MediaUploader::fromSource(...)
-        ->useHashForFilename()
+        ->useHashForFilename() // default is 'md5'
+        ->useHashForFilename('sha1')
         ->upload();
 
 You can restore the default behaviour with ``useOriginalFilename()``.
+
+Adding Alt Text
+--------------------
+
+You can record alt text attribute for the media record by calling the ``withAltAttribute()`` method.
+
+::
+    <?php
+    MediaUploader::fromSource(...)
+        ->withAltAttribute('This is the alt text')
+        ->upload();
 
 Handling Duplicates
 ----------------------
@@ -129,6 +142,12 @@ You can override the most validation configuration values set in ``config/mediab
         // only allow files of specific aggregate types
         ->setAllowedAggregateTypes(['image'])
 
+        // ensure that the file contents match a provided hash
+        // second argument is the hash algorithm to use
+        // supports any algorithm supported by PHP's hash() function
+        ->validateHash('3ef5e70366086147c2695325d79a25cc', 'md5')
+        ->validateHash('5e96e1fa58067853219c4cb6d3c1ce01cc5cc8ce', 'sha1')
+
         ->upload();
 
 You can also validate the file without uploading it by calling the ``verifyFile`` method.
@@ -150,12 +169,35 @@ If the file does not pass validation, an instance of ``Plank\Mediable\MediaUploa
 
         ->verifyFile()
 
+Manipulate images during upload
+-------------------------------
 
-Alter Model before upload
+It is possible to edit images during the upload process using the `intervention/image` library.
+
+::
+
+    <?php
+    $manipulation = ImageManipulation::make(function (Image $image, Media $originalMedia) {
+        $image->fit(100, 100);
+    })->outputPngFormat();
+    $media = MediaUploader::fromSource($request->file('image'))
+        ->applyImageManipulation($manipulation);
+        ->upload()
+
+    // alternatively you can reference a register variant name
+    $media = MediaUploader::fromSource($request->file('image'))
+        ->applyImageManipulation('thumbnail')
+        ->upload()
+
+If the aggregate type of the file is not `'image'`, the manipulation will be ignored.
+
+This will load the file contents and apply manipulations synchronously as part of the upload process, which may add latency. The original file is not persisted. To apply manipulations asynchronously on copies of the original file, and for more information on manipulations, see the :ref:`Image Variants <variants>` sections.
+
+Alter Model before saving
 -------------------------
 
 You can manipulate the model before it's saved by passing a callable to the ``beforeSave`` method.
-The callback takes two params, ``$model`` an instance of ``Plank\Mediable\Media`` the current model and ``$source`` an instance of ``Plank\Mediable\SourceAdapters\SourceAdapterInterface`` the current source.
+The callback takes two params, ``$model``, an instance of ``Plank\Mediable\Media`` the current model and ``$source``, an instance of ``Plank\Mediable\SourceAdapters\SourceAdapterInterface`` the current source.
 
 ::
 
