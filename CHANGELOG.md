@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.0.1
+
+- Fix readthedocs documentation build configuration
+
 ## 6.0.0
 
 ### Compatibility
