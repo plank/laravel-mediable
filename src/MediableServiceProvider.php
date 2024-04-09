@@ -5,7 +5,10 @@ namespace Plank\Mediable;
 
 use CreateMediableTables;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Support\ServiceProvider;
+use Intervention\Image\ImageManager;
 use Mimey\MimeTypes;
 use Plank\Mediable\Commands\ImportMediaCommand;
 use Plank\Mediable\Commands\PruneMediaCommand;
@@ -188,7 +191,13 @@ class MediableServiceProvider extends ServiceProvider
 
     public function registerImageManipulator(): void
     {
-        $this->app->singleton(ImageManipulator::class);
+        $this->app->singleton(ImageManipulator::class, function (Container $app) {
+            return new ImageManipulator(
+                $app->get(ImageManager::class),
+                $app->get(FilesystemManager::class),
+                $app->get(ImageOptimizer::class)
+            );
+        });
     }
 
     /**
