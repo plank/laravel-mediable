@@ -55,6 +55,9 @@
             "migrations/"
         ]
     },
+    "suggest": {
+        "intervention/image-laravel": "Laravel bindings for the intervention/image package used for image manipulation"
+    },
     "minimum-stability": "stable",
     "prefer-stable": true,
     "extra": {

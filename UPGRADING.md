@@ -4,6 +4,7 @@
 
 * Minimum PHP version moved to 8.1
 * Minimum Laravel version moved to 10
+* (optional) If upgrading the `intervention/image` package to 3.X, be sure to review the [upgrading instructions](https://image.intervention.io/v3/introduction/upgrade) for that package. Notably, the Laravel service providers for configuring the package have been moved to a separate repository [intervention/image-laravel](https://github.com/Intervention/image-laravel)
 * New database migration file is included with the package. Run `php artisan migrate` to apply the changes.
 * Add the `MediableInterface` to all models using the `Mediable` trait.
 * To add support for data URLs to the MediaUploader, the following entry should be added to the `source_adapters.pattern` field in `config/mediable.php`
