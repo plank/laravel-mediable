@@ -35,7 +35,7 @@ use Psr\Http\Message\StreamInterface;
  * @property string|null $variant_name
  * @property int|string|null $original_media_id
  * @property int|null $size
- * @property string|null $alt
+ * @property string $alt
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Pivot $pivot
@@ -83,6 +83,10 @@ class Media extends Model
 
     protected $casts = [
         'size' => 'int',
+    ];
+
+    protected $attributes = [
+        'alt' => ''
     ];
 
     /**

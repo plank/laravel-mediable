@@ -18,7 +18,7 @@ class AddAltToMedia extends Migration
         Schema::table(
             'media',
             function (Blueprint $table) {
-                $table->text('alt')->default('');
+                $table->text('alt');
             }
         );
     }
