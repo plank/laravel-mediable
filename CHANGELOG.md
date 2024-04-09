@@ -1,5 +1,22 @@
 # Changelog
 
+## 6.1.0
+
+* Attempt to automatically select an `intervention/image` driver based on the available extensions.
+* Fix an error in package discovery if attempting to install both `plank/laravel-mediable` and `intervention/image-laravel` at the same time
+
+## 6.0.5
+
+* move ImageManipulator singleton to lazy instantiation
+
+## 6.0.4
+
+* Fix alt migration default value for the mysql dialect. Default value assigned from the Media model
+
+## 6.0.3
+
+* fix service provider database migration bindings by @frasmage in #349
+
 ## 6.0.2
 - Added `intervention/image-laravel` package to the composer suggests list
 - Updated documentation with configuration instructions for intervention/image

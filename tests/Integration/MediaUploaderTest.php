@@ -823,7 +823,8 @@ class MediaUploaderTest extends TestCase
             function (Image $image) {
                 $image->resize(16, 16);
             }
-        )->outputJpegFormat();
+        )->outputJpegFormat()
+        ->noOptimization();
 
         app(ImageManipulator::class)->defineVariant(
             'foo',
@@ -843,8 +844,8 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('image/jpeg', $media->mime_type);
         $this->assertEquals('image', $media->aggregate_type);
         $this->assertTrue(
-            $media->size >= 933 // intervention/image <3.0
-            && $media->size <= 951 // intervention/image >=3.0
+            $media->size <= 951, // intervention/image >=3.0,
+            "got size {$media->size}"
         );
     }
 

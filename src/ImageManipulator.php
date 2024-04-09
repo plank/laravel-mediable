@@ -9,6 +9,7 @@ use Intervention\Image\Commands\StreamCommand;
 use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
 use Plank\Mediable\Exceptions\ImageManipulationException;
+use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
 use Plank\Mediable\SourceAdapters\StreamAdapter;
 use Psr\Http\Message\StreamInterface;
@@ -16,7 +17,7 @@ use Spatie\ImageOptimizer\OptimizerChain;
 
 class ImageManipulator
 {
-    private ImageManager $imageManager;
+    private ?ImageManager $imageManager;
 
     /**
      * @var ImageManipulation[]
@@ -33,7 +34,7 @@ class ImageManipulator
     private ImageOptimizer $imageOptimizer;
 
     public function __construct(
-        ImageManager $imageManager,
+        ?ImageManager $imageManager,
         FilesystemManager $filesystem,
         ImageOptimizer $imageOptimizer
     ) {
@@ -47,6 +48,9 @@ class ImageManipulator
         ImageManipulation $manipulation,
         ?array $tags = []
     ) {
+        if (!$this->imageManager) {
+            throw ConfigurationException::interventionImageNotConfigured();
+        }
         $this->variantDefinitions[$variantName] = $manipulation;
         foreach ($tags as $tag) {
             $this->variantDefinitionGroups[$tag][] = $variantName;
@@ -105,6 +109,10 @@ class ImageManipulator
         string $variantName,
         bool $forceRecreate = false
     ): Media {
+        if (!$this->imageManager) {
+            throw ConfigurationException::interventionImageNotConfigured();
+        }
+
         $this->validateMedia($media);
 
         $modelClass = config('mediable.model');
@@ -217,6 +225,10 @@ class ImageManipulator
         SourceAdapterInterface $source,
         ImageManipulation $manipulation
     ): StreamAdapter {
+        if (!$this->imageManager) {
+            throw ConfigurationException::interventionImageNotConfigured();
+        }
+
         $outputFormat = $this->determineOutputFormat($manipulation, $media);
         if (method_exists($this->imageManager, 'read')) {
             // Intervention Image  >=3.0
