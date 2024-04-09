@@ -52,4 +52,9 @@ class ConfigurationException extends MediaUploadException
     {
         return new self("Invalid optimizer class `{$optimizerClass}`. Must implement `\Spatie\ImageOptimizer\Optimizer`.");
     }
+
+    public static function interventionImageNotConfigured(): self
+    {
+        return new self("Before variants can be created, the intervention/image package must be configured in the Laravel container.");
+    }
 }

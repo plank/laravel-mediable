@@ -10,30 +10,44 @@ Laravel-Mediable integrates the `intervention/image <http://image.intervention.i
 Configure Intervention/image ImageManager
 -----------------------------------------
 
-Before you can use the ImageManipulation features of this package, you will need to make sure that the intervention/image package is properly configured. Intervention/image is capable of using either the `GD <https://www.php.net/manual/en/book.image.php>`_ or `ImageMagick <https://www.php.net/manual/en/book.imagick.php>`_ libraries as the underlying driver.
+Before you can use the ImageManipulation features of this package, you will need to make sure that the intervention/image package is properly configured. Intervention/image is capable of using either the `GD <https://www.php.net/manual/en/book.image.php>`_ or `ImageMagick <https://www.php.net/manual/en/book.imagick.php>`_ PHP extensions as the underlying driver.
+
+If intervention/image is not configured in the Laravel service container, this package will attempt to automatically select an intervention/image driver based on the extensions available, preferring `imagick` if available, and falling back to `gd`. If neither are available, attempting to use the ImageManipulator will result in an exception.
+
+To configure Intervention/image yourself, refer to the following guides based on your version of the package.
 
 Intervention/image >=3.0
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 RECOMMENDED:  install the `intervention/image-laravel <https://image.intervention.io/v3/introduction/frameworks#laravel>`_ package to configure the container bindings automatically.
 
-Alternatively, you can add the necessary bindings to the service container by adding the following to one of the service providers of your application.
+Alternatively, you can add the necessary bindings to the service container manually by adding the following bindings to one of the service providers of your application.
 
 ::
 
     <?php
-    // if using GD
-    $app->bind(Intervention\Image\Interfaces\DriverInterface::class, \Intervention\Image\Drivers\Gd\Driver::class);
+    class AppServiceProvider extends ServiceProvider
+    {
+        public function register()
+        {
+            // if using GD
+            $app->bind(Intervention\Image\Interfaces\DriverInterface::class,
+                \Intervention\Image\Drivers\Gd\Driver::class
+            );
 
-    // if using Imagick
-    $app->bind(Intervention\Image\Interfaces\DriverInterface::class, \Intervention\Image\Drivers\Imagick\Driver::class);
+            // if using Imagick
+            $app->bind(Intervention\Image\Interfaces\DriverInterface::class,
+                \Intervention\Image\Drivers\Imagick\Driver::class
+            );
+        }
+    }
 
 Intervention/image <3.0
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 RECOMMENDED: `follow the steps <https://image.intervention.io/v2/introduction/installation#integration-in-laravel>`_ to enable the intervention/image Laravel service provider.
 
-Otherwise, by default, intervention/image will use the `GD <https://www.php.net/manual/en/book.image.php>`_ library driver. If you intend to use the additional features of the `ImageMagick <https://www.php.net/manual/en/book.imagick.php>`_ driver, you should make sure that the PHP extension is installed and the correct configuration is bound to the Laravel service container.
+Alternatively, you can add the necessary bindings to the service container manually by adding the following bindings to one of the service providers of your application.
 
 ::
 
@@ -49,6 +63,7 @@ Otherwise, by default, intervention/image will use the `GD <https://www.php.net/
                 ImageManager::class,
                 function() {
                     return new ImageManager(['driver' => 'imagick']);
+                    // return new ImageManager(['driver' => 'gd']);
                 }
             );
         }

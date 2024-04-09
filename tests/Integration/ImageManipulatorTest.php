@@ -7,10 +7,12 @@ use Intervention\Image\Drivers\Gd\Driver as GdDriver;
 use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
 use Plank\Mediable\Exceptions\ImageManipulationException;
+use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Plank\Mediable\ImageManipulation;
 use Plank\Mediable\ImageManipulator;
 use Plank\Mediable\ImageOptimizer;
 use Plank\Mediable\Media;
+use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
 use Plank\Mediable\Tests\TestCase;
 use Spatie\ImageOptimizer\Optimizers\Optipng;
 use Spatie\ImageOptimizer\Optimizers\Pngquant;
@@ -764,5 +766,51 @@ class ImageManipulatorTest extends TestCase
                 app(ImageOptimizer::class)
             );
         }
+    }
+
+    public function test_it_throws_if_no_intervention_image_define_variant(): void
+    {
+        $this->expectException(ConfigurationException::class);
+        $manipulator = new ImageManipulator(
+            null,
+            app(FilesystemManager::class),
+            app(ImageOptimizer::class)
+        );
+
+        $manipulator->defineVariant(
+            'foo',
+            new ImageManipulation($this->getMockCallable())
+        );
+    }
+
+    public function test_it_throws_if_no_intervention_image_create_image_variant(): void
+    {
+        $this->expectException(ConfigurationException::class);
+        $manipulator = new ImageManipulator(
+            null,
+            app(FilesystemManager::class),
+            app(ImageOptimizer::class)
+        );
+
+        $manipulator->createImageVariant(
+            new Media,
+            'foo'
+        );
+    }
+
+    public function test_it_throws_if_no_intervention_image_manipulate_upload(): void
+    {
+        $this->expectException(ConfigurationException::class);
+        $manipulator = new ImageManipulator(
+            null,
+            app(FilesystemManager::class),
+            app(ImageOptimizer::class)
+        );
+
+        $manipulator->manipulateUpload(
+            new Media,
+            $this->createMock(SourceAdapterInterface::class),
+            $this->createMock(ImageManipulation::class),
+        );
     }
 }

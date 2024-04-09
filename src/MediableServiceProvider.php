@@ -3,13 +3,11 @@ declare(strict_types=1);
 
 namespace Plank\Mediable;
 
-use CreateMediableTables;
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Support\ServiceProvider;
 use Intervention\Image\ImageManager;
-use Mimey\MimeTypes;
+use Intervention\Image\Interfaces\DriverInterface;
 use Plank\Mediable\Commands\ImportMediaCommand;
 use Plank\Mediable\Commands\PruneMediaCommand;
 use Plank\Mediable\Commands\SyncMediaCommand;
@@ -108,11 +106,11 @@ class MediableServiceProvider extends ServiceProvider
         );
 
         $this->registerSourceAdapterFactory();
+        $this->registerImageManipulator();
         $this->registerUploader();
         $this->registerMover();
         $this->registerUrlGeneratorFactory();
         $this->registerConsoleCommands();
-        $this->registerImageManipulator();
     }
 
     /**
@@ -193,7 +191,7 @@ class MediableServiceProvider extends ServiceProvider
     {
         $this->app->singleton(ImageManipulator::class, function (Container $app) {
             return new ImageManipulator(
-                $app->get(ImageManager::class),
+                $this->getInterventionImageManagerConfiguration($app),
                 $app->get(FilesystemManager::class),
                 $app->get(ImageOptimizer::class)
             );
@@ -211,5 +209,43 @@ class MediableServiceProvider extends ServiceProvider
             PruneMediaCommand::class,
             SyncMediaCommand::class,
         ]);
+    }
+
+    private function getInterventionImageManagerConfiguration(Container $app): ?ImageManager
+    {
+        $imageManager = null;
+        if ($app->has(ImageManager::class)
+            || (
+                class_exists(DriverInterface::class) // intervention >= 3.0
+                && $app->has(DriverInterface::class)
+            )
+        ) {
+            // use whatever the user has bound to the container if available
+            $imageManager = $app->get(ImageManager::class);
+        } elseif (extension_loaded('imagick')) {
+            // attempt to automatically configure for imagick
+            if (class_exists(\Intervention\Image\Drivers\Imagick\Driver::class)) {
+                // intervention/image >=3.0
+                $imageManager = new ImageManager(
+                    new \Intervention\Image\Drivers\Imagick\Driver()
+                );
+            } else {
+                // intervention/image <3.0
+                $imageManager = new ImageManager(['driver' => 'imagick']);
+            }
+        } elseif (extension_loaded('gd')) {
+            // attempt to automatically configure for gd
+            if (class_exists(\Intervention\Image\Drivers\GD\Driver::class)) {
+                // intervention/image >=3.0
+                $imageManager = new ImageManager(
+                    new \Intervention\Image\Drivers\GD\Driver()
+                );
+            } else {
+                // intervention/image <3.0
+                $imageManager = new ImageManager(['driver' => 'gd']);
+            }
+        }
+
+        return $imageManager;
     }
 }
