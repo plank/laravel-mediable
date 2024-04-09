@@ -235,10 +235,10 @@ class MediableServiceProvider extends ServiceProvider
             }
         } elseif (extension_loaded('gd')) {
             // attempt to automatically configure for gd
-            if (class_exists(\Intervention\Image\Drivers\GD\Driver::class)) {
+            if (class_exists(\Intervention\Image\Drivers\Gd\Driver::class)) {
                 // intervention/image >=3.0
                 $imageManager = new ImageManager(
-                    new \Intervention\Image\Drivers\GD\Driver()
+                    new \Intervention\Image\Drivers\Gd\Driver()
                 );
             } else {
                 // intervention/image <3.0
