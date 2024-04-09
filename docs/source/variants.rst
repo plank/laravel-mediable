@@ -10,7 +10,30 @@ Laravel-Mediable integrates the `intervention/image <http://image.intervention.i
 Configure Intervention/image ImageManager
 -----------------------------------------
 
-By default, intervention/image will use the `GD <https://www.php.net/manual/en/book.image.php>`_ library driver. If you intend to use the additional features of the `ImageMagick <https://www.php.net/manual/en/book.imagick.php>`_ driver, you should make sure that the PHP extension is installed and the correct configuration is bound to the Laravel service container.
+Before you can use the ImageManipulation features of this package, you will need to make sure that the intervention/image package is properly configured. Intervention/image is capable of using either the `GD <https://www.php.net/manual/en/book.image.php>`_ or `ImageMagick <https://www.php.net/manual/en/book.imagick.php>`_ libraries as the underlying driver.
+
+Intervention/image >=3.0
+^^^^^^^^^^^^^^^^^^^^^^^
+
+RECOMMENDED:  install the `intervention/image-laravel <https://image.intervention.io/v3/introduction/frameworks#laravel>`_ package to configure the container bindings automatically.
+
+Alternatively, you can add the necessary bindings to the service container by adding the following to one of the service providers of your application.
+
+::
+
+    <?php
+    // if using GD
+    $app->bind(Intervention\Image\Interfaces\DriverInterface::class, \Intervention\Image\Drivers\Gd\Driver::class);
+
+    // if using Imagick
+    $app->bind(Intervention\Image\Interfaces\DriverInterface::class, \Intervention\Image\Drivers\Imagick\Driver::class);
+
+Intervention/image <3.0
+^^^^^^^^^^^^^^^^^^^^^^^
+
+RECOMMENDED: `follow the steps <https://image.intervention.io/v2/introduction/installation#integration-in-laravel>`_ to enable the intervention/image Laravel service provider.
+
+Otherwise, by default, intervention/image will use the `GD <https://www.php.net/manual/en/book.image.php>`_ library driver. If you intend to use the additional features of the `ImageMagick <https://www.php.net/manual/en/book.imagick.php>`_ driver, you should make sure that the PHP extension is installed and the correct configuration is bound to the Laravel service container.
 
 ::
 

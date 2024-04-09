@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.0.2
+- Added `intervention/image-laravel` package to the composer suggests list
+- Updated documentation with configuration instructions for intervention/image
+
 ## 6.0.1
 
 - Fix readthedocs documentation build configuration
