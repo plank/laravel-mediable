@@ -76,12 +76,12 @@ class MediableServiceProvider extends ServiceProvider
         if (empty(glob($this->app->databasePath('migrations/*_add_alt_to_media.php')))) {
             $this->publishes(
                 [
-                    $root . '/migrations/2020_10_12_000000_add_variants_to_media.php' =>
+                    $root . '/migrations/2024_03_30_000000_add_alt_to_media.php' =>
                         $this->app->databasePath(
                             'migrations/' . date(
                                 'Y_m_d_His',
                                 $time
-                            ) . '_add_variants_to_media.php'
+                            ) . '_add_alt_to_media.php'
                         ),
                 ],
                 'mediable-migrations'
