@@ -3,42 +3,33 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Plank\Mediable\Media;
 
 /**
  * Create table for mock mediable model
  */
-class CreateMediableTestTables extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('sample_mediables', function (Blueprint $table) {
-            $table->increments('id');
+            $table->id();
             $table->timestamps();
             $table->softDeletes();
         });
-
         Schema::connection($this->getConnectionName())->table('media', function (Blueprint $table) {
             $table->softDeletes();
         });
-
         Schema::create('prefixed_mediables', function (Blueprint $table) {
-            $table->integer('media_id')->unsigned();
-            $table->string('mediable_type');
-            $table->integer('mediable_id')->unsigned();
-            $table->string('tag');
-            $table->integer('order')->unsigned();
-
+            $table->foreignIdFor(Media::class)->constrained((new Media())->getTable())->cascadeOnDelete();
+            $table->morphs('mediable');
+            $table->string('tag')->index();
+            $table->unsignedBigInteger('order')->index();
             $table->primary(['media_id', 'mediable_type', 'mediable_id', 'tag']);
-            $table->index(['mediable_id', 'mediable_type']);
-            $table->index('tag');
-            $table->index('order');
-            $table->foreign('media_id')->references('id')->on('media')
-                ->onDelete('cascade');
         });
     }
 
@@ -65,4 +56,4 @@ class CreateMediableTestTables extends Migration
     {
         return config('mediable.connection_name', $this->getConnection());
     }
-}
+};

@@ -3,10 +3,8 @@ declare(strict_types=1);
 
 namespace Plank\Mediable;
 
-use CreateMediableTables;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\ServiceProvider;
-use Mimey\MimeTypes;
 use Plank\Mediable\Commands\ImportMediaCommand;
 use Plank\Mediable\Commands\PruneMediaCommand;
 use Plank\Mediable\Commands\SyncMediaCommand;
@@ -39,12 +37,9 @@ class MediableServiceProvider extends ServiceProvider
             'config'
         );
 
-        if (empty(glob($this->app->databasePath('migrations/*_create_mediable_tables.php'))) && empty(glob($this->app->databasePath('migrations/*_add_variants_to_media.php')))) {
+        if (empty(glob($this->app->databasePath('migrations/*_create_mediable_tables.php')))) {
             $this->publishes([
                 $root . '/migrations/2016_06_27_000000_create_mediable_tables.php' => $this->app->databasePath('migrations/'.date('Y_m_d_His', time()).'_create_mediable_tables.php'),
-            ], 'mediable-migrations');
-            $this->publishes([
-                $root . '/migrations/2020_10_12_000000_add_variants_to_media.php' => $this->app->databasePath('migrations/'.date('Y_m_d_His', time() + 1).'_add_variants_to_media.php'),
             ], 'mediable-migrations');
         }
 
