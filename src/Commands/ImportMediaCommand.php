@@ -111,9 +111,7 @@ class ImportMediaCommand extends Command
         $filename = pathinfo($path, PATHINFO_FILENAME);
         $extension = pathinfo($path, PATHINFO_EXTENSION);
 
-        return $existingMedia->filter(function (Media $media) use ($directory, $filename, $extension) {
-            return $media->directory == $directory && $media->filename == $filename && $media->extension == $extension;
-        })->first();
+        return $existingMedia->filter(fn (Media $media) => $media->directory == $directory && $media->filename == $filename && $media->extension == $extension)->first();
     }
 
     /**
@@ -137,7 +135,7 @@ class ImportMediaCommand extends Command
 
     /**
      * Update an existing media record.
-     * @param  \Plank\Mediable\Media $media
+     * @param  Media  $media
      * @param  string $path
      * @return void
      */
