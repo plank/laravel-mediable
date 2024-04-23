@@ -5,8 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Plank\Mediable\Media;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -43,7 +42,9 @@ return new class extends Migration
             Schema::create(
                 'mediables',
                 function (Blueprint $table) {
-                    $table->foreignIdFor(Media::class)->constrained('media')->cascadeOnDelete();
+                    $table->foreignIdFor(Media::class)
+                        ->constrained((new Media())->getTable())
+                        ->cascadeOnDelete();
                     $table->morphs('mediable');
                     $table->string('tag')->index();
                     $table->unsignedInteger('order')->index();
