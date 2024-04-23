@@ -32,7 +32,7 @@ class SourceAdapterTest extends TestCase
         parent::setUp();
     }
 
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
         $app['filesystem']->disk('uploads')->put('plank.png', $this->sampleFile());

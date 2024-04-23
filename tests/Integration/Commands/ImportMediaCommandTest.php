@@ -18,7 +18,7 @@ class ImportMediaCommandTest extends TestCase
         $this->withoutMockingConsoleOutput();
     }
 
-    public function getEnvironmentSetUp($app)
+    public function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
         $app['config']->set('mediable.allow_unrecognized_types', true);

@@ -3,7 +3,9 @@
 namespace Plank\Mediable\Tests;
 
 use Dotenv\Dotenv;
+use Exception;
 use Faker\Factory;
+use Generator;
 use GuzzleHttp\Psr7\Utils;
 use Illuminate\Filesystem\Filesystem;
 use Intervention\Image\Drivers\Gd\Driver;
@@ -16,25 +18,29 @@ use Plank\Mediable\Tests\Mocks\MockCallable;
 use ReflectionClass;
 use PHPUnit\Framework\Constraint\Callback;
 use PHPUnit\Framework\Constraint\Constraint;
+use ReflectionException;
 
 class TestCase extends BaseTestCase
 {
     const TEST_FILE_SIZE = 7173;
 
+    /**
+     * @throws Exception
+     */
     public function setUp(): void
     {
         parent::setUp();
         $this->withFactories(__DIR__ . '/Factories');
     }
 
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return [
             MediableServiceProvider::class
         ];
     }
 
-    protected function getPackageAliases($app)
+    protected function getPackageAliases($app): array
     {
         return [
             'MediaUploader' => \Plank\Mediable\Facades\MediaUploader::class,
@@ -42,7 +48,7 @@ class TestCase extends BaseTestCase
         ];
     }
 
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         if (file_exists(dirname(__DIR__) . '/.env')) {
             Dotenv::createImmutable(dirname(__DIR__))->load();
@@ -110,20 +116,24 @@ class TestCase extends BaseTestCase
         }
     }
 
+    /**
+     * @throws ReflectionException
+     */
     protected function getPrivateProperty($class, $property_name): \ReflectionProperty
     {
         $reflector = new ReflectionClass($class);
-        $property = $reflector->getProperty($property_name);
-        $property->setAccessible(true);
-        return $property;
+
+        return $reflector->getProperty($property_name);
     }
 
+    /**
+     * @throws ReflectionException
+     */
     protected function getPrivateMethod($class, $method_name): \ReflectionMethod
     {
         $reflector = new ReflectionClass($class);
-        $method = $reflector->getMethod($method_name);
-        $method->setAccessible(true);
-        return $method;
+
+        return $reflector->getMethod($method_name);
     }
 
     protected function seedFileForMedia(Media $media, $contents = ''): void
@@ -203,6 +213,7 @@ class TestCase extends BaseTestCase
 
     /**
      * @return callable&MockObject
+     * @throws \PHPUnit\Framework\MockObject\Exception
      */
     protected function getMockCallable(): callable
     {
@@ -210,12 +221,12 @@ class TestCase extends BaseTestCase
     }
 
     /**
-     * @param array<mixed> $firstCallArguments
-     * @param array<mixed> ...$consecutiveCallsArguments
+     * @param  array  $firstCallArguments
+     * @param  array  ...$consecutiveCallsArguments
      *
-     * @return \Generator<int,Callback<mixed>>
+     * @return Generator<int,Callback<mixed>>
      */
-    public static function withConsecutive(array $firstCallArguments, array ...$consecutiveCallsArguments): \Generator
+    public static function withConsecutive(array $firstCallArguments, array ...$consecutiveCallsArguments): Generator
     {
         foreach ($consecutiveCallsArguments as $consecutiveCallArguments) {
             self::assertSameSize($firstCallArguments, $consecutiveCallArguments, 'Each expected arguments list need to have the same size.');
