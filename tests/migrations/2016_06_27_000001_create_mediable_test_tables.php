@@ -7,8 +7,7 @@ use Illuminate\Support\Facades\Schema;
 /**
  * Create table for mock mediable model
  */
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *

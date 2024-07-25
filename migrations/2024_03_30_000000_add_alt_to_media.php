@@ -6,8 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Plank\Mediable\Media;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -15,7 +14,10 @@ return new class extends Migration
      */
     public function up():void
     {
-        Schema::whenTableDoesntHaveColumn('media', 'alt', function (Blueprint $table) {
+        Schema::whenTableDoesntHaveColumn(
+            'media',
+            'alt',
+            function (Blueprint $table) {
                 $table->text('alt')->nullable();
             }
         );
@@ -29,7 +31,10 @@ return new class extends Migration
     public function down():void
     {
 
-        Schema::whenTableHasColumn('media', 'alt', function (Blueprint $table) {
+        Schema::whenTableHasColumn(
+            'media',
+            'alt',
+            function (Blueprint $table) {
                 $table->dropColumn('alt');
             }
         );
