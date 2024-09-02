@@ -47,10 +47,13 @@ return new class extends Migration {
             'media',
             'original_media_id',
             function (Blueprint $table) {
+                // SQLite does not support dropping foreign keys or columns with constraints
+                // skip removing this column, the `whenTableDoesntHaveColumn`
+                // method should make this safe to play back
                 if (DB::getDriverName() !== 'sqlite') {
                     $table->dropForeign('original_media_id');
+                    $table->dropColumn('original_media_id');
                 }
-                $table->dropColumn('original_media_id');
             }
         );
         Schema::whenTableHasColumn(
