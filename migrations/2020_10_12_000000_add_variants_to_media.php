@@ -6,21 +6,27 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Plank\Mediable\Media;
 
-class AddVariantsToMedia extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
-        Schema::table(
+        Schema::whenTableDoesntHaveColumn(
             'media',
+            'variant_name',
             function (Blueprint $table) {
                 $table->string('variant_name', 255)
                     ->after('size')
                     ->nullable();
+            }
+        );
+        Schema::whenTableDoesntHaveColumn(
+            'media',
+            'original_media_id',
+            function (Blueprint $table) {
                 $table->foreignIdFor(Media::class, 'original_media_id')
                     ->nullable()
                     ->after('variant_name')
@@ -35,10 +41,11 @@ class AddVariantsToMedia extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
-        Schema::table(
+        Schema::whenTableHasColumn(
             'media',
+            'original_media_id',
             function (Blueprint $table) {
                 if (DB::getDriverName() !== 'sqlite') {
                     $table->dropForeign('original_media_id');
@@ -46,8 +53,9 @@ class AddVariantsToMedia extends Migration
                 $table->dropColumn('original_media_id');
             }
         );
-        Schema::table(
+        Schema::whenTableHasColumn(
             'media',
+            'variant_name',
             function (Blueprint $table) {
                 $table->dropColumn('variant_name');
             }
@@ -61,4 +69,4 @@ class AddVariantsToMedia extends Migration
     {
         return config('mediable.connection_name', parent::getConnection());
     }
-}
+};

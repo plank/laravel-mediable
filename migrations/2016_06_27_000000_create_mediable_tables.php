@@ -5,14 +5,13 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Plank\Mediable\Media;
 
-class CreateMediableTables extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         if (!Schema::hasTable('media')) {
             Schema::create(
@@ -52,7 +51,7 @@ class CreateMediableTables extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('mediables');
         Schema::dropIfExists('media');
@@ -65,4 +64,4 @@ class CreateMediableTables extends Migration
     {
         return config('mediable.connection_name', parent::getConnection());
     }
-}
+};

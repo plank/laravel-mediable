@@ -7,14 +7,13 @@ use Illuminate\Support\Facades\Schema;
 /**
  * Create table for mock mediable model
  */
-class CreateMediableTestTables extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('sample_mediables', function (Blueprint $table) {
             $table->increments('id');
@@ -47,7 +46,7 @@ class CreateMediableTestTables extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::connection($this->getConnectionName())->table('media', function (Blueprint $table) {
             $table->dropColumn('deleted_at');
@@ -65,4 +64,4 @@ class CreateMediableTestTables extends Migration
     {
         return config('mediable.connection_name', $this->getConnection());
     }
-}
+};

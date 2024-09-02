@@ -6,19 +6,19 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Plank\Mediable\Media;
 
-class AddAltToMedia extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up():void
     {
-        Schema::table(
+        Schema::whenTableDoesntHaveColumn(
             'media',
+            'alt',
             function (Blueprint $table) {
-                $table->text('alt');
+                $table->text('alt')->nullable();
             }
         );
     }
@@ -28,10 +28,11 @@ class AddAltToMedia extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down():void
     {
-        Schema::table(
+        Schema::whenTableHasColumn(
             'media',
+            'alt',
             function (Blueprint $table) {
                 $table->dropColumn('alt');
             }
@@ -45,4 +46,4 @@ class AddAltToMedia extends Migration
     {
         return config('mediable.connection_name', parent::getConnection());
     }
-}
+};
