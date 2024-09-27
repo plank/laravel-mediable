@@ -30,7 +30,7 @@ class MediaMover
      * @return void
      * @throws MediaMoveException If attempting to change the file extension or a file with the same name already exists at the destination
      */
-    public function move(Media $media, string $directory, ?string $filename): void
+    public function move(Media $media, string $directory, ?string $filename = null): void
     {
         $storage = $this->filesystem->disk($media->disk);
 
@@ -65,7 +65,7 @@ class MediaMover
         Media $media,
         string $disk,
         string $directory,
-        ?string $filename,
+        ?string $filename = null,
         array $options = []
     ): void {
         if ($media->disk === $disk) {
@@ -113,7 +113,7 @@ class MediaMover
      * @return Media
      * @throws MediaMoveException If a file with the same name already exists at the destination or it fails to copy the file
      */
-    public function copyTo(Media $media, string $directory, ?string $filename): Media
+    public function copyTo(Media $media, string $directory, ?string $filename = null): Media
     {
         $storage = $this->filesystem->disk($media->disk);
 
@@ -160,7 +160,7 @@ class MediaMover
         Media $media,
         string $disk,
         string $directory,
-        ?string $filename,
+        ?string $filename = null,
         array $options = []
     ): Media {
         if ($media->disk === $disk) {

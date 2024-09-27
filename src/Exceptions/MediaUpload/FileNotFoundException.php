@@ -7,7 +7,7 @@ use Plank\Mediable\Exceptions\MediaUploadException;
 
 class FileNotFoundException extends MediaUploadException
 {
-    public static function fileNotFound(string $path, ?\Throwable $original): self
+    public static function fileNotFound(string $path, ?\Throwable $original = null): self
     {
         return new self("File `{$path}` does not exist.", 0, $original);
     }

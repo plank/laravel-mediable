@@ -30,7 +30,7 @@ class File
      * @param  string $path
      * @return string
      */
-    public static function sanitizePath(string $path, ?string $language): string
+    public static function sanitizePath(string $path, ?string $language = null): string
     {
         $language = $language ?: App::currentLocale();
         return trim(
@@ -48,7 +48,7 @@ class File
      * @param  string $file
      * @return string
      */
-    public static function sanitizeFileName(string $file, ?string $language): string
+    public static function sanitizeFileName(string $file, ?string $language = null): string
     {
         $language = $language ?: App::currentLocale();
         return trim(

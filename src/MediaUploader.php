@@ -88,7 +88,7 @@ class MediaUploader
         FileSystemManager $filesystem,
         SourceAdapterFactory $factory,
         ImageManipulator $imageManipulator,
-        ?array $config
+        ?array $config = null
     ) {
         $this->filesystem = $filesystem;
         $this->factory = $factory;
