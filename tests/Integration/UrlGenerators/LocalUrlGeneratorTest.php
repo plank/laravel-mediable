@@ -86,7 +86,7 @@ class LocalUrlGeneratorTest extends TestCase
 
     protected function setupGenerator(
         $disk = 'uploads',
-        bool $public = null
+        ?bool $public
     ): LocalUrlGenerator {
         /** @var Media $media */
         $media = factory(Media::class)->make(
