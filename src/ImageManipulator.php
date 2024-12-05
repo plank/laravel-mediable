@@ -345,7 +345,7 @@ class ImageManipulator
     private function checkForDuplicates(
         Media $variant,
         ImageManipulation $manipulation,
-        Media $originalVariant = null
+        ?Media $originalVariant = null
     ) {
         if ($originalVariant
             && $variant->disk === $originalVariant->disk

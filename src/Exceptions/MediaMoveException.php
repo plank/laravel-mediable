@@ -17,12 +17,12 @@ class MediaMoveException extends Exception
         return new self("Another file already exists at `{$path}` on disk `{$disk}`.");
     }
 
-    public static function fileNotFound(string $disk, string $path, Exception $previous = null): self
+    public static function fileNotFound(string $disk, string $path, ?Exception $previous = null): self
     {
         return new self("File not found at `{$path}` on disk `{$disk}`.", 0, $previous);
     }
 
-    public static function failedToCopy(string $from, string $to, Exception $previous = null): self
+    public static function failedToCopy(string $from, string $to, ?Exception $previous = null): self
     {
         return new self("Failed to copy file from `{$from}` to `{$to}`.", 0, $previous);
     }
