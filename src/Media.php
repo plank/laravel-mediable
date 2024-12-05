@@ -47,7 +47,7 @@ use Psr\Http\Message\StreamInterface;
  * @method static Builder forPathOnDisk(string $disk, string $path)
  * @method static Builder unordered()
  * @method static Builder whereIsOriginal()
- * @method static Builder whereIsVariant(string $variant_name = null)
+ * @method static Builder whereIsVariant(?string $variant_name = null)
  */
 class Media extends Model
 {
@@ -305,7 +305,7 @@ class Media extends Model
         $q->whereNull('original_media_id');
     }
 
-    public function scopeWhereIsVariant(Builder $q, string $variant_name = null): void
+    public function scopeWhereIsVariant(Builder $q, ?string $variant_name = null): void
     {
         $q->whereNotNull('original_media_id');
         if ($variant_name) {
@@ -431,7 +431,7 @@ class Media extends Model
      * @param string|null $variantName if specified, will check if the model if a specific kind of variant
      * @return bool
      */
-    public function isVariant(string $variantName = null): bool
+    public function isVariant(?string $variantName = null): bool
     {
         return $this->original_media_id !== null
             && (!$variantName || $this->variant_name === $variantName);
@@ -482,7 +482,7 @@ class Media extends Model
      * @return void
      * @throws MediaMoveException
      */
-    public function move(string $destination, string $filename = null): void
+    public function move(string $destination, ?string $filename = null): void
     {
         $this->getMediaMover()->move($this, $destination, $filename);
     }
@@ -507,7 +507,7 @@ class Media extends Model
      * @return Media
      * @throws MediaMoveException
      */
-    public function copyTo(string $destination, string $filename = null): self
+    public function copyTo(string $destination, ?string $filename = null): self
     {
         return $this->getMediaMover()->copyTo($this, $destination, $filename);
     }
@@ -525,7 +525,7 @@ class Media extends Model
     public function moveToDisk(
         string $disk,
         string $destination,
-        string $filename = null,
+        ?string $filename = null,
         array $options = []
     ): void {
         $this->getMediaMover()
@@ -547,7 +547,7 @@ class Media extends Model
     public function copyToDisk(
         string $disk,
         string $destination,
-        string $filename = null,
+        ?string $filename = null,
         array $options = []
     ): self {
         return $this->getMediaMover()
