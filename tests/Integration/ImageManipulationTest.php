@@ -46,6 +46,8 @@ class ImageManipulationTest extends TestCase
         $this->assertEquals('webp', $manipulation->getOutputFormat());
         $manipulation->outputJpegFormat();
         $this->assertEquals('jpg', $manipulation->getOutputFormat());
+        $manipulation->outputHeicFormat();
+        $this->assertEquals('heic', $manipulation->getOutputFormat());
     }
 
     public function test_can_get_set_before_save_callback(): void

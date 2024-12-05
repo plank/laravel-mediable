@@ -94,12 +94,14 @@ return [
                 'image/jpeg',
                 'image/png',
                 'image/gif',
+                'image/heic',
             ],
             'extensions' => [
                 'jpg',
                 'jpeg',
                 'png',
                 'gif',
+                'heic',
             ]
         ],
         Plank\Mediable\Media::TYPE_IMAGE_VECTOR => [
