@@ -18,29 +18,29 @@
     "require": {
         "php": ">=8.1.0",
         "ext-fileinfo": "*",
-        "guzzlehttp/guzzle": "^7.4.1",
-        "guzzlehttp/psr7": "^2.6",
-        "illuminate/database": "^10.0|^11.34",
-        "illuminate/filesystem": "^10.0|^11.34",
-        "illuminate/support": "^10.0|^11.34",
+        "guzzlehttp/guzzle": "^7.9.1",
+        "guzzlehttp/psr7": "^2.7",
+        "illuminate/database": "^10.0|^11.34.2",
+        "illuminate/filesystem": "^10.0|^11.34.2",
+        "illuminate/support": "^10.0|^11.34.2",
         "intervention/image": "^2.7.1|^3.9.1",
-        "league/flysystem": "^3.0.4",
+        "league/flysystem": "^3.29.1",
         "symfony/http-foundation": "^6.0.3|^7.2",
         "symfony/mime": "^6.0|^7.2",
         "spatie/image-optimizer": "^1.8"
     },
     "require-dev": {
         "aws/aws-sdk-php": "^3.334.0",
-        "doctrine/dbal": "^2.11|^3.0",
+        "doctrine/dbal": "^2.11|^3.9.3",
         "guzzlehttp/promises": "^1.5.1",
-        "laravel/legacy-factories": "^1.3.0",
-        "league/flysystem-aws-s3-v3": "^3.0",
-        "mockery/mockery": "^1.4.2",
-        "orchestra/testbench": "^8.0|^9.6",
-        "php-coveralls/php-coveralls": "^2.5.2",
+        "laravel/legacy-factories": "^1.4.0",
+        "league/flysystem-aws-s3-v3": "^3.29.0",
+        "mockery/mockery": "^1.6.12",
+        "orchestra/testbench": "^8.0|^9.6.1",
+        "php-coveralls/php-coveralls": "^2.7.0",
         "phpunit/phpunit": "^10.5.38",
-        "vlucas/phpdotenv": "^5.4.1",
-        "phpstan/phpstan": "^2.0"
+        "vlucas/phpdotenv": "^5.6.1",
+        "phpstan/phpstan": "^2.0.3"
     },
     "autoload": {
         "psr-4": {
