@@ -9,27 +9,30 @@ use Spatie\ImageOptimizer\OptimizerChain;
 
 class ImageManipulation
 {
+    public const FORMAT_BMP = 'bmp';
+    public const FORMAT_GIF = 'gif';
+    public const FORMAT_HEIC = 'heic';
     public const FORMAT_JPG = 'jpg';
     public const FORMAT_PNG = 'png';
-    public const FORMAT_GIF = 'gif';
     public const FORMAT_TIFF = 'tif';
-    public const FORMAT_BMP = 'bmp';
     public const FORMAT_WEBP = 'webp';
 
     public const VALID_IMAGE_FORMATS = [
+        self::FORMAT_BMP,
+        self::FORMAT_GIF,
+        self::FORMAT_HEIC,
         self::FORMAT_JPG,
         self::FORMAT_PNG,
-        self::FORMAT_GIF,
         self::FORMAT_TIFF,
-        self::FORMAT_BMP
     ];
 
     public const MIME_TYPE_MAP = [
+        self::FORMAT_BMP => 'image/bmp',
+        self::FORMAT_GIF => 'image/gif',
+        self::FORMAT_HEIC => 'image/heic',
         self::FORMAT_JPG => 'image/jpeg',
         self::FORMAT_PNG => 'image/png',
-        self::FORMAT_GIF => 'image/gif',
         self::FORMAT_TIFF => 'image/tiff',
-        self::FORMAT_BMP => 'image/bmp',
         self::FORMAT_WEBP => 'image/webp'
     ];
 
@@ -178,6 +181,13 @@ class ImageManipulation
     public function outputWebpFormat(): self
     {
         $this->setOutputFormat(self::FORMAT_WEBP);
+
+        return $this;
+    }
+
+    public function outputHeicFormat(): self
+    {
+        $this->setOutputFormat(self::FORMAT_HEIC);
 
         return $this;
     }

@@ -411,6 +411,7 @@ class ImageManipulator
             ImageManipulation::FORMAT_GIF => $image->toGif(),
             ImageManipulation::FORMAT_WEBP => $image->toBitmap(),
             ImageManipulation::FORMAT_TIFF => $image->toTiff($outputQuality),
+            ImageManipulation::FORMAT_HEIC => $image->toHeic($outputQuality),
             default => throw ImageManipulationException::unknownOutputFormat(),
         };
         return Utils::streamFor($formatted->toFilePointer());
