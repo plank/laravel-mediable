@@ -46,7 +46,7 @@ class MediaUploader
     /**
      * Path relative to the filesystem disk root.
      */
-    private ?string $directory = null;
+    private string $directory = '';
 
     /**
      * Name of the new file.
