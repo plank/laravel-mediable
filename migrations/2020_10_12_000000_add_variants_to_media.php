@@ -51,7 +51,7 @@ return new class extends Migration {
                 // skip removing this column, the `whenTableDoesntHaveColumn`
                 // method should make this safe to play back
                 if (DB::getDriverName() !== 'sqlite') {
-                    $table->dropConstrainedForeignId('original_media_id');
+                    $table->dropConstrainedForeignIdFor(Media::class, 'original_media_id');
                 }
             }
         );
