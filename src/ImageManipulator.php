@@ -409,7 +409,7 @@ class ImageManipulator
             ImageManipulation::FORMAT_JPG => $image->toJpeg($outputQuality),
             ImageManipulation::FORMAT_PNG => $image->toPng(),
             ImageManipulation::FORMAT_GIF => $image->toGif(),
-            ImageManipulation::FORMAT_WEBP => $image->toBitmap(),
+            ImageManipulation::FORMAT_WEBP => $image->toWebp($outputQuality),
             ImageManipulation::FORMAT_TIFF => $image->toTiff($outputQuality),
             ImageManipulation::FORMAT_HEIC => $image->toHeic($outputQuality),
             default => throw ImageManipulationException::unknownOutputFormat(),
