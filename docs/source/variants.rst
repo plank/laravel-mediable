@@ -125,7 +125,7 @@ The ImageManipulation class also offers a fluent interface for defining how the 
     $manipulation->outputHeicFormat();
     $manipulation->setOutputFormat($format);
 
-If outputting to JPEG or HEIC format, it is also possible to set the desired level of lossy compression, from 0 (low quality, smaller file size) to 100 (high quality, larger file size). Defaults to 90. This value is ignored by other formats.
+If outputting to JPEG, TIFF, WEBP, or HEIC format, it is also possible to set the desired level of lossy compression, from 0 (low quality, smaller file size) to 100 (high quality, larger file size). Defaults to 90. This value is ignored by other formats.
 
 ::
 
