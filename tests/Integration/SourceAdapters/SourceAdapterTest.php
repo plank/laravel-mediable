@@ -3,6 +3,7 @@
 namespace Plank\Mediable\Tests\Integration\SourceAdapters;
 
 use GuzzleHttp\Psr7\Utils;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Plank\Mediable\SourceAdapters\DataUrlAdapter;
 use Plank\Mediable\SourceAdapters\FileAdapter;
@@ -251,9 +252,7 @@ class SourceAdapterTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider adapterProvider
-     */
+    #[DataProvider('adapterProvider')]
     public function test_it_extracts_expected_information_from_source(
         string $adapterClass,
         mixed $source,
@@ -280,9 +279,7 @@ class SourceAdapterTest extends TestCase
         $this->assertSame($sha1Hash, $adapter->hash('sha1'));
     }
 
-    /**
-     * @dataProvider invalidAdapterProvider
-     */
+    #[DataProvider('invalidAdapterProvider')]
     public function test_it_verifies_file_validity_failure(
         string $adapterClass,
         $args
