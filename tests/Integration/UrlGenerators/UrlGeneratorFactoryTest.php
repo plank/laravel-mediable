@@ -16,7 +16,26 @@ class UrlGeneratorFactoryTest extends TestCase
     public function test_it_sets_generator_for_driver(): void
     {
         $factory = new UrlGeneratorFactory;
-        $generator = $this->createMock(UrlGeneratorInterface::class);
+        $generator = new class() implements UrlGeneratorInterface {
+            public function setMedia(Media $media): void
+            {
+            }
+
+            public function getAbsolutePath(): string
+            {
+                return '';
+            }
+
+            public function isPubliclyAccessible(): bool
+            {
+                return true;
+            }
+
+            public function getUrl(): string
+            {
+                return '';
+            }
+        };
         $class = get_class($generator);
 
         $media = factory(Media::class)->make(['disk' => 'uploads']);

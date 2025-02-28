@@ -6,6 +6,7 @@ use Illuminate\Filesystem\FilesystemManager;
 use Intervention\Image\Drivers\Gd\Driver as GdDriver;
 use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Plank\Mediable\Exceptions\ImageManipulationException;
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Plank\Mediable\ImageManipulation;
@@ -252,9 +253,7 @@ class ImageManipulatorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider formatProvider
-     */
+    #[DataProvider('formatProvider')]
     public function test_it_can_create_a_variant_of_a_different_format(
         string $format,
         string $mime,
@@ -667,7 +666,7 @@ class ImageManipulatorTest extends TestCase
         ];
     }
 
-    /** @dataProvider visibilityProvider */
+    #[DataProvider('visibilityProvider')]
     public function test_variant_created_with_visibility(
         string $disk,
         string $originalVisibility,

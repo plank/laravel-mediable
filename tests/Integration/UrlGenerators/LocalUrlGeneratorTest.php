@@ -4,6 +4,7 @@ namespace Plank\Mediable\Tests\Integration\UrlGenerators;
 
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Plank\Mediable\Media;
 use Plank\Mediable\Tests\TestCase;
 use Plank\Mediable\UrlGenerators\LocalUrlGenerator;
@@ -49,9 +50,7 @@ class LocalUrlGeneratorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider public_visibility_provider
-     */
+    #[DataProvider('public_visibility_provider')]
     public function test_it_checks_public_visibility(
         string $disk,
         bool $public,
