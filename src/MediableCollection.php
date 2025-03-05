@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
  * Collection of Mediable Models.
  *
  * @template TKey of array-key
- * @template TMedia of Model&MediableInterface
+ * @template TMedia of Model|MediableInterface
  * @extends Collection<TKey, TMedia>
  */
 class MediableCollection extends Collection
