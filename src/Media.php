@@ -42,6 +42,13 @@ use Psr\Http\Message\StreamInterface;
  * @property Pivot $pivot
  * @property Collection|Media[] $variants
  * @property Media $originalMedia
+ * @method static Builder inDirectory(string $disk, string $directory, bool $recursive = false)
+ * @method static Builder inOrUnderDirectory(string $disk, string $directory)
+ * @method static Builder whereBasename(string $basename)
+ * @method static Builder forPathOnDisk(string $disk, string $path)
+ * @method static Builder unordered()
+ * @method static Builder whereIsOriginal()
+ * @method static Builder whereIsVariant(?string $variant_name = null)
  */
 class Media extends Model
 {
