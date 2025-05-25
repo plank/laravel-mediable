@@ -127,8 +127,7 @@ class ImageManipulatorTest extends TestCase
         $this->expectException(ImageManipulationException::class);
         $this->expectExceptionMessage("Unable to determine valid output format for file.");
         $manipulation = ImageManipulation::make(
-            function (Image $image) {
-            }
+            function (Image $image) {}
         );
         $media = $this->makeMedia(
             [
@@ -145,8 +144,19 @@ class ImageManipulatorTest extends TestCase
         $manipulator->createImageVariant($media, 'foo');
     }
 
+    private function canRunFormatConversionTests(): bool
+    {
+        if (class_exists(GdDriver::class)) {
+            return true;
+        }
+        return extension_loaded('imagick');
+    }
+
     public function test_it_can_create_a_variant(): void
     {
+        if (!$this->canRunFormatConversionTests()) {
+            $this->markTestSkipped('Format conversion not supported with current driver configuration');
+        }
         $this->useFilesystem('tmp');
         $this->useDatabase();
 
@@ -326,6 +336,9 @@ class ImageManipulatorTest extends TestCase
 
     public function test_it_can_output_to_hash_filename(): void
     {
+        if (!$this->canRunFormatConversionTests()) {
+            $this->markTestSkipped('Format conversion not supported with current driver configuration');
+        }
         $this->useFilesystem('tmp');
         $this->useFilesystem('uploads');
         $this->useDatabase();
@@ -362,6 +375,9 @@ class ImageManipulatorTest extends TestCase
 
     public function test_it_errors_on_duplicate(): void
     {
+        if (!$this->canRunFormatConversionTests()) {
+            $this->markTestSkipped('Format conversion not supported with current driver configuration');
+        }
         $this->expectException(ImageManipulationException::class);
         $this->useFilesystem('tmp');
         $this->useDatabase();
@@ -393,6 +409,9 @@ class ImageManipulatorTest extends TestCase
 
     public function test_it_errors_on_duplicate_after_before_save(): void
     {
+        if (!$this->canRunFormatConversionTests()) {
+            $this->markTestSkipped('Format conversion not supported with current driver configuration');
+        }
         $this->expectException(ImageManipulationException::class);
         $this->useFilesystem('tmp');
         $this->useDatabase();
@@ -673,6 +692,9 @@ class ImageManipulatorTest extends TestCase
         ?string $manipulationVisibility,
         bool $expectedVisibility
     ): void {
+        if (!$this->canRunFormatConversionTests()) {
+            $this->markTestSkipped('Format conversion not supported with current driver configuration');
+        }
         $this->useFilesystem($disk);
         $this->useDatabase();
 
@@ -759,8 +781,12 @@ class ImageManipulatorTest extends TestCase
             );
         } else {
             // Intervention Image <3.0
+            $driver = 'imagick';
+            if (!extension_loaded('imagick') && extension_loaded('gd')) {
+                $driver = 'gd';
+            }
             return new ImageManipulator(
-                new ImageManager(['driver' => 'gd']),
+                new ImageManager(['driver' => $driver]),
                 app(FilesystemManager::class),
                 app(ImageOptimizer::class)
             );
