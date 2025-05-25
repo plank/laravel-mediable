@@ -195,9 +195,7 @@ class Media extends Model
         if ($variantName == $this->variant_name) {
             return $this;
         }
-
         return $this->originalMedia->variants->first($filter);
-
     }
 
     public function findOriginal(): Media
