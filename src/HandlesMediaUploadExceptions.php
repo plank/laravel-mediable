@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Plank\Mediable;
 
-use Exception;
 use Plank\Mediable\Exceptions\MediaUpload\FileExistsException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException;
@@ -12,6 +11,7 @@ use Plank\Mediable\Exceptions\MediaUpload\ForbiddenException;
 use Plank\Mediable\Exceptions\MediaUploadException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Throwable;
 
 trait HandlesMediaUploadExceptions
 {
@@ -50,10 +50,10 @@ trait HandlesMediaUploadExceptions
     /**
      * Transform a MediaUploadException into an HttpException.
      *
-     * @param  \Throwable $e
-     * @return \Throwable
+     * @param  Throwable $e
+     * @return Throwable
      */
-    protected function transformMediaUploadException(\Throwable $e): \Throwable
+    protected function transformMediaUploadException(Throwable $e): Throwable
     {
         if ($e instanceof MediaUploadException) {
             $status_code = $this->getStatusCodeForMediaUploadException($e);

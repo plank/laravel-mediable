@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Plank\Mediable\SourceAdapters;
@@ -14,13 +15,11 @@ use Psr\Http\Message\StreamInterface;
  */
 class StreamAdapter implements SourceAdapterInterface
 {
-    const BUFFER_SIZE = 2048;
+    private const BUFFER_SIZE = 2048;
 
     private const TYPE_MEMORY = 'php';
     private const TYPE_DATA_URL = 'rfc2397';
     private const TYPE_HTTP = 'http';
-    private const TYPE_FILE = 'plainfile';
-    private const TYPE_FTP = 'ftp';
 
     protected StreamInterface $source;
 
@@ -205,7 +204,8 @@ class StreamAdapter implements SourceAdapterInterface
             return null;
         }
         $headers = $this->originalSource->getMetadata('wrapper_data');
-        if (!empty($headers)
+        if (
+            !empty($headers)
             && preg_match('/HTTP\/\d+\.\d+\s+(\d+)/i', $headers[0], $matches)
         ) {
             return (int)$matches[1];

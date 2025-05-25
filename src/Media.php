@@ -25,39 +25,39 @@ use Psr\Http\Message\StreamInterface;
 
 /**
  * Media Model.
- * @property int|string|null $id
- * @property string|null $disk
- * @property string|null $directory
- * @property string|null $filename
- * @property string|null $extension
- * @property string|null $basename
- * @property string|null $mime_type
- * @property string|null $aggregate_type
+ * @property int $id
+ * @property string $disk
+ * @property string $directory
+ * @property string $filename
+ * @property string $extension
+ * @property string $basename
+ * @property string $mime_type
+ * @property string $aggregate_type
  * @property string|null $variant_name
- * @property int|string|null $original_media_id
- * @property int|null $size
- * @property string $alt
- * @property Carbon $created_at
- * @property Carbon $updated_at
+ * @property int|null $original_media_id
+ * @property int $size
+ * @property string|null $alt
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  * @property Pivot $pivot
  * @property Collection|Media[] $variants
  * @property Media $originalMedia
  */
 class Media extends Model
 {
-    const TYPE_IMAGE = 'image';
-    const TYPE_IMAGE_VECTOR = 'vector';
-    const TYPE_PDF = 'pdf';
-    const TYPE_VIDEO = 'video';
-    const TYPE_AUDIO = 'audio';
-    const TYPE_ARCHIVE = 'archive';
-    const TYPE_DOCUMENT = 'document';
-    const TYPE_SPREADSHEET = 'spreadsheet';
-    const TYPE_PRESENTATION = 'presentation';
-    const TYPE_OTHER = 'other';
-    const TYPE_ALL = 'all';
+    public const TYPE_IMAGE = 'image';
+    public const TYPE_IMAGE_VECTOR = 'vector';
+    public const TYPE_PDF = 'pdf';
+    public const TYPE_VIDEO = 'video';
+    public const TYPE_AUDIO = 'audio';
+    public const TYPE_ARCHIVE = 'archive';
+    public const TYPE_DOCUMENT = 'document';
+    public const TYPE_SPREADSHEET = 'spreadsheet';
+    public const TYPE_PRESENTATION = 'presentation';
+    public const TYPE_OTHER = 'other';
+    public const TYPE_ALL = 'all';
 
-    const VARIANT_NAME_ORIGINAL = 'original';
+    public const VARIANT_NAME_ORIGINAL = 'original';
 
     protected $table = 'media';
 
@@ -189,11 +189,8 @@ class Media extends Model
             return $this;
         }
 
-        if ($this->originalMedia) {
-            return $this->originalMedia->variants->first($filter);
-        }
+        return $this->originalMedia->variants->first($filter);
 
-        return null;
     }
 
     public function findOriginal(): Media
@@ -333,6 +330,7 @@ class Media extends Model
     /**
      * Get the absolute filesystem path to the file.
      * @return string
+     * @throws MediaUrlException
      */
     public function getAbsolutePath(): string
     {
@@ -342,6 +340,7 @@ class Media extends Model
     /**
      * Check if the file is located below the public webroot.
      * @return bool
+     * @throws MediaUrlException
      */
     public function isPubliclyAccessible(): bool
     {
@@ -475,8 +474,8 @@ class Media extends Model
      * Move the file to a new location on disk.
      *
      * Will invoke the `save()` method on the model after the associated file has been moved to prevent synchronization errors
-     * @param  string $destination directory relative to disk root
-     * @param  string $filename filename. Do not include extension
+     * @param string $destination directory relative to disk root
+     * @param string|null $filename filename. Do not include extension
      * @return void
      * @throws MediaMoveException
      */
@@ -487,8 +486,9 @@ class Media extends Model
 
     /**
      * Rename the file in place.
-     * @param  string $filename
+     * @param string $filename
      * @return void
+     * @throws MediaMoveException
      * @see Media::move()
      */
     public function rename(string $filename): void
@@ -500,8 +500,8 @@ class Media extends Model
      * Copy the file from one Media object to another one.
      *
      * Will invoke the `save()` method on the model after the associated file has been copied to prevent synchronization errors
-     * @param  string $destination directory relative to disk root
-     * @param  string $filename optional filename. Do not include extension
+     * @param string $destination directory relative to disk root
+     * @param string|null $filename optional filename. Do not include extension
      * @return Media
      * @throws MediaMoveException
      */
@@ -514,9 +514,10 @@ class Media extends Model
      * Move the file to a new location on another disk.
      *
      * Will invoke the `save()` method on the model after the associated file has been moved to prevent synchronization errors
-     * @param  string $disk the disk to move the file to
-     * @param  string $destination directory relative to disk root
-     * @param  string $filename filename. Do not include extension
+     * @param string $disk the disk to move the file to
+     * @param string $destination directory relative to disk root
+     * @param string|null $filename filename. Do not include extension
+     * @param array $options
      * @return void
      * @throws MediaMoveException If attempting to change the file extension or a file with the same name already exists at the destination
      */
@@ -535,10 +536,10 @@ class Media extends Model
      *
      * This method creates a new Media object as well as duplicates the associated file on the disk.
      *
-     * @param  string $disk the disk to copy the file to
-     * @param  string $destination directory relative to disk root
-     * @param  string $filename optional filename. Do not include extension
-     *
+     * @param string $disk the disk to copy the file to
+     * @param string $destination directory relative to disk root
+     * @param string|null $filename optional filename. Do not include extension
+     * @param array $options
      * @return Media
      * @throws MediaMoveException If a file with the same name already exists at the destination or it fails to copy the file
      */
@@ -586,8 +587,9 @@ class Media extends Model
     }
 
     /**
-     * Get a UrlGenerator instance for the media.
+     * Get an UrlGenerator instance for the media.
      * @return UrlGeneratorInterface
+     * @throws MediaUrlException
      */
     protected function getUrlGenerator(): UrlGeneratorInterface
     {

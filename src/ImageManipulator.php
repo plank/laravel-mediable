@@ -29,7 +29,7 @@ class ImageManipulator
     /**
      * @var FilesystemManager
      */
-    private $filesystem;
+    private FilesystemManager $filesystem;
 
     private ImageOptimizer $imageOptimizer;
 
@@ -43,11 +43,14 @@ class ImageManipulator
         $this->imageOptimizer = $imageOptimizer;
     }
 
+    /**
+     * @throws ConfigurationException
+     */
     public function defineVariant(
         string $variantName,
         ImageManipulation $manipulation,
         ?array $tags = []
-    ) {
+    ): void {
         if (!$this->imageManager) {
             throw ConfigurationException::interventionImageNotConfigured();
         }
@@ -102,7 +105,7 @@ class ImageManipulator
      * @param string $variantName
      * @param bool $forceRecreate
      * @return Media
-     * @throws ImageManipulationException
+     * @throws ImageManipulationException|ConfigurationException
      */
     public function createImageVariant(
         Media $media,
@@ -220,6 +223,7 @@ class ImageManipulator
      * @param ImageManipulation $manipulation
      * @return StreamAdapter
      * @throws ImageManipulationException
+     * @throws ConfigurationException
      */
     public function manipulateUpload(
         Media $media,
@@ -231,6 +235,8 @@ class ImageManipulator
         }
 
         $outputFormat = $this->determineOutputFormat($manipulation, $media);
+
+        /** @phpstan-ignore-next-line */
         if (method_exists($this->imageManager, 'read')) {
             // Intervention Image  >=3.0
             $image = $this->imageManager->read($source->getStream()->getContents());
@@ -324,6 +330,9 @@ class ImageManipulator
         return sprintf('%s-%s', $originalMedia->filename, $variant->variant_name);
     }
 
+    /**
+     * @throws ImageManipulationException
+     */
     public function validateMedia(Media $media): void
     {
         if ($media->aggregate_type != Media::TYPE_IMAGE) {
@@ -344,11 +353,14 @@ class ImageManipulator
         return $filename;
     }
 
+    /**
+     * @throws ImageManipulationException
+     */
     private function checkForDuplicates(
         Media $variant,
         ImageManipulation $manipulation,
         ?Media $originalVariant = null
-    ) {
+    ): void {
         if (
             $originalVariant
             && $variant->disk === $originalVariant->disk
@@ -400,7 +412,7 @@ class ImageManipulator
         string $outputFormat,
         int $outputQuality
     ) {
-        if (class_exists(StreamCommand::class)) {
+        if (class_exists(Intervention\Image\Commands\StreamCommand::class)) {
             // Intervention Image  <3.0
             /** @phpstan-ignore-next-line */
             return $image->stream(
