@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Plank\Mediable;
@@ -13,9 +14,10 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
  * Collection of Mediable Models.
  *
  * @template TKey of array-key
- * @template TMedia of Model|MediableInterface
+ * @template TMedia of Model&MediableInterface
  * @extends Collection<TKey, TMedia>
  */
+
 class MediableCollection extends Collection
 {
     /**
@@ -27,7 +29,7 @@ class MediableCollection extends Collection
      * @return $this
      */
     public function loadMedia(
-        $tags = [],
+        array|string $tags = [],
         bool $matchAll = false,
         bool $withVariants = false
     ): self {
@@ -81,7 +83,7 @@ class MediableCollection extends Collection
      * @param bool $matchAll If true, only load media attached to all tags simultaneously
      * @return $this
      */
-    public function loadMediaWithVariants($tags = [], bool $matchAll = false): self
+    public function loadMediaWithVariants(array|string $tags = [], bool $matchAll = false): self
     {
         return $this->loadMedia($tags, $matchAll, true);
     }
@@ -94,7 +96,7 @@ class MediableCollection extends Collection
      * If one or more tags are specified, only media attached to all of those tags will be loaded.
      * @return $this
      */
-    public function loadMediaMatchAll($tags = [], bool $withVariants = false): self
+    public function loadMediaMatchAll(array|string $tags = [], bool $withVariants = false): self
     {
         return $this->loadMedia($tags, true, $withVariants);
     }
@@ -106,7 +108,7 @@ class MediableCollection extends Collection
      * If one or more tags are specified, only media attached to all of those tags will be loaded.
      * @return $this
      */
-    public function loadMediaWithVariantsMatchAll($tags = []): self
+    public function loadMediaWithVariantsMatchAll(array|string $tags = []): self
     {
         return $this->loadMedia($tags, true, true);
     }

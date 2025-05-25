@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Plank\Mediable;
@@ -41,13 +42,6 @@ use Psr\Http\Message\StreamInterface;
  * @property Pivot $pivot
  * @property Collection|Media[] $variants
  * @property Media $originalMedia
- * @method static Builder inDirectory(string $disk, string $directory, bool $recursive = false)
- * @method static Builder inOrUnderDirectory(string $disk, string $directory)
- * @method static Builder whereBasename(string $basename)
- * @method static Builder forPathOnDisk(string $disk, string $path)
- * @method static Builder unordered()
- * @method static Builder whereIsOriginal()
- * @method static Builder whereIsVariant(?string $variant_name = null)
  */
 class Media extends Model
 {
@@ -92,7 +86,7 @@ class Media extends Model
     /**
      * {@inheritdoc}
      */
-    public static function boot()
+    public static function boot(): void
     {
         parent::boot();
 
@@ -144,7 +138,7 @@ class Media extends Model
 
     /**
      * Retrieve all other variants and originals of the media
-     * @return Collection|Media[]
+     * @return Collection
      */
     public function getAllVariants(): Collection
     {
@@ -223,6 +217,7 @@ class Media extends Model
     /**
      * Retrieve the file url.
      * @return string
+     * @throws MediaUrlException
      */
     public function getUrlAttribute(): string
     {
@@ -231,33 +226,34 @@ class Media extends Model
 
     /**
      * Query scope for to find media in a particular directory.
-     * @param  Builder $q
-     * @param  string $disk Filesystem disk to search in
-     * @param  string $directory Path relative to disk
-     * @param  bool $recursive (_optional_) If true, will find media in or under the specified directory
-     * @return void
+     * @param Builder<Media> $query
+     * @param string $disk Filesystem disk to search in
+     * @param string $directory Path relative to disk
+     * @param bool $recursive (_optional_) If true, will find media in or under the specified directory
+     * @return Builder<Media>
      */
-    public function scopeInDirectory(Builder $q, string $disk, string $directory, bool $recursive = false): void
+    public function scopeInDirectory(Builder $query, string $disk, string $directory, bool $recursive = false): Builder
     {
-        $q->where('disk', $disk);
+        $query->where('disk', $disk);
         if ($recursive) {
             $directory = str_replace(['%', '_'], ['\%', '\_'], $directory);
-            $q->where('directory', 'like', $directory . '%');
+            $query->where('directory', 'like', $directory . '%');
         } else {
-            $q->where('directory', '=', $directory);
+            $query->where('directory', '=', $directory);
         }
+        return  $query;
     }
 
     /**
      * Query scope for finding media in a particular directory or one of its subdirectories.
-     * @param  Builder $q
-     * @param  string $disk Filesystem disk to search in
-     * @param  string $directory Path relative to disk
-     * @return void
+     * @param Builder<Media> $query
+     * @param string $disk Filesystem disk to search in
+     * @param string $directory Path relative to disk
+     * @return Builder<Media>
      */
-    public function scopeInOrUnderDirectory(Builder $q, string $disk, string $directory): void
+    public function scopeInOrUnderDirectory(Builder $query, string $disk, string $directory): Builder
     {
-        $q->inDirectory($disk, $directory, true);
+        return $query->inDirectory($disk, $directory, true);
     }
 
     /**
@@ -288,17 +284,19 @@ class Media extends Model
     }
 
     /**
+     * @deprecated Use $query->reorder() directly instead of this scope.
+     *
      * Query scope to remove the order by clause from the query.
-     * @param  Builder $q
-     * @return void
+     * This is equivalent to calling `$query->reorder()` directly.
+     *
+     * @param  Builder<Media> $query
+     * @return Builder<Media>
      */
-    public function scopeUnordered(Builder $q): void
+    public function scopeUnordered(Builder $query): Builder
     {
-        $query = $q->getQuery();
-        if ($query->orders) {
-            $query->orders = null;
-        }
+        return $query->reorder();
     }
+
 
     public function scopeWhereIsOriginal(Builder $q): void
     {
@@ -562,7 +560,8 @@ class Media extends Model
     protected function handleMediaDeletion(): void
     {
         // optionally detach mediable relationships on soft delete
-        if (static::hasGlobalScope(SoftDeletingScope::class)
+        if (
+            static::hasGlobalScope(SoftDeletingScope::class)
             && (!property_exists($this, 'forceDeleting') || !$this->forceDeleting)
         ) {
             if (config('mediable.detach_on_soft_delete')) {

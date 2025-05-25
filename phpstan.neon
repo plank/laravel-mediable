@@ -1,8 +1,13 @@
+includes:
+  - vendor/larastan/larastan/extension.neon
+  - vendor/nesbot/carbon/extension.neon
+
 parameters:
-	level: 1
-	paths:
-		- src
-		- tests
-	excludePaths:
-	    analyse:
-	        - vendor
+  level: 2
+
+  paths:
+    - src
+
+  excludePaths:
+    analyse:
+      - vendor

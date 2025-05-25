@@ -142,6 +142,7 @@ class ImageManipulator
             $image = $this->imageManager->read($media->contents());
         } else {
             // Intervention Image <3.0
+            /** @phpstan-ignore-next-line */
             $image = $this->imageManager->make($media->contents());
         }
 
@@ -235,6 +236,7 @@ class ImageManipulator
             $image = $this->imageManager->read($source->getStream()->getContents());
         } else {
             // Intervention Image <3.0
+            /** @phpstan-ignore-next-line */
             $image = $this->imageManager->make($source->getStream()->getContents());
         }
 
@@ -347,7 +349,8 @@ class ImageManipulator
         ImageManipulation $manipulation,
         ?Media $originalVariant = null
     ) {
-        if ($originalVariant
+        if (
+            $originalVariant
             && $variant->disk === $originalVariant->disk
             && $variant->getDiskPath() === $originalVariant->getDiskPath()
         ) {
@@ -399,6 +402,7 @@ class ImageManipulator
     ) {
         if (class_exists(StreamCommand::class)) {
             // Intervention Image  <3.0
+            /** @phpstan-ignore-next-line */
             return $image->stream(
                 $outputFormat,
                 $outputQuality
