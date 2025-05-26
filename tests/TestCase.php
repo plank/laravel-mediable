@@ -8,13 +8,13 @@ use GuzzleHttp\Psr7\Utils;
 use Illuminate\Filesystem\Filesystem;
 use Intervention\Image\ImageManager;
 use Orchestra\Testbench\TestCase as BaseTestCase;
+use PHPUnit\Framework\Constraint\Callback;
+use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\MockObject\MockObject;
 use Plank\Mediable\Media;
 use Plank\Mediable\MediableServiceProvider;
 use Plank\Mediable\Tests\Mocks\MockCallable;
 use ReflectionClass;
-use PHPUnit\Framework\Constraint\Callback;
-use PHPUnit\Framework\Constraint\Constraint;
 
 class TestCase extends BaseTestCase
 {
@@ -23,83 +23,83 @@ class TestCase extends BaseTestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->withFactories(__DIR__ . '/Factories');
+        $this->withFactories(__DIR__.'/Factories');
     }
 
     protected function getPackageProviders($app)
     {
         return [
-            MediableServiceProvider::class
+            MediableServiceProvider::class,
         ];
     }
 
     protected function getPackageAliases($app)
     {
         return [
-            'MediaUploader' => \Plank\Mediable\Facades\MediaUploader::class,
+            'MediaUploader'    => \Plank\Mediable\Facades\MediaUploader::class,
             'ImageManipulator' => \Plank\Mediable\Facades\ImageManipulator::class,
         ];
     }
 
     protected function getEnvironmentSetUp($app)
     {
-        if (file_exists(dirname(__DIR__) . '/.env')) {
+        if (file_exists(dirname(__DIR__).'/.env')) {
             Dotenv::createImmutable(dirname(__DIR__))->load();
         }
         //use in-memory database
         $app['config']->set('database.connections.testing', [
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => ':memory:',
-            'prefix' => ''
+            'prefix'   => '',
         ]);
         $app['config']->set('database.default', 'testing');
         $app['config']->set('filesystems.default', 'uploads');
         $app['config']->set('filesystems.disks', [
             //private local storage
             'tmp' => [
-                'driver' => 'local',
-                'root' => storage_path('tmp'),
-                'visibility' => 'private'
+                'driver'     => 'local',
+                'root'       => storage_path('tmp'),
+                'visibility' => 'private',
             ],
             'novisibility' => [
                 'driver' => 'local',
-                'root' => storage_path('tmp'),
+                'root'   => storage_path('tmp'),
             ],
             //public local storage
             'uploads' => [
-                'driver' => 'local',
-                'root' => public_path('uploads'),
-                'url' => 'http://localhost/uploads',
-                'visibility' => 'public'
+                'driver'     => 'local',
+                'root'       => public_path('uploads'),
+                'url'        => 'http://localhost/uploads',
+                'visibility' => 'public',
             ],
             'public_storage' => [
-                'driver' => 'local',
-                'root' => storage_path('public'),
-                'url' => 'http://localhost/storage',
+                'driver'     => 'local',
+                'root'       => storage_path('public'),
+                'url'        => 'http://localhost/storage',
                 'visibility' => 'public',
             ],
             's3' => [
-                'driver' => 's3',
-                'key' => env('S3_KEY'),
-                'secret' => env('S3_SECRET'),
-                'region' => env('S3_REGION'),
-                'bucket' => env('S3_BUCKET'),
-                'version' => 'latest',
+                'driver'     => 's3',
+                'key'        => env('S3_KEY'),
+                'secret'     => env('S3_SECRET'),
+                'region'     => env('S3_REGION'),
+                'bucket'     => env('S3_BUCKET'),
+                'version'    => 'latest',
                 'visibility' => 'public',
                 // set random root to avoid parallel test runs from deleting each other's files
-                'root' => Factory::create()->md5
+                'root' => Factory::create()->md5,
             ],
             'scoped' => [
                 'driver' => 'scoped',
-                'disk' => 'tmp',
-                'prefix' => 'scoped'
+                'disk'   => 'tmp',
+                'prefix' => 'scoped',
             ],
         ]);
 
         $app['config']->set('mediable.allowed_disks', [
             'tmp',
             'novisibility',
-            'uploads'
+            'uploads',
         ]);
 
         $app['config']->set('mediable.image_optimization.enabled', false);
@@ -124,6 +124,7 @@ class TestCase extends BaseTestCase
         $reflector = new ReflectionClass($class);
         $property = $reflector->getProperty($property_name);
         $property->setAccessible(true);
+
         return $property;
     }
 
@@ -132,6 +133,7 @@ class TestCase extends BaseTestCase
         $reflector = new ReflectionClass($class);
         $method = $reflector->getMethod($method_name);
         $method->setAccessible(true);
+
         return $method;
     }
 
@@ -155,19 +157,19 @@ class TestCase extends BaseTestCase
         $this->loadMigrationsFrom(
             [
                 '--path' => [
-                    dirname(__DIR__) . '/migrations',
-                    __DIR__ . '/migrations'
-                ]
+                    dirname(__DIR__).'/migrations',
+                    __DIR__.'/migrations',
+                ],
             ]
         );
     }
 
     protected function useFilesystem($disk): void
     {
-        if (!$this->app['config']->has('filesystems.disks.' . $disk)) {
+        if (!$this->app['config']->has('filesystems.disks.'.$disk)) {
             return;
         }
-        $root = $this->app['config']->get('filesystems.disks.' . $disk . '.root');
+        $root = $this->app['config']->get('filesystems.disks.'.$disk.'.root');
         $filesystem = $this->app->make(Filesystem::class);
         $filesystem->cleanDirectory($root);
     }
@@ -182,12 +184,12 @@ class TestCase extends BaseTestCase
 
     protected static function sampleFilePath(): string
     {
-        return realpath(__DIR__ . '/_data/plank.png');
+        return realpath(__DIR__.'/_data/plank.png');
     }
 
     protected static function alternateFilePath(): string
     {
-        return realpath(__DIR__ . '/_data/plank2.png');
+        return realpath(__DIR__.'/_data/plank2.png');
     }
 
     protected static function remoteFilePath(): string
@@ -233,13 +235,13 @@ class TestCase extends BaseTestCase
         $allConsecutiveCallsArguments = [$firstCallArguments, ...$consecutiveCallsArguments];
 
         $numberOfArguments = count($firstCallArguments);
-        $argumentList      = [];
+        $argumentList = [];
         for ($argumentPosition = 0; $argumentPosition < $numberOfArguments; $argumentPosition++) {
             $argumentList[$argumentPosition] = array_column($allConsecutiveCallsArguments, $argumentPosition);
         }
 
         $mockedMethodCall = 0;
-        $callbackCall     = 0;
+        $callbackCall = 0;
         foreach ($argumentList as $index => $argument) {
             yield new Callback(
                 static function (mixed $actualArgument) use ($argumentList, &$mockedMethodCall, &$callbackCall, $index, $numberOfArguments): bool {

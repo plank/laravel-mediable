@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Plank\Mediable\Commands;
@@ -14,6 +15,7 @@ class PruneMediaCommand extends Command
 {
     /**
      * {@inheritdoc}
+     *
      * @var string
      */
     protected $signature = 'media:prune {disk : the name of the filesystem disk.}
@@ -22,6 +24,7 @@ class PruneMediaCommand extends Command
 
     /**
      * {@inheritdoc}
+     *
      * @var string
      */
     protected $description = 'Delete media records that do not correspond to a file on disk';
@@ -54,7 +57,7 @@ class PruneMediaCommand extends Command
         foreach ($records as $media) {
             if (!$media->fileExists()) {
                 $media->delete();
-                ++$counter;
+                $counter++;
                 $this->info("Pruned record for file {$media->getDiskPath()}", 'v');
             }
         }
@@ -64,12 +67,13 @@ class PruneMediaCommand extends Command
 
     /**
      * Generate an instance of the `Media` class.
+     *
      * @return Media
      */
     private function makeModel(): Media
     {
         $class = config('mediable.model', Media::class);
 
-        return new $class;
+        return new $class();
     }
 }

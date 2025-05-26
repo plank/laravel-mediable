@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Plank\Mediable\Commands;
@@ -12,6 +13,7 @@ class SyncMediaCommand extends Command
 {
     /**
      * {@inheritdoc}
+     *
      * @var string
      */
     protected $signature = 'media:sync {disk : the name of the filesystem disk.}
@@ -21,6 +23,7 @@ class SyncMediaCommand extends Command
 
     /**
      * {@inheritdoc}
+     *
      * @var string
      */
     protected $description = 'Synchronize media records with the filesystem.';
@@ -34,20 +37,20 @@ class SyncMediaCommand extends Command
     {
         $disk = $this->argument('disk');
         $directory = $this->option('directory') ?: '';
-        $non_recursive = (bool)$this->option('non-recursive');
-        $force = (bool)$this->option('force');
+        $non_recursive = (bool) $this->option('non-recursive');
+        $force = (bool) $this->option('force');
 
         $this->call('media:prune', [
-            'disk' => $disk,
-            '--directory' => $directory,
+            'disk'            => $disk,
+            '--directory'     => $directory,
             '--non-recursive' => $non_recursive,
         ]);
 
         $this->call('media:import', [
-            'disk' => $disk,
-            '--directory' => $directory,
+            'disk'            => $disk,
+            '--directory'     => $directory,
             '--non-recursive' => $non_recursive,
-            '--force' => $force,
+            '--force'         => $force,
         ]);
     }
 }

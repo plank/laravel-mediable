@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Plank\Mediable\UrlGenerators;
@@ -10,6 +11,7 @@ interface UrlGeneratorInterface
 {
     /**
      * Set the media instance for which urls are being generated.
+     *
      * @param \Plank\Mediable\Media $media
      */
     public function setMedia(Media $media): void;
@@ -19,9 +21,10 @@ interface UrlGeneratorInterface
      *
      * For local files this should return a path
      * For remote files this should return a url
-     * @return string
      *
      * @throws MediaUrlException
+     *
+     * @return string
      */
     public function getAbsolutePath(): string;
 
@@ -29,15 +32,17 @@ interface UrlGeneratorInterface
      * Check if the file is publicly accessible.
      *
      * Disks configs should indicate this with the visibility key
+     *
      * @return bool
      */
     public function isPubliclyAccessible(): bool;
 
     /**
      * Get a Url to the file.
-     * @return string
      *
      * @throws MediaUrlException
+     *
+     * @return string
      */
     public function getUrl(): string;
 }

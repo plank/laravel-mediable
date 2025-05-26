@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Plank\Mediable\Exceptions\MediaUpload;
@@ -33,7 +34,7 @@ class ConfigurationException extends MediaUploadException
         return new self("Could not recognize source, `{$source}` provided.");
     }
 
-    public static function invalidSource(string $message, ?\Throwable $original= null): self
+    public static function invalidSource(string $message, ?\Throwable $original = null): self
     {
         return new self("Invalid source provided. {$message}", 0, $original);
     }
@@ -55,6 +56,6 @@ class ConfigurationException extends MediaUploadException
 
     public static function interventionImageNotConfigured(): self
     {
-        return new self("Before variants can be created, the intervention/image package must be configured in the Laravel container.");
+        return new self('Before variants can be created, the intervention/image package must be configured in the Laravel container.');
     }
 }
