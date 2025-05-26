@@ -19,7 +19,6 @@ class ImportMediaCommand extends Command
 {
     /**
      * {@inheritdoc}
-     *
      * @var string
      */
     protected $signature = 'media:import {disk : the name of the filesystem disk.}
@@ -29,7 +28,6 @@ class ImportMediaCommand extends Command
 
     /**
      * {@inheritdoc}
-     *
      * @var string
      */
     protected $description = 'Create a media entity for each file on a disk';
@@ -66,7 +64,7 @@ class ImportMediaCommand extends Command
         $disk = $this->argument('disk');
         $directory = $this->option('directory') ?: '';
         $recursive = !$this->option('non-recursive');
-        $force = (bool) $this->option('force');
+        $force = (bool)$this->option('force');
 
         $files = $this->listFiles($disk, $directory, $recursive);
         $existing_media = $this->makeModel()
@@ -88,11 +86,9 @@ class ImportMediaCommand extends Command
 
     /**
      * Generate a list of all files in the specified directory.
-     *
-     * @param string $disk
-     * @param string $directory
-     * @param bool   $recursive
-     *
+     * @param  string $disk
+     * @param  string $directory
+     * @param  bool $recursive
      * @return array
      */
     protected function listFiles(string $disk, string $directory = '', bool $recursive = true): array
@@ -106,10 +102,8 @@ class ImportMediaCommand extends Command
 
     /**
      * Search through the record list for one matching the provided path.
-     *
-     * @param string                        $path
+     * @param  string $path
      * @param Collection<string|int, Media> $existingMedia
-     *
      * @return Media|null
      */
     protected function getRecordForFile(string $path, Collection $existingMedia): ?Media
@@ -125,53 +119,48 @@ class ImportMediaCommand extends Command
 
     /**
      * Generate a new media record.
-     *
-     * @param string $disk
-     * @param string $path
-     *
+     * @param  string $disk
+     * @param  string $path
      * @return void
      */
     protected function createRecordForFile(string $disk, string $path): void
     {
         try {
             $this->uploader->importPath($disk, $path);
-            $this->counters['created']++;
+            ++$this->counters['created'];
             $this->info("Created Record for file at {$path}", 'v');
         } catch (MediaUploadException $e) {
             $this->warn($e->getMessage(), 'vvv');
-            $this->counters['skipped']++;
+            ++$this->counters['skipped'];
             $this->info("Skipped file at {$path}", 'v');
         }
     }
 
     /**
      * Update an existing media record.
-     *
-     * @param \Plank\Mediable\Media $media
-     * @param string                $path
-     *
+     * @param  \Plank\Mediable\Media $media
+     * @param  string $path
      * @return void
      */
     protected function updateRecordForFile(Media $media, string $path): void
     {
         try {
             if ($this->uploader->update($media)) {
-                $this->counters['updated']++;
+                ++$this->counters['updated'];
                 $this->info("Updated record for {$path}", 'v');
             } else {
-                $this->counters['skipped']++;
+                ++$this->counters['skipped'];
                 $this->info("Skipped unmodified file at {$path}", 'v');
             }
         } catch (MediaUploadException $e) {
             $this->warn($e->getMessage(), 'vvv');
-            $this->counters['skipped']++;
+            ++$this->counters['skipped'];
             $this->info("Skipped file at {$path}", 'v');
         }
     }
 
     /**
      * Send the counter total to the console.
-     *
      * @return void
      */
     protected function outputCounters(): void
@@ -187,7 +176,6 @@ class ImportMediaCommand extends Command
 
     /**
      * Reset the counters of processed files.
-     *
      * @return void
      */
     protected function resetCounters(): void
@@ -201,13 +189,12 @@ class ImportMediaCommand extends Command
 
     /**
      * Generate an instance of the `Media` class.
-     *
      * @return Media
      */
     private function makeModel(): Media
     {
         $class = config('mediable.model', Media::class);
 
-        return new $class();
+        return new $class;
     }
 }

@@ -1173,6 +1173,7 @@ class MediaUploader
      * @throws ConfigurationException
      *
      * @return string
+     * @throws ConfigurationException
      */
     private function generateFilename(): string
     {

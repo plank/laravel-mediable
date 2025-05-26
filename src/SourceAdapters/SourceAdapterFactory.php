@@ -36,7 +36,7 @@ class SourceAdapterFactory
      *
      * @return SourceAdapterInterface
      */
-    public function create($source): SourceAdapterInterface
+    public function create(object|string $source): SourceAdapterInterface
     {
         $adapter = null;
 
