@@ -5,9 +5,9 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * Create table for mock mediable model.
+ * Create a table for a mock mediable model.
  */
-return new class() extends Migration {
+return new class extends Migration {
     /**
      * Run the migrations.
      *
