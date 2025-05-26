@@ -246,7 +246,7 @@ class ImageManipulator
             $image = $this->imageManager->read($source->getStream()->getContents());
         } else {
             // Intervention Image <3.0
-            /** @phpstan-ignore-next-line */
+            /** @phpstan-ignore-next-line MethodDoesNotExist */
             $image = $this->imageManager->make($source->getStream()->getContents());
         }
 
