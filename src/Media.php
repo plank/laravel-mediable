@@ -145,7 +145,7 @@ class Media extends Model
 
     /**
      * Retrieve all other variants and originals of the media
-     * @return Collection
+     * @return Collection<Media>
      */
     public function getAllVariants(): Collection
     {
@@ -162,6 +162,9 @@ class Media extends Model
         return $collection;
     }
 
+    /**
+     * @return Collection<Media>
+     */
     public function getAllVariantsAndSelf(): Collection
     {
         if ($this->isOriginal()) {

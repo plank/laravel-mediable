@@ -1074,6 +1074,7 @@ class MediaUploader
     /**
      * Generate the model's filename.
      * @return string
+     * @throws ConfigurationException
      */
     private function generateFilename(): string
     {
@@ -1086,6 +1087,9 @@ class MediaUploader
         }
 
         $filename = $this->source->filename();
+        if (!$filename) {
+            throw ConfigurationException::cannotInferFilename();
+        }
 
         return File::sanitizeFileName($filename);
     }

@@ -31,7 +31,7 @@ class SourceAdapterFactory
      * @return SourceAdapterInterface
      * @throws ConfigurationException If the provided source does not match any of the mapped classes or patterns
      */
-    public function create($source): SourceAdapterInterface
+    public function create(object|string $source): SourceAdapterInterface
     {
         $adapter = null;
 

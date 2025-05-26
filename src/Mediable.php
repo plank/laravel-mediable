@@ -263,7 +263,7 @@ trait Mediable
 
     /**
      * Lazy eager load attached media relationships matching all provided tags.
-     * @param  string|string[] $tags one or more tags
+     * @param string|string[] $tags one or more tags
      * @param bool $withVariants If true, also load the variants and/or originalMedia relation of each Media
      * @return $this
      */
@@ -275,8 +275,8 @@ trait Mediable
     /**
      * Lazy eager load attached media relationships matching all provided tags, as well
      * as the variants of those media.
-     * @param array $tags
-     * @return $this
+     * @param string|string[] $tags
+     * @return self
      */
     public function loadMediaWithVariantsMatchAll($tags = []): self
     {

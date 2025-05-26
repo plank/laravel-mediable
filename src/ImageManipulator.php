@@ -236,7 +236,7 @@ class ImageManipulator
 
         $outputFormat = $this->determineOutputFormat($manipulation, $media);
 
-        /** @phpstan-ignore-next-line */
+        /** @phpstan-ignore-next-line MethodDoesNotExist */
         if (method_exists($this->imageManager, 'read')) {
             // Intervention Image  >=3.0
             $image = $this->imageManager->read($source->getStream()->getContents());

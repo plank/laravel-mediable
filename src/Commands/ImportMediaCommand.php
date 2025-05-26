@@ -103,7 +103,7 @@ class ImportMediaCommand extends Command
     /**
      * Search through the record list for one matching the provided path.
      * @param  string $path
-     * @param Collection<int, Media> $existingMedia
+     * @param Collection<string|int, Media> $existingMedia
      * @return Media|null
      */
     protected function getRecordForFile(string $path, Collection $existingMedia): ?Media
