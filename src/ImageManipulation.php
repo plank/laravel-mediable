@@ -27,13 +27,13 @@ class ImageManipulation
     ];
 
     public const MIME_TYPE_MAP = [
-        self::FORMAT_BMP => 'image/bmp',
-        self::FORMAT_GIF => 'image/gif',
+        self::FORMAT_BMP  => 'image/bmp',
+        self::FORMAT_GIF  => 'image/gif',
         self::FORMAT_HEIC => 'image/heic',
-        self::FORMAT_JPG => 'image/jpeg',
-        self::FORMAT_PNG => 'image/png',
+        self::FORMAT_JPG  => 'image/jpeg',
+        self::FORMAT_PNG  => 'image/png',
         self::FORMAT_TIFF => 'image/tiff',
-        self::FORMAT_WEBP => 'image/webp'
+        self::FORMAT_WEBP => 'image/webp',
     ];
 
     public const ON_DUPLICATE_INCREMENT = 'increment';
@@ -97,6 +97,7 @@ class ImageManipulation
 
     /**
      * @param int $outputQuality
+     *
      * @return $this
      */
     public function setOutputQuality(int $outputQuality): self
@@ -116,6 +117,7 @@ class ImageManipulation
 
     /**
      * @param string|null $outputFormat
+     *
      * @return $this
      */
     public function setOutputFormat(?string $outputFormat): self
@@ -203,8 +205,8 @@ class ImageManipulation
     /**
      * Set the filesystem disk and relative directory where the file will be saved.
      *
-     * @param  string $disk
-     * @param  string $directory
+     * @param string $disk
+     * @param string $directory
      *
      * @return $this
      */
@@ -240,7 +242,9 @@ class ImageManipulation
 
     /**
      * Set the directory relative to the filesystem disk at which the file will be saved.
+     *
      * @param string $directory
+     *
      * @return $this
      */
     public function toDirectory(string $directory): self
@@ -260,7 +264,9 @@ class ImageManipulation
 
     /**
      * Specify the filename to copy to the file to.
+     *
      * @param string $filename
+     *
      * @return $this
      */
     public function useFilename(string $filename): self
@@ -273,6 +279,7 @@ class ImageManipulation
 
     /**
      * Indicates to the uploader to generate a filename using the file's MD5 hash.
+     *
      * @return $this
      */
     public function useHashForFilename(string $algo = 'md5'): self
@@ -285,6 +292,7 @@ class ImageManipulation
 
     /**
      * Restore the default behaviour of using the source file's filename.
+     *
      * @return $this
      */
     public function useOriginalFilename(): self
@@ -316,6 +324,7 @@ class ImageManipulation
     public function onDuplicateIncrement(): self
     {
         $this->onDuplicateBehaviour = self::ON_DUPLICATE_INCREMENT;
+
         return $this;
     }
 
@@ -325,6 +334,7 @@ class ImageManipulation
     public function onDuplicateError(): self
     {
         $this->onDuplicateBehaviour = self::ON_DUPLICATE_ERROR;
+
         return $this;
     }
 
@@ -339,24 +349,28 @@ class ImageManipulation
     public function makePrivate(): self
     {
         $this->visibility = 'private';
+
         return $this;
     }
 
     public function makePublic(): self
     {
         $this->visibility = 'public';
+
         return $this;
     }
 
     public function matchOriginalVisibility(): self
     {
         $this->visibility = 'match';
+
         return $this;
     }
 
     public function setVisibility(?string $visibility): self
     {
         $this->visibility = $visibility;
+
         return $this;
     }
 
@@ -367,6 +381,7 @@ class ImageManipulation
 
     /**
      * @param callable $beforeSave
+     *
      * @return $this
      */
     public function beforeSave(callable $beforeSave): self
@@ -378,6 +393,7 @@ class ImageManipulation
 
     /**
      * Disable image optimization.
+     *
      * @return $this
      */
     public function noOptimization(): self
@@ -389,12 +405,15 @@ class ImageManipulation
 
     /**
      * Enable image optimization.
+     *
      * @param array<class-string<Optimizer>,string[]> $customOptimizers Override default optimizers.
-     *     The array keys should be the fully qualified class names of the optimizers to use.
-     *     The array values should be arrays of command line arguments to pass to the optimizer.
-     *     DO NOT PASS UNTRUSTED USER INPUT AS COMMAND LINE ARGUMENTS
-     * @return $this
+     *                                                                  The array keys should be the fully qualified class names of the optimizers to use.
+     *                                                                  The array values should be arrays of command line arguments to pass to the optimizer.
+     *                                                                  DO NOT PASS UNTRUSTED USER INPUT AS COMMAND LINE ARGUMENTS
+     *
      * @throws ConfigurationException
+     *
+     * @return $this
      */
     public function optimize(?array $customOptimizers = null): self
     {
@@ -418,6 +437,7 @@ class ImageManipulation
             $optimizer = new $optimizerClass($args);
             $chain->addOptimizer($optimizer);
         }
+
         return $chain;
     }
 

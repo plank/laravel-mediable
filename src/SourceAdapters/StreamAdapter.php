@@ -27,6 +27,7 @@ class StreamAdapter implements SourceAdapterInterface
 
     /**
      * The contents of the stream.
+     *
      * @var string
      */
     protected string $contents;
@@ -40,6 +41,7 @@ class StreamAdapter implements SourceAdapterInterface
 
     /**
      * Constructor.
+     *
      * @param StreamInterface $source
      */
     public function __construct(StreamInterface $source)
@@ -85,6 +87,7 @@ class StreamAdapter implements SourceAdapterInterface
         if (!$path) {
             return null;
         }
+
         return pathinfo(
             parse_url($this->path(), PHP_URL_PATH) ?? '',
             PATHINFO_FILENAME
@@ -162,6 +165,7 @@ class StreamAdapter implements SourceAdapterInterface
 
     /**
      * {@inheritdoc}
+     *
      * @param string $algo
      */
     public function hash(string $algo = 'md5'): string
@@ -169,6 +173,7 @@ class StreamAdapter implements SourceAdapterInterface
         if (!isset($this->hash[$algo])) {
             $this->scanFile($algo);
         }
+
         return $this->hash[$algo];
     }
 
@@ -208,7 +213,7 @@ class StreamAdapter implements SourceAdapterInterface
             !empty($headers)
             && preg_match('/HTTP\/\d+\.\d+\s+(\d+)/i', $headers[0], $matches)
         ) {
-            return (int)$matches[1];
+            return (int) $matches[1];
         }
 
         return null;
@@ -218,6 +223,7 @@ class StreamAdapter implements SourceAdapterInterface
     {
         $this->size = 0;
         $this->source->rewind();
+
         try {
             $hash = hash_init($hashAlgorithm);
             $finfo = finfo_open(FILEINFO_MIME_TYPE);

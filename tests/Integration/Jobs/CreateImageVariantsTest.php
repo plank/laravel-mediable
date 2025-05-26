@@ -2,7 +2,6 @@
 
 namespace Plank\Mediable\Tests\Integration\Jobs;
 
-use GuzzleHttp\Promise\Create;
 use Illuminate\Database\Eloquent\Collection;
 use Plank\Mediable\ImageManipulation;
 use Plank\Mediable\ImageManipulator;

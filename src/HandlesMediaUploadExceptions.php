@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Plank\Mediable;
@@ -50,13 +51,15 @@ trait HandlesMediaUploadExceptions
     /**
      * Transform a MediaUploadException into an HttpException.
      *
-     * @param  Throwable $e
+     * @param Throwable $e
+     *
      * @return Throwable
      */
     protected function transformMediaUploadException(Throwable $e): Throwable
     {
         if ($e instanceof MediaUploadException) {
             $status_code = $this->getStatusCodeForMediaUploadException($e);
+
             return new HttpException($status_code, $e->getMessage(), $e);
         }
 
@@ -66,8 +69,9 @@ trait HandlesMediaUploadExceptions
     /**
      * Get the appropriate HTTP status code for the exception.
      *
-     * @param  MediaUploadException $e
-     * @return integer
+     * @param MediaUploadException $e
+     *
+     * @return int
      */
     private function getStatusCodeForMediaUploadException(MediaUploadException $e): int
     {

@@ -11,12 +11,11 @@ use Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException;
 use Plank\Mediable\Exceptions\MediaUpload\FileSizeException;
 use Plank\Mediable\Exceptions\MediaUpload\ForbiddenException;
 use Plank\Mediable\Exceptions\MediaUpload\InvalidHashException;
+use Plank\Mediable\Facades\MediaUploader as Facade;
 use Plank\Mediable\ImageManipulation;
 use Plank\Mediable\ImageManipulator;
 use Plank\Mediable\Media;
 use Plank\Mediable\MediaUploader;
-use Plank\Mediable\Facades\MediaUploader as Facade;
-use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
 use Plank\Mediable\Tests\Mocks\MediaSubclass;
 use Plank\Mediable\Tests\TestCase;
 use stdClass;
@@ -295,7 +294,7 @@ class MediaUploaderTest extends TestCase
         $uploader->setOnDuplicateBehavior(MediaUploader::ON_DUPLICATE_ERROR);
         $method = $this->getPrivateMethod($uploader, 'handleDuplicate');
         $this->expectException(FileExistsException::class);
-        $method->invoke($uploader, new Media);
+        $method->invoke($uploader, new Media());
     }
 
     public function test_it_sets_file_visibility(): void
@@ -337,21 +336,21 @@ class MediaUploaderTest extends TestCase
 
         $media = $this->createMedia(
             [
-                'id' => 66,
-                'disk' => 'tmp',
+                'id'        => 66,
+                'disk'      => 'tmp',
                 'directory' => '',
-                'filename' => 'plank',
-                'extension' => 'png'
+                'filename'  => 'plank',
+                'extension' => 'png',
             ]
         );
         $variant = $this->createMedia(
             [
-                'id' => 77,
-                'disk' => 'tmp',
-                'directory' => '',
-                'filename' => 'plank-variant',
-                'extension' => 'png',
-                'original_media_id' => $media->getKey()
+                'id'                => 77,
+                'disk'              => 'tmp',
+                'directory'         => '',
+                'filename'          => 'plank-variant',
+                'extension'         => 'png',
+                'original_media_id' => $media->getKey(),
             ]
         );
         $this->seedFileForMedia($media, TestCase::sampleFilePath());
@@ -374,19 +373,19 @@ class MediaUploaderTest extends TestCase
 
         $media = $this->createMedia(
             [
-                'disk' => 'tmp',
+                'disk'      => 'tmp',
                 'directory' => '',
-                'filename' => 'plank',
-                'extension' => 'png'
+                'filename'  => 'plank',
+                'extension' => 'png',
             ]
         );
         $variant = $this->createMedia(
             [
-                'disk' => 'tmp',
-                'directory' => '',
-                'filename' => 'plank-variant',
-                'extension' => 'png',
-                'original_media_id' => $media->getKey()
+                'disk'              => 'tmp',
+                'directory'         => '',
+                'filename'          => 'plank-variant',
+                'extension'         => 'png',
+                'original_media_id' => $media->getKey(),
             ]
         );
         $this->seedFileForMedia($media, TestCase::sampleFilePath());
@@ -406,11 +405,11 @@ class MediaUploaderTest extends TestCase
 
         $media = $this->createMedia(
             [
-                'disk' => 'tmp',
-                'directory' => '',
-                'filename' => 'plank',
-                'extension' => 'png',
-                'aggregate_type' => 'bar'
+                'disk'           => 'tmp',
+                'directory'      => '',
+                'filename'       => 'plank',
+                'extension'      => 'png',
+                'aggregate_type' => 'bar',
             ]
         );
 
@@ -438,11 +437,11 @@ class MediaUploaderTest extends TestCase
 
         $media = $this->makeMedia(
             [
-                'disk' => 'tmp',
-                'directory' => '',
-                'filename' => 'plank',
-                'extension' => 'png',
-                'aggregate_type' => 'bar'
+                'disk'           => 'tmp',
+                'directory'      => '',
+                'filename'       => 'plank',
+                'extension'      => 'png',
+                'aggregate_type' => 'bar',
             ]
         );
 
@@ -465,10 +464,10 @@ class MediaUploaderTest extends TestCase
 
         $media = factory(Media::class)->make(
             [
-                'disk' => 'tmp',
+                'disk'      => 'tmp',
                 'directory' => '',
-                'filename' => 'duplicate',
-                'extension' => 'png'
+                'filename'  => 'duplicate',
+                'extension' => 'png',
             ]
         );
         $this->seedFileForMedia($media);
@@ -588,11 +587,11 @@ class MediaUploaderTest extends TestCase
 
         $media = factory(Media::class)->make(
             [
-                'disk' => 'tmp',
+                'disk'      => 'tmp',
                 'directory' => 'foo',
-                'filename' => 'bar',
+                'filename'  => 'bar',
                 'extension' => 'png',
-                'mime_type' => 'image/png'
+                'mime_type' => 'image/png',
             ]
         );
         $this->seedFileForMedia($media, $this->sampleFile());
@@ -613,11 +612,11 @@ class MediaUploaderTest extends TestCase
 
         $media = factory(Media::class)->make(
             [
-                'disk' => 'tmp',
+                'disk'      => 'tmp',
                 'directory' => 'foo',
-                'filename' => 'bar',
+                'filename'  => 'bar',
                 'extension' => 'PNG',
-                'mime_type' => 'image/png'
+                'mime_type' => 'image/png',
             ]
         );
         $this->seedFileForMedia($media, $this->sampleFile());
@@ -638,11 +637,11 @@ class MediaUploaderTest extends TestCase
 
         $media = $this->createMedia(
             [
-                'disk' => 'tmp',
-                'extension' => 'png',
-                'mime_type' => 'video/mpeg',
+                'disk'           => 'tmp',
+                'extension'      => 'png',
+                'mime_type'      => 'video/mpeg',
                 'aggregate_type' => 'video',
-                'size' => 999,
+                'size'           => 999,
             ]
         );
         $this->seedFileForMedia($media, $this->sampleFile());
@@ -662,9 +661,9 @@ class MediaUploaderTest extends TestCase
 
         $media = $this->createMedia(
             [
-                'disk' => 'tmp',
+                'disk'      => 'tmp',
                 'extension' => 'png',
-                'size' => 999
+                'size'      => 999,
             ]
         );
         $this->seedFileForMedia($media, $this->sampleFile());
@@ -740,9 +739,9 @@ class MediaUploaderTest extends TestCase
 
         $media = $this->createMedia(
             [
-                'disk' => 'tmp',
+                'disk'      => 'tmp',
                 'directory' => 'baz',
-                'filename' => 'buzz',
+                'filename'  => 'buzz',
                 'extension' => 'png',
             ]
         );
@@ -795,12 +794,12 @@ class MediaUploaderTest extends TestCase
 
         $media = $this->createMedia(
             [
-                'disk' => 'tmp',
+                'disk'      => 'tmp',
                 'directory' => 'foo',
-                'filename' => 'bar',
+                'filename'  => 'bar',
                 'extension' => 'png',
                 'mime_type' => 'image/png',
-                'size' => 999,
+                'size'      => 999,
             ]
         );
         $this->seedFileForMedia($media, $this->sampleFile());
@@ -859,7 +858,7 @@ class MediaUploaderTest extends TestCase
 
         $manipulation = ImageManipulation::make($callback);
 
-        $media = Facade::fromSource("data:text/plain;base64," . base64_encode('foo'))
+        $media = Facade::fromSource('data:text/plain;base64,'.base64_encode('foo'))
             ->toDestination('tmp', 'foo')
             ->useFilename('bar')
             ->applyImageManipulation($manipulation)

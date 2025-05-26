@@ -110,21 +110,21 @@ class ImportMediaCommandTest extends TestCase
         $artisan = $this->getArtisan();
         $media1 = factory(Media::class)->create(
             [
-                'disk' => 'tmp',
-                'filename' => 'foo',
-                'extension' => 'png',
-                'mime_type' => 'image/png',
-                'aggregate_type' => 'foo'
+                'disk'           => 'tmp',
+                'filename'       => 'foo',
+                'extension'      => 'png',
+                'mime_type'      => 'image/png',
+                'aggregate_type' => 'foo',
             ]
         );
         $media2 = factory(Media::class)->create(
             [
-                'disk' => 'tmp',
-                'filename' => 'bar',
-                'extension' => 'png',
-                'size' => 7173,
-                'mime_type' => 'image/png',
-                'aggregate_type' => 'image'
+                'disk'           => 'tmp',
+                'filename'       => 'bar',
+                'extension'      => 'png',
+                'size'           => 7173,
+                'mime_type'      => 'image/png',
+                'aggregate_type' => 'image',
             ]
         );
         $this->seedFileForMedia($media1, $this->sampleFile());

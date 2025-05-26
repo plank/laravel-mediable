@@ -23,9 +23,9 @@ class MediaTest extends TestCase
     {
         $media = $this->makeMedia(
             [
-                'disk' => 'tmp',
+                'disk'      => 'tmp',
                 'directory' => 'a/b/c',
-                'filename' => 'foo.bar',
+                'filename'  => 'foo.bar',
                 'extension' => 'jpg',
             ]
         );
@@ -85,11 +85,11 @@ class MediaTest extends TestCase
 
         $this->createMedia(
             [
-                'id' => 4,
-                'disk' => 'tmp',
+                'id'        => 4,
+                'disk'      => 'tmp',
                 'directory' => 'foo/bar/baz',
-                'filename' => 'bat',
-                'extension' => 'jpg'
+                'filename'  => 'bat',
+                'extension' => 'jpg',
             ]
         );
         $this->assertEquals(
@@ -104,11 +104,11 @@ class MediaTest extends TestCase
 
         $this->createMedia(
             [
-                'id' => 4,
-                'disk' => 'tmp',
+                'id'        => 4,
+                'disk'      => 'tmp',
                 'directory' => '',
-                'filename' => 'bat',
-                'extension' => 'jpg'
+                'filename'  => 'bat',
+                'extension' => 'jpg',
             ]
         );
         $this->assertEquals(4, Media::forPathOnDisk('tmp', 'bat.jpg')->first()->id);
@@ -156,6 +156,7 @@ class MediaTest extends TestCase
 
         $media = $this->makeMedia(['disk' => 's3']);
         $this->seedFileForMedia($media);
+
         try {
             $this->assertTrue($media->isPubliclyAccessible());
 
@@ -176,10 +177,10 @@ class MediaTest extends TestCase
     {
         $media = $this->makeMedia(
             [
-                'disk' => 'uploads',
+                'disk'      => 'uploads',
                 'directory' => 'foo/bar',
-                'filename' => 'baz',
-                'extension' => 'jpg'
+                'filename'  => 'baz',
+                'extension' => 'jpg',
             ]
         );
         $this->seedFileForMedia($media);
@@ -191,10 +192,10 @@ class MediaTest extends TestCase
         $this->app['config']->set('filesystems.disks.uploads.url', 'http://example.com');
         $media = $this->makeMedia(
             [
-                'disk' => 'uploads',
+                'disk'      => 'uploads',
                 'directory' => 'foo/bar',
-                'filename' => 'baz',
-                'extension' => 'jpg'
+                'filename'  => 'baz',
+                'extension' => 'jpg',
             ]
         );
         $this->seedFileForMedia($media);
@@ -208,13 +209,14 @@ class MediaTest extends TestCase
         }
         $media = $this->makeMedia(
             [
-                'disk' => 's3',
+                'disk'      => 's3',
                 'directory' => 'foo/bar',
-                'filename' => 'baz',
-                'extension' => 'jpg'
+                'filename'  => 'baz',
+                'extension' => 'jpg',
             ]
         );
         $this->seedFileForMedia($media);
+
         try {
             $this->assertEquals(
                 sprintf(
@@ -247,10 +249,10 @@ class MediaTest extends TestCase
 
         $media = $this->makeMedia(
             [
-                'disk' => 'tmp',
+                'disk'      => 'tmp',
                 'directory' => 'foo',
-                'filename' => 'bar',
-                'extension' => 'baz'
+                'filename'  => 'bar',
+                'extension' => 'baz',
             ]
         );
         $this->seedFileForMedia($media);
@@ -272,10 +274,10 @@ class MediaTest extends TestCase
 
         $media = $this->makeMedia(
             [
-                'disk' => 'tmp',
+                'disk'      => 'tmp',
                 'directory' => 'foo',
-                'filename' => 'bar',
-                'extension' => 'baz'
+                'filename'  => 'bar',
+                'extension' => 'baz',
             ]
         );
         $this->seedFileForMedia($media);
@@ -305,18 +307,18 @@ class MediaTest extends TestCase
 
         $media1 = $this->makeMedia(
             [
-                'disk' => 'tmp',
+                'disk'      => 'tmp',
                 'directory' => '',
-                'filename' => 'foo',
-                'extension' => 'baz'
+                'filename'  => 'foo',
+                'extension' => 'baz',
             ]
         );
         $media2 = $this->makeMedia(
             [
-                'disk' => 'tmp',
+                'disk'      => 'tmp',
                 'directory' => '',
-                'filename' => 'bar',
-                'extension' => 'baz'
+                'filename'  => 'bar',
+                'extension' => 'baz',
             ]
         );
         $this->seedFileForMedia($media1);
@@ -335,10 +337,10 @@ class MediaTest extends TestCase
 
         $media = $this->makeMedia(
             [
-                'disk' => 'tmp',
+                'disk'      => 'tmp',
                 'directory' => 'foo',
-                'filename' => 'bar',
-                'extension' => 'baz'
+                'filename'  => 'bar',
+                'extension' => 'baz',
             ]
         );
         $original_path = $media->getAbsolutePath();
@@ -362,10 +364,10 @@ class MediaTest extends TestCase
 
         $media = $this->makeMedia(
             [
-                'disk' => 'tmp',
+                'disk'      => 'tmp',
                 'directory' => 'foo',
-                'filename' => 'bar',
-                'extension' => 'baz'
+                'filename'  => 'bar',
+                'extension' => 'baz',
             ]
         );
         $original_path = $media->getAbsolutePath();
@@ -389,10 +391,10 @@ class MediaTest extends TestCase
 
         $media = $this->makeMedia(
             [
-                'disk' => 'tmp',
+                'disk'      => 'tmp',
                 'directory' => 'foo',
-                'filename' => 'bar',
-                'extension' => 'baz'
+                'filename'  => 'bar',
+                'extension' => 'baz',
             ]
         );
         $this->seedFileForMedia($media);
@@ -420,10 +422,10 @@ class MediaTest extends TestCase
 
         $media = $this->makeMedia(
             [
-                'disk' => 'tmp',
+                'disk'      => 'tmp',
                 'directory' => 'foo',
-                'filename' => 'bar',
-                'extension' => 'baz'
+                'filename'  => 'bar',
+                'extension' => 'baz',
             ]
         );
         $this->seedFileForMedia($media);
@@ -448,8 +450,8 @@ class MediaTest extends TestCase
 
         $media = $this->makeMedia(
             [
-                'disk' => 'tmp',
-                'extension' => 'html'
+                'disk'      => 'tmp',
+                'extension' => 'html',
             ]
         );
         $this->seedFileForMedia($media, '<h1>Hello World</h1>');
@@ -463,10 +465,10 @@ class MediaTest extends TestCase
 
         $media = $this->createMedia(
             [
-                'disk' => 'tmp',
+                'disk'      => 'tmp',
                 'directory' => '',
-                'filename' => 'file',
-                'extension' => 'txt'
+                'filename'  => 'file',
+                'extension' => 'txt',
             ]
         );
         $this->seedFileForMedia($media);
@@ -563,10 +565,10 @@ class MediaTest extends TestCase
 
         $media = $this->makeMedia(
             [
-                'disk' => 'tmp',
+                'disk'      => 'tmp',
                 'directory' => 'foo',
-                'filename' => 'bar',
-                'extension' => 'baz'
+                'filename'  => 'bar',
+                'extension' => 'baz',
             ]
         );
         $this->seedFileForMedia($media, 'test');
@@ -581,7 +583,7 @@ class MediaTest extends TestCase
         $media = $this->makeMedia(
             [
                 'original_media_id' => null,
-                'variant_name' => null
+                'variant_name'      => null,
             ]
         );
 
@@ -614,14 +616,14 @@ class MediaTest extends TestCase
         $media1 = $this->createMedia(
             [
                 'original_media_id' => null,
-                'variant_name' => null
+                'variant_name'      => null,
             ]
         );
 
         $media2 = $this->createMedia(
             [
                 'original_media_id' => null,
-                'variant_name' => null
+                'variant_name'      => null,
             ]
         );
 
@@ -647,7 +649,7 @@ class MediaTest extends TestCase
         $media = $this->makeMedia(
             [
                 'original_media_id' => null,
-                'variant_name' => null
+                'variant_name'      => null,
             ]
         );
 
@@ -660,21 +662,21 @@ class MediaTest extends TestCase
         $media1 = $this->createMedia(
             [
                 'original_media_id' => null,
-                'variant_name' => null
+                'variant_name'      => null,
             ]
         );
 
         $media2 = $this->createMedia(
             [
                 'original_media_id' => $media1->getKey(),
-                'variant_name' => 'foo'
+                'variant_name'      => 'foo',
             ]
         );
 
         $media3 = $this->createMedia(
             [
                 'original_media_id' => $media1->getKey(),
-                'variant_name' => 'bar'
+                'variant_name'      => 'bar',
             ]
         );
 
@@ -698,25 +700,25 @@ class MediaTest extends TestCase
     {
         $media1 = $this->makeMedia(
             [
-                'id' => 4,
+                'id'                => 4,
                 'original_media_id' => null,
-                'variant_name' => null
+                'variant_name'      => null,
             ]
         );
 
         $media2 = $this->makeMedia(
             [
-                'id' => 5,
+                'id'                => 5,
                 'original_media_id' => $media1->getKey(),
-                'variant_name' => 'foo'
+                'variant_name'      => 'foo',
             ]
         );
 
         $media3 = $this->makeMedia(
             [
-                'id' => 6,
+                'id'                => 6,
                 'original_media_id' => $media1->getKey(),
-                'variant_name' => 'bar'
+                'variant_name'      => 'bar',
             ]
         );
 

@@ -15,21 +15,26 @@ class SourceAdapterFactory
 {
     /**
      * Map of which adapters to use for a given source class.
+     *
      * @var class-string<SourceAdapterInterface>[]
      */
     private array $classAdapters = [];
 
     /**
      * Map of which adapters to use for a given string pattern.
+     *
      * @var class-string<SourceAdapterInterface>[]
      */
     private array $patternAdapters = [];
 
     /**
      * Create a Source Adapter for the provided source.
+     *
      * @param object|string $source
-     * @return SourceAdapterInterface
+     *
      * @throws ConfigurationException If the provided source does not match any of the mapped classes or patterns
+     *
+     * @return SourceAdapterInterface
      */
     public function create(object|string $source): SourceAdapterInterface
     {
@@ -54,11 +59,13 @@ class SourceAdapterFactory
 
     /**
      * Specify the FQCN of a SourceAdapter class to use when the source inherits from a given class.
+     *
      * @param class-string<SourceAdapterInterface> $adapterClass
-     * @param string $sourceClass
-     * @return void
+     * @param string                               $sourceClass
      *
      * @throws ConfigurationException
+     *
+     * @return void
      */
     public function setAdapterForClass(string $adapterClass, string $sourceClass): void
     {
@@ -68,11 +75,13 @@ class SourceAdapterFactory
 
     /**
      * Specify the FQCN of a SourceAdapter class to use when the source is a string matching the given pattern.
+     *
      * @param class-string<SourceAdapterInterface> $adapterClass
-     * @param string $sourcePattern
-     * @return void
+     * @param string                               $sourcePattern
      *
      * @throws ConfigurationException
+     *
+     * @return void
      */
     public function setAdapterForPattern(string $adapterClass, string $sourcePattern): void
     {
@@ -82,7 +91,9 @@ class SourceAdapterFactory
 
     /**
      * Choose an adapter class for the class of the provided object.
-     * @param  object $source
+     *
+     * @param object $source
+     *
      * @return class-string<SourceAdapterInterface>|null
      */
     private function adaptClass(object $source): ?string
@@ -98,13 +109,15 @@ class SourceAdapterFactory
 
     /**
      * Choose an adapter class for the provided string.
-     * @param  string $source
+     *
+     * @param string $source
+     *
      * @return class-string<SourceAdapterInterface>|null
      */
     private function adaptString(string $source): ?string
     {
         foreach ($this->patternAdapters as $pattern => $adapter) {
-            $pattern = '/' . str_replace('/', '\\/', $pattern) . '/i';
+            $pattern = '/'.str_replace('/', '\\/', $pattern).'/i';
             if (preg_match($pattern, $source)) {
                 return $adapter;
             }
@@ -115,9 +128,12 @@ class SourceAdapterFactory
 
     /**
      * Verify that the provided class implements the SourceAdapter interface.
+     *
      * @param string $class
-     * @return void
+     *
      * @throws ConfigurationException If a class is not valid
+     *
+     * @return void
      */
     private function validateAdapterClass(string $class): void
     {
