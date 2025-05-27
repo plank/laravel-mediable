@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Plank\Mediable\Commands;
@@ -102,7 +103,7 @@ class ImportMediaCommand extends Command
     /**
      * Search through the record list for one matching the provided path.
      * @param  string $path
-     * @param  Collection $existingMedia
+     * @param Collection<string|int, Media> $existingMedia
      * @return Media|null
      */
     protected function getRecordForFile(string $path, Collection $existingMedia): ?Media

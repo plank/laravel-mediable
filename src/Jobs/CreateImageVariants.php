@@ -21,7 +21,7 @@ class CreateImageVariants implements ShouldQueue
      */
     private array $variantNames;
     /**
-     * @var Collection<Media>
+     * @var Collection<int, Media>
      */
     private Collection $models;
 
@@ -32,7 +32,7 @@ class CreateImageVariants implements ShouldQueue
 
     /**
      * CreateImageVariants constructor.
-     * @param Media|Collection|Media[] $models
+     * @param Media|Collection<int, Media>|Media[] $models
      * @param string|string[] $variantNames
      * @throws ImageManipulationException
      */

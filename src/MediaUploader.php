@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Plank\Mediable;
@@ -6,6 +7,7 @@ namespace Plank\Mediable;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemManager;
 use League\Flysystem\UnableToRetrieveMetadata;
+use Plank\Mediable\Exceptions\ImageManipulationException;
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Plank\Mediable\Exceptions\MediaUpload\FileExistsException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException;
@@ -25,11 +27,11 @@ use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
  */
 class MediaUploader
 {
-    const ON_DUPLICATE_UPDATE = 'update';
-    const ON_DUPLICATE_INCREMENT = 'increment';
-    const ON_DUPLICATE_ERROR = 'error';
-    const ON_DUPLICATE_REPLACE = 'replace';
-    const ON_DUPLICATE_REPLACE_WITH_VARIANTS = 'replace_with_variants';
+    public const ON_DUPLICATE_UPDATE = 'update';
+    public const ON_DUPLICATE_INCREMENT = 'increment';
+    public const ON_DUPLICATE_ERROR = 'error';
+    public const ON_DUPLICATE_REPLACE = 'replace';
+    public const ON_DUPLICATE_REPLACE_WITH_VARIANTS = 'replace_with_variants';
 
     private FileSystemManager $filesystem;
 
@@ -64,10 +66,10 @@ class MediaUploader
     private ?string $visibility = null;
 
     /**
-     * Callable allowing to alter the model before save.
-     * @var callable
+     * @var callable|null
      */
-    private $before_save;
+    private $before_save = null;
+
 
     /**
      * Additional options to pass to the filesystem while uploading
@@ -82,6 +84,7 @@ class MediaUploader
      * Constructor.
      * @param FilesystemManager $filesystem
      * @param SourceAdapterFactory $factory
+     * @param ImageManipulator $imageManipulator
      * @param array|null $config
      */
     public function __construct(
@@ -460,7 +463,7 @@ class MediaUploader
         }
 
         return config(
-            'filesystems.disks.'.$this->disk.'.visibility',
+            'filesystems.disks.' . $this->disk . '.visibility',
             Filesystem::VISIBILITY_PUBLIC
         );
     }
@@ -475,6 +478,7 @@ class MediaUploader
      * @param string|ImageManipulation $imageManipulation Either a defined ImageManipulation variant name
      *   or an ImageManipulation instance
      * @return $this
+     * @throws ImageManipulationException
      */
     public function applyImageManipulation($imageManipulation): self
     {
@@ -522,7 +526,7 @@ class MediaUploader
         if (count($intersection)) {
             $type = $intersection[0];
         } elseif (empty($typesForMime) && empty($typesForExtension)) {
-            if (!$this->config['allow_unrecognized_types'] ?? false) {
+            if (!$this->config['allow_unrecognized_types']) {
                 throw FileNotSupportedException::unrecognizedFileType($mimeType, $extension);
             }
             $type = Media::TYPE_OTHER;
@@ -586,7 +590,7 @@ class MediaUploader
      * @throws FileNotFoundException
      * @throws FileNotSupportedException
      * @throws FileSizeException
-     * @throws InvalidHashException
+     * @throws InvalidHashException|Exceptions\ImageManipulationException
      */
     public function upload(): Media
     {
@@ -662,14 +666,12 @@ class MediaUploader
      * @param  Media $model
      * @return Media
      *
-     * @throws ConfigurationException
-     * @throws FileNotFoundException
      * @throws FileNotSupportedException
      * @throws FileSizeException
      */
     private function populateModel(Media $model): Media
     {
-        $model->size = $this->verifyFileSize($this->source->size() ?? 0);
+        $model->size = $this->verifyFileSize($this->source->size());
         $model->mime_type = $this->verifyMimeType($this->selectMimeType());
         $model->extension = $this->verifyExtension(
             $this->source->extension()
@@ -783,7 +785,7 @@ class MediaUploader
      * @throws FileNotSupportedException
      * @throws FileSizeException
      */
-    public function update(Media $media):  bool
+    public function update(Media $media): bool
     {
         $storage = $this->filesystem->disk($media->disk);
 
@@ -807,16 +809,15 @@ class MediaUploader
     /**
      * Verify if file is valid
      * @throws ConfigurationException If no source is provided
-     * @throws FileNotFoundException If the source is invalid
      * @throws FileSizeException If the file is too large
      * @throws FileNotSupportedException If the mime type is not allowed
-     * @throws FileNotSupportedException If the file extension is not allowed
+     * @throws FileNotSupportedException|InvalidHashException If the file extension is not allowed
      * @return void
      */
     public function verifyFile(): void
     {
         $this->verifySource();
-        $this->verifyFileSize($this->source->size() ?? 0);
+        $this->verifyFileSize($this->source->size());
         $mimeType = $this->verifyMimeType(
             $this->selectMimeType()
         );
@@ -862,7 +863,6 @@ class MediaUploader
      * Ensure that a valid source has been provided.
      * @return void
      * @throws ConfigurationException If no source is provided
-     * @throws FileNotFoundException If the source is invalid
      */
     private function verifySource(): void
     {
@@ -875,9 +875,7 @@ class MediaUploader
     {
         $mimeType = null;
         try {
-            if (method_exists($filesystem, 'mimeType')) {
-                $mimeType = $filesystem->mimeType($path);
-            }
+            $mimeType = $filesystem->mimeType($path);
         } catch (UnableToRetrieveMetadata $e) {
             // previous versions of flysystem would default to octet-stream when
             // the file was unrecognized. Maintain the behaviour for now
@@ -999,11 +997,11 @@ class MediaUploader
                 break;
             case static::ON_DUPLICATE_UPDATE:
                 $original = $model->newQuery()
-                   ->where('disk', $model->disk)
-                   ->where('directory', $model->directory)
-                   ->where('filename', $model->filename)
-                   ->where('extension', $model->extension)
-                   ->first();
+                    ->where('disk', $model->disk)
+                    ->where('directory', $model->directory)
+                    ->where('filename', $model->filename)
+                    ->where('extension', $model->extension)
+                    ->first();
 
                 if ($original) {
                     $model->{$model->getKeyName()} = $original->getKey();
@@ -1076,6 +1074,7 @@ class MediaUploader
     /**
      * Generate the model's filename.
      * @return string
+     * @throws ConfigurationException
      */
     private function generateFilename(): string
     {
@@ -1089,8 +1088,8 @@ class MediaUploader
 
         $filename = $this->source->filename();
 
-        if ($filename === null) {
-            ConfigurationException::cannotInferFilename();
+        if (!$filename) {
+            throw ConfigurationException::cannotInferFilename();
         }
 
         return File::sanitizeFileName($filename);
@@ -1118,13 +1117,11 @@ class MediaUploader
     /**
      * @param Media $model
      * @return void
-     * @throws Exceptions\ImageManipulationException
+     * @throws Exceptions\ImageManipulationException|ConfigurationException
      */
     public function manipulateImage(Media $model): void
     {
-        if (empty($this->config['image_manipulation'])
-            || $model->aggregate_type !== Media::TYPE_IMAGE
-        ) {
+        if (empty($this->config['image_manipulation'])|| $model->aggregate_type !== Media::TYPE_IMAGE) {
             return;
         }
         $manipulation = $this->config['image_manipulation'];

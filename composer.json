@@ -40,7 +40,7 @@
         "php-coveralls/php-coveralls": "^2.7.0",
         "phpunit/phpunit": "^11.5.10",
         "vlucas/phpdotenv": "^5.6.1",
-        "phpstan/phpstan": "^2.0.3"
+        "larastan/larastan": "^3.4"
     },
     "autoload": {
         "psr-4": {

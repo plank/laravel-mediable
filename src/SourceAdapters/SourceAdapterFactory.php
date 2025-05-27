@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Plank\Mediable\SourceAdapters;
@@ -26,7 +27,7 @@ class SourceAdapterFactory
 
     /**
      * Create a Source Adapter for the provided source.
-     * @param  object|string|resource $source
+     * @param object|string|resource $source
      * @return SourceAdapterInterface
      * @throws ConfigurationException If the provided source does not match any of the mapped classes or patterns
      */
@@ -114,9 +115,9 @@ class SourceAdapterFactory
 
     /**
      * Verify that the provided class implements the SourceAdapter interface.
-     * @param  class-string<SourceAdapterInterface> $class
-     * @throws ConfigurationException If class is not valid
+     * @param string $class
      * @return void
+     * @throws ConfigurationException If a class is not valid
      */
     private function validateAdapterClass(string $class): void
     {

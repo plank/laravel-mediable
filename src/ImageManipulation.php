@@ -219,6 +219,7 @@ class ImageManipulation
      * @param string $disk
      *
      * @return $this
+     * @throws ConfigurationException
      */
     public function toDisk(string $disk): self
     {

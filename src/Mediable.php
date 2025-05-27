@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Plank\Mediable;
@@ -79,7 +80,7 @@ trait Mediable
                 ->selectRaw('count(*)')
                 ->whereRaw(
                     $grammar->wrap($this->media()->getQualifiedForeignPivotKeyName())
-                    . ' = ' . $grammar->wrap($this->getQualifiedKeyName())
+                        . ' = ' . $grammar->wrap($this->getQualifiedKeyName())
                 );
             $q->whereRaw('(' . $subquery->toSql() . ') >= 1', $subquery->getBindings());
 
@@ -262,7 +263,7 @@ trait Mediable
 
     /**
      * Lazy eager load attached media relationships matching all provided tags.
-     * @param  string|string[] $tags one or more tags
+     * @param string|string[] $tags one or more tags
      * @param bool $withVariants If true, also load the variants and/or originalMedia relation of each Media
      * @return $this
      */
@@ -274,8 +275,8 @@ trait Mediable
     /**
      * Lazy eager load attached media relationships matching all provided tags, as well
      * as the variants of those media.
-     * @param array $tags
-     * @return $this
+     * @param string|string[] $tags
+     * @return self
      */
     public function loadMediaWithVariantsMatchAll($tags = []): self
     {
@@ -565,7 +566,8 @@ trait Mediable
     protected function handleMediableDeletion(): void
     {
         // only cascade soft deletes when configured
-        if (static::hasGlobalScope(SoftDeletingScope::class)
+        if (
+            static::hasGlobalScope(SoftDeletingScope::class)
             && (!property_exists($this, 'forceDeleting') || !$this->forceDeleting)
         ) {
             if (config('mediable.detach_on_soft_delete')) {
@@ -628,7 +630,8 @@ trait Mediable
             $relations = func_get_args();
         }
 
-        if (array_key_exists('media', $relations)
+        if (
+            array_key_exists('media', $relations)
             || in_array('media', $relations)
         ) {
             $this->mediaDirtyTags = [];

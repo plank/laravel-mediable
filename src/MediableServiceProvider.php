@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Plank\Mediable;
@@ -42,12 +43,12 @@ class MediableServiceProvider extends ServiceProvider
             $this->publishes(
                 [
                     $root . '/migrations/2016_06_27_000000_create_mediable_tables.php' =>
-                        $this->app->databasePath(
-                            'migrations/' . date(
-                                'Y_m_d_His',
-                                $time
-                            ) . '_create_mediable_tables.php'
-                        )
+                    $this->app->databasePath(
+                        'migrations/' . date(
+                            'Y_m_d_His',
+                            $time
+                        ) . '_create_mediable_tables.php'
+                    )
                 ],
                 'mediable-migrations'
             );
@@ -57,12 +58,12 @@ class MediableServiceProvider extends ServiceProvider
             $this->publishes(
                 [
                     $root . '/migrations/2020_10_12_000000_add_variants_to_media.php' =>
-                        $this->app->databasePath(
-                            'migrations/' . date(
-                                'Y_m_d_His',
-                                $time
-                            ) . '_add_variants_to_media.php'
-                        )
+                    $this->app->databasePath(
+                        'migrations/' . date(
+                            'Y_m_d_His',
+                            $time
+                        ) . '_add_variants_to_media.php'
+                    )
                 ],
                 'mediable-migrations'
             );
@@ -73,12 +74,12 @@ class MediableServiceProvider extends ServiceProvider
             $this->publishes(
                 [
                     $root . '/migrations/2024_03_30_000000_add_alt_to_media.php' =>
-                        $this->app->databasePath(
-                            'migrations/' . date(
-                                'Y_m_d_His',
-                                $time
-                            ) . '_add_alt_to_media.php'
-                        ),
+                    $this->app->databasePath(
+                        'migrations/' . date(
+                            'Y_m_d_His',
+                            $time
+                        ) . '_add_alt_to_media.php'
+                    ),
                 ],
                 'mediable-migrations'
             );
@@ -210,7 +211,8 @@ class MediableServiceProvider extends ServiceProvider
     private function getInterventionImageManagerConfiguration(Container $app): ?ImageManager
     {
         $imageManager = null;
-        if ($app->has(ImageManager::class)
+        if (
+            $app->has(ImageManager::class)
             || (
                 class_exists(DriverInterface::class) // intervention >= 3.0
                 && $app->has(DriverInterface::class)
@@ -227,7 +229,7 @@ class MediableServiceProvider extends ServiceProvider
                 );
             } else {
                 // intervention/image <3.0
-                $imageManager = new ImageManager(['driver' => 'imagick']);
+                $imageManager = new ImageManager('imagick');
             }
         } elseif (extension_loaded('gd')) {
             // attempt to automatically configure for gd
@@ -238,7 +240,7 @@ class MediableServiceProvider extends ServiceProvider
                 );
             } else {
                 // intervention/image <3.0
-                $imageManager = new ImageManager(['driver' => 'gd']);
+                $imageManager = new ImageManager('gd');
             }
         }
 

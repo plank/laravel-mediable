@@ -1,8 +1,16 @@
+includes:
+  - vendor/larastan/larastan/extension.neon
+  - vendor/nesbot/carbon/extension.neon
+
 parameters:
-	level: 1
-	paths:
-		- src
-		- tests
-	excludePaths:
-	    analyse:
-	        - vendor
+  level: 4
+
+  paths:
+    - src
+
+  excludePaths:
+    analyse:
+      - vendor
+
+  ignoreErrors:
+    - '#Trait Plank\\Mediable\\.* is used zero times and is not analysed.#'

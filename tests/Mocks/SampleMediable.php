@@ -13,5 +13,5 @@ class SampleMediable extends Model implements MediableInterface
 {
     use Mediable;
 
-    public $rehydrates_media = true;
+    public bool $rehydrates_media = true;
 }
