@@ -1087,6 +1087,7 @@ class MediaUploader
         }
 
         $filename = $this->source->filename();
+
         if (!$filename) {
             throw ConfigurationException::cannotInferFilename();
         }

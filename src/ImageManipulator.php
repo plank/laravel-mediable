@@ -360,11 +360,7 @@ class ImageManipulator
         ImageManipulation $manipulation,
         ?Media $originalVariant = null
     ): void {
-        if (
-            $originalVariant
-            && $variant->disk === $originalVariant->disk
-            && $variant->getDiskPath() === $originalVariant->getDiskPath()
-        ) {
+        if ($originalVariant && $variant->disk === $originalVariant->disk && $variant->getDiskPath() === $originalVariant->getDiskPath()) {
             // same as the original, no conflict as we are going to replace the file anyways
             return;
         }

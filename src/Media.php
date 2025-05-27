@@ -460,11 +460,11 @@ class Media extends Model
     }
 
     /**
-     * @param Media|string|int $media
+     * @param int|string|Media $media
      * @param string $variantName
      * @return $this
      */
-    public function makeVariantOf($media, string $variantName): self
+    public function makeVariantOf(int|string|Media $media, string $variantName): self
     {
         if (!$media instanceof self) {
             $media = $this->newQuery()->findOrFail($media);
