@@ -235,14 +235,13 @@ class ImageManipulator
         }
 
         $outputFormat = $this->determineOutputFormat($manipulation, $media);
-
-        /** @phpstan-ignore-next-line MethodDoesNotExist */
+        // @phpstan-ignore function.alreadyNarrowedType (BC check for Intervention Image 3.x)
         if (method_exists($this->imageManager, 'read')) {
             // Intervention Image  >=3.0
             $image = $this->imageManager->read($source->getStream()->getContents());
         } else {
             // Intervention Image <3.0
-            /** @phpstan-ignore-next-line MethodDoesNotExist */
+            // @phpstan-ignore method.notFound
             $image = $this->imageManager->make($source->getStream()->getContents());
         }
 
@@ -407,6 +406,9 @@ class ImageManipulator
         return $filename;
     }
 
+    /**
+     * @throws ImageManipulationException
+     */
     private function imageToStream(
         Image $image,
         string $outputFormat,

@@ -1120,10 +1120,7 @@ class MediaUploader
      */
     public function manipulateImage(Media $model): void
     {
-        if (
-            empty($this->config['image_manipulation'])
-            || $model->aggregate_type !== Media::TYPE_IMAGE
-        ) {
+        if (empty($this->config['image_manipulation'])|| $model->aggregate_type !== Media::TYPE_IMAGE) {
             return;
         }
         $manipulation = $this->config['image_manipulation'];
