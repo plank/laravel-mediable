@@ -63,7 +63,7 @@ return [
 
     /**
      * Prefer the client-provided MIME type over the one inferred from the file contents, if provided
-     * May be slightly faster to compute, but is not guaranteed to be accurate if the source is untrusted.
+     * May be slightly faster to compute, but is not guaranteed to be accurate if the source is untrusted
      */
     'prefer_client_mime_type' => false,
 
@@ -102,7 +102,7 @@ return [
                 'png',
                 'gif',
                 'heic',
-            ],
+            ]
         ],
         Plank\Mediable\Media::TYPE_IMAGE_VECTOR => [
             'mime_types' => [
@@ -110,7 +110,7 @@ return [
             ],
             'extensions' => [
                 'svg',
-            ],
+            ]
         ],
         Plank\Mediable\Media::TYPE_PDF => [
             'mime_types' => [
@@ -118,7 +118,7 @@ return [
             ],
             'extensions' => [
                 'pdf',
-            ],
+            ]
         ],
         Plank\Mediable\Media::TYPE_AUDIO => [
             'mime_types' => [
@@ -127,7 +127,7 @@ return [
                 'audio/mpeg',
                 'audio/mp3',
                 'audio/mpeg',
-                'audio/wav',
+                'audio/wav'
             ],
             'extensions' => [
                 'aac',
@@ -135,22 +135,22 @@ return [
                 'oga',
                 'mp3',
                 'wav',
-            ],
+            ]
         ],
         Plank\Mediable\Media::TYPE_VIDEO => [
             'mime_types' => [
                 'video/mp4',
                 'video/mpeg',
                 'video/ogg',
-                'video/webm',
+                'video/webm'
             ],
             'extensions' => [
                 'mp4',
                 'm4v',
                 'mov',
                 'ogv',
-                'webm',
-            ],
+                'webm'
+            ]
         ],
         Plank\Mediable\Media::TYPE_ARCHIVE => [
             'mime_types' => [
@@ -160,7 +160,7 @@ return [
             ],
             'extensions' => [
                 'zip',
-            ],
+            ]
         ],
         Plank\Mediable\Media::TYPE_DOCUMENT => [
             'mime_types' => [
@@ -170,7 +170,7 @@ return [
                 'text/json',
                 'application/json',
                 'application/msword',
-                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
             ],
             'extensions' => [
                 'doc',
@@ -179,7 +179,7 @@ return [
                 'text',
                 'xml',
                 'json',
-            ],
+            ]
         ],
         Plank\Mediable\Media::TYPE_SPREADSHEET => [
             'mime_types' => [
@@ -189,19 +189,21 @@ return [
             'extensions' => [
                 'xls',
                 'xlsx',
-            ],
+            ]
         ],
         Plank\Mediable\Media::TYPE_PRESENTATION => [
-            'mime_types' => [
-                'application/vnd.ms-powerpoint',
-                'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-                'application/vnd.openxmlformats-officedocument.presentationml.slideshow',
-            ],
-            'extensions' => [
-                'ppt',
-                'pptx',
-                'ppsx',
-            ],
+            'mime_types' =>
+                [
+                    'application/vnd.ms-powerpoint',
+                    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                    'application/vnd.openxmlformats-officedocument.presentationml.slideshow'
+                ],
+            'extensions' =>
+                [
+                    'ppt',
+                    'pptx',
+                    'ppsx',
+                ]
         ],
     ],
 
@@ -213,13 +215,13 @@ return [
     'source_adapters' => [
         'class' => [
             Symfony\Component\HttpFoundation\File\UploadedFile::class => Plank\Mediable\SourceAdapters\UploadedFileAdapter::class,
-            Symfony\Component\HttpFoundation\File\File::class         => Plank\Mediable\SourceAdapters\FileAdapter::class,
-            Psr\Http\Message\StreamInterface::class                   => Plank\Mediable\SourceAdapters\StreamAdapter::class,
+            Symfony\Component\HttpFoundation\File\File::class => Plank\Mediable\SourceAdapters\FileAdapter::class,
+            Psr\Http\Message\StreamInterface::class => Plank\Mediable\SourceAdapters\StreamAdapter::class,
         ],
         'pattern' => [
-            '^https?://'       => Plank\Mediable\SourceAdapters\RemoteUrlAdapter::class,
-            '^/'               => Plank\Mediable\SourceAdapters\LocalPathAdapter::class,
-            '^[a-zA-Z]:\\\\'   => Plank\Mediable\SourceAdapters\LocalPathAdapter::class,
+            '^https?://' => Plank\Mediable\SourceAdapters\RemoteUrlAdapter::class,
+            '^/' => Plank\Mediable\SourceAdapters\LocalPathAdapter::class,
+            '^[a-zA-Z]:\\\\' => Plank\Mediable\SourceAdapters\LocalPathAdapter::class,
             '^data:/?/?[^,]*,' => Plank\Mediable\SourceAdapters\DataUrlAdapter::class,
         ],
     ],
@@ -230,7 +232,7 @@ return [
      */
     'url_generators' => [
         'local' => Plank\Mediable\UrlGenerators\LocalUrlGenerator::class,
-        's3'    => Plank\Mediable\UrlGenerators\S3UrlGenerator::class,
+        's3' => Plank\Mediable\UrlGenerators\S3UrlGenerator::class,
     ],
 
     /**
@@ -253,16 +255,16 @@ return [
     'ignore_migrations' => false,
 
     /**
-     * Configuration for image optimization.
+     * Configuration for image optimization
      */
     'image_optimization' => [
         /**
-         * Whether to apply image optimization after performing image manipulations by default.
+         * Whether to apply image optimization after performing image manipulations by default
          */
         'enabled' => true,
         /**
          * array of optimizers to use, which should implement \Spatie\ImageOptimizer\Optimizer
-         * Each can be passed an array of command line arguments to be passed to the optimizer.
+         * Each can be passed an array of command line arguments to be passed to the optimizer
          */
         'optimizers' => [
             \Spatie\ImageOptimizer\Optimizers\Jpegoptim::class => [
@@ -301,5 +303,5 @@ return [
                 '-a tune=ssim',
             ],
         ],
-    ],
+    ]
 ];

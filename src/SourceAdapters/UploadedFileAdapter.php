@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 
 namespace Plank\Mediable\SourceAdapters;
@@ -20,7 +19,6 @@ class UploadedFileAdapter implements SourceAdapterInterface
 
     /**
      * Constructor.
-     *
      * @param UploadedFile $source
      */
     public function __construct(UploadedFile $source)
@@ -80,7 +78,6 @@ class UploadedFileAdapter implements SourceAdapterInterface
 
     /**
      * {@inheritdoc}
-     *
      * @param string $algo
      */
     public function hash(string $algo = 'md5'): string

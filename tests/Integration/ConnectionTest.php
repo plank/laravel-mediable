@@ -25,9 +25,9 @@ class ConnectionTest extends TestCase
         $this->assertEquals('my_connection', $media->getConnectionName());
         $this->assertDatabaseHas($media->getTable(), ['id' => 1], 'my_connection');
         $this->assertDatabaseHas(config('mediable.mediables_table'), [
-            'media_id'      => $media->getKey(),
+            'media_id' => $media->getKey(),
             'mediable_type' => get_class($mediable),
-            'mediable_id'   => $mediable->getKey(),
+            'mediable_id' => $mediable->getKey(),
         ], 'my_connection');
         $this->assertEquals(1, $mediable->firstMedia('foo')->id);
     }
@@ -35,9 +35,9 @@ class ConnectionTest extends TestCase
     protected function setupConnection(): void
     {
         $this->app['config']->set('database.connections.my_connection', [
-            'driver'   => 'sqlite',
+            'driver' => 'sqlite',
             'database' => ':memory:',
-            'prefix'   => 'my__',
+            'prefix' => 'my__',
         ]);
 
         $this->app['config']->set('mediable.connection_name', 'my_connection');

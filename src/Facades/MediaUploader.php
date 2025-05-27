@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 
 namespace Plank\Mediable\Facades;
@@ -22,7 +21,7 @@ use Plank\Mediable\MediaUploader as Uploader;
  * @method static Uploader setModelClass(string $class)
  * @method static Uploader setMaximumSize(int $size)
  * @method static Uploader setOnDuplicateBehavior(string $behavior)
- * @method static string   getOnDuplicateBehavior()
+ * @method static string getOnDuplicateBehavior()
  * @method static Uploader onDuplicateError()
  * @method static Uploader onDuplicateIncrement()
  * @method static Uploader onDuplicateReplace()
@@ -38,17 +37,17 @@ use Plank\Mediable\MediaUploader as Uploader;
  * @method static Uploader preferInferredMimeType()
  * @method static Uploader makePublic()
  * @method static Uploader makePrivate()
- * @method static string   inferAggregateType(string $mime_type, string $extension)
+ * @method static string inferAggregateType(string $mime_type, string $extension)
  * @method static string[] possibleAggregateTypesForMimeType(string $mime)
  * @method static string[] possibleAggregateTypesForExtension(string $extension)
- * @method static Media    upload()
- * @method static Media    replace(Media $media)
- * @method static Media    populateModel(Media $model)
+ * @method static Media upload()
+ * @method static Media replace(Media $media)
+ * @method static Media populateModel(Media $model)
  * @method static Uploader beforeSave(callable $callable)
- * @method static Media    importPath(string $disk, string $path)
- * @method static Media    import(string $disk, string $directory, string $filename, string $extension)
- * @method static bool     update(Media $media)
- * @method static void     verifyFile()
+ * @method static Media importPath(string $disk, string $path)
+ * @method static Media import(string $disk, string $directory, string $filename, string $extension)
+ * @method static bool update(Media $media)
+ * @method static void verifyFile()
  */
 class MediaUploader extends Facade
 {
@@ -68,7 +67,6 @@ class MediaUploader extends Facade
         if (!self::isMock()) {
             self::clearResolvedInstance('mediable.uploader');
         }
-
         return parent::getFacadeRoot();
     }
 }

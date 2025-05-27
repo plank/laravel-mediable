@@ -2,7 +2,9 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Plank\Mediable\Media;
 
 return new class extends Migration {
     /**
@@ -10,7 +12,7 @@ return new class extends Migration {
      *
      * @return void
      */
-    public function up(): void
+    public function up():void
     {
         Schema::whenTableDoesntHaveColumn(
             'media',
@@ -26,7 +28,7 @@ return new class extends Migration {
      *
      * @return void
      */
-    public function down(): void
+    public function down():void
     {
         Schema::whenTableHasColumn(
             'media',

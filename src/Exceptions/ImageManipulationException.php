@@ -1,5 +1,6 @@
 <?php
 
+
 namespace Plank\Mediable\Exceptions;
 
 class ImageManipulationException extends \Exception
@@ -21,7 +22,7 @@ class ImageManipulationException extends \Exception
     public static function unknownOutputFormat(): self
     {
         return new self(
-            'Unable to determine valid output format for file.'
+            "Unable to determine valid output format for file."
         );
     }
 

@@ -1,11 +1,13 @@
 <?php
-
 declare(strict_types=1);
 
 namespace Plank\Mediable\SourceAdapters;
 
 use GuzzleHttp\Psr7\Utils;
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
+use Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException;
+use Plank\Mediable\Helpers\File;
+use Psr\Http\Message\StreamInterface;
 
 /**
  * Local Path Adapter.

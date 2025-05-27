@@ -2,6 +2,7 @@
 
 namespace Plank\Mediable\Tests\Integration;
 
+use Illuminate\Support\Facades\DB;
 use Plank\Mediable\Media;
 use Plank\Mediable\MediableCollection;
 use Plank\Mediable\Tests\Mocks\SampleMediable;
@@ -168,8 +169,8 @@ class MediableCollectionTest extends TestCase
         $query = $mediable1->media()->newPivotStatement();
         $pivots = $query->get();
         $this->assertCount(1, $pivots);
-        $this->assertEquals('2', $pivots[0]->media_id);
-        $this->assertEquals('3', $pivots[0]->mediable_id);
-        $this->assertEquals('foo', $pivots[0]->tag);
+        $this->assertEquals("2", $pivots[0]->media_id);
+        $this->assertEquals("3", $pivots[0]->mediable_id);
+        $this->assertEquals("foo", $pivots[0]->tag);
     }
 }

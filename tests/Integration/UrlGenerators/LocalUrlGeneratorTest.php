@@ -65,17 +65,17 @@ class LocalUrlGeneratorTest extends TestCase
         $filesystem = $this->createConfiguredMock(
             FilesystemManager::class,
             [
-                'disk' => Storage::fake('uploads'),
+                'disk' => Storage::fake('uploads')
             ]
         );
         $generator = new LocalUrlGenerator(config(), $filesystem);
 
         $media = factory(Media::class)->make(
             [
-                'disk'      => 'uploads',
+                'disk' => 'uploads',
                 'directory' => 'foo',
-                'filename'  => 'bar',
-                'extension' => 'jpg',
+                'filename' => 'bar',
+                'extension' => 'jpg'
             ]
         );
         $this->seedFileForMedia($media);
@@ -90,10 +90,10 @@ class LocalUrlGeneratorTest extends TestCase
         /** @var Media $media */
         $media = factory(Media::class)->make(
             [
-                'disk'      => $disk,
+                'disk' => $disk,
                 'directory' => 'foo',
-                'filename'  => 'bar',
-                'extension' => 'jpg',
+                'filename' => 'bar',
+                'extension' => 'jpg'
             ]
         );
         $this->useFilesystem($disk);
@@ -107,7 +107,6 @@ class LocalUrlGeneratorTest extends TestCase
         }
         $generator = new LocalUrlGenerator(config(), app(FilesystemManager::class));
         $generator->setMedia($media);
-
         return $generator;
     }
 }

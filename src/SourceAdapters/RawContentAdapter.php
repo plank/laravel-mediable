@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 
 namespace Plank\Mediable\SourceAdapters;
@@ -52,7 +51,7 @@ class RawContentAdapter implements SourceAdapterInterface
     {
         $fileInfo = new \finfo(FILEINFO_MIME_TYPE);
 
-        return (string) $fileInfo->buffer($this->source);
+        return (string)$fileInfo->buffer($this->source);
     }
 
     public function clientMimeType(): ?string
@@ -80,7 +79,6 @@ class RawContentAdapter implements SourceAdapterInterface
     {
         $hash = hash_init($algo);
         hash_update($hash, $this->source);
-
         return hash_final($hash);
     }
 }

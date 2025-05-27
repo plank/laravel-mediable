@@ -14,10 +14,7 @@ use Plank\Mediable\Media;
 
 class CreateImageVariants implements ShouldQueue
 {
-    use Dispatchable;
-    use InteractsWithQueue;
-    use Queueable;
-    use SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
      * @var string[]
@@ -35,10 +32,8 @@ class CreateImageVariants implements ShouldQueue
 
     /**
      * CreateImageVariants constructor.
-     *
      * @param Media|Collection<int, Media>|Media[] $models
-     * @param string|string[]                      $variantNames
-     *
+     * @param string|string[] $variantNames
      * @throws ImageManipulationException
      */
     public function __construct($models, $variantNames, bool $forceRecreate = false)
@@ -83,8 +78,7 @@ class CreateImageVariants implements ShouldQueue
 
     /**
      * @param Collection<Media> $models
-     * @param array             $variantNames
-     *
+     * @param array $variantNames
      * @throws ImageManipulationException
      */
     private function validate(Collection $models, array $variantNames): void
@@ -113,7 +107,6 @@ class CreateImageVariants implements ShouldQueue
 
     /**
      * @param Media|Collection|Media[] $models
-     *
      * @return Collection
      */
     private function collect($models): Collection
@@ -121,7 +114,6 @@ class CreateImageVariants implements ShouldQueue
         if ($models instanceof Media) {
             $models = [$models];
         }
-
         return new Collection($models);
     }
 }

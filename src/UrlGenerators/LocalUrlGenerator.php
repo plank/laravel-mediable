@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 
 namespace Plank\Mediable\UrlGenerators;
@@ -14,8 +13,7 @@ class LocalUrlGenerator extends BaseUrlGenerator
 
     /**
      * Constructor.
-     *
-     * @param Config            $config
+     * @param Config $config
      * @param FilesystemManager $filesystem
      */
     public function __construct(Config $config, FilesystemManager $filesystem)
@@ -35,14 +33,12 @@ class LocalUrlGenerator extends BaseUrlGenerator
 
     /**
      * {@inheritdoc}
-     *
      * @throws \Plank\Mediable\Exceptions\MediaUrlException If media's disk is not publicly accessible
      */
     public function getUrl(): string
     {
         /** @var Cloud $filesystem */
         $filesystem = $this->filesystem->disk($this->media->disk);
-
         return $filesystem->url($this->media->getDiskPath());
     }
 
@@ -51,7 +47,7 @@ class LocalUrlGenerator extends BaseUrlGenerator
      */
     public function getAbsolutePath(): string
     {
-        return $this->getDiskConfig('root').DIRECTORY_SEPARATOR.$this->media->getDiskPath();
+        return $this->getDiskConfig('root') . DIRECTORY_SEPARATOR . $this->media->getDiskPath();
     }
 
     private function isInWebroot(): bool

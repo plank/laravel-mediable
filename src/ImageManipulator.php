@@ -5,6 +5,7 @@ namespace Plank\Mediable;
 use GuzzleHttp\Psr7\Utils;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Support\Collection;
+use Intervention\Image\Commands\StreamCommand;
 use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
 use Plank\Mediable\Exceptions\ImageManipulationException;
@@ -12,6 +13,7 @@ use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
 use Plank\Mediable\SourceAdapters\StreamAdapter;
 use Psr\Http\Message\StreamInterface;
+use Spatie\ImageOptimizer\OptimizerChain;
 
 class ImageManipulator
 {
@@ -65,10 +67,8 @@ class ImageManipulator
 
     /**
      * @param string $variantName
-     *
-     * @throws ImageManipulationException if Variant is not defined
-     *
      * @return ImageManipulation
+     * @throws ImageManipulationException if Variant is not defined
      */
     public function getVariantDefinition(string $variantName): ImageManipulation
     {
@@ -101,13 +101,11 @@ class ImageManipulator
     }
 
     /**
-     * @param Media  $media
+     * @param Media $media
      * @param string $variantName
-     * @param bool   $forceRecreate
-     *
-     * @throws ImageManipulationException|ConfigurationException
-     *
+     * @param bool $forceRecreate
      * @return Media
+     * @throws ImageManipulationException|ConfigurationException
      */
     public function createImageVariant(
         Media $media,
@@ -220,14 +218,12 @@ class ImageManipulator
     }
 
     /**
-     * @param Media                  $media
+     * @param Media $media
      * @param SourceAdapterInterface $source
-     * @param ImageManipulation      $manipulation
-     *
+     * @param ImageManipulation $manipulation
+     * @return StreamAdapter
      * @throws ImageManipulationException
      * @throws ConfigurationException
-     *
-     * @return StreamAdapter
      */
     public function manipulateUpload(
         Media $media,
@@ -281,11 +277,9 @@ class ImageManipulator
 
     /**
      * @param ImageManipulation $manipulation
-     * @param Media             $media
-     *
-     * @throws ImageManipulationException If output format cannot be determined
-     *
+     * @param Media $media
      * @return string
+     * @throws ImageManipulationException If output format cannot be determined
      */
     private function determineOutputFormat(
         ImageManipulation $manipulation,
@@ -333,7 +327,6 @@ class ImageManipulator
                 $manipulation->getHashFilenameAlgo() ?? 'md5'
             );
         }
-
         return sprintf('%s-%s', $originalMedia->filename, $variant->variant_name);
     }
 
@@ -385,6 +378,7 @@ class ImageManipulator
         switch ($manipulation->getOnDuplicateBehaviour()) {
             case ImageManipulation::ON_DUPLICATE_ERROR:
                 throw ImageManipulationException::fileExists($variant->getDiskPath());
+
             case ImageManipulation::ON_DUPLICATE_INCREMENT:
             default:
                 $variant->filename = $this->generateUniqueFilename($variant);
@@ -394,9 +388,7 @@ class ImageManipulator
 
     /**
      * Increment model's filename until one is found that doesn't already exist.
-     *
      * @param Media $model
-     *
      * @return string
      */
     private function generateUniqueFilename(Media $model): string
@@ -406,10 +398,10 @@ class ImageManipulator
         do {
             $filename = "{$model->filename}";
             if ($counter > 0) {
-                $filename .= '-'.$counter;
+                $filename .= '-' . $counter;
             }
             $path = "{$model->directory}/{$filename}.{$model->extension}";
-            $counter++;
+            ++$counter;
         } while ($storage->exists($path));
 
         return $filename;
@@ -430,15 +422,14 @@ class ImageManipulator
         }
 
         $formatted = match ($outputFormat) {
-            ImageManipulation::FORMAT_JPG  => $image->toJpeg($outputQuality),
-            ImageManipulation::FORMAT_PNG  => $image->toPng(),
-            ImageManipulation::FORMAT_GIF  => $image->toGif(),
+            ImageManipulation::FORMAT_JPG => $image->toJpeg($outputQuality),
+            ImageManipulation::FORMAT_PNG => $image->toPng(),
+            ImageManipulation::FORMAT_GIF => $image->toGif(),
             ImageManipulation::FORMAT_WEBP => $image->toWebp($outputQuality),
             ImageManipulation::FORMAT_TIFF => $image->toTiff($outputQuality),
             ImageManipulation::FORMAT_HEIC => $image->toHeic($outputQuality),
-            default                        => throw ImageManipulationException::unknownOutputFormat(),
+            default => throw ImageManipulationException::unknownOutputFormat(),
         };
-
         return Utils::streamFor($formatted->toFilePointer());
     }
 }

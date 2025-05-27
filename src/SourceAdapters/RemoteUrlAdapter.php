@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 
 namespace Plank\Mediable\SourceAdapters;
@@ -19,7 +18,6 @@ class RemoteUrlAdapter extends StreamAdapter
     public function __construct(string $source)
     {
         $this->url = $source;
-
         try {
             $resource = Utils::tryFopen($source, 'rb');
             $stream = Utils::streamFor($resource);

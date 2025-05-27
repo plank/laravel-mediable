@@ -96,11 +96,10 @@ class S3UrlGeneratorTest extends TestCase
         $filesystemManager->disk('s3')
             ->put(
                 $media->getDiskPath(),
-                file_get_contents(dirname(__DIR__, 2).'/_data/plank.png')
+                file_get_contents(dirname(__DIR__, 2) . '/_data/plank.png')
             );
         $generator = new S3UrlGenerator(config(), $filesystemManager);
         $generator->setMedia($media);
-
         return $generator;
     }
 
@@ -108,10 +107,10 @@ class S3UrlGeneratorTest extends TestCase
     {
         return $this->makeMedia(
             [
-                'disk'      => 's3',
+                'disk' => 's3',
                 'directory' => 'foo',
-                'filename'  => 'bar',
-                'extension' => 'jpg',
+                'filename' => 'bar',
+                'extension' => 'jpg'
             ]
         );
     }

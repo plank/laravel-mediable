@@ -21,19 +21,19 @@ class SyncMediaCommandTest extends TestCase
                 [
                     $this->equalTo('media:prune'),
                     [
-                        'disk'            => null,
-                        '--directory'     => '',
+                        'disk' => null,
+                        '--directory' => '',
                         '--non-recursive' => false,
-                    ],
+                    ]
                 ],
                 [
                     $this->equalTo('media:import'),
                     [
-                        'disk'            => null,
-                        '--directory'     => '',
+                        'disk' => null,
+                        '--directory' => '',
                         '--non-recursive' => false,
-                        '--force'         => false,
-                    ],
+                        '--force' => false
+                    ]
                 ]
             ));
 

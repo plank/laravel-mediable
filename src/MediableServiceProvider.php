@@ -32,7 +32,7 @@ class MediableServiceProvider extends ServiceProvider
         $root = dirname(__DIR__);
         $this->publishes(
             [
-                $root.'/config/mediable.php' => config_path('mediable.php'),
+                $root . '/config/mediable.php' => config_path('mediable.php'),
             ],
             'config'
         );
@@ -42,12 +42,13 @@ class MediableServiceProvider extends ServiceProvider
         if (empty(glob($this->app->databasePath('migrations/*_create_mediable_tables.php')))) {
             $this->publishes(
                 [
-                    $root.'/migrations/2016_06_27_000000_create_mediable_tables.php' => $this->app->databasePath(
-                        'migrations/'.date(
+                    $root . '/migrations/2016_06_27_000000_create_mediable_tables.php' =>
+                    $this->app->databasePath(
+                        'migrations/' . date(
                             'Y_m_d_His',
                             $time
-                        ).'_create_mediable_tables.php'
-                    ),
+                        ) . '_create_mediable_tables.php'
+                    )
                 ],
                 'mediable-migrations'
             );
@@ -56,12 +57,13 @@ class MediableServiceProvider extends ServiceProvider
         if (empty(glob($this->app->databasePath('migrations/*_add_variants_to_media.php')))) {
             $this->publishes(
                 [
-                    $root.'/migrations/2020_10_12_000000_add_variants_to_media.php' => $this->app->databasePath(
-                        'migrations/'.date(
+                    $root . '/migrations/2020_10_12_000000_add_variants_to_media.php' =>
+                    $this->app->databasePath(
+                        'migrations/' . date(
                             'Y_m_d_His',
                             $time
-                        ).'_add_variants_to_media.php'
-                    ),
+                        ) . '_add_variants_to_media.php'
+                    )
                 ],
                 'mediable-migrations'
             );
@@ -71,11 +73,12 @@ class MediableServiceProvider extends ServiceProvider
         if (empty(glob($this->app->databasePath('migrations/*_add_alt_to_media.php')))) {
             $this->publishes(
                 [
-                    $root.'/migrations/2024_03_30_000000_add_alt_to_media.php' => $this->app->databasePath(
-                        'migrations/'.date(
+                    $root . '/migrations/2024_03_30_000000_add_alt_to_media.php' =>
+                    $this->app->databasePath(
+                        'migrations/' . date(
                             'Y_m_d_His',
                             $time
-                        ).'_add_alt_to_media.php'
+                        ) . '_add_alt_to_media.php'
                     ),
                 ],
                 'mediable-migrations'
@@ -83,7 +86,7 @@ class MediableServiceProvider extends ServiceProvider
         }
 
         if (!config('mediable.ignore_migrations', false)) {
-            $this->loadMigrationsFrom($root.'/migrations');
+            $this->loadMigrationsFrom($root . '/migrations');
         }
     }
 
@@ -95,7 +98,7 @@ class MediableServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(
-            dirname(__DIR__).'/config/mediable.php',
+            dirname(__DIR__) . '/config/mediable.php',
             'mediable'
         );
 
@@ -111,13 +114,12 @@ class MediableServiceProvider extends ServiceProvider
      * Bind an instance of the Source Adapter Factory to the container.
      *
      * Attaches the default adapter types
-     *
      * @return void
      */
     public function registerSourceAdapterFactory(): void
     {
         $this->app->singleton('mediable.source.factory', function (Container $app) {
-            $factory = new SourceAdapterFactory();
+            $factory = new SourceAdapterFactory;
 
             $classAdapters = $app['config']->get('mediable.source_adapters.class', []);
             foreach ($classAdapters as $source => $adapter) {
@@ -136,7 +138,6 @@ class MediableServiceProvider extends ServiceProvider
 
     /**
      * Bind the Media Uploader to the container.
-     *
      * @return void
      */
     public function registerUploader(): void
@@ -154,7 +155,6 @@ class MediableServiceProvider extends ServiceProvider
 
     /**
      * Bind the Media Uploader to the container.
-     *
      * @return void
      */
     public function registerMover(): void
@@ -167,13 +167,12 @@ class MediableServiceProvider extends ServiceProvider
 
     /**
      * Bind the Media Uploader to the container.
-     *
      * @return void
      */
     public function registerUrlGeneratorFactory(): void
     {
         $this->app->singleton('mediable.url.factory', function (Container $app) {
-            $factory = new UrlGeneratorFactory();
+            $factory = new UrlGeneratorFactory;
 
             $config = $app['config']->get('mediable.url_generators', []);
             foreach ($config as $driver => $generator) {
@@ -198,7 +197,6 @@ class MediableServiceProvider extends ServiceProvider
 
     /**
      * Add package commands to artisan console.
-     *
      * @return void
      */
     public function registerConsoleCommands(): void

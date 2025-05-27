@@ -125,18 +125,18 @@ class ImageManipulatorTest extends TestCase
     {
         $this->useFilesystem('tmp');
         $this->expectException(ImageManipulationException::class);
-        $this->expectExceptionMessage('Unable to determine valid output format for file.');
+        $this->expectExceptionMessage("Unable to determine valid output format for file.");
         $manipulation = ImageManipulation::make(
             function (Image $image) {
             }
         );
         $media = $this->makeMedia(
             [
-                'disk'           => 'tmp',
-                'filename'       => 'foo',
-                'extension'      => 'psd',
-                'mime_type'      => 'image/vnd.adobe.photoshop',
-                'aggregate_type' => 'image',
+                'disk' => 'tmp',
+                'filename' => 'foo',
+                'extension' => 'psd',
+                'mime_type' => 'image/vnd.adobe.photoshop',
+                'aggregate_type' => 'image'
             ]
         );
         $this->seedFileForMedia($media);
@@ -152,13 +152,13 @@ class ImageManipulatorTest extends TestCase
 
         $media = $this->makeMedia(
             [
-                'id'             => 10,
-                'disk'           => 'tmp',
-                'directory'      => 'foo',
-                'filename'       => 'bar',
-                'extension'      => 'png',
-                'mime_type'      => 'image/png',
-                'aggregate_type' => 'image',
+                'id' => 10,
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'extension' => 'png',
+                'mime_type' => 'image/png',
+                'aggregate_type' => 'image'
             ]
         );
         $this->seedFileForMedia($media, $this->sampleFile());
@@ -171,7 +171,6 @@ class ImageManipulatorTest extends TestCase
                     function (Media $media) {
                         $result = $media->directory === 'foo';
                         $media->directory = 'baz';
-
                         return $result;
                     }
                 )
@@ -199,7 +198,7 @@ class ImageManipulatorTest extends TestCase
             [
                 449, // Laravel <=8
                 442, // laravel 11
-                438, // Laravel 9+
+                438 // Laravel 9+
             ]
         );
         $this->assertEquals('test', $result->variant_name);
@@ -216,15 +215,15 @@ class ImageManipulatorTest extends TestCase
 
         $media = $this->createMedia(
             [
-                'id'                => 20,
-                'disk'              => 'tmp',
-                'directory'         => 'foo',
-                'filename'          => 'bar-other',
-                'extension'         => 'png',
-                'mime_type'         => 'image/png',
-                'aggregate_type'    => 'image',
-                'variant_name'      => 'other',
-                'original_media_id' => $originalMedia->getKey(),
+                'id' => 20,
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar-other',
+                'extension' => 'png',
+                'mime_type' => 'image/png',
+                'aggregate_type' => 'image',
+                'variant_name' => 'other',
+                'original_media_id' => $originalMedia->getKey()
             ]
         );
         $this->seedFileForMedia($media, $this->sampleFile());
@@ -265,12 +264,12 @@ class ImageManipulatorTest extends TestCase
 
         $media = $this->makeMedia(
             [
-                'disk'           => 'tmp',
-                'directory'      => 'foo',
-                'filename'       => 'bar',
-                'extension'      => 'png',
-                'mime_type'      => 'image/png',
-                'aggregate_type' => 'image',
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'extension' => 'png',
+                'mime_type' => 'image/png',
+                'aggregate_type' => 'image'
             ]
         );
         $this->seedFileForMedia($media, $this->sampleFile());
@@ -299,12 +298,12 @@ class ImageManipulatorTest extends TestCase
 
         $media = $this->makeMedia(
             [
-                'disk'           => 'tmp',
-                'directory'      => 'foo',
-                'filename'       => 'bar',
-                'extension'      => 'png',
-                'mime_type'      => 'image/png',
-                'aggregate_type' => 'image',
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'extension' => 'png',
+                'mime_type' => 'image/png',
+                'aggregate_type' => 'image'
             ]
         );
         $this->seedFileForMedia($media, $this->sampleFile());
@@ -333,12 +332,12 @@ class ImageManipulatorTest extends TestCase
 
         $media = $this->makeMedia(
             [
-                'disk'           => 'tmp',
-                'directory'      => 'foo',
-                'filename'       => 'bar',
-                'extension'      => 'png',
-                'mime_type'      => 'image/png',
-                'aggregate_type' => 'image',
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'extension' => 'png',
+                'mime_type' => 'image/png',
+                'aggregate_type' => 'image'
             ]
         );
         $this->seedFileForMedia($media, $this->sampleFile());
@@ -369,12 +368,12 @@ class ImageManipulatorTest extends TestCase
 
         $media = $this->makeMedia(
             [
-                'disk'           => 'tmp',
-                'directory'      => 'foo',
-                'filename'       => 'bar-test',
-                'extension'      => 'png',
-                'mime_type'      => 'image/png',
-                'aggregate_type' => 'image',
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar-test',
+                'extension' => 'png',
+                'mime_type' => 'image/png',
+                'aggregate_type' => 'image'
             ]
         );
         $this->seedFileForMedia($media, $this->sampleFile());
@@ -400,12 +399,12 @@ class ImageManipulatorTest extends TestCase
 
         $media = $this->makeMedia(
             [
-                'disk'           => 'tmp',
-                'directory'      => 'foo',
-                'filename'       => 'bar',
-                'extension'      => 'png',
-                'mime_type'      => 'image/png',
-                'aggregate_type' => 'image',
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'extension' => 'png',
+                'mime_type' => 'image/png',
+                'aggregate_type' => 'image'
             ]
         );
         $this->seedFileForMedia($media, $this->sampleFile());
@@ -433,12 +432,12 @@ class ImageManipulatorTest extends TestCase
 
         $media = $this->makeMedia(
             [
-                'disk'           => 'tmp',
-                'directory'      => 'foo',
-                'filename'       => 'bar-test',
-                'extension'      => 'png',
-                'mime_type'      => 'image/png',
-                'aggregate_type' => 'image',
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar-test',
+                'extension' => 'png',
+                'mime_type' => 'image/png',
+                'aggregate_type' => 'image'
             ]
         );
         $this->seedFileForMedia($media, $this->sampleFile());
@@ -467,12 +466,12 @@ class ImageManipulatorTest extends TestCase
 
         $media = $this->makeMedia(
             [
-                'disk'           => 'tmp',
-                'directory'      => 'foo',
-                'filename'       => 'bar',
-                'extension'      => 'png',
-                'mime_type'      => 'image/png',
-                'aggregate_type' => 'image',
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'extension' => 'png',
+                'mime_type' => 'image/png',
+                'aggregate_type' => 'image'
             ]
         );
         $this->seedFileForMedia($media, $this->sampleFile());
@@ -502,20 +501,20 @@ class ImageManipulatorTest extends TestCase
 
         $originalMedia = $this->createMedia(
             [
-                'disk'           => 'tmp',
-                'directory'      => 'foo',
-                'filename'       => 'bar',
-                'aggregate_type' => 'image',
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'aggregate_type' => 'image'
             ]
         );
         $previousVariant = $this->createMedia(
             [
-                'disk'              => 'uploads',
-                'directory'         => 'foo',
-                'filename'          => 'bar-test',
-                'aggregate_type'    => 'image',
-                'variant_name'      => 'test',
-                'original_media_id' => $originalMedia->getKey(),
+                'disk' => 'uploads',
+                'directory' => 'foo',
+                'filename' => 'bar-test',
+                'aggregate_type' => 'image',
+                'variant_name' => 'test',
+                'original_media_id' => $originalMedia->getKey()
             ]
         );
 
@@ -556,26 +555,26 @@ class ImageManipulatorTest extends TestCase
 
         $originalMedia = $this->createMedia(
             [
-                'disk'           => 'tmp',
-                'directory'      => 'foo',
-                'filename'       => 'bar',
-                'extension'      => 'png',
-                'mime_type'      => 'image/png',
-                'aggregate_type' => 'image',
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'extension' => 'png',
+                'mime_type' => 'image/png',
+                'aggregate_type' => 'image'
             ]
         );
         $this->seedFileForMedia($originalMedia, $this->sampleFile());
         $previousVariant = $this->createMedia(
             [
-                'disk'              => 'uploads',
-                'directory'         => 'foo',
-                'filename'          => 'bar-test',
-                'extension'         => 'png',
-                'mime_type'         => 'image/png',
-                'aggregate_type'    => 'image',
-                'variant_name'      => 'test',
-                'size'              => 0,
-                'original_media_id' => $originalMedia->getKey(),
+                'disk' => 'uploads',
+                'directory' => 'foo',
+                'filename' => 'bar-test',
+                'extension' => 'png',
+                'mime_type' => 'image/png',
+                'aggregate_type' => 'image',
+                'variant_name' => 'test',
+                'size' => 0,
+                'original_media_id' => $originalMedia->getKey()
             ]
         );
         $this->seedFileForMedia($previousVariant);
@@ -609,26 +608,26 @@ class ImageManipulatorTest extends TestCase
 
         $originalMedia = $this->createMedia(
             [
-                'disk'           => 'tmp',
-                'directory'      => 'foo',
-                'filename'       => 'bar',
-                'extension'      => 'png',
-                'mime_type'      => 'image/png',
-                'aggregate_type' => 'image',
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'extension' => 'png',
+                'mime_type' => 'image/png',
+                'aggregate_type' => 'image'
             ]
         );
         $this->seedFileForMedia($originalMedia, $this->sampleFile());
         $previousVariant = $this->createMedia(
             [
-                'disk'              => 'uploads',
-                'directory'         => 'foo',
-                'filename'          => 'bar-test',
-                'extension'         => 'png',
-                'mime_type'         => 'image/png',
-                'aggregate_type'    => 'image',
-                'variant_name'      => 'test',
-                'size'              => 0,
-                'original_media_id' => $originalMedia->getKey(),
+                'disk' => 'uploads',
+                'directory' => 'foo',
+                'filename' => 'bar-test',
+                'extension' => 'png',
+                'mime_type' => 'image/png',
+                'aggregate_type' => 'image',
+                'variant_name' => 'test',
+                'size' => 0,
+                'original_media_id' => $originalMedia->getKey()
             ]
         );
         $this->seedFileForMedia($previousVariant);
@@ -663,7 +662,7 @@ class ImageManipulatorTest extends TestCase
             ['tmp', 'public', 'match', true],
             ['tmp', 'private', 'match', false],
             ['tmp', 'public', 'private', false],
-            ['tmp', 'private', 'public', true],
+            ['tmp', 'private', 'public', true]
         ];
     }
 
@@ -679,12 +678,12 @@ class ImageManipulatorTest extends TestCase
 
         $media = $this->makeMedia(
             [
-                'disk'           => $disk,
-                'directory'      => 'foo',
-                'filename'       => 'bar',
-                'extension'      => 'png',
-                'mime_type'      => 'image/png',
-                'aggregate_type' => 'image',
+                'disk' => $disk,
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'extension' => 'png',
+                'mime_type' => 'image/png',
+                'aggregate_type' => 'image'
             ]
         );
         $this->seedFileForMedia($media, $this->sampleFile());
@@ -715,12 +714,12 @@ class ImageManipulatorTest extends TestCase
 
         $media = $this->makeMedia(
             [
-                'disk'           => 'tmp',
-                'directory'      => 'foo',
-                'filename'       => 'bar',
-                'extension'      => 'png',
-                'mime_type'      => 'image/png',
-                'aggregate_type' => 'image',
+                'disk' => 'tmp',
+                'directory' => 'foo',
+                'filename' => 'bar',
+                'extension' => 'png',
+                'mime_type' => 'image/png',
+                'aggregate_type' => 'image'
             ]
         );
         $this->seedFileForMedia($media, $this->sampleFile());
@@ -732,13 +731,13 @@ class ImageManipulatorTest extends TestCase
                 Pngquant::class => [
                     '--quality=85',
                     '--force',
-                    '--skip-if-larger',
+                    '--skip-if-larger'
                 ],
                 Optipng::class => [
                     '-i0',
                     '-o2',
                     '-quiet',
-                ],
+                ]
             ]);
 
         $imageManipulator = $this->getManipulator();
@@ -793,7 +792,7 @@ class ImageManipulatorTest extends TestCase
         );
 
         $manipulator->createImageVariant(
-            new Media(),
+            new Media,
             'foo'
         );
     }
@@ -808,7 +807,7 @@ class ImageManipulatorTest extends TestCase
         );
 
         $manipulator->manipulateUpload(
-            new Media(),
+            new Media,
             $this->createMock(SourceAdapterInterface::class),
             $this->createMock(ImageManipulation::class),
         );

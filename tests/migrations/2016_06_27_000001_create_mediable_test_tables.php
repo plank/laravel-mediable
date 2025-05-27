@@ -5,7 +5,11 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
+<<<<<<< HEAD
  * Create a table for a mock mediable model.
+=======
+ * Create table for mock mediable model
+>>>>>>> parent of 288a94f (Apply fixes from StyleCI)
  */
 return new class extends Migration {
     /**
