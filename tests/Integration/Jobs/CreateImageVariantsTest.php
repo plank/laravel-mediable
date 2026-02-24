@@ -4,11 +4,13 @@ namespace Plank\Mediable\Tests\Integration\Jobs;
 
 use GuzzleHttp\Promise\Create;
 use Illuminate\Database\Eloquent\Collection;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Plank\Mediable\ImageManipulation;
 use Plank\Mediable\ImageManipulator;
 use Plank\Mediable\Jobs\CreateImageVariants;
 use Plank\Mediable\Tests\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 class CreateImageVariantsTest extends TestCase
 {
     public function test_it_will_trigger_image_manipulation(): void

@@ -2,11 +2,13 @@
 
 namespace Plank\Mediable\Tests\Integration;
 
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Plank\Mediable\ImageManipulation;
 use Plank\Mediable\Tests\TestCase;
 use Spatie\ImageOptimizer\Optimizers\Jpegoptim;
 use Spatie\ImageOptimizer\Optimizers\Pngquant;
 
+#[AllowMockObjectsWithoutExpectations]
 class ImageManipulationTest extends TestCase
 {
     public function test_can_get_set_manipulation_callback(): void

@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Plank\Mediable\Exceptions\MediaMoveException;
 use Plank\Mediable\Exceptions\MediaUrlException;
 use Plank\Mediable\Media;
@@ -17,6 +18,7 @@ use Plank\Mediable\UrlGenerators\TemporaryUrlGeneratorInterface;
 use Plank\Mediable\UrlGenerators\UrlGeneratorFactory;
 use Plank\Mediable\UrlGenerators\UrlGeneratorInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 class MediaTest extends TestCase
 {
     public function test_it_has_path_accessors(): void
