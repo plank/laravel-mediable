@@ -3,6 +3,7 @@
 namespace Plank\Mediable\Tests\Integration\UrlGenerators;
 
 use League\Flysystem\PathPrefixing\PathPrefixedAdapter;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Plank\Mediable\Exceptions\MediaUrlException;
 use Plank\Mediable\Media;
 use Plank\Mediable\Tests\TestCase;
@@ -11,6 +12,7 @@ use Plank\Mediable\UrlGenerators\UrlGeneratorFactory;
 use Plank\Mediable\UrlGenerators\UrlGeneratorInterface;
 use stdClass;
 
+#[AllowMockObjectsWithoutExpectations]
 class UrlGeneratorFactoryTest extends TestCase
 {
     public function test_it_sets_generator_for_driver(): void

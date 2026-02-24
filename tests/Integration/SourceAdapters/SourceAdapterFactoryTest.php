@@ -2,12 +2,14 @@
 
 namespace Plank\Mediable\Tests\Integration\SourceAdapters;
 
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Plank\Mediable\SourceAdapters\SourceAdapterFactory;
 use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
 use Plank\Mediable\Tests\TestCase;
 use stdClass;
 
+#[AllowMockObjectsWithoutExpectations]
 class SourceAdapterFactoryTest extends TestCase
 {
     public function test_it_allows_setting_adapter_for_class(): void

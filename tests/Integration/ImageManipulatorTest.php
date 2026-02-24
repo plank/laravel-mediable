@@ -6,6 +6,7 @@ use Illuminate\Filesystem\FilesystemManager;
 use Intervention\Image\Drivers\Gd\Driver as GdDriver;
 use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Plank\Mediable\Exceptions\ImageManipulationException;
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
@@ -18,6 +19,7 @@ use Plank\Mediable\Tests\TestCase;
 use Spatie\ImageOptimizer\Optimizers\Optipng;
 use Spatie\ImageOptimizer\Optimizers\Pngquant;
 
+#[AllowMockObjectsWithoutExpectations]
 class ImageManipulatorTest extends TestCase
 {
     public function test_it_can_be_accessed_via_facade(): void

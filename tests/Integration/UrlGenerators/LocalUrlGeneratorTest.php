@@ -4,11 +4,13 @@ namespace Plank\Mediable\Tests\Integration\UrlGenerators;
 
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Plank\Mediable\Media;
 use Plank\Mediable\Tests\TestCase;
 use Plank\Mediable\UrlGenerators\LocalUrlGenerator;
 
+#[AllowMockObjectsWithoutExpectations]
 class LocalUrlGeneratorTest extends TestCase
 {
     public function test_it_generates_absolute_path(): void

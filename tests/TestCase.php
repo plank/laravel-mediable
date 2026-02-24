@@ -8,6 +8,7 @@ use GuzzleHttp\Psr7\Utils;
 use Illuminate\Filesystem\Filesystem;
 use Intervention\Image\ImageManager;
 use Orchestra\Testbench\TestCase as BaseTestCase;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use Plank\Mediable\Media;
 use Plank\Mediable\MediableServiceProvider;
