@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=8.1.0",
+        "php": ">=8.3.0",
         "ext-fileinfo": "*",
         "guzzlehttp/guzzle": "^7.9.1",
         "guzzlehttp/psr7": "^2.7",
