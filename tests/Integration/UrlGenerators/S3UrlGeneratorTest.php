@@ -20,9 +20,11 @@ class S3UrlGeneratorTest extends TestCase
 
     public function tearDown(): void
     {
-        $filesystemManager = app(FilesystemManager::class);
-        $filesystemManager->disk('s3')
-            ->delete($this->getMedia()->getDiskPath());
+        if ($this->s3ConfigLoaded()) {
+            $filesystemManager = app(FilesystemManager::class, ['app' => $this->app]);
+            $filesystemManager->disk('s3')
+                ->delete($this->getMedia()->getDiskPath());
+        }
 
         parent::tearDown();
     }
