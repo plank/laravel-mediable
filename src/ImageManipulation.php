@@ -44,7 +44,9 @@ class ImageManipulation
 
     private ?string $outputFormat = null;
 
-    private int $outputQuality = 90;
+    private ?int $outputQuality = null;
+
+    private array $outputOptions = [];
 
     private ?string $disk = null;
 
@@ -89,8 +91,9 @@ class ImageManipulation
 
     /**
      * @return int
+     * @deprecated use getOutputOptions() instead and check for the 'quality' key. Output quality is not supported by all encoders and may be ignored depending on the output format and encoders used.
      */
-    public function getOutputQuality(): int
+    public function getOutputQuality(): ?int
     {
         return $this->outputQuality;
     }
@@ -98,6 +101,7 @@ class ImageManipulation
     /**
      * @param int $outputQuality
      * @return $this
+     * @deprecated use setOutputOptions() instead with the appropriate options for the encoder you are using. Output quality is not supported by all encoders and may be ignored depending on the output format and encoders used.
      */
     public function setOutputQuality(int $outputQuality): self
     {
@@ -112,6 +116,21 @@ class ImageManipulation
     public function getOutputFormat(): ?string
     {
         return $this->outputFormat;
+    }
+
+    /**
+     * Get the options to be passed to the encoder when saving the image.
+     * The options may vary depending on the output format and encoders used.
+     *
+     * @return array
+     */
+    public function getOutputOptions(): array
+    {
+        $options = $this->outputOptions;
+        if ($this->outputQuality !== null) {
+            $options['quality'] = $this->outputQuality;
+        }
+        return $options;
     }
 
     /**
@@ -189,6 +208,16 @@ class ImageManipulation
     {
         $this->setOutputFormat(self::FORMAT_HEIC);
 
+        return $this;
+    }
+
+    /**
+     * @param array $options The options to be passed to the encoder when saving the image. The options may vary depending on the output format and encoders used.
+     * @return $this
+     */
+    public function setOutputOptions(array $options): self
+    {
+        $this->outputOptions = $options;
         return $this;
     }
 

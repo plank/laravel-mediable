@@ -6,6 +6,7 @@ use GuzzleHttp\Psr7\Utils;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Support\Collection;
 use Intervention\Image\Commands\StreamCommand;
+use Intervention\Image\Format;
 use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
 use Plank\Mediable\Exceptions\ImageManipulationException;
@@ -137,12 +138,12 @@ class ImageManipulator
         $manipulation = $this->getVariantDefinition($variantName);
 
         $outputFormat = $this->determineOutputFormat($manipulation, $media);
-        if (method_exists($this->imageManager, 'read')) {
-            // Intervention Image  >=3.0
-            $image = $this->imageManager->read($media->contents());
+        if (method_exists($this->imageManager, 'decode')) {
+            // Intervention Image  >=4.0
+            $image = $this->imageManager->decode($media->contents());
         } else {
-            // Intervention Image <3.0
-            $image = $this->imageManager->make($media->contents());
+            // Intervention Image ~3.0
+            $image = $this->imageManager->read($media->contents());
         }
 
         $callback = $manipulation->getCallback();
@@ -151,7 +152,7 @@ class ImageManipulator
         $outputStream = $this->imageToStream(
             $image,
             $outputFormat,
-            $manipulation->getOutputQuality()
+            $manipulation->getOutputOptions()
         );
 
         if ($manipulation->shouldOptimize()) {
@@ -230,12 +231,12 @@ class ImageManipulator
         }
 
         $outputFormat = $this->determineOutputFormat($manipulation, $media);
-        if (method_exists($this->imageManager, 'read')) {
-            // Intervention Image  >=3.0
-            $image = $this->imageManager->read($source->getStream()->getContents());
+        if (method_exists($this->imageManager, 'decode')) {
+            // Intervention Image  >=4.0
+            $image = $this->imageManager->decode($source->getStream()->getContents());
         } else {
-            // Intervention Image <3.0
-            $image = $this->imageManager->make($source->getStream()->getContents());
+            // Intervention Image ~3.0
+            $image = $this->imageManager->read($source->getStream()->getContents());
         }
 
         $callback = $manipulation->getCallback();
@@ -244,7 +245,7 @@ class ImageManipulator
         $outputStream = $this->imageToStream(
             $image,
             $outputFormat,
-            $manipulation->getOutputQuality()
+            $manipulation->getOutputOptions()
         );
 
         if ($manipulation->shouldOptimize()) {
@@ -395,25 +396,38 @@ class ImageManipulator
     private function imageToStream(
         Image $image,
         string $outputFormat,
-        int $outputQuality
+        array $outputOptions
     ) {
-        if (class_exists(StreamCommand::class)) {
-            // Intervention Image  <3.0
-            return $image->stream(
-                $outputFormat,
-                $outputQuality
-            );
-        }
+        if (method_exists($image, 'encodeUsingFormat')) {
+            // Intervention Image  >=4.0
 
-        $formatted = match ($outputFormat) {
-            ImageManipulation::FORMAT_JPG => $image->toJpeg($outputQuality),
-            ImageManipulation::FORMAT_PNG => $image->toPng(),
-            ImageManipulation::FORMAT_GIF => $image->toGif(),
-            ImageManipulation::FORMAT_WEBP => $image->toWebp($outputQuality),
-            ImageManipulation::FORMAT_TIFF => $image->toTiff($outputQuality),
-            ImageManipulation::FORMAT_HEIC => $image->toHeic($outputQuality),
-            default => throw ImageManipulationException::unknownOutputFormat(),
-        };
-        return Utils::streamFor($formatted->toFilePointer());
+            $formatted = $image->encodeUsingFormat(
+                match ($outputFormat) {
+                    ImageManipulation::FORMAT_JPG => Format::JPEG,
+                    ImageManipulation::FORMAT_PNG => Format::PNG,
+                    ImageManipulation::FORMAT_GIF => Format::GIF,
+                    ImageManipulation::FORMAT_WEBP => Format::WEBP,
+                    ImageManipulation::FORMAT_TIFF => Format::TIFF,
+                    ImageManipulation::FORMAT_HEIC => Format::HEIC,
+                    default => throw ImageManipulationException::unknownOutputFormat(),
+                },
+                ...$outputOptions
+            );
+            return Utils::streamFor($formatted->toStream());
+        } else {
+            // Intervention Image <4.0
+            $outputQuality = $outputOptions['quality'] ?? 90;
+
+            $formatted = match ($outputFormat) {
+                ImageManipulation::FORMAT_JPG => $image->toJpeg($outputQuality),
+                ImageManipulation::FORMAT_PNG => $image->toPng(),
+                ImageManipulation::FORMAT_GIF => $image->toGif(),
+                ImageManipulation::FORMAT_WEBP => $image->toWebp($outputQuality),
+                ImageManipulation::FORMAT_TIFF => $image->toTiff($outputQuality),
+                ImageManipulation::FORMAT_HEIC => $image->toHeic($outputQuality),
+                default => throw ImageManipulationException::unknownOutputFormat(),
+            };
+            return Utils::streamFor($formatted->toFilePointer());
+        }
     }
 }

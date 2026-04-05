@@ -21,7 +21,7 @@ class ImageManipulationTest extends TestCase
     public function test_can_get_set_output_quality(): void
     {
         $manipulation = new ImageManipulation($this->getMockCallable());
-        $this->assertEquals(90, $manipulation->getOutputQuality());
+        $this->assertSame(null, $manipulation->getOutputQuality());
         $manipulation->setOutputQuality(-100);
         $this->assertEquals(0, $manipulation->getOutputQuality());
         $manipulation->setOutputQuality(500);
