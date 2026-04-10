@@ -86,7 +86,7 @@ class Media extends Model
     ];
 
     protected $attributes = [
-        'alt' => ''
+        'alt' => null
     ];
 
     /**
