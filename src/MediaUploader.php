@@ -520,7 +520,7 @@ class MediaUploader
         }
 
         if (count($intersection)) {
-            $type = $intersection[0];
+            $type = reset($intersection);
         } elseif (empty($typesForMime) && empty($typesForExtension)) {
             if (!$this->config['allow_unrecognized_types'] ?? false) {
                 throw FileNotSupportedException::unrecognizedFileType($mimeType, $extension);
