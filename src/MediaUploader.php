@@ -373,6 +373,13 @@ class MediaUploader
         return $this;
     }
 
+    public function setForbiddenMimeTypes(array $forbiddenMimes): self
+    {
+        $this->config['forbidden_mime_types'] = array_map('strtolower', $forbiddenMimes);
+
+        return $this;
+    }
+
     /**
      * Prefer the MIME type provided by the client, if any, over the inferred MIME type.
      * Depending on the source, this may not be accurate.
@@ -405,6 +412,13 @@ class MediaUploader
     public function setAllowedExtensions(array $allowedExtensions): self
     {
         $this->config['allowed_extensions'] = array_map('strtolower', $allowedExtensions);
+
+        return $this;
+    }
+
+    public function setForbiddenExtensions(array $forbiddenExtensions): self
+    {
+        $this->config['forbidden_extensions'] = array_map('strtolower', $forbiddenExtensions);
 
         return $this;
     }
@@ -908,8 +922,13 @@ class MediaUploader
     {
         $mimeType = strtolower($mimeType);
         $allowed = $this->config['allowed_mime_types'] ?? [];
-        if (!empty($allowed) && !in_array($mimeType, $allowed)) {
-            throw FileNotSupportedException::mimeRestricted($mimeType, $allowed);
+        $forbidden = $this->config['forbidden_mime_types'] ?? [];
+        $actuallyAllowed = array_diff($allowed, $forbidden);
+        if (!empty($allowed) && !in_array($mimeType, $actuallyAllowed)) {
+            throw FileNotSupportedException::mimeRestricted($mimeType, $actuallyAllowed);
+        }
+        if (empty($allowed) && in_array($mimeType, $forbidden)) {
+            throw FileNotSupportedException::mimeRestricted($mimeType, $actuallyAllowed);
         }
 
         return $mimeType;
@@ -926,8 +945,13 @@ class MediaUploader
     {
         $extensionLower = strtolower($extension);
         $allowed = $this->config['allowed_extensions'] ?? [];
-        if (!empty($allowed) && !in_array($extensionLower, $allowed)) {
-            throw FileNotSupportedException::extensionRestricted($extensionLower, $allowed);
+        $forbidden = $this->config['forbidden_extensions'] ?? [];
+        $actuallyAllowed = array_diff($allowed, $forbidden);
+        if (!empty($allowed) && !in_array($extensionLower, $actuallyAllowed)) {
+            throw FileNotSupportedException::extensionRestricted($extensionLower, $actuallyAllowed);
+        }
+        if (empty($allowed) && in_array($extensionLower, $forbidden)) {
+            throw FileNotSupportedException::extensionRestricted($extensionLower, $actuallyAllowed);
         }
 
         return $toLower ? $extensionLower : $extension;

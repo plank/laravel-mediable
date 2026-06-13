@@ -61,7 +61,7 @@ return [
      */
     'allow_unrecognized_types' => false,
 
-    /**
+    /*
      * Prefer the client-provided MIME type over the one inferred from the file contents, if provided
      * May be slightly faster to compute, but is not guaranteed to be accurate if the source is untrusted
      */
@@ -69,13 +69,56 @@ return [
 
     /*
      * Only allow files with specific MIME type(s) to be uploaded
+     * If blank, all MIME types will be allowed, unless it is forbidden by the `forbidden_mime_types` config
      */
     'allowed_mime_types' => [],
 
     /*
+     * Reject files with specific MIME types from being uploaded
+     */
+    'forbidden_mime_types' => [],
+
+    /*
      * Only allow files with specific file extension(s) to be uploaded
+     * If blank, all file extensions will be allowed, unless it is forbidden by the `forbidden_extensions` config
      */
     'allowed_extensions' => [],
+
+    /*
+     * Reject files with specific file extensions from being uploaded
+     * This is intended to be used as a security measure to prevent potentially executable files from being uploaded, even if they are disguised with an allowed MIME type
+     * This list should include any file extension which is configured to be executable from your Apache or Nginx configuration
+     *
+     * This is verified both on the source file and the intended destination filename
+     */
+    'forbidden_extensions' => [
+        'php',
+        'php3',
+        'php4',
+        'php5',
+        'php6',
+        'php7',
+        'php8',
+        'phtml',
+        'phar',
+        'phpt',
+        'pgif',
+        'shtml',
+        'shtm',
+        'stm',
+        'pl',
+        'cgi',
+        'py',
+        'asp',
+        'aspx',
+        'ashx',
+        'jsp',
+        'jspx',
+        'cfm',
+        'cfml',
+        'htaccess',
+        'htpasswd',
+    ],
 
     /*
      * Only allow files matching specific aggregate type(s) to be uploaded

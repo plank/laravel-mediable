@@ -923,6 +923,24 @@ class MediaUploaderTest extends TestCase
         );
     }
 
+    public function test_it_forbids_mime_types(): void
+    {
+        $uploader = $this->getUploader();
+        $uploader->setForbiddenMimeTypes(['text/plain']);
+        $uploader->fromString("foo");
+        $this->expectException(FileNotSupportedException::class);
+        $uploader->upload();
+    }
+
+    public function test_it_forbids_extensions(): void
+    {
+        $uploader = $this->getUploader();
+        $uploader->setForbiddenMimeTypes(['image/png']);
+        $uploader->fromSource($this->sampleFilePath());
+        $this->expectException(FileNotSupportedException::class);
+        $uploader->upload();
+    }
+
     protected function getUploader(): MediaUploader
     {
         return app('mediable.uploader');

@@ -91,14 +91,33 @@ The `config/mediable.php` offers a number of options for configuring how media u
     'allow_unrecognized_types' => false,
 
     /*
-     * Only allow files with specific MIME type(s) to be uploaded
-     */
-    'allowed_mime_types' => [],
+    * Only allow files with specific MIME type(s) to be uploaded
+    * If blank, all MIME types will be allowed, unless it is forbidden by the `forbidden_mime_types` config
+    */
+    allowed_mime_types' => [],
 
-    /*
-     * Only allow files with specific file extension(s) to be uploaded
-     */
-    'allowed_extensions' => [],
+    *
+    * Reject files with specific MIME types from being uploaded
+    */
+    forbidden_mime_types' => [],
+
+    *
+    * Only allow files with specific file extension(s) to be uploaded
+    * If blank, all file extensions will be allowed, unless it is forbidden by the `forbidden_extensions` config
+    */
+    allowed_extensions' => [],
+
+    *
+    * Reject files with specific file extensions from being uploaded
+    * This is intended to be used as a security measure to prevent potentially executable files from being uploaded, even if they are disguised with an allowed MIME type
+    * This list should include any file extension which is configured to be executable from your Apache or Nginx configuration
+    *
+    * This is verified both on the source file and the intended destination filename
+    */
+    forbidden_extensions' => [
+       'php',
+       // ...
+    ,
 
     /*
     * Only allow remote files to be imported from specific host(s)
@@ -159,6 +178,11 @@ Note: a MIME type or extension could be present in more than one aggregate type'
 
 .. _extending_functionality:
 
+File Sanitization
+------------------------
+
+When dealing with file uploads from untrusted sources, certain file types may pose additional security risks. This can be mitigated by stripping potentially dangerous content from files of certain types. By default, this package will strip executable javascript from SVG files. You can configure sanitization rules for other file types by creating a class that implements the `Plank\Mediable\Sanitizers\FileSanitizerInterface` and adding it to the `file_sanitizers` array in the config file.
+
 Extending functionality
 ------------------------
 
@@ -213,8 +237,3 @@ It is also possible to define the connection name that Laravel-Mediable will use
      */
     'connection_name' => null,
     //...
-
-File Sanitization
-------------------------
-
-When dealing with file uploads from untrusted sources, certain file types may pose additional security risks. This can be mitigated by stripping potentially dangerous content from files of certain types. By default, this package will strip executable javascript from SVG files. You can configure sanitization rules for other file types by creating a class that implements the `Plank\Mediable\Sanitizers\FileSanitizerInterface` and adding it to the `file_sanitizers` array in the config file.
