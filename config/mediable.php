@@ -83,6 +83,19 @@ return [
     'allowed_aggregate_types' => [],
 
     /*
+     * Only allow remote files to be imported from specific host(s)
+     * If empty, will allow any host that is not a private IP address or localhost
+     */
+    'allowed_remote_hosts' => [],
+
+    /*
+     * Only allow remote files to be imported from URLs with specific scheme(s)
+     * If empty, will allow any scheme supported by the application.
+     * If modifying this value, be sure to also update the pattern matching in `source_adapters` as well
+     */
+    'allowed_remote_schemes' => ['https'],
+
+    /*
      * List of aggregate types recognized by the application
      *
      * Each type should list the MIME types and extensions

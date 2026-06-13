@@ -196,6 +196,11 @@ class TestCase extends BaseTestCase
         return 'https://raw.githubusercontent.com/plank/laravel-mediable/master/tests/_data/plank.png';
     }
 
+    protected static function remoteHost(): string
+    {
+        return parse_url(self::remoteFilePath(), PHP_URL_HOST);
+    }
+
     protected function sampleFile()
     {
         return Utils::tryFopen(TestCase::sampleFilePath(), 'r');

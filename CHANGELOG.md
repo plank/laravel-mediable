@@ -1,5 +1,12 @@
 # Changelog
 
+## 6.2.0
+
+**This is a security release, upgrading is strongly recommended**
+* Added `mediable.allowed_remote_hosts` configuration which allows restricting remote URL source adapters to a whitelist. Wildcard subdomains may be specified with `*.example.com` syntax. By default, all hosts are allowed.
+* If no `mediable.allowed_remote_hosts` allow list is provided, the `RemoteUrlAdapter` will reject private IP addresses and localhost by default, to prevent Server-Side Request Forgery (SSRF) attacks. [CVE-2026-49969]
+* Added `mediable.allowed_remote_schemes` configuration which allows restricting remote URL source adapters to a whitelist of allowed URL schemes (e.g. `http`, `https`, `ftp`, etc.). By default, only `https` is allowed. When modifying this configuration, it may also be necessary to modify the `source_adapters` pattern matching.
+
 ## 6.1.0
 
 * Attempt to automatically select an `intervention/image` driver based on the available extensions.

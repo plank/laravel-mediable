@@ -101,6 +101,19 @@ The `config/mediable.php` offers a number of options for configuring how media u
     'allowed_extensions' => [],
 
     /*
+    * Only allow remote files to be imported from specific host(s)
+    * If empty, will allow any host that is not a private IP address or localhost
+    */
+    'allowed_remote_hosts' => [],
+
+    *
+    * Only allow remote files to be imported from URLs with specific scheme(s)
+    * If empty, will allow any scheme supported by the application.
+    * If modifying this value, be sure to also update the pattern matching in `source_adapters` as well
+    */
+    'allowed_remote_schemes' => ['https'],
+
+    /*
      * Only allow files matching specific aggregate type(s) to be uploaded
      */
     'allowed_aggregate_types' => [],
