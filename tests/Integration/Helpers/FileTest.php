@@ -47,9 +47,13 @@ class FileTest extends TestCase
     public function test_it_sanitizes_paths(): void
     {
         $this->assertEquals(
-            'hello/world-what-s_new-with.you',
-            File::sanitizePath("/héllo/world! \\  \t whàt\'ς_new with.you??")
+            'hello/world/what-s_new-with-you',
+            File::sanitizePath("/héllo/world! \\  \t whàt'ς_new with.you??")
         );
+        $this->assertEquals('bar-jpg', File::sanitizePath('./bar.jpg'));
+        $this->assertEquals('bar', File::sanitizePath('../bar'));
+        $this->assertEquals('foo/env', File::sanitizePath('/foo/../../../.env'));
+        $this->assertEquals('foo/bar', File::sanitizePath('/foo/// //bar'));
     }
 
     public function test_it_joins_path_components(): void
