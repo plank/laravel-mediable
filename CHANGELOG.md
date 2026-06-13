@@ -10,6 +10,7 @@
 * Added `mediable.file_sanitizers` configuration which allows specifying custom sanitizers for rewriting file contents to strip out security risks before they are uploaded. A sanitizer must implements the `Plank\Mediable\Sanitizers\SanitizerInterface` interface.
 * Added `SvgSanitizer` which will strip executable javascript and other untrusted content from `image/svg+xml` files, which can result in stored XSS if rendered directly to a webpage. By default, this sanitizer is applied to all uploaded SVG files. It can be disabled by removing it from the `mediable.sanitizers` config array. [CVE-2026-49971]
 * Added `mediable.forbidden_file_extensions` configuration and `MediaUploader::setForbiddenExtensions()` which allows specifying a blacklist of file extensions that are forbidden to be uploaded. Any file extension which is considered executable by your Apache or Nginx configuration should be included in this list. A number of common executable file extensions are included in this list by default to prevent remote code execution exploits.
+* In addition, forbidden file extensions are now sanitized if they are nested within destination filenames (e.g. `script.php.jpg` becomes `script-php.jpg`). This prevents remote code execution from double extension bypass due to common Apache and Nginx misconfigurations  
 * Added `mediable.forbidden_mime_types` configuration and `MediaUploader::setForbiddenMimeTypes()` which allows specifying a blacklist of MIME types that are forbidden to be uploaded.
 
 ## 6.1.0

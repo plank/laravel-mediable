@@ -175,7 +175,11 @@ class MediaUploader
      */
     public function useFilename(string $filename): self
     {
-        $this->filename = File::sanitizeFilename($filename);
+        $this->filename = File::sanitizeFilename(
+            $filename,
+            null,
+            $this->config['forbidden_extensions']
+        );
         $this->hashFilenameAlgo = null;
 
         return $this;
@@ -1121,7 +1125,11 @@ class MediaUploader
             ConfigurationException::cannotInferFilename();
         }
 
-        return File::sanitizeFileName($filename);
+        return File::sanitizeFileName(
+            $filename,
+            null,
+            $this->config['forbidden_extensions']
+        );
     }
 
     private function writeToDisk(Media $model): void

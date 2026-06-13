@@ -86,10 +86,11 @@ return [
 
     /*
      * Reject files with specific file extensions from being uploaded
-     * This is intended to be used as a security measure to prevent potentially executable files from being uploaded, even if they are disguised with an allowed MIME type
+     * This is intended to be used as a security measure to prevent potentially executable files from being uploaded to public drives.
      * This list should include any file extension which is configured to be executable from your Apache or Nginx configuration
      *
-     * This is verified both on the source file and the intended destination filename
+     * These extensions are also sanitized if nested in destination filenames (script.php.jpg becomes script-php.jpg) to protect against
+     * common Apache `AddHandler` and Nginx `fastcgi_split_path_info` misconfigurations
      */
     'forbidden_extensions' => [
         'php',

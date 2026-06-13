@@ -34,6 +34,11 @@ class FileTest extends TestCase
             'hello-world-what-ss_new-with.you',
             File::sanitizeFileName("héllo/world! \\  \t whàt\'ß_new with.you?", 'en')
         );
+
+        $this->assertEquals(
+            'script-php.txt',
+            File::sanitizeFileName('script.php.txt', null, ['php'])
+        );
     }
 
     public function test_it_sanitizes_filenames_with_locale(): void
