@@ -48,6 +48,11 @@ class ConfigurationException extends MediaUploadException
         return new self('No filename is provided and cannot infer filename from the provided source.');
     }
 
+    public static function invalidSanitizer(string $sanitizerClass): self
+    {
+        return new self("Invalid sanitizer class `{$sanitizerClass}`. Must implement `\Plank\Mediable\FileSanitizers\SanitizerInterface`.");
+    }
+
     public static function invalidOptimizer(string $optimizerClass): self
     {
         return new self("Invalid optimizer class `{$optimizerClass}`. Must implement `\Spatie\ImageOptimizer\Optimizer`.");

@@ -902,6 +902,27 @@ class MediaUploaderTest extends TestCase
             ->upload();
     }
 
+    public function test_it_sanitizes_files(): void
+    {
+        $this->useDatabase();
+        $this->useFilesystem('tmp');
+
+        $media = Facade::fromSource($this->insecureSvgPath())
+            ->toDestination('tmp', 'foo')
+            ->useFilename('bar')
+            ->upload();
+
+        $this->assertInstanceOf(Media::class, $media);
+        $this->assertTrue($media->fileExists());
+        $this->assertEquals('tmp', $media->disk);
+        $this->assertEquals('foo/bar.svg', $media->getDiskPath());
+        $this->assertEquals('image/svg+xml', $media->mime_type);
+        $this->assertEquals(
+            file_get_contents($this->cleanedSvgPath()),
+            file_get_contents($media->getAbsolutePath())
+        );
+    }
+
     protected function getUploader(): MediaUploader
     {
         return app('mediable.uploader');

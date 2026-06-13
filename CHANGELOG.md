@@ -7,6 +7,8 @@
 * If no `mediable.allowed_remote_hosts` allow list is provided, the `RemoteUrlAdapter` will reject private IP addresses and localhost by default, to prevent Server-Side Request Forgery (SSRF) attacks. [CVE-2026-49969]
 * Added `mediable.allowed_remote_schemes` configuration which allows restricting remote URL source adapters to a whitelist of allowed URL schemes (e.g. `http`, `https`, `ftp`, etc.). By default, only `https` is allowed. When modifying this configuration, it may also be necessary to modify the `source_adapters` pattern matching.
 * Directory validation will now strip `.` characters from path segments. This prevents attackers from using directory traversal patterns like `../`  as well as preventing potential issues with certain filesystems where `.` characters in directory names may cause unexpected behaviour. [CVE-2026-49970]
+* Added `mediable.file_sanitizers` configuration which allows specifying custom sanitizers for rewriting file contents to strip out security risks before they are uploaded. A sanitizer must implements the `Plank\Mediable\Sanitizers\SanitizerInterface` interface.
+* Added `SvgSanitizer` which will strip executable javascript and other untrusted content from `image/svg+xml` files, which can result in stored XSS if rendered directly to a webpage. By default, this sanitizer is applied to all uploaded SVG files. It can be disabled by removing it from the `mediable.sanitizers` config array. [CVE-2026-49971]
 
 ## 6.1.0
 

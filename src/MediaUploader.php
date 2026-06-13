@@ -13,10 +13,12 @@ use Plank\Mediable\Exceptions\MediaUpload\FileNotSupportedException;
 use Plank\Mediable\Exceptions\MediaUpload\FileSizeException;
 use Plank\Mediable\Exceptions\MediaUpload\ForbiddenException;
 use Plank\Mediable\Exceptions\MediaUpload\InvalidHashException;
+use Plank\Mediable\FileSanitizers\SanitizerInterface;
 use Plank\Mediable\Helpers\File;
 use Plank\Mediable\SourceAdapters\RawContentAdapter;
 use Plank\Mediable\SourceAdapters\SourceAdapterFactory;
 use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
+use Plank\Mediable\SourceAdapters\StreamAdapter;
 
 /**
  * Media Uploader.
@@ -594,6 +596,7 @@ class MediaUploader
 
         $model = $this->populateModel($this->makeModel());
 
+        $this->sanitizeFile($model);
         $this->manipulateImage($model);
 
         if (is_callable($this->before_save)) {
@@ -642,6 +645,7 @@ class MediaUploader
         $path = $media->getDiskPath();
 
         $model = $this->populateModel($media);
+        $this->sanitizeFile($model);
 
         if (is_callable($this->before_save)) {
             call_user_func($this->before_save, $model, $this->source);
@@ -1113,6 +1117,31 @@ class MediaUploader
             $options['visibility'] = $this->getVisibility();
         }
         return $options;
+    }
+
+    public function sanitizeFile(Media $model): void
+    {
+        if (empty($this->config['file_sanitizers'])) {
+            return;
+        }
+        foreach ($this->config['file_sanitizers'] as $sanitizerClass) {
+            if (!is_a($sanitizerClass, SanitizerInterface::class, true)) {
+                throw ConfigurationException::invalidSanitizer($sanitizerClass);
+            }
+            $sanitizer = app($sanitizerClass);
+            if ($sanitizer->isApplicable(
+                $model->mime_type,
+                $model->extension,
+                $model->aggregate_type
+            )) {
+                $result = $sanitizer->sanitize($this->source->getStream());
+                if ($result !== null) {
+                    $this->source = new StreamAdapter($result);
+                }
+            }
+        }
+        // Update the model's size in case the sanitizer modified the file contents
+        $model->size = $this->source->size() ?? $model->size;
     }
 
     /**

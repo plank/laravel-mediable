@@ -268,6 +268,15 @@ return [
     'ignore_migrations' => false,
 
     /**
+     * List of file sanitizers to apply to uploaded files before they are stored
+     * Used to apply security measures to prevent malicious files from being uploaded,
+     * e.g. stripping executable javascript from SVGs
+     */
+    'file_sanitizers' => [
+        Plank\Mediable\FileSanitizers\SvgSanitizer::class,
+    ],
+
+    /**
      * Configuration for image optimization
      */
     'image_optimization' => [

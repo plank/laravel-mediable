@@ -213,3 +213,8 @@ It is also possible to define the connection name that Laravel-Mediable will use
      */
     'connection_name' => null,
     //...
+
+File Sanitization
+------------------------
+
+When dealing with file uploads from untrusted sources, certain file types may pose additional security risks. This can be mitigated by stripping potentially dangerous content from files of certain types. By default, this package will strip executable javascript from SVG files. You can configure sanitization rules for other file types by creating a class that implements the `Plank\Mediable\Sanitizers\FileSanitizerInterface` and adding it to the `file_sanitizers` array in the config file.
