@@ -6,6 +6,7 @@ namespace Plank\Mediable;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemManager;
 use League\Flysystem\UnableToRetrieveMetadata;
+use Plank\Mediable\Enum\OnDuplicateBehaviour;
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Plank\Mediable\Exceptions\MediaUpload\FileExistsException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException;
@@ -27,12 +28,6 @@ use Plank\Mediable\SourceAdapters\StreamAdapter;
  */
 class MediaUploader
 {
-    const ON_DUPLICATE_UPDATE = 'update';
-    const ON_DUPLICATE_INCREMENT = 'increment';
-    const ON_DUPLICATE_ERROR = 'error';
-    const ON_DUPLICATE_REPLACE = 'replace';
-    const ON_DUPLICATE_REPLACE_WITH_VARIANTS = 'replace_with_variants';
-
     private FileSystemManager $filesystem;
 
     private SourceAdapterFactory $factory;
@@ -96,6 +91,7 @@ class MediaUploader
         $this->factory = $factory;
         $this->imageManipulator = $imageManipulator;
         $this->config = $config ?: config('mediable', []);
+        $this->config['on_duplicate'] = OnDuplicateBehaviour::from($this->config['on_duplicate']);
     }
 
     /**
@@ -246,10 +242,10 @@ class MediaUploader
 
     /**
      * Change the behaviour for when a file already exists at the destination.
-     * @param string $behavior
+     * @param OnDuplicateBehaviour $behavior
      * @return $this
      */
-    public function setOnDuplicateBehavior(string $behavior): self
+    public function setOnDuplicateBehavior(OnDuplicateBehaviour $behavior): self
     {
         $this->config['on_duplicate'] = $behavior;
 
@@ -259,9 +255,9 @@ class MediaUploader
     /**
      * Get current behavior when duplicate file is uploaded.
      *
-     * @return string
+     * @return OnDuplicateBehaviour
      */
-    public function getOnDuplicateBehavior(): string
+    public function getOnDuplicateBehavior(): OnDuplicateBehaviour
     {
         return $this->config['on_duplicate'];
     }
@@ -273,7 +269,7 @@ class MediaUploader
      */
     public function onDuplicateError(): self
     {
-        return $this->setOnDuplicateBehavior(self::ON_DUPLICATE_ERROR);
+        return $this->setOnDuplicateBehavior(OnDuplicateBehaviour::Error);
     }
 
     /**
@@ -283,7 +279,7 @@ class MediaUploader
      */
     public function onDuplicateIncrement(): self
     {
-        return $this->setOnDuplicateBehavior(self::ON_DUPLICATE_INCREMENT);
+        return $this->setOnDuplicateBehavior(OnDuplicateBehaviour::Increment);
     }
 
     /**
@@ -295,7 +291,7 @@ class MediaUploader
      */
     public function onDuplicateReplace(): self
     {
-        return $this->setOnDuplicateBehavior(self::ON_DUPLICATE_REPLACE);
+        return $this->setOnDuplicateBehavior(OnDuplicateBehaviour::Replace);
     }
 
     /**
@@ -309,7 +305,7 @@ class MediaUploader
      */
     public function onDuplicateReplaceWithVariants(): self
     {
-        return $this->setOnDuplicateBehavior(self::ON_DUPLICATE_REPLACE_WITH_VARIANTS);
+        return $this->setOnDuplicateBehavior(OnDuplicateBehaviour::ReplaceWithVariants);
     }
 
     /**
@@ -321,7 +317,7 @@ class MediaUploader
      */
     public function onDuplicateUpdate(): self
     {
-        return $this->setOnDuplicateBehavior(self::ON_DUPLICATE_UPDATE);
+        return $this->setOnDuplicateBehavior(OnDuplicateBehaviour::Update);
     }
 
     /**
@@ -496,7 +492,7 @@ class MediaUploader
      *   or an ImageManipulation instance
      * @return $this
      */
-    public function applyImageManipulation($imageManipulation): self
+    public function applyImageManipulation(string|ImageManipulation $imageManipulation): self
     {
         if (is_string($imageManipulation)) {
             $imageManipulation = $this->imageManipulator->getVariantDefinition($imageManipulation);
@@ -1020,16 +1016,16 @@ class MediaUploader
      */
     private function handleDuplicate(Media $model): Media
     {
-        switch ($this->config['on_duplicate'] ?? MediaUploader::ON_DUPLICATE_INCREMENT) {
-            case static::ON_DUPLICATE_ERROR:
+        switch ($this->config['on_duplicate'] ?? OnDuplicateBehaviour::Increment) {
+            case OnDuplicateBehaviour::Error:
                 throw FileExistsException::fileExists($model->getDiskPath());
-            case static::ON_DUPLICATE_REPLACE:
+            case OnDuplicateBehaviour::Replace:
                 $this->deleteExistingMedia($model);
                 break;
-            case static::ON_DUPLICATE_REPLACE_WITH_VARIANTS:
+            case OnDuplicateBehaviour::ReplaceWithVariants:
                 $this->deleteExistingMedia($model, true);
                 break;
-            case static::ON_DUPLICATE_UPDATE:
+            case OnDuplicateBehaviour::Update:
                 $original = $model->newQuery()
                    ->where('disk', $model->disk)
                    ->where('directory', $model->directory)
@@ -1042,7 +1038,7 @@ class MediaUploader
                     $model->exists = true;
                 }
                 break;
-            case static::ON_DUPLICATE_INCREMENT:
+            case OnDuplicateBehaviour::Increment:
             default:
                 $model->filename = $this->generateUniqueFilename($model);
         }

@@ -4,6 +4,7 @@ namespace Plank\Mediable\Tests\Integration;
 
 use GuzzleHttp\Psr7\Utils;
 use Intervention\Image\Image;
+use Plank\Mediable\Enum\OnDuplicateBehaviour;
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Plank\Mediable\Exceptions\MediaUpload\FileExistsException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException;
@@ -61,31 +62,31 @@ class MediaUploaderTest extends TestCase
     {
         $uploader = Facade::onDuplicateError();
         $this->assertEquals(
-            MediaUploader::ON_DUPLICATE_ERROR,
+            OnDuplicateBehaviour::Error,
             $uploader->getOnDuplicateBehavior()
         );
 
         $uploader = Facade::onDuplicateIncrement();
         $this->assertEquals(
-            MediaUploader::ON_DUPLICATE_INCREMENT,
+            OnDuplicateBehaviour::Increment,
             $uploader->getOnDuplicateBehavior()
         );
 
         $uploader = Facade::onDuplicateReplace();
         $this->assertEquals(
-            MediaUploader::ON_DUPLICATE_REPLACE,
+            OnDuplicateBehaviour::Replace,
             $uploader->getOnDuplicateBehavior()
         );
 
         $uploader = Facade::onDuplicateReplaceWithVariants();
         $this->assertEquals(
-            MediaUploader::ON_DUPLICATE_REPLACE_WITH_VARIANTS,
+            OnDuplicateBehaviour::ReplaceWithVariants,
             $uploader->getOnDuplicateBehavior()
         );
 
         $uploader = Facade::onDuplicateUpdate();
         $this->assertEquals(
-            MediaUploader::ON_DUPLICATE_UPDATE,
+            OnDuplicateBehaviour::Update,
             $uploader->getOnDuplicateBehavior()
         );
     }
@@ -292,7 +293,7 @@ class MediaUploaderTest extends TestCase
     public function test_it_can_error_on_duplicate_files(): void
     {
         $uploader = $this->getUploader();
-        $uploader->setOnDuplicateBehavior(MediaUploader::ON_DUPLICATE_ERROR);
+        $uploader->onDuplicateError();
         $method = $this->getPrivateMethod($uploader, 'handleDuplicate');
         $this->expectException(FileExistsException::class);
         $method->invoke($uploader, new Media);
