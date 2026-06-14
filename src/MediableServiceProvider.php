@@ -146,7 +146,7 @@ class MediableServiceProvider extends ServiceProvider
                 $app['filesystem'],
                 $app['mediable.source.factory'],
                 $app[ImageManipulator::class],
-                $app['config']->get('mediable')
+                MediaUploaderConfiguration::fromConfig()
             );
         });
         $this->app->alias('mediable.uploader', MediaUploader::class);

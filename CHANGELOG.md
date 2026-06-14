@@ -13,7 +13,8 @@
 * In addition, forbidden file extensions are now sanitized if they are nested within destination filenames (e.g. `script.php.jpg` becomes `script-php.jpg`). This prevents remote code execution from double extension bypass due to common Apache and Nginx misconfigurations
 * Added `mediable.forbidden_mime_types` configuration and `MediaUploader::setForbiddenMimeTypes()` which allows specifying a blacklist of MIME types that are forbidden to be uploaded.
 * MediaUploader::ON_DUPLICATE_* constants have been moved to an `Plank\Mediable\Enum\OnDuplicateBehaviour` enum.
-*
+* Added `MediaUploaderConfiguration` class. Most `MediaUploader` instance properties are moved to this class. The `MediaUploader` class now accepts this as a constructor argument instead of an array of configs.
+* `MediaUploader::beforeSave()` now accepts a `\Closure` instead of a `callable` for better static analysis and type safety.
 
 ## 6.1.0
 

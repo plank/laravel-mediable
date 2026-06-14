@@ -17,7 +17,6 @@ use Plank\Mediable\ImageManipulator;
 use Plank\Mediable\Media;
 use Plank\Mediable\MediaUploader;
 use Plank\Mediable\Facades\MediaUploader as Facade;
-use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
 use Plank\Mediable\Tests\Mocks\MediaSubclass;
 use Plank\Mediable\Tests\TestCase;
 use stdClass;
@@ -45,7 +44,6 @@ class MediaUploaderTest extends TestCase
         $uploader2->setAllowedAggregateTypes(['archive']);
 
         $config = $this->getPrivateProperty($uploader1, 'config');
-        $config->setAccessible(true);
         $this->assertNotEquals(
             $config->getValue($uploader1),
             $config->getValue($uploader2)
@@ -417,7 +415,7 @@ class MediaUploaderTest extends TestCase
 
         $this->seedFileForMedia($media, fopen(TestCase::sampleFilePath(), 'r'));
 
-        $creaetdAt = $media->created_at;
+        $createdAt = $media->created_at;
         $updatedAt = $media->updated_at;
         sleep(1); // required to check the update time is different
 
@@ -426,7 +424,7 @@ class MediaUploaderTest extends TestCase
             ->toDestination('tmp', '')->upload();
 
         $media = $media->fresh();
-        $this->assertEquals($media->created_at, $creaetdAt);
+        $this->assertEquals($media->created_at, $createdAt);
         $this->assertNotEquals($media->updated_at, $updatedAt);
         $this->assertEquals($media->getKey(), $result->getKey());
         $this->assertEquals('image', $media->aggregate_type);

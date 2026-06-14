@@ -34,64 +34,27 @@ class MediaUploader
 
     private ImageManipulator $imageManipulator;
 
-    private array $config;
+    private MediaUploaderConfiguration $config;
 
     private SourceAdapterInterface $source;
-
-    private ?string $disk = null;
-
-    /**
-     * Path relative to the filesystem disk root.
-     */
-    private string $directory = '';
-
-    /**
-     * Name of the new file.
-     */
-    private ?string $filename = null;
-
-    /**
-     * If true the contents hash of the source will be used as the filename.
-     */
-    private ?string $hashFilenameAlgo = null;
-
-    /**
-     * Visibility for the new file
-     */
-    private ?string $visibility = null;
-
-    /**
-     * Callable allowing to alter the model before save.
-     * @var callable
-     */
-    private $before_save;
-
-    /**
-     * Additional options to pass to the filesystem while uploading
-     */
-    private array $options = [];
-
-    private ?string $alt = null;
-
-    private array $expectedHashes = [];
 
     /**
      * Constructor.
      * @param FilesystemManager $filesystem
      * @param SourceAdapterFactory $factory
-     * @param array|null $config
+     * @param ImageManipulator $imageManipulator
+     * @param MediaUploaderConfiguration $configuration
      */
     public function __construct(
         FileSystemManager $filesystem,
         SourceAdapterFactory $factory,
         ImageManipulator $imageManipulator,
-        ?array $config = null
+        MediaUploaderConfiguration $configuration
     ) {
         $this->filesystem = $filesystem;
         $this->factory = $factory;
         $this->imageManipulator = $imageManipulator;
-        $this->config = $config ?: config('mediable', []);
-        $this->config['on_duplicate'] = OnDuplicateBehaviour::from($this->config['on_duplicate']);
+        $this->config = $configuration;
     }
 
     /**
@@ -147,7 +110,7 @@ class MediaUploader
      */
     public function toDisk(string $disk): self
     {
-        $this->disk = $this->verifyDisk($disk);
+        $this->config->destinationDisk = $this->verifyDisk($disk);
 
         return $this;
     }
@@ -159,7 +122,7 @@ class MediaUploader
      */
     public function toDirectory(string $directory): self
     {
-        $this->directory = File::sanitizePath($directory);
+        $this->config->destinationDirectory = File::sanitizePath($directory);
 
         return $this;
     }
@@ -171,19 +134,19 @@ class MediaUploader
      */
     public function useFilename(string $filename): self
     {
-        $this->filename = File::sanitizeFilename(
+        $this->config->destinationFilename = File::sanitizeFilename(
             $filename,
             null,
-            $this->config['forbidden_extensions']
+            $this->config->forbiddenExtensions
         );
-        $this->hashFilenameAlgo = null;
+        $this->config->hashFilenameAlgorithm = null;
 
         return $this;
     }
 
     public function withAltAttribute(string $alt): self
     {
-        $this->alt = $alt;
+        $this->config->fileAlternativeText = $alt;
         return $this;
     }
 
@@ -194,8 +157,8 @@ class MediaUploader
      */
     public function useHashForFilename(string $algo = 'md5'): self
     {
-        $this->hashFilenameAlgo = $algo;
-        $this->filename = null;
+        $this->config->hashFilenameAlgorithm = $algo;
+        $this->config->destinationFilename = null;
 
         return $this;
     }
@@ -206,8 +169,8 @@ class MediaUploader
      */
     public function useOriginalFilename(): self
     {
-        $this->filename = null;
-        $this->hashFilenameAlgo = null;
+        $this->config->destinationFilename = null;
+        $this->config->hashFilenameAlgorithm = null;
 
         return $this;
     }
@@ -223,7 +186,7 @@ class MediaUploader
         if (!is_subclass_of($class, Media::class)) {
             throw ConfigurationException::cannotSetModel($class);
         }
-        $this->config['model'] = $class;
+        $this->config->modelClass = $class;
 
         return $this;
     }
@@ -235,7 +198,7 @@ class MediaUploader
      */
     public function setMaximumSize(int $size): self
     {
-        $this->config['max_size'] = $size;
+        $this->config->maxUploadSize = $size;
 
         return $this;
     }
@@ -247,7 +210,7 @@ class MediaUploader
      */
     public function setOnDuplicateBehavior(OnDuplicateBehaviour $behavior): self
     {
-        $this->config['on_duplicate'] = $behavior;
+        $this->config->onDuplicate = $behavior;
 
         return $this;
     }
@@ -259,7 +222,7 @@ class MediaUploader
      */
     public function getOnDuplicateBehavior(): OnDuplicateBehaviour
     {
-        return $this->config['on_duplicate'];
+        return $this->config->onDuplicate;
     }
 
     /**
@@ -327,7 +290,7 @@ class MediaUploader
      */
     public function setStrictTypeChecking(bool $strict): self
     {
-        $this->config['strict_type_checking'] = $strict;
+        $this->config->strictTypeChecking = $strict;
 
         return $this;
     }
@@ -339,7 +302,7 @@ class MediaUploader
      */
     public function setAllowUnrecognizedTypes(bool $allow): self
     {
-        $this->config['allow_unrecognized_types'] = $allow;
+        $this->config->allowUnrecognizedTypes = $allow;
 
         return $this;
     }
@@ -353,7 +316,7 @@ class MediaUploader
      */
     public function setTypeDefinition(string $type, array $mimeTypes, array $extensions): self
     {
-        $this->config['aggregate_types'][$type] = [
+        $this->config->definedAggregateTypes[$type] = [
             'mime_types' => array_map('strtolower', $mimeTypes),
             'extensions' => array_map('strtolower', $extensions),
         ];
@@ -368,14 +331,14 @@ class MediaUploader
      */
     public function setAllowedMimeTypes(array $allowedMimes): self
     {
-        $this->config['allowed_mime_types'] = array_map('strtolower', $allowedMimes);
+        $this->config->allowedMimeTypes = array_map('strtolower', $allowedMimes);
 
         return $this;
     }
 
     public function setForbiddenMimeTypes(array $forbiddenMimes): self
     {
-        $this->config['forbidden_mime_types'] = array_map('strtolower', $forbiddenMimes);
+        $this->config->forbiddenMimeTypes = array_map('strtolower', $forbiddenMimes);
 
         return $this;
     }
@@ -387,7 +350,7 @@ class MediaUploader
      */
     public function preferClientMimeType(): self
     {
-        $this->config['prefer_client_mime_type'] = true;
+        $this->config->preferClientMimeType = true;
 
         return $this;
     }
@@ -399,7 +362,7 @@ class MediaUploader
      */
     public function preferInferredMimeType(): self
     {
-        $this->config['prefer_client_mime_type'] = false;
+        $this->config->preferClientMimeType = false;
 
         return $this;
     }
@@ -411,14 +374,14 @@ class MediaUploader
      */
     public function setAllowedExtensions(array $allowedExtensions): self
     {
-        $this->config['allowed_extensions'] = array_map('strtolower', $allowedExtensions);
+        $this->config->allowedExtensions = array_map('strtolower', $allowedExtensions);
 
         return $this;
     }
 
     public function setForbiddenExtensions(array $forbiddenExtensions): self
     {
-        $this->config['forbidden_extensions'] = array_map('strtolower', $forbiddenExtensions);
+        $this->config->forbiddenExtensions = array_map('strtolower', $forbiddenExtensions);
 
         return $this;
     }
@@ -430,7 +393,7 @@ class MediaUploader
      */
     public function setAllowedAggregateTypes(array $allowedTypes): self
     {
-        $this->config['allowed_aggregate_types'] = $allowedTypes;
+        $this->config->allowedAggregateTypes = $allowedTypes;
 
         return $this;
     }
@@ -445,7 +408,7 @@ class MediaUploader
      */
     public function validateHash(?string $expectedHash, string $algo = 'md5'): self
     {
-        $this->expectedHashes[$algo] = $expectedHash;
+        $this->config->expectedHashes[$algo] = $expectedHash;
         return $this;
     }
 
@@ -455,7 +418,7 @@ class MediaUploader
      */
     public function makePublic(): self
     {
-        $this->visibility = Filesystem::VISIBILITY_PUBLIC;
+        $this->config->fileVisibility = Filesystem::VISIBILITY_PUBLIC;
         return $this;
     }
 
@@ -465,18 +428,18 @@ class MediaUploader
      */
     public function makePrivate(): self
     {
-        $this->visibility = Filesystem::VISIBILITY_PRIVATE;
+        $this->config->fileVisibility = Filesystem::VISIBILITY_PRIVATE;
         return $this;
     }
 
     public function getVisibility(): string
     {
-        if ($this->visibility) {
-            return $this->visibility;
+        if ($this->config->fileVisibility) {
+            return $this->config->fileVisibility;
         }
 
         return config(
-            'filesystems.disks.'.$this->disk.'.visibility',
+            'filesystems.disks.'.$this->config->destinationDisk.'.visibility',
             Filesystem::VISIBILITY_PUBLIC
         );
     }
@@ -497,7 +460,7 @@ class MediaUploader
         if (is_string($imageManipulation)) {
             $imageManipulation = $this->imageManipulator->getVariantDefinition($imageManipulation);
         }
-        $this->config['image_manipulation'] = $imageManipulation;
+        $this->config->imageManipulation = $imageManipulation;
         return $this;
     }
 
@@ -508,7 +471,7 @@ class MediaUploader
      */
     public function withOptions(array $options): self
     {
-        $this->options = $options;
+        $this->config->filesystemOptions = $options;
         return $this;
     }
 
@@ -525,7 +488,7 @@ class MediaUploader
     {
         $mimeType = strtolower($mimeType);
         $extension = strtolower($extension);
-        $allowedTypes = $this->config['allowed_aggregate_types'] ?? [];
+        $allowedTypes = $this->config->allowedAggregateTypes;
         $typesForMime = $this->possibleAggregateTypesForMimeType($mimeType);
         $typesForExtension = $this->possibleAggregateTypesForExtension($extension);
 
@@ -538,12 +501,12 @@ class MediaUploader
         if (count($intersection)) {
             $type = $intersection[0];
         } elseif (empty($typesForMime) && empty($typesForExtension)) {
-            if (!$this->config['allow_unrecognized_types'] ?? false) {
+            if (!$this->config->allowUnrecognizedTypes) {
                 throw FileNotSupportedException::unrecognizedFileType($mimeType, $extension);
             }
             $type = Media::TYPE_OTHER;
         } else {
-            if ($this->config['strict_type_checking'] ?? false) {
+            if ($this->config->strictTypeChecking) {
                 throw FileNotSupportedException::strictTypeMismatch($mimeType, $extension);
             }
             $merged = array_merge($typesForMime, $typesForExtension);
@@ -565,7 +528,7 @@ class MediaUploader
     public function possibleAggregateTypesForMimeType(string $mime): array
     {
         $types = [];
-        foreach ($this->config['aggregate_types'] ?? [] as $type => $attributes) {
+        foreach ($this->config->definedAggregateTypes as $type => $attributes) {
             if (in_array($mime, $attributes['mime_types'])) {
                 $types[] = $type;
             }
@@ -582,7 +545,7 @@ class MediaUploader
     public function possibleAggregateTypesForExtension(string $extension): array
     {
         $types = [];
-        foreach ($this->config['aggregate_types'] ?? [] as $type => $attributes) {
+        foreach ($this->config->definedAggregateTypes ?? [] as $type => $attributes) {
             if (in_array($extension, $attributes['extensions'])) {
                 $types[] = $type;
             }
@@ -613,8 +576,8 @@ class MediaUploader
         $this->sanitizeFile($model);
         $this->manipulateImage($model);
 
-        if (is_callable($this->before_save)) {
-            call_user_func($this->before_save, $model, $this->source);
+        if ($this->config->beforeSaveCallback) {
+            call_user_func($this->config->beforeSaveCallback, $model, $this->source);
         }
 
         $this->verifyDestination($model);
@@ -641,15 +604,15 @@ class MediaUploader
      */
     public function replace(Media $media): Media
     {
-        if (!$this->disk) {
+        if (!$this->config->destinationDisk) {
             $this->toDisk($media->disk);
         }
 
-        if (!$this->directory) {
+        if (!$this->config->destinationDirectory) {
             $this->toDirectory($media->directory);
         }
 
-        if (!$this->filename) {
+        if (!$this->config->destinationFilename) {
             $this->useFilename($media->filename);
         }
 
@@ -661,9 +624,10 @@ class MediaUploader
         $model = $this->populateModel($media);
         $this->sanitizeFile($model);
 
-        if (is_callable($this->before_save)) {
-            call_user_func($this->before_save, $model, $this->source);
+        if ($this->config->beforeSaveCallback) {
+            call_user_func($this->config->beforeSaveCallback, $model, $this->source);
         }
+
 
         $this->verifyDestination($model);
         // Delete original file, if necessary
@@ -695,12 +659,12 @@ class MediaUploader
         );
         $model->aggregate_type = $this->inferAggregateType($model->mime_type, $model->extension);
 
-        $model->disk = $this->disk ?: $this->config['default_disk'];
-        $model->directory = $this->directory;
+        $model->disk = $this->config->destinationDisk ?? $this->config->defaultDisk;
+        $model->directory = $this->config->destinationDirectory;
         $model->filename = $this->generateFilename();
 
-        if ($this->alt) {
-            $model->alt = $this->alt;
+        if ($this->config->fileAlternativeText) {
+            $model->alt = $this->config->fileAlternativeText;
         }
 
         return $model;
@@ -708,12 +672,12 @@ class MediaUploader
 
     /**
      * Set the before save callback
-     * @param callable $callable
+     * @param \Closure $callable
      * @return $this
      */
-    public function beforeSave(callable $callable): self
+    public function beforeSave(\Closure $callable): self
     {
-        $this->before_save = $callable;
+        $this->config->beforeSaveCallback = $callable;
         return $this;
     }
 
@@ -775,16 +739,16 @@ class MediaUploader
         $model->aggregate_type = $this->inferAggregateType($model->mime_type, $model->extension);
         $model->size = $this->verifyFileSize($storage->size($model->getDiskPath()));
 
-        if ($this->visibility) {
-            $storage->setVisibility($model->getDiskPath(), $this->visibility);
+        if ($this->config->fileVisibility) {
+            $storage->setVisibility($model->getDiskPath(), $this->config->fileVisibility);
         }
 
-        if ($this->alt) {
-            $model->alt = $this->alt;
+        if ($this->config->fileAlternativeText) {
+            $model->alt = $this->config->fileAlternativeText;
         }
 
-        if (is_callable($this->before_save)) {
-            call_user_func($this->before_save, $model, $this->source);
+        if ($this->config->beforeSaveCallback) {
+            call_user_func($this->config->beforeSaveCallback, $model, $this->source);
         }
 
         $model->save();
@@ -811,8 +775,8 @@ class MediaUploader
         );
         $media->aggregate_type = $this->inferAggregateType($media->mime_type, $media->extension);
 
-        if ($this->alt) {
-            $media->alt = $this->alt;
+        if ($this->config->fileAlternativeText) {
+            $media->alt = $this->config->fileAlternativeText;
         }
 
         if ($dirty = $media->isDirty()) {
@@ -851,7 +815,7 @@ class MediaUploader
      */
     private function makeModel(): Media
     {
-        $class = $this->config['model'] ?? Media::class;
+        $class = $this->config->modelClass;
 
         return new $class;
     }
@@ -869,7 +833,7 @@ class MediaUploader
             throw ConfigurationException::diskNotFound($disk);
         }
 
-        if (!in_array($disk, $this->config['allowed_disks'] ?? [])) {
+        if (!in_array($disk, $this->config->allowedDisks)) {
             throw ForbiddenException::diskNotAllowed($disk);
         }
 
@@ -880,7 +844,6 @@ class MediaUploader
      * Ensure that a valid source has been provided.
      * @return void
      * @throws ConfigurationException If no source is provided
-     * @throws FileNotFoundException If the source is invalid
      */
     private function verifySource(): void
     {
@@ -906,7 +869,7 @@ class MediaUploader
 
     private function selectMimeType(): string
     {
-        if ($this->config['prefer_client_mime_type'] ?? false) {
+        if ($this->config->preferClientMimeType) {
             return $this->source->clientMimeType() ?? $this->source->mimeType();
         }
         return $this->source->mimeType();
@@ -921,8 +884,8 @@ class MediaUploader
     private function verifyMimeType(string $mimeType): string
     {
         $mimeType = strtolower($mimeType);
-        $allowed = $this->config['allowed_mime_types'] ?? [];
-        $forbidden = $this->config['forbidden_mime_types'] ?? [];
+        $allowed = $this->config->allowedMimeTypes;
+        $forbidden = $this->config->forbiddenMimeTypes;
         $actuallyAllowed = array_diff($allowed, $forbidden);
         if (!empty($allowed) && !in_array($mimeType, $actuallyAllowed)) {
             throw FileNotSupportedException::mimeRestricted($mimeType, $actuallyAllowed);
@@ -944,8 +907,8 @@ class MediaUploader
     private function verifyExtension(string $extension, bool $toLower = true): string
     {
         $extensionLower = strtolower($extension);
-        $allowed = $this->config['allowed_extensions'] ?? [];
-        $forbidden = $this->config['forbidden_extensions'] ?? [];
+        $allowed = $this->config->allowedExtensions;
+        $forbidden = $this->config->forbiddenExtensions;
         $actuallyAllowed = array_diff($allowed, $forbidden);
         if (!empty($allowed) && !in_array($extensionLower, $actuallyAllowed)) {
             throw FileNotSupportedException::extensionRestricted($extensionLower, $actuallyAllowed);
@@ -965,7 +928,7 @@ class MediaUploader
      */
     private function verifyFileSize(int $size): int
     {
-        $max = $this->config['max_size'] ?? 0;
+        $max = $this->config->maxUploadSize;
         if ($max > 0 && $size > $max) {
             throw FileSizeException::fileIsTooBig($size, $max);
         }
@@ -975,7 +938,7 @@ class MediaUploader
 
     private function verifyHashes(): void
     {
-        foreach ($this->expectedHashes as $algo => $expectedHash) {
+        foreach ($this->config->expectedHashes as $algo => $expectedHash) {
             if ($expectedHash === null) {
                 return;
             }
@@ -1016,7 +979,7 @@ class MediaUploader
      */
     private function handleDuplicate(Media $model): Media
     {
-        switch ($this->config['on_duplicate'] ?? OnDuplicateBehaviour::Increment) {
+        switch ($this->config->onDuplicate) {
             case OnDuplicateBehaviour::Error:
                 throw FileExistsException::fileExists($model->getDiskPath());
             case OnDuplicateBehaviour::Replace:
@@ -1107,12 +1070,12 @@ class MediaUploader
      */
     private function generateFilename(): string
     {
-        if ($this->filename) {
-            return $this->filename;
+        if ($this->config->destinationFilename) {
+            return $this->config->destinationFilename;
         }
 
-        if ($this->hashFilenameAlgo) {
-            return $this->source->hash($this->hashFilenameAlgo);
+        if ($this->config->hashFilenameAlgorithm) {
+            return $this->source->hash($this->config->hashFilenameAlgorithm);
         }
 
         $filename = $this->source->filename();
@@ -1124,7 +1087,7 @@ class MediaUploader
         return File::sanitizeFileName(
             $filename,
             null,
-            $this->config['forbidden_extensions']
+            $this->config->forbiddenExtensions
         );
     }
 
@@ -1140,7 +1103,7 @@ class MediaUploader
 
     public function getOptions(): array
     {
-        $options = $this->options;
+        $options = $this->config->filesystemOptions;
         if (!isset($options['visibility'])) {
             $options['visibility'] = $this->getVisibility();
         }
@@ -1149,10 +1112,10 @@ class MediaUploader
 
     public function sanitizeFile(Media $model): void
     {
-        if (empty($this->config['file_sanitizers'])) {
+        if (empty($this->config->fileSanitizers)) {
             return;
         }
-        foreach ($this->config['file_sanitizers'] as $sanitizerClass) {
+        foreach ($this->config->fileSanitizers as $sanitizerClass) {
             if (!is_a($sanitizerClass, SanitizerInterface::class, true)) {
                 throw ConfigurationException::invalidSanitizer($sanitizerClass);
             }
@@ -1179,12 +1142,12 @@ class MediaUploader
      */
     public function manipulateImage(Media $model): void
     {
-        if (empty($this->config['image_manipulation'])
+        if (empty($this->config->imageManipulation)
             || $model->aggregate_type !== Media::TYPE_IMAGE
         ) {
             return;
         }
-        $manipulation = $this->config['image_manipulation'];
+        $manipulation = $this->config->imageManipulation;
         $this->source = $this->imageManipulator->manipulateUpload(
             $model,
             $this->source,
