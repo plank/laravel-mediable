@@ -5,6 +5,7 @@ namespace Plank\Mediable;
 
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemManager;
+use Illuminate\Support\Arr;
 use League\Flysystem\UnableToRetrieveMetadata;
 use Plank\Mediable\Enum\OnDuplicateBehaviour;
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
@@ -499,7 +500,7 @@ class MediaUploader
         }
 
         if (count($intersection)) {
-            $type = $intersection[0];
+            $type = Arr::first($intersection);
         } elseif (empty($typesForMime) && empty($typesForExtension)) {
             if (!$this->config->allowUnrecognizedTypes) {
                 throw FileNotSupportedException::unrecognizedFileType($mimeType, $extension);
