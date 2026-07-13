@@ -1,5 +1,22 @@
 # Upgrading
 
+## 6.x to 7.x
+
+**This is a security release, Upgrading is strongly recommended.**
+
+This version adds a number of more robust security defaults to the package to minimize the risk of exploits due to common server misconfigurations. Most of these changes should not negatively affect most installations, but workarounds are available for use cases which specifically use more dangerous workflows.
+
+* [Optional] review the new configuration fields in [config/mediable.php](https://github.com/plank/laravel-mediable/blob/master/config/mediable.php). It is recommended to copy them to your own config file. Consider populating new configs, as applicable for the types of files supported by your applications.
+* [Medium] `MediaUploader::beforeSave()` now accepts a `\Closure` instead of a `callable` for better static analysis and type safety. If calling this method with a callable that is not a closure, you will need to wrap it in a closure using `\Closure::fromCallable()`.
+* [Medium] The `MediaUploader` constructor now accepts an instance of `MediaUploaderConfiguration` instead of an array of configuration values. If you are instantiating the `MediaUploader` class directly, you will need to update your code to use the new constructor signature. The `MediaUploaderConfiguration::fromConfig()` method replicates the default behaviour.
+* [Low] MediaUploader::ON_DUPLICATE_* constants have been moved to an `Plank\Mediable\Enum\OnDuplicateBehaviour` enum. If accessing these constants directly, you will need to update your code to use the enum instead.
+* [Low] `MediaUploader` now supports whitelisting remote URL hosts, and will now automatically block hostnames mapping to internal IP addresses if not whitelisted. If you allow uploading files from URL strings, and those URL strings map to local IP addresses, you must whitelist the hostnames that you want to allow by adding the `mediable.allowed_remote_hosts` config value to your `config/mediable.php` file. If you always import from the same set of remote hosts, populating this config value is also recommended, but optional.
+* [Low] `MediuaUploader` will now restrict remote URL HTTP schemes to `https` only by default. If you allow uploading files from URL strings, and those URL strings use HTTP schemes other than `https`, you must whitelist the allowed schemes by adding the `mediable.allowed_remote_schemes` config value to your `config/mediable.php` file.
+* [Low] `MediaUploader` will now automatically strip executable javascript from SVG files to avoid stored XSS. If you have a use case where you need to allow executable javascript in SVG files, you can disable this behavior by setting the `mediable.allow_svg_javascript` config value to `true` in your `config/mediable.php` file.
+* [Low] `MediaUploader` will now automatically block files with commonly executable file extensions from being uploaded. If you allow uploading files with any of affected extensions from trusted sources and/or can confirm that your server configuration does not make these files executable, you can allow them by editing the `mediable.forbidden_file_extensions` configuration and/or apply the `MediaUploader::setForbiddenExtensions()` fluent setter.
+* [Low] `MediaUploader` will now automatically strip all period (`.`) characters from filenames (except for the extension separator) to avoid a number of exploits due to common server misconfigurations. No workaround is provided.
+
+
 ## 5.x to 6.x
 
 * Minimum PHP version moved to 8.1

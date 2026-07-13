@@ -27,7 +27,8 @@
         "league/flysystem": "^3.29.1",
         "symfony/http-foundation": "^6.0.3|^7.2|^8.0",
         "symfony/mime": "^6.0|^7.2|^8.0",
-        "spatie/image-optimizer": "^1.8"
+        "spatie/image-optimizer": "^1.8",
+        "enshrined/svg-sanitize": "^0.22.0"
     },
     "require-dev": {
         "aws/aws-sdk-php": "^3.340.0",

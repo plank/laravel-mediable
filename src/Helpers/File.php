@@ -33,14 +33,17 @@ class File
     public static function sanitizePath(string $path, ?string $language = null): string
     {
         $language = $language ?: App::currentLocale();
-        return trim(
-            preg_replace(
-                '/[^a-zA-Z0-9-_\/.%]+/',
-                '-',
-                Str::ascii($path, $language)
-            ),
-            DIRECTORY_SEPARATOR . '-'
-        );
+        $ascii    = Str::ascii($path, $language);
+        $ascii    = str_replace('\\', '/', $ascii);
+        $segments = explode('/', $ascii);
+        $safe     = [];
+        foreach ($segments as $segment) {
+            if ($segment === '..' || $segment === '.' || $segment === '') {
+                continue;
+            }
+            $safe[] = trim(preg_replace('/[^a-zA-Z0-9\-_%]+/', '-', $segment), '-');
+        }
+        return implode('/', array_filter($safe));
     }
 
     /**
@@ -48,17 +51,25 @@ class File
      * @param  string $file
      * @return string
      */
-    public static function sanitizeFileName(string $file, ?string $language = null): string
-    {
+    public static function sanitizeFileName(
+        string $file,
+        ?string $language = null,
+        ?array $forbiddenExtensions = null
+    ): string {
         $language = $language ?: App::currentLocale();
-        return trim(
-            preg_replace(
-                '/[^a-zA-Z0-9\-_.%]+/',
-                '-',
-                Str::ascii($file, $language)
-            ),
-            '-'
-        );
+        $forbiddenExtensions = $forbiddenExtensions ?? config('mediable.forbidden_file_extensions');
+        $pattern = "/[^a-zA-Z0-9\-_.%]+/";
+        if (!empty($forbiddenExtensions)) {
+            $forbiddenExtensions = array_map(
+                fn (string $ext) => preg_replace('[^a-z0-9]', '', strtolower($ext)),
+                $forbiddenExtensions
+            );
+            $forbiddenExtensions = implode('|', $forbiddenExtensions);
+            $pattern = "/[^a-zA-Z0-9\-_.%]+|\.(?=$forbiddenExtensions)/i";
+        }
+
+        $filename = preg_replace($pattern, '-', Str::ascii($file, $language));
+        return trim($filename, '-');
     }
 
     /**

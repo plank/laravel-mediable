@@ -34,6 +34,11 @@ class FileTest extends TestCase
             'hello-world-what-ss_new-with.you',
             File::sanitizeFileName("héllo/world! \\  \t whàt\'ß_new with.you?", 'en')
         );
+
+        $this->assertEquals(
+            'script-php.txt',
+            File::sanitizeFileName('script.php.txt', null, ['php'])
+        );
     }
 
     public function test_it_sanitizes_filenames_with_locale(): void
@@ -47,9 +52,13 @@ class FileTest extends TestCase
     public function test_it_sanitizes_paths(): void
     {
         $this->assertEquals(
-            'hello/world-what-s_new-with.you',
-            File::sanitizePath("/héllo/world! \\  \t whàt\'ς_new with.you??")
+            'hello/world/what-s_new-with-you',
+            File::sanitizePath("/héllo/world! \\  \t whàt'ς_new with.you??")
         );
+        $this->assertEquals('bar-jpg', File::sanitizePath('./bar.jpg'));
+        $this->assertEquals('bar', File::sanitizePath('../bar'));
+        $this->assertEquals('foo/env', File::sanitizePath('/foo/../../../.env'));
+        $this->assertEquals('foo/bar', File::sanitizePath('/foo/// //bar'));
     }
 
     public function test_it_joins_path_components(): void

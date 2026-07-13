@@ -39,16 +39,12 @@ return [
      */
     'max_size' => 1024 * 1024 * 10,
 
-    /*
+    /**
      * What to do if a duplicate file is uploaded.
      *
-     * Options include:
-     *
-     * * `'increment'`: the new file's name is given an incrementing suffix
-     * * `'replace'` : the old file and media model is deleted
-     * * `'error'`: an Exception is thrown
+     * @see Plank\Mediable\Enum\OnDuplicateBehaviour for options
      */
-    'on_duplicate' => Plank\Mediable\MediaUploader::ON_DUPLICATE_INCREMENT,
+    'on_duplicate' => 'increment',
 
     /*
      * Reject files unless both their mime and extension are recognized and both match a single aggregate type
@@ -61,7 +57,7 @@ return [
      */
     'allow_unrecognized_types' => false,
 
-    /**
+    /*
      * Prefer the client-provided MIME type over the one inferred from the file contents, if provided
      * May be slightly faster to compute, but is not guaranteed to be accurate if the source is untrusted
      */
@@ -69,18 +65,75 @@ return [
 
     /*
      * Only allow files with specific MIME type(s) to be uploaded
+     * If blank, all MIME types will be allowed, unless it is forbidden by the `forbidden_mime_types` config
      */
     'allowed_mime_types' => [],
 
     /*
+     * Reject files with specific MIME types from being uploaded
+     */
+    'forbidden_mime_types' => [],
+
+    /*
      * Only allow files with specific file extension(s) to be uploaded
+     * If blank, all file extensions will be allowed, unless it is forbidden by the `forbidden_extensions` config
      */
     'allowed_extensions' => [],
+
+    /*
+     * Reject files with specific file extensions from being uploaded
+     * This is intended to be used as a security measure to prevent potentially executable files from being uploaded to public drives.
+     * This list should include any file extension which is configured to be executable from your Apache or Nginx configuration
+     *
+     * These extensions are also sanitized if nested in destination filenames (script.php.jpg becomes script-php.jpg) to protect against
+     * common Apache `AddHandler` and Nginx `fastcgi_split_path_info` misconfigurations
+     */
+    'forbidden_extensions' => [
+        'php',
+        'php3',
+        'php4',
+        'php5',
+        'php6',
+        'php7',
+        'php8',
+        'phtml',
+        'phar',
+        'phpt',
+        'pgif',
+        'shtml',
+        'shtm',
+        'stm',
+        'pl',
+        'cgi',
+        'py',
+        'asp',
+        'aspx',
+        'ashx',
+        'jsp',
+        'jspx',
+        'cfm',
+        'cfml',
+        'htaccess',
+        'htpasswd',
+    ],
 
     /*
      * Only allow files matching specific aggregate type(s) to be uploaded
      */
     'allowed_aggregate_types' => [],
+
+    /*
+     * Only allow remote files to be imported from specific host(s)
+     * If empty, will allow any host that is not a private IP address or localhost
+     */
+    'allowed_remote_hosts' => [],
+
+    /*
+     * Only allow remote files to be imported from URLs with specific scheme(s)
+     * If empty, will allow any scheme supported by the application.
+     * If modifying this value, be sure to also update the pattern matching in `source_adapters` as well
+     */
+    'allowed_remote_schemes' => ['https'],
 
     /*
      * List of aggregate types recognized by the application
@@ -253,6 +306,15 @@ return [
      * Use this if you are renaming the published migrations and want to prevent them from being loaded twice.
      */
     'ignore_migrations' => false,
+
+    /**
+     * List of file sanitizers to apply to uploaded files before they are stored
+     * Used to apply security measures to prevent malicious files from being uploaded,
+     * e.g. stripping executable javascript from SVGs
+     */
+    'file_sanitizers' => [
+        Plank\Mediable\FileSanitizers\SvgSanitizer::class,
+    ],
 
     /**
      * Configuration for image optimization

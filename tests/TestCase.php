@@ -191,9 +191,24 @@ class TestCase extends BaseTestCase
         return realpath(__DIR__ . '/_data/plank2.png');
     }
 
+    protected static function insecureSvgPath(): string
+    {
+        return realpath(__DIR__ . '/_data/insecure.svg');
+    }
+
+    protected static function cleanedSvgPath(): string
+    {
+        return realpath(__DIR__ . '/_data/cleaned.svg');
+    }
+
     protected static function remoteFilePath(): string
     {
         return 'https://raw.githubusercontent.com/plank/laravel-mediable/master/tests/_data/plank.png';
+    }
+
+    protected static function remoteHost(): string
+    {
+        return parse_url(self::remoteFilePath(), PHP_URL_HOST);
     }
 
     protected function sampleFile()

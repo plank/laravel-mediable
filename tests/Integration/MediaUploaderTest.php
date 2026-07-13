@@ -4,6 +4,7 @@ namespace Plank\Mediable\Tests\Integration;
 
 use GuzzleHttp\Psr7\Utils;
 use Intervention\Image\Image;
+use Plank\Mediable\Enum\OnDuplicateBehaviour;
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
 use Plank\Mediable\Exceptions\MediaUpload\FileExistsException;
 use Plank\Mediable\Exceptions\MediaUpload\FileNotFoundException;
@@ -16,7 +17,6 @@ use Plank\Mediable\ImageManipulator;
 use Plank\Mediable\Media;
 use Plank\Mediable\MediaUploader;
 use Plank\Mediable\Facades\MediaUploader as Facade;
-use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
 use Plank\Mediable\Tests\Mocks\MediaSubclass;
 use Plank\Mediable\Tests\TestCase;
 use stdClass;
@@ -44,7 +44,6 @@ class MediaUploaderTest extends TestCase
         $uploader2->setAllowedAggregateTypes(['archive']);
 
         $config = $this->getPrivateProperty($uploader1, 'config');
-        $config->setAccessible(true);
         $this->assertNotEquals(
             $config->getValue($uploader1),
             $config->getValue($uploader2)
@@ -61,31 +60,31 @@ class MediaUploaderTest extends TestCase
     {
         $uploader = Facade::onDuplicateError();
         $this->assertEquals(
-            MediaUploader::ON_DUPLICATE_ERROR,
+            OnDuplicateBehaviour::Error,
             $uploader->getOnDuplicateBehavior()
         );
 
         $uploader = Facade::onDuplicateIncrement();
         $this->assertEquals(
-            MediaUploader::ON_DUPLICATE_INCREMENT,
+            OnDuplicateBehaviour::Increment,
             $uploader->getOnDuplicateBehavior()
         );
 
         $uploader = Facade::onDuplicateReplace();
         $this->assertEquals(
-            MediaUploader::ON_DUPLICATE_REPLACE,
+            OnDuplicateBehaviour::Replace,
             $uploader->getOnDuplicateBehavior()
         );
 
         $uploader = Facade::onDuplicateReplaceWithVariants();
         $this->assertEquals(
-            MediaUploader::ON_DUPLICATE_REPLACE_WITH_VARIANTS,
+            OnDuplicateBehaviour::ReplaceWithVariants,
             $uploader->getOnDuplicateBehavior()
         );
 
         $uploader = Facade::onDuplicateUpdate();
         $this->assertEquals(
-            MediaUploader::ON_DUPLICATE_UPDATE,
+            OnDuplicateBehaviour::Update,
             $uploader->getOnDuplicateBehavior()
         );
     }
@@ -292,7 +291,7 @@ class MediaUploaderTest extends TestCase
     public function test_it_can_error_on_duplicate_files(): void
     {
         $uploader = $this->getUploader();
-        $uploader->setOnDuplicateBehavior(MediaUploader::ON_DUPLICATE_ERROR);
+        $uploader->onDuplicateError();
         $method = $this->getPrivateMethod($uploader, 'handleDuplicate');
         $this->expectException(FileExistsException::class);
         $method->invoke($uploader, new Media);
@@ -416,7 +415,7 @@ class MediaUploaderTest extends TestCase
 
         $this->seedFileForMedia($media, fopen(TestCase::sampleFilePath(), 'r'));
 
-        $creaetdAt = $media->created_at;
+        $createdAt = $media->created_at;
         $updatedAt = $media->updated_at;
         sleep(1); // required to check the update time is different
 
@@ -425,7 +424,7 @@ class MediaUploaderTest extends TestCase
             ->toDestination('tmp', '')->upload();
 
         $media = $media->fresh();
-        $this->assertEquals($media->created_at, $creaetdAt);
+        $this->assertEquals($media->created_at, $createdAt);
         $this->assertNotEquals($media->updated_at, $updatedAt);
         $this->assertEquals($media->getKey(), $result->getKey());
         $this->assertEquals('image', $media->aggregate_type);
@@ -900,6 +899,45 @@ class MediaUploaderTest extends TestCase
             ->validateHash('3ef5e70366086147c2695325d79a25cc', 'md5')
             ->validateHash('abcdefabcdef', 'sha1')
             ->upload();
+    }
+
+    public function test_it_sanitizes_files(): void
+    {
+        $this->useDatabase();
+        $this->useFilesystem('tmp');
+
+        $media = Facade::fromSource($this->insecureSvgPath())
+            ->toDestination('tmp', 'foo')
+            ->useFilename('bar')
+            ->upload();
+
+        $this->assertInstanceOf(Media::class, $media);
+        $this->assertTrue($media->fileExists());
+        $this->assertEquals('tmp', $media->disk);
+        $this->assertEquals('foo/bar.svg', $media->getDiskPath());
+        $this->assertEquals('image/svg+xml', $media->mime_type);
+        $this->assertEquals(
+            file_get_contents($this->cleanedSvgPath()),
+            file_get_contents($media->getAbsolutePath())
+        );
+    }
+
+    public function test_it_forbids_mime_types(): void
+    {
+        $uploader = $this->getUploader();
+        $uploader->setForbiddenMimeTypes(['text/plain']);
+        $uploader->fromString("foo");
+        $this->expectException(FileNotSupportedException::class);
+        $uploader->upload();
+    }
+
+    public function test_it_forbids_extensions(): void
+    {
+        $uploader = $this->getUploader();
+        $uploader->setForbiddenMimeTypes(['image/png']);
+        $uploader->fromSource($this->sampleFilePath());
+        $this->expectException(FileNotSupportedException::class);
+        $uploader->upload();
     }
 
     protected function getUploader(): MediaUploader
