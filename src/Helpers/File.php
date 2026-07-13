@@ -61,7 +61,7 @@ class File
         $pattern = "/[^a-zA-Z0-9\-_.%]+/";
         if (!empty($forbiddenExtensions)) {
             $forbiddenExtensions = array_map(
-                fn(string $ext) => preg_replace('[^a-z0-9]', '', strtolower($ext)),
+                fn (string $ext) => preg_replace('[^a-z0-9]', '', strtolower($ext)),
                 $forbiddenExtensions
             );
             $forbiddenExtensions = implode('|', $forbiddenExtensions);

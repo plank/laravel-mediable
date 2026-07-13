@@ -9,7 +9,6 @@ use Plank\Mediable\Tests\TestCase;
 
 class RemoteUrlAdapterTest extends TestCase
 {
-
     public function test_it_restricts_url_schema_with_no_restriction(): void
     {
         config()->set('mediable.allowed_remote_schemes', []);
@@ -79,7 +78,7 @@ class RemoteUrlAdapterTest extends TestCase
         );
     }
 
-    static public function privateHostProvider(): array
+    public static function privateHostProvider(): array
     {
         return [
             'localhost' => ['https://localhost/image.jpg'],

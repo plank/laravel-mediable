@@ -127,7 +127,6 @@ class MediaUploaderConfiguration
         $this->imageManipulation = null;
         $this->onDuplicate = OnDuplicateBehaviour::tryFrom($config['on_duplicate'] ?? 'increment')
             ?? OnDuplicateBehaviour::Increment;
-
     }
 
     public static function fromConfig(): self
