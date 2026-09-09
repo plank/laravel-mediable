@@ -103,4 +103,35 @@ class RemoteUrlAdapterTest extends TestCase
 
         new RemoteUrlAdapter($privateHost);
     }
+
+    public function test_it_validates_hostname_on_redirects()
+    {
+        $this->expectException(ConfigurationException::class);
+        $this->expectExceptionMessage(
+            'Remote URL host is not in the allowlist.'
+        );
+        config()->set('mediable.max_remote_url_redirects', 1);
+        config()->set('mediable.allowed_remote_hosts', ['httpbin.org']);
+        new RemoteUrlAdapter('https://httpbin.org/redirect-to?url=https://evil.com/foo');
+    }
+
+    public function test_it_validates_ip_range_on_redirects()
+    {
+        $this->expectException(ConfigurationException::class);
+        $this->expectExceptionMessage(
+            'Private IP ranges are not permitted for remote URLs.'
+        );
+        config()->set('mediable.max_remote_url_redirects', 1);
+        new RemoteUrlAdapter('https://httpbin.org/redirect-to?url=https://localhost/image.jpg');
+    }
+
+    public function test_it_limits_redirects()
+    {
+        $this->expectException(ConfigurationException::class);
+        $this->expectExceptionMessage(
+            'Too many redirects for a remote URL.'
+        );
+        config()->set('mediable.max_remote_url_redirects', 2);
+        new RemoteUrlAdapter('https://httpbin.org/redirect/3');
+    }
 }
