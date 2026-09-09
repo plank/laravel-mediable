@@ -136,6 +136,18 @@ return [
     'allowed_remote_schemes' => ['https'],
 
     /*
+     * Whether allowed_remote_hosts, allowed_remote_schemes, and private IP address
+     * validation should be applied to each step of a redirect chain
+     */
+    'validate_remote_url_redirects' => true,
+
+    /*
+     * Maximum number of redirects permitted for remote URLs
+     * Only applied if validate_remote_url_redirects is enabled
+     */
+    'max_remote_url_redirects' => 5,
+
+    /*
      * List of aggregate types recognized by the application
      *
      * Each type should list the MIME types and extensions
