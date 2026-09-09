@@ -39,7 +39,7 @@ class MediaUploaderConfiguration
      * @var list<string>
      */
     public array $allowedDisks;
-    public string $destinationDisk;
+    public ?string $destinationDisk;
     public string $defaultDisk;
 
     /**
@@ -116,7 +116,7 @@ class MediaUploaderConfiguration
         $this->preferClientMimeType = $config['prefer_client_mime_type'] ?? false;
 
         $this->allowedDisks = $config['allowed_disks'] ?? [];
-        $this->destinationDisk = $config['destination_disk'] ?? '';
+        $this->destinationDisk = $config['destination_disk'] ?? null;
         $this->defaultDisk = $config['default_disk'] ?? '';
         $this->destinationDirectory = $config['destination_directory'] ?? '';
         $this->destinationFilename = $config['destination_filename'] ?? null;

@@ -439,8 +439,10 @@ class MediaUploader
             return $this->config->fileVisibility;
         }
 
+        $disk = $this->config->destinationDisk ?? $this->config->defaultDisk;
+
         return config(
-            'filesystems.disks.'.$this->config->destinationDisk.'.visibility',
+            'filesystems.disks.'.$disk.'.visibility',
             Filesystem::VISIBILITY_PUBLIC
         );
     }
