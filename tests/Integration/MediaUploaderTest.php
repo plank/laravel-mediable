@@ -209,6 +209,16 @@ class MediaUploaderTest extends TestCase
         $uploader->toDisk('foo');
     }
 
+    public function test_it_uses_default_disk(): void
+    {
+        $this->useDatabase();
+        config()->set('mediable.default_disk', 'tmp');
+        $uploader = $this->getUploader();
+        $media = $uploader->fromSource(TestCase::sampleFilePath())
+            ->upload();
+        $this->assertSame('tmp', $media->disk);
+    }
+
     public function test_it_can_change_model_class(): void
     {
         $uploader = $this->getUploader();
