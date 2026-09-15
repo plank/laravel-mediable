@@ -97,6 +97,7 @@ return [
         'php7',
         'php8',
         'phtml',
+        'pht',
         'phar',
         'phpt',
         'pgif',
