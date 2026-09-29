@@ -6,6 +6,7 @@
 * Remote URL validation is now applied to each step in a redirect chain to protect against some forms of Server-Side Request Forgery (SSRF) attacks. This behaviour can be disabled by setting the `mediable.validate_remote_url_redirects` config to `false`.
 * Added `mediable.max_remote_url_redirects` config, which limits the number of redirects that will be followed when `mediable.validate_remote_url_redirects` is enabled. If the limit is exceeded, an exception will be thrown.
 * Fix a bug which caused `MediaUploader` to throw an exception when depending on the configured `mediable.default_disk`
+* Added support for Guzzle 8, along with its `guzzlehttp/psr7` 3.x and `guzzlehttp/promises` 3.x dependency stack. Guzzle 7 remains supported.
 
 ## 7.0.0
 
