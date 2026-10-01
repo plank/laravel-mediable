@@ -2,11 +2,19 @@
 
 ## 7.1.0
 
+* Added support for Guzzle 8, along with its `guzzlehttp/psr7` 3.x and `guzzlehttp/promises` 3.x dependency stack. Guzzle 7 remains supported.
+* Removed inconsistently named config key `mediable.forbidden_file_extensions`. All usage is now aligned to us `mediable.forbidden_extensions` naming.
+
+## 7.0.2
+
+* Disallow .PHT files by default
+
+## 7.0.1
+
 **This is a security release, upgrading is strongly recommended**
 * Remote URL validation is now applied to each step in a redirect chain to protect against some forms of Server-Side Request Forgery (SSRF) attacks. This behaviour can be disabled by setting the `mediable.validate_remote_url_redirects` config to `false`.
 * Added `mediable.max_remote_url_redirects` config, which limits the number of redirects that will be followed when `mediable.validate_remote_url_redirects` is enabled. If the limit is exceeded, an exception will be thrown.
 * Fix a bug which caused `MediaUploader` to throw an exception when depending on the configured `mediable.default_disk`
-* Added support for Guzzle 8, along with its `guzzlehttp/psr7` 3.x and `guzzlehttp/promises` 3.x dependency stack. Guzzle 7 remains supported.
 
 ## 7.0.0
 
@@ -17,7 +25,7 @@
 * Directory validation will now strip `.` characters from path segments. This prevents attackers from using directory traversal patterns like `../`  as well as preventing potential issues with certain filesystems where `.` characters in directory names may cause unexpected behaviour. [CVE-2026-49970]
 * Added `mediable.file_sanitizers` configuration which allows specifying custom sanitizers for rewriting file contents to strip out security risks before they are uploaded. A sanitizer must implements the `Plank\Mediable\Sanitizers\SanitizerInterface` interface.
 * Added `SvgSanitizer` which will strip executable javascript and other untrusted content from `image/svg+xml` files, which can result in stored XSS if rendered directly to a webpage. By default, this sanitizer is applied to all uploaded SVG files. It can be disabled by removing it from the `mediable.sanitizers` config array. [CVE-2026-49971]
-* Added `mediable.forbidden_file_extensions` configuration and `MediaUploader::setForbiddenExtensions()` which allows specifying a blacklist of file extensions that are forbidden to be uploaded. Any file extension which is considered executable by your Apache or Nginx configuration should be included in this list. A number of common executable file extensions are included in this list by default to prevent remote code execution exploits.
+* Added `mediable.forbidden_extensions` configuration and `MediaUploader::setForbiddenExtensions()` which allows specifying a blacklist of file extensions that are forbidden to be uploaded. Any file extension which is considered executable by your Apache or Nginx configuration should be included in this list. A number of common executable file extensions are included in this list by default to prevent remote code execution exploits.
 * In addition, forbidden file extensions are now sanitized if they are nested within destination filenames (e.g. `script.php.jpg` becomes `script-php.jpg`). This prevents remote code execution from double extension bypass due to common Apache and Nginx misconfigurations
 * Added `mediable.forbidden_mime_types` configuration and `MediaUploader::setForbiddenMimeTypes()` which allows specifying a blacklist of MIME types that are forbidden to be uploaded.
 * MediaUploader::ON_DUPLICATE_* constants have been moved to an `Plank\Mediable\Enum\OnDuplicateBehaviour` enum.

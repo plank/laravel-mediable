@@ -57,7 +57,7 @@ class File
         ?array $forbiddenExtensions = null
     ): string {
         $language = $language ?: App::currentLocale();
-        $forbiddenExtensions = $forbiddenExtensions ?? config('mediable.forbidden_file_extensions');
+        $forbiddenExtensions = $forbiddenExtensions ?? config('mediable.forbidden_extensions');
         $pattern = "/[^a-zA-Z0-9\-_.%]+/";
         if (!empty($forbiddenExtensions)) {
             $forbiddenExtensions = array_map(
