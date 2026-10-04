@@ -1,5 +1,11 @@
 # Changelog
 
+## 7.1.1
+
+* Disallow .INI, .ACA, .CER files by default
+* Sanitize leading dots in filenames, to protect against exploits by uploading dotfiles.
+* Correct error handling for missing filenames, if not provided and cannot be inferred
+
 ## 7.1.0
 
 * Added support for Guzzle 8, along with its `guzzlehttp/psr7` 3.x and `guzzlehttp/promises` 3.x dependency stack. Guzzle 7 remains supported.

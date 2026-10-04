@@ -950,6 +950,17 @@ class MediaUploaderTest extends TestCase
         $uploader->upload();
     }
 
+    public function test_it_forbids_empty_filenames(): void
+    {
+        $uploader = $this->getUploader();
+        $uploader->fromString('foo');
+        $uploader->toDisk('tmp');
+        $uploader->useFilename('');
+        $this->expectException(ConfigurationException::class);
+        $this->expectExceptionMessage("No filename is provided and cannot infer filename from the provided source.");
+        $uploader->upload();
+    }
+
     protected function getUploader(): MediaUploader
     {
         return app('mediable.uploader');
