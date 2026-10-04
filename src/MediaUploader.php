@@ -1083,15 +1083,22 @@ class MediaUploader
 
         $filename = $this->source->filename();
 
+
         if ($filename === null) {
-            ConfigurationException::cannotInferFilename();
+            throw ConfigurationException::cannotInferFilename();
         }
 
-        return File::sanitizeFileName(
+        $filename = File::sanitizeFileName(
             $filename,
             null,
             $this->config->forbiddenExtensions
         );
+
+        if ($filename === '') {
+            throw ConfigurationException::cannotInferFilename();
+        }
+
+        return $filename;
     }
 
     private function writeToDisk(Media $model): void

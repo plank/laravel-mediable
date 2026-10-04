@@ -116,6 +116,9 @@ return [
         'cfml',
         'htaccess',
         'htpasswd',
+        'ini',
+        'cer',
+        'asa',
     ],
 
     /*

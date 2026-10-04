@@ -69,7 +69,7 @@ class File
         }
 
         $filename = preg_replace($pattern, '-', Str::ascii($file, $language));
-        return trim($filename, '-');
+        return trim(trim($filename, '-'), '.');
     }
 
     /**

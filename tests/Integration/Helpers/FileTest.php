@@ -41,6 +41,14 @@ class FileTest extends TestCase
         );
     }
 
+    public function test_it_forbids_leading_dot(): void
+    {
+        $this->assertEquals(
+            'env',
+            File::sanitizeFileName(".env", 'en')
+        );
+    }
+
     public function test_it_sanitizes_filenames_with_locale(): void
     {
         $this->assertEquals(

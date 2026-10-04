@@ -201,6 +201,11 @@ class TestCase extends BaseTestCase
         return realpath(__DIR__ . '/_data/cleaned.svg');
     }
 
+    protected static function dotfilePath(): string
+    {
+        return realpath(__DIR__ . '/_data/.env');
+    }
+
     protected static function remoteFilePath(): string
     {
         return 'https://raw.githubusercontent.com/plank/laravel-mediable/master/tests/_data/plank.png';
