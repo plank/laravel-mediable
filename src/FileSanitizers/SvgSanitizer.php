@@ -14,7 +14,7 @@ class SvgSanitizer implements SanitizerInterface
         string $extension,
         string $aggregateType
     ): bool {
-        return $mimeType === 'image/svg+xml';
+        return $mimeType === 'image/svg+xml' || $extension === 'svg';
     }
 
     public function sanitize(StreamInterface $source): ?StreamInterface

@@ -13,6 +13,8 @@ class SvgSanitizerTest extends TestCase
     {
         $sanitizer = new SvgSanitizer();
         $this->assertTrue($sanitizer->isApplicable('image/svg+xml', 'svg', Media::TYPE_IMAGE_VECTOR));
+        $this->assertTrue($sanitizer->isApplicable('image/svg+xml', 'txt', Media::TYPE_IMAGE_VECTOR));
+        $this->assertTrue($sanitizer->isApplicable('text/plain', 'svg', Media::TYPE_OTHER));
         $this->assertFalse($sanitizer->isApplicable('image/jpeg', 'jpg', Media::TYPE_IMAGE));
     }
 
