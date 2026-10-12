@@ -1,5 +1,13 @@
 # Changelog
 
+## 7.1.3
+
+Apply default SVG sanitizer even if mime check fails
+
+## 7.1.2
+
+* Add support for `enshrined/svg-sanitize:^1.0`
+
 ## 7.1.1
 
 * Disallow .INI, .ACA, .CER files by default
