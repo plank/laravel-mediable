@@ -17,6 +17,7 @@ use Plank\Mediable\ImageManipulator;
 use Plank\Mediable\Media;
 use Plank\Mediable\MediaUploader;
 use Plank\Mediable\Facades\MediaUploader as Facade;
+use Plank\Mediable\SourceAdapters\SourceAdapterInterface;
 use Plank\Mediable\Tests\Mocks\MediaSubclass;
 use Plank\Mediable\Tests\TestCase;
 use stdClass;
@@ -944,8 +945,20 @@ class MediaUploaderTest extends TestCase
     public function test_it_forbids_extensions(): void
     {
         $uploader = $this->getUploader();
-        $uploader->setForbiddenMimeTypes(['image/png']);
+        $uploader->setForbiddenExtensions(['png']);
         $uploader->fromSource($this->sampleFilePath());
+        $this->expectException(FileNotSupportedException::class);
+        $uploader->upload();
+    }
+
+    public function test_it_forbids_extensions_trimmed(): void
+    {
+        $source = $this->createMock(SourceAdapterInterface::class);
+        $source->method('extension')->willReturn(' png ');
+
+        $uploader = $this->getUploader();
+        $uploader->setForbiddenExtensions(['png']);
+        $uploader->fromSource($source);
         $this->expectException(FileNotSupportedException::class);
         $uploader->upload();
     }
