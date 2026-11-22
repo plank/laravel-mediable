@@ -152,6 +152,12 @@ return [
     'max_remote_url_redirects' => 5,
 
     /*
+     * Maximum socket timeout in seconds for remote URL connections (float)
+     * If null, uses PHP's default_socket_timeout INI value
+     */
+    'remote_url_timeout' => null,
+
+    /*
      * List of aggregate types recognized by the application
      *
      * Each type should list the MIME types and extensions

@@ -5,6 +5,8 @@ namespace Plank\Mediable\SourceAdapters;
 
 use GuzzleHttp\Psr7\Utils;
 use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
+use Plank\Mediable\Helpers\Stream;
+use Psr\Http\Message\StreamInterface;
 
 /**
  * URL Adapter.
@@ -13,15 +15,14 @@ use Plank\Mediable\Exceptions\MediaUpload\ConfigurationException;
  */
 class RemoteUrlAdapter extends StreamAdapter
 {
+    private Stream $streamHelper;
     protected string $url;
 
     public function __construct(string $source)
     {
-        $this->validateUrl($source, config('mediable.max_remote_url_redirects'));
         $this->url = $source;
         try {
-            $resource = Utils::tryFopen($source, 'rb');
-            $stream = Utils::streamFor($resource);
+            $stream = $this->connect($source, config('mediable.max_remote_url_redirects'));
         } catch (\RuntimeException $e) {
             throw ConfigurationException::invalidSource(
                 "Failed to connect to URL: {$e->getMessage()}",
@@ -33,7 +34,91 @@ class RemoteUrlAdapter extends StreamAdapter
         );
     }
 
-    private function validateUrl(string $url, int $maxRedirects): void
+    private function connect(string $url, int $maxRedirects): StreamInterface
+    {
+        if (config('mediable.validate_remote_url_redirects', true)) {
+            return $this->walkRedirects($url, $maxRedirects);
+        }
+
+        // validate initial URL then blindly follow redirects
+        $this->validateUrl($url);
+        return Utils::streamFor(Utils::tryFopen($url, 'rb'));
+    }
+
+    private function walkRedirects(string $url, int $maxRedirects): StreamInterface
+    {
+        $this->validateUrl($url);
+
+        $options = [
+            'http' => [
+                'method' => 'GET',
+                'max_redirects' => 0,     // Stop PHP from following Location headers
+                'ignore_errors' => true,  // Keep the stream open on 3xx/4xx/5xx responses
+            ],
+        ];
+        $timeout = config('mediable.remote_url_timeout');
+        if ($timeout !== null) {
+            $options['http']['timeout'] = (float) $timeout;
+        }
+        $context = stream_context_create($options);
+        $handle = Stream::tryFopen($url, 'rb', false, $context);
+
+        if (!$handle) {
+            throw ConfigurationException::invalidSource(
+                "Failed to connect to URL: failed to connect to remote resource."
+            );
+        }
+        // Inspect response headers (including the 'Location' header if redirected)
+        $headers = stream_get_meta_data($handle)['wrapper_data'] ?? [];
+
+        // extract status code
+        preg_match('/HTTP\/\S+\s+(\d{3})/', $headers[0] ?? '', $matches);
+        $statusCode = isset($matches[1]) ? (int)$matches[1] : null;
+
+        // handle error codes
+        if ($statusCode >= 400) {
+            fclose($handle);
+            throw ConfigurationException::invalidSource(
+                "Failed to connect to URL: received $statusCode response code."
+            );
+        }
+
+        // Handle redirect codes (301, 302, 303, 307, 308)
+        if ($statusCode >= 300) {
+            fclose($handle);
+            // 2. Find the Location header (case-insensitive)
+            $redirectUrl = null;
+            foreach ($headers as $header) {
+                if (stripos($header, 'Location:') === 0) {
+                    $redirectUrl = trim(substr($header, 9));
+                    break;
+                }
+            }
+            if (empty($redirectUrl)) {
+                throw ConfigurationException::invalidSource(
+                    "Failed to connect to URL: remote URL received $statusCode response code, but no Location header."
+                );
+            }
+            if ($maxRedirects < 1) {
+                throw ConfigurationException::invalidSource(
+                    'Too many redirects for a remote URL.'
+                );
+            }
+            // Resolve relative paths if the redirect header isn't an absolute URL
+            if (!str_contains($redirectUrl, '://')) {
+                $parts = parse_url($url);
+                $redirectUrl = $parts['scheme'] . '://' . $parts['host'] . '/' . ltrim(
+                    $redirectUrl,
+                    '/'
+                );
+            }
+            return $this->walkRedirects($redirectUrl, $maxRedirects - 1);
+        }
+
+        return Utils::streamFor($handle);
+    }
+
+    private function validateUrl(string $url): void
     {
         $allowedSchemes = (array) config('mediable.allowed_remote_schemes', ['https']);
         $parsed = parse_url($url);
@@ -77,42 +162,6 @@ class RemoteUrlAdapter extends StreamAdapter
                 throw ConfigurationException::invalidSource(
                     'Private IP ranges are not permitted for remote URLs.'
                 );
-            }
-        }
-
-        if (config('mediable.validate_remote_url_redirects', true)) {
-            // Make a header-only request to check for a redirect
-            $ch = curl_init($url);
-            curl_setopt($ch, CURLOPT_NOBODY, true); // HEAD (headers only)
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt(
-                $ch,
-                CURLOPT_FOLLOWLOCATION,
-                false
-            ); // DO NOT follow automatically
-            curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-            curl_exec($ch);
-
-            $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            $redirectUrl = curl_getinfo($ch, CURLINFO_REDIRECT_URL);
-            curl_close($ch);
-
-            // Handle redirect codes (301, 302, 303, 307, 308)
-            if ($statusCode >= 300 && $statusCode < 400 && !empty($redirectUrl)) {
-                if ($maxRedirects < 1) {
-                    throw ConfigurationException::invalidSource(
-                        'Too many redirects for a remote URL.'
-                    );
-                }
-                // Resolve relative paths if the redirect header isn't an absolute URL
-                if (!str_contains($redirectUrl, '://')) {
-                    $parts = parse_url($url);
-                    $redirectUrl = $parts['scheme'] . '://' . $parts['host'] . '/' . ltrim(
-                        $redirectUrl,
-                        '/'
-                    );
-                }
-                $this->validateUrl($redirectUrl, $maxRedirects - 1);
             }
         }
     }
