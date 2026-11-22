@@ -886,7 +886,7 @@ class MediaUploader
      */
     private function verifyMimeType(string $mimeType): string
     {
-        $mimeType = strtolower($mimeType);
+        $mimeType = trim(strtolower($mimeType));
         $allowed = $this->config->allowedMimeTypes;
         $forbidden = $this->config->forbiddenMimeTypes;
         $actuallyAllowed = array_diff($allowed, $forbidden);
@@ -909,7 +909,7 @@ class MediaUploader
      */
     private function verifyExtension(string $extension, bool $toLower = true): string
     {
-        $extensionLower = strtolower($extension);
+        $extensionLower = trim(strtolower($extension));
         $allowed = $this->config->allowedExtensions;
         $forbidden = $this->config->forbiddenExtensions;
         $actuallyAllowed = array_diff($allowed, $forbidden);

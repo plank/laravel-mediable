@@ -1,5 +1,9 @@
 # Changelog
 
+## 7.2.1
+
+* Trim MIME types and extensions before validation to avoid issues where whitespace could in result in misidentification against allow list or forbidden lists.
+
 ## 7.2.0
 
 * Added `mediable.remote_url_timeout` config, which configures the socket timeout for remote URL connections. Defaults to using PHP's `default_socket_timeout` INI value.
