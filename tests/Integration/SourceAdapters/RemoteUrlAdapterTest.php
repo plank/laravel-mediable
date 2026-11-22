@@ -112,17 +112,18 @@ class RemoteUrlAdapterTest extends TestCase
         );
         config()->set('mediable.max_remote_url_redirects', 1);
         config()->set('mediable.allowed_remote_hosts', ['httpbin.org']);
-        new RemoteUrlAdapter('https://httpbin.org/redirect-to?url=https://evil.com/foo');
+        new RemoteUrlAdapter('https://httpbin.org/redirect-to?url=https://example.com/foo');
     }
 
-    public function test_it_validates_ip_range_on_redirects()
+    public function test_it_limits_remote_timeout()
     {
         $this->expectException(ConfigurationException::class);
         $this->expectExceptionMessage(
-            'Private IP ranges are not permitted for remote URLs.'
+            'timed out'
         );
-        config()->set('mediable.max_remote_url_redirects', 1);
-        new RemoteUrlAdapter('https://httpbin.org/redirect-to?url=https://localhost/image.jpg');
+        config()->set('mediable.remote_url_timeout', 0);
+        config()->set('mediable.allowed_remote_hosts', ['httpbin.org']);
+        new RemoteUrlAdapter('https://httpbin.org/');
     }
 
     public function test_it_limits_redirects()

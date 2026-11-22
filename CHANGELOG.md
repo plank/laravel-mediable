@@ -1,8 +1,13 @@
 # Changelog
 
+## 7.2.0
+
+* Added `mediable.remote_url_timeout` config, which configures the socket timeout for remote URL connections. Defaults to using PHP's `default_socket_timeout` INI value.
+* Reworked the implementation of the `mediable.validate_remote_url_redirects` setting. Will now validate for redirects and establish a stream from the same connection.
+
 ## 7.1.3
 
-Apply default SVG sanitizer even if mime check fails
+* Apply default SVG sanitizer even if mime check fails
 
 ## 7.1.2
 
